@@ -30,6 +30,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.dataset.DatasetVariable;
+import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
@@ -181,19 +182,39 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable) {
 		this.studyValidator.validate(studyId, true);
+
 		final Integer variableId = datasetVariable.getVariableId();
 		final StandardVariable traitVariable =
 			this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
 
-		final String alias = datasetVariable.getStudyAlias() != null ? datasetVariable.getStudyAlias() : traitVariable.getName();
+		final String alias = this.getAlias(datasetVariable, traitVariable);
 		final VariableType type = VariableType.getById(datasetVariable.getVariableTypeId());
 		this.middlewareDatasetService.addDatasetVariable(datasetId, variableId, type, alias);
+
 		final MeasurementVariable measurementVariable = this.measurementVariableTransformer.transform(traitVariable, false);
 		measurementVariable.setName(alias);
 		measurementVariable.setVariableType(type);
 		measurementVariable.setRequired(false);
 		return measurementVariable;
+	}
 
+	@Override
+	public void addDatasetVariables(final Integer studyId, final Integer datasetId,
+		final List<DatasetVariable> datasetVariables) {
+		this.studyValidator.validate(studyId, true);
+
+		datasetVariables.forEach(datasetVariable -> {
+			final StandardVariable traitVariable =
+				this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
+			final String alias = this.getAlias(datasetVariable, traitVariable);
+
+			this.middlewareDatasetService.addDatasetVariable(datasetId, datasetVariable.getVariableId(),
+				VariableType.getById(datasetVariable.getVariableTypeId()), this.getAlias(datasetVariable, traitVariable));
+		});
+	}
+
+	private String getAlias(final DatasetVariable datasetVariable, final StandardVariable traitVariable) {
+		return datasetVariable.getStudyAlias() != null ? datasetVariable.getStudyAlias() : traitVariable.getName();
 	}
 
 	@Override

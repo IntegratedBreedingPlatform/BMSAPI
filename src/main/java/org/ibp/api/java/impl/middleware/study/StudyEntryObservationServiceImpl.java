@@ -72,7 +72,6 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	public Integer updateObservation(final Integer studyId, final StockPropertyData stockPropertyData) {
 		this.commonValidations(studyId, stockPropertyData, false);
 		this.validateStudyEntryVariableShouldExist(stockPropertyData.getStockId(), stockPropertyData.getVariableId());
-
 		this.setCategoricalValueId(stockPropertyData);
 		return this.studyEntryObservationService.updateObservation(stockPropertyData);
 	}
@@ -101,7 +100,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	private void validateValue(final String value) {
 		if (value.length() > VALUE_MAX_LENGTH) {
 			this.errors.reject("study.entry.observation.invalid.length", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
@@ -153,15 +152,16 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 			this.ontologyVariableDataManager.getVariable(null, variableId, false);
 		if (variable == null) {
 			this.errors.reject("study.entry.invalid.variable", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		return variable;
 	}
 
 	private void validateVariableDataTypeValue(final Variable variable, final String value) {
 		if (!VariableValueUtil.isValidAttributeValue(variable, value)) {
-			this.errors.reject("invalid.variable.value", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("invalid.variable.value.with.param", new String[] {
+				"variable: " + variable.getName() + ", value: " + value}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 
@@ -173,7 +173,8 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		}
 
 		if (!stockProperty.getStock().getProject().getProjectId().equals(studyId)) {
-			this.errors.reject("study.entry.observation.must.belong.to.study", new String[] {String.valueOf(observationId), String.valueOf(studyId)}, "");
+			this.errors.reject("study.entry.observation.must.belong.to.study",
+				new String[] {String.valueOf(observationId), String.valueOf(studyId)}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		return stockProperty;
@@ -190,7 +191,7 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		final DataSet dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
 		if (this.studyDataManager.countExperiments(dataSet.getId()) > 0) {
 			this.errors.reject("study.entry.observation.cannot.create-or-edit", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 

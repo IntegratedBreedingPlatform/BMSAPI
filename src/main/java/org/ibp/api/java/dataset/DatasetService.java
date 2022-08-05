@@ -11,6 +11,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
+import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.rest.dataset.DatasetDTO;
@@ -80,6 +81,8 @@ public interface DatasetService {
 	 * @return A measurement variable.
 	 */
 	MeasurementVariable addDatasetVariable(Integer studyId, Integer datasetId, DatasetVariable datasetVariable);
+
+	void addDatasetVariables(Integer studyId, Integer datasetId, List<DatasetVariable> datasetVariable);
 
 	/**
 	 * Get the list of dataset variables of an specific variable type

@@ -7,8 +7,8 @@ import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateReq
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
-import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.domain.study.StudyEntryDetailsImportRequest;
 import org.ibp.api.java.study.StudyEntryService;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -20,8 +20,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 public class StudyEntryResourceTest extends ApiUnitTestBase {
 
@@ -41,14 +39,15 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 		newDto.setGid(newGid);
 
 		final StudyEntryDto dto = new StudyEntryDto(newEntryId, 6, newGid, RandomStringUtils.randomAlphabetic(20));
-		dto.getProperties().put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
+		dto.getProperties().put(TermId.ENTRY_TYPE.getId(),
+			new StudyEntryPropertyData(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
 		Mockito.doNothing().when(this.studyEntryService).replaceStudyEntry(studyId, entryId, newDto);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}",
-				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, entryId)
-			.content(this.convertObjectToByte(newDto))
-			.contentType(this.contentType))
+				.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}",
+					CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId, entryId)
+				.content(this.convertObjectToByte(newDto))
+				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 	}
@@ -68,9 +67,9 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 		Mockito.doNothing().when(this.studyEntryService).createStudyEntries(studyId, listId);
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation?listId=" + listId,
-				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
-			.contentType(this.contentType))
+				.post("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation?listId=" + listId,
+					CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
 
@@ -83,9 +82,9 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 		final int studyId = random.nextInt();
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.delete("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries",
-				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
-			.contentType(this.contentType))
+				.delete("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries",
+					CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -100,13 +99,46 @@ public class StudyEntryResourceTest extends ApiUnitTestBase {
 		final StudyEntryPropertyBatchUpdateRequest requestDto = new StudyEntryPropertyBatchUpdateRequest();
 
 		this.mockMvc.perform(MockMvcRequestBuilders
-			.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/properties",
-				CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
-			.content(this.convertObjectToByte(requestDto))
-			.contentType(this.contentType))
+				.put("/crops/{cropname}/programs/{programUUID}/studies/{studyId}/entries/properties",
+					CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+				.content(this.convertObjectToByte(requestDto))
+				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isNoContent());
 
 	}
 
+	@Test
+	public void testGetVariables() throws Exception {
+
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int variableTypeId = random.nextInt();
+
+		this.mockMvc.perform(MockMvcRequestBuilders
+				.get("/crops/{cropName}/programs/{programUUID}/studies/{studyId}/entries/variables?variableTypeId=" + variableTypeId,
+					CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+
+	}
+
+	@Test
+	public void testImportStudyEntryDetails() throws Exception {
+
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+
+		final StudyEntryDetailsImportRequest requestDto = new StudyEntryDetailsImportRequest();
+
+		this.mockMvc.perform(MockMvcRequestBuilders
+				.post("/crops/{cropName}/programs/{programUUID}/studies/{studyId}/entries/import",
+					CropType.CropEnum.MAIZE.name().toLowerCase(), this.programUuid, studyId)
+				.content(this.convertObjectToByte(requestDto))
+				.contentType(this.contentType))
+			.andDo(MockMvcResultHandlers.print())
+			.andExpect(MockMvcResultMatchers.status().isOk());
+
+	}
 }

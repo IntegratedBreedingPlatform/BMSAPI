@@ -133,6 +133,17 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		}
 	}
 
+	public org.generationcp.middleware.domain.ontology.VariableType validateVariableTypeId(final Integer variableTypeId,
+		final Errors errors) {
+		final org.generationcp.middleware.domain.ontology.VariableType type =
+			org.generationcp.middleware.domain.ontology.VariableType.getById(variableTypeId);
+		if (type == null) {
+			this.addCustomError(errors, "variableTypes", BaseValidator.INVALID_TYPE_ID, new Object[] {VariableValidator.VARIABLE_TYPE});
+		}
+
+		return type;
+	}
+
 	private boolean nameValidationProcessor(final VariableDetails variable, final Errors errors) {
 
 		final Integer initialCount = errors.getErrorCount();
@@ -446,11 +457,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 		boolean isTrait = false;
 
 		for (final VariableType variableType : variable.getVariableTypes()) {
-			final org.generationcp.middleware.domain.ontology.VariableType type =
-				org.generationcp.middleware.domain.ontology.VariableType.getById(this.parseVariableTypeAsInteger(variableType));
-			if (type == null) {
-				this.addCustomError(errors, "variableTypes", BaseValidator.INVALID_TYPE_ID, new Object[] {VariableValidator.VARIABLE_TYPE});
-			} else if (type.equals(org.generationcp.middleware.domain.ontology.VariableType.TRAIT)) {
+			if (org.generationcp.middleware.domain.ontology.VariableType.TRAIT.equals(
+				this.validateVariableTypeId(this.parseVariableTypeAsInteger(variableType), errors))) {
 				isTrait = true;
 			}
 		}

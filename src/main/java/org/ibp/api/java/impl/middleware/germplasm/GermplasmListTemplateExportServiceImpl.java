@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import com.google.common.io.Files;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -34,8 +35,9 @@ import java.util.Map;
 @Service
 public class GermplasmListTemplateExportServiceImpl implements GermplasmListTemplateExportService {
 
-	private static final String FILE_NAME_IMPORT = "GermplasmListImportTemplate_";
-	private static final String FILE_NAME_IMPORT_UPDATE = "GermplasmListImportUpdateTemplate_";
+	private static final String DEFAULT_FILE_NAME_PREFIX = "GermplasmList";
+	private static final String FILE_NAME_IMPORT = "ImportTemplate_";
+	private static final String FILE_NAME_IMPORT_UPDATE = "ImportUpdateTemplate_";
 	private static final String FILE_NAME_EXTENSION = ".xls";
 	private static final int COLUMN_WIDTH_PADDING = 6;
 	private static final int CHARACTER_WIDTH = 250;
@@ -72,10 +74,11 @@ public class GermplasmListTemplateExportServiceImpl implements GermplasmListTemp
 	protected OntologyVariableSheetGenerator ontologyVariableSheetGenerator;
 
 	@Override
-	public File export(final String cropName, final String programUUID, final boolean isGermplasmListUpdateFormat) {
+	public File export(final String cropName, final String programUUID, final boolean isGermplasmListUpdateFormat, final String fileNamePrefix) {
 		try {
 			final File temporaryFolder = Files.createTempDir();
-			final String filename = isGermplasmListUpdateFormat ? GermplasmListTemplateExportServiceImpl.FILE_NAME_IMPORT_UPDATE :
+			String filename = StringUtils.isEmpty(fileNamePrefix) ? DEFAULT_FILE_NAME_PREFIX : fileNamePrefix ;
+			filename += isGermplasmListUpdateFormat ? GermplasmListTemplateExportServiceImpl.FILE_NAME_IMPORT_UPDATE :
 				GermplasmListTemplateExportServiceImpl.FILE_NAME_IMPORT;
 			final String fileNameFullPath =	temporaryFolder.getAbsolutePath() + File.separator + filename + cropName.toLowerCase()
 				+ GermplasmListTemplateExportServiceImpl.FILE_NAME_EXTENSION;

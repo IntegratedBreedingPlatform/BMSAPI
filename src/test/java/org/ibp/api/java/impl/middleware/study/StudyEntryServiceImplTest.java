@@ -10,14 +10,19 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntryGeneratorRequestDto;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
+import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.hamcrest.collection.IsIn;
+import org.ibp.api.domain.dataset.DatasetVariable;
+import org.ibp.api.domain.study.StudyEntryDetailsImportRequest;
+import org.ibp.api.domain.study.StudyEntryDetailsValueMap;
 import org.ibp.api.java.entrytype.EntryTypeService;
 import org.ibp.api.java.impl.middleware.common.validator.EntryTypeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
@@ -35,6 +40,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
@@ -76,7 +82,10 @@ public class StudyEntryServiceImplTest {
 	private StudyEntryService middlewareStudyEntryService;
 
 	@Mock
-	private DatasetService datasetService;
+	private DatasetService mwDatasetService;
+
+	@Mock
+	private org.ibp.api.java.dataset.DatasetService datasetService;
 
 	@Mock
 	private GermplasmDataManager germplasmDataManager;
@@ -120,7 +129,8 @@ public class StudyEntryServiceImplTest {
 
 		Mockito.when(this.searchRequestDtoResolver.resolveGidSearchDto(searchCompositeDto)).thenReturn(gids);
 
-		Mockito.doNothing().when(this.middlewareStudyEntryService).saveStudyEntries(studyId, gids, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+		Mockito.doNothing().when(this.middlewareStudyEntryService)
+			.saveStudyEntries(studyId, gids, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 
 		this.studyEntryService.createStudyEntries(studyId, studyEntryGeneratorRequestDto);
 
@@ -129,7 +139,8 @@ public class StudyEntryServiceImplTest {
 		Mockito.verify(this.searchCompositeDtoValidator)
 			.validateSearchCompositeDto(ArgumentMatchers.eq(searchCompositeDto), ArgumentMatchers.any(BindingResult.class));
 		Mockito.verify(this.germplasmValidator).validateGids(ArgumentMatchers.any(BindingResult.class), ArgumentMatchers.eq(gids));
-		Mockito.verify(this.middlewareStudyEntryService).saveStudyEntries(studyId, gids, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+		Mockito.verify(this.middlewareStudyEntryService)
+			.saveStudyEntries(studyId, gids, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 
 		Mockito.verifyNoMoreInteractions(this.studyValidator);
 		Mockito.verifyNoMoreInteractions(this.entryTypeValidator);
@@ -169,24 +180,25 @@ public class StudyEntryServiceImplTest {
 		final Long nonReplicatedEntriesCount = Long.valueOf(3);
 
 		Mockito.when(this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
-			Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()))))
+				Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()))))
 			.thenReturn(testEntriesCount);
 		Mockito.when(this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
-			Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()))))
+				Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()))))
 			.thenReturn(checkEntriesCount);
 		Mockito.when(this.middlewareStudyEntryService.countStudyGermplasmByEntryTypeIds(studyId,
 				Collections.singletonList(Integer.valueOf(SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId()))))
-				.thenReturn(nonReplicatedEntriesCount);
+			.thenReturn(nonReplicatedEntriesCount);
 
 		final List<Enumeration> enumerations = new ArrayList<>();
 		enumerations.add(new Enumeration(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId(),
-			SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName(),SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue(), 1));
+			SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName(), SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue(), 1));
 		enumerations.add(new Enumeration(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId(),
-			SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeName(),SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeValue(), 2));
+			SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeName(), SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeValue(), 2));
 		enumerations.add(new Enumeration(SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeCategoricalId(),
-			SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeName(),SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeValue(), 3));
+			SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeName(), SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeValue(), 3));
 		enumerations.add(new Enumeration(SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeCategoricalId(),
-				SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeName(),SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeValue(), 4));
+			SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeName(), SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeValue(),
+			4));
 
 		Mockito.when(this.entryTypeService.getEntryTypes(programUUID)).thenReturn(enumerations);
 
@@ -195,14 +207,12 @@ public class StudyEntryServiceImplTest {
 			.map(entryType -> entryType.getId()).collect(Collectors.toList());
 
 		final List<Integer> nonReplicatedEntryTypeIds = enumerations.stream()
-				.filter(entryType -> entryType.getId() == SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId())
-				.map(entryType -> entryType.getId()).collect(Collectors.toList());
-
+			.filter(entryType -> entryType.getId() == SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId())
+			.map(entryType -> entryType.getId()).collect(Collectors.toList());
 
 		Mockito.when(this.middlewareStudyEntryService
 			.countStudyGermplasmByEntryTypeIds(studyId, checkEntryTypeIds)).thenReturn(nonTestEntriesCount);
 		Mockito.when(this.middlewareStudyEntryService.hasUnassignedEntries(studyId)).thenReturn(false);
-
 
 		final StudyEntryMetadata metadata = this.studyEntryService.getStudyEntriesMetadata(studyId, programUUID);
 		Assert.assertEquals(testEntriesCount, metadata.getTestEntriesCount());
@@ -229,7 +239,7 @@ public class StudyEntryServiceImplTest {
 		final Integer variableId = this.random.nextInt();
 		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto();
 		searchCompositeDto.setItemIds(new HashSet(Collections.singletonList(entryId)));
-		final StudyEntryPropertyBatchUpdateRequest requestDto = new StudyEntryPropertyBatchUpdateRequest( searchCompositeDto,
+		final StudyEntryPropertyBatchUpdateRequest requestDto = new StudyEntryPropertyBatchUpdateRequest(searchCompositeDto,
 			variableId, String.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId()));
 		this.studyEntryService.updateStudyEntriesProperty(studyId, requestDto);
 
@@ -241,6 +251,40 @@ public class StudyEntryServiceImplTest {
 	}
 
 	@Test
+	public void testImportUpdates() {
+
+		final Integer studyId = this.random.nextInt();
+		final Integer datasetId = this.random.nextInt();
+		final String entryId = this.random.toString();
+		final Integer variableId = this.random.nextInt();
+
+		final StudyEntryDetailsValueMap valueMap = new StudyEntryDetailsValueMap();
+		valueMap.setEntryNumber(entryId);
+		valueMap.setData(Arrays.asList(new StockPropertyData(1, variableId, "sample", null)));
+
+		final List<DatasetVariable> datasetVariables = Arrays.asList(new DatasetVariable());
+
+		final StudyEntryDetailsImportRequest studyEntryDetailsImportRequest = new StudyEntryDetailsImportRequest(
+			Arrays.asList(valueMap), datasetVariables
+		);
+
+		org.ibp.api.rest.dataset.DatasetDTO dataset = new org.ibp.api.rest.dataset.DatasetDTO();
+		dataset.setDatasetId(datasetId);
+		Mockito.when(this.datasetService.getDatasets(
+			studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())))
+			.thenReturn(Arrays.asList(dataset));
+
+		this.studyEntryService.importUpdates(studyId, studyEntryDetailsImportRequest);
+
+		Mockito.verify(this.datasetService).addDatasetVariables(studyId, datasetId, datasetVariables);
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.studyEntryValidator).validateStudyContainsEntryNumbers(studyId, Collections.singleton(entryId));
+		Mockito.verify(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
+			ArgumentMatchers.any(StudyEntrySearchDto.Filter.class),
+			ArgumentMatchers.eq(new PageRequest(0, Integer.MAX_VALUE)));
+	}
+
+	@Test
 	public void testGetEntryDescriptorColumns() {
 		final Random random = new Random();
 		final int studyId = random.nextInt();
@@ -249,7 +293,7 @@ public class StudyEntryServiceImplTest {
 		datasetDTO.setDatasetId(datasetId);
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
 		final List<DatasetDTO> datasetDTOS = Collections.singletonList(datasetDTO);
-		Mockito.when(this.datasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
+		Mockito.when(this.mwDatasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))))
 			.thenReturn(datasetDTOS);
 
 		final MeasurementVariable entryCodeVariable = new MeasurementVariable(TermId.ENTRY_CODE.getId());
@@ -263,10 +307,11 @@ public class StudyEntryServiceImplTest {
 			.newArrayList(entryCodeVariable, observationUnitIdVariable, entryNoVariable, designationVariable,
 				crossVariable, gidVariable);
 
-		Mockito.when(this.datasetService.getObservationSetVariables(datasetId, Lists.newArrayList(VariableType.GERMPLASM_ATTRIBUTE.getId(),
-			VariableType.GERMPLASM_PASSPORT.getId(),
-			VariableType.GERMPLASM_DESCRIPTOR.getId(),
-			VariableType.ENTRY_DETAIL.getId()))).thenReturn(measurementVariables);
+		Mockito.when(
+			this.mwDatasetService.getObservationSetVariables(datasetId, Lists.newArrayList(VariableType.GERMPLASM_ATTRIBUTE.getId(),
+				VariableType.GERMPLASM_PASSPORT.getId(),
+				VariableType.GERMPLASM_DESCRIPTOR.getId(),
+				VariableType.ENTRY_DETAIL.getId()))).thenReturn(measurementVariables);
 
 		final List<MeasurementVariable> results = this.studyEntryService.getEntryTableHeader(studyId);
 
