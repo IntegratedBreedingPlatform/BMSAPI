@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.api.program.ProgramDTO;
@@ -59,7 +61,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -368,7 +369,35 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		filter.setEntryNumbers(new ArrayList<>(entriesMap.keySet()));
 		final List<StudyEntryDto> studyEntries =
 			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
-		this.middlewareStudyEntryService.importUpdates(studyId, studyEntries, entriesMap);
+
+		MultiKeyMap stockPropertyMap = this.middlewareStudyEntryService.getStudyEntryStockPropertyMap(studyId, studyEntries);
+		studyEntries.forEach(entry ->
+			this.processStudyEntry(studyId, entriesMap.get(String.valueOf(entry.getEntryNumber())),
+				entry.getEntryId(), stockPropertyMap)
+		);
+	}
+
+	private void processStudyEntry(final Integer studyId, final List<StockPropertyData> stockPropDataList,
+		final Integer stockId, final MultiKeyMap stockPropertyMap) {
+		if (!CollectionUtils.isEmpty(stockPropDataList)) {
+			stockPropDataList.forEach(stockProp -> {
+				stockProp.setStockId(stockId);
+				final boolean hasStockProperty = stockPropertyMap.containsKey(stockProp.getStockId(), stockProp.getVariableId());
+
+				if (stockProp.hasValue() && !stockProp.getValue().isEmpty()) {
+					if (hasStockProperty) {
+						this.studyEntryObservationService.updateObservation(studyId, stockProp);
+					} else {
+						this.studyEntryObservationService.createObservation(studyId, stockProp);
+					}
+				} else {
+					if (hasStockProperty) {
+						final StockProperty sp = (StockProperty) stockPropertyMap.get(stockProp.getStockId(), stockProp.getVariableId());
+						this.studyEntryObservationService.deleteObservation(studyId, sp.getStockPropId());
+					}
+				}
+			});
+		}
 	}
 
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
