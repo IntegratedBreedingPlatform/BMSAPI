@@ -229,9 +229,6 @@ public class MiddlewareFactory {
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	@Autowired
-	private Environment environment;
-
 	public MiddlewareFactory() {
 		super();
 	}
@@ -483,6 +480,9 @@ public class MiddlewareFactory {
 	public PermissionServiceImpl getPermissionService() {
 		return new PermissionServiceImpl(this.getWorkbenchSessionProvider());
 	}
+
+	@Autowired
+	private Environment environment;
 
 	@Bean
 	public CrossExpansionProperties getCrossExpansionProperties() {
