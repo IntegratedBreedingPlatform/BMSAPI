@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.api.program.ProgramDTO;
@@ -17,7 +19,6 @@ import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateReq
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
@@ -59,7 +60,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -368,7 +368,28 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		filter.setEntryNumbers(new ArrayList<>(entriesMap.keySet()));
 		final List<StudyEntryDto> studyEntries =
 			this.middlewareStudyEntryService.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
-		this.middlewareStudyEntryService.importUpdates(studyId, studyEntries, entriesMap);
+
+		final MultiKeyMap stockPropertyMap = this.middlewareStudyEntryService.getStudyEntryStockPropertyMap(studyId, studyEntries);
+		studyEntries.forEach(entry ->
+			this.processStudyEntry(studyId, entriesMap.get(String.valueOf(entry.getEntryNumber())),
+				entry.getEntryId(), stockPropertyMap)
+		);
+	}
+
+	private void processStudyEntry(final Integer studyId, final List<StockPropertyData> stockPropDataList,
+		final Integer stockId, final MultiKeyMap stockPropertyMap) {
+		if (!CollectionUtils.isEmpty(stockPropDataList)) {
+			stockPropDataList.forEach(stockProp -> {
+				if (stockProp.hasValue() && !stockProp.getValue().isEmpty()) {
+					stockProp.setStockId(stockId);
+					if (stockPropertyMap.containsKey(stockProp.getStockId(), stockProp.getVariableId())) {
+						this.studyEntryObservationService.updateObservation(studyId, stockProp);
+					} else {
+						this.studyEntryObservationService.createObservation(studyId, stockProp);
+					}
+				}
+			});
+		}
 	}
 
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
