@@ -60,6 +60,8 @@ public class DatasetExcelGeneratorTest {
 	private static final String ENVIRONMENTAL_DETAILS_TEST = "EnvironmentalDesignTest";
 	private static final String ENVIRONMENTAL_CONDITIONS_TEST = "EnvironmentalConditionsTest";
 	private static final String GERMPLASM_DESCRIPTORS_TEST = "GermplasmDescriptorsTest";
+	private static final String GERMPLASM_PASSPORTS_TEST = "GermplasmPassportsTest";
+	private static final String GERMPLASM_ATTRIBUTES_TEST = "GermplasmAttributesTest";
 	private static final String OBSERVATION_UNIT_TEST = "ObservationUnitTest";
 	private static final String TRAITS_TEST = "TraitsTest";
 	private static final String SELECTION_TEST = "SelectionTest";
@@ -125,6 +127,16 @@ public class DatasetExcelGeneratorTest {
 		germplasmDescriptorVariable.setValue(GERMPLASM_DESCRIPTORS_TEST);
 		germplasmDescriptorVariable.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
 
+		final MeasurementVariable germplasmPassportsVariable = new MeasurementVariable();
+		germplasmPassportsVariable.setDataTypeId(VariableType.GERMPLASM_PASSPORT.getId());
+		germplasmPassportsVariable.setValue(GERMPLASM_PASSPORTS_TEST);
+		germplasmPassportsVariable.setVariableType(VariableType.GERMPLASM_PASSPORT);
+
+		final MeasurementVariable germplasmAttributesVariable = new MeasurementVariable();
+		germplasmAttributesVariable.setDataTypeId(VariableType.GERMPLASM_ATTRIBUTE.getId());
+		germplasmAttributesVariable.setValue(GERMPLASM_ATTRIBUTES_TEST);
+		germplasmAttributesVariable.setVariableType(VariableType.GERMPLASM_ATTRIBUTE);
+
 		final MeasurementVariable observationUnitVariable = new MeasurementVariable();
 		observationUnitVariable.setDataTypeId(VariableType.OBSERVATION_UNIT.getId());
 		observationUnitVariable.setValue(OBSERVATION_UNIT_TEST);
@@ -143,7 +155,8 @@ public class DatasetExcelGeneratorTest {
 		final List<MeasurementVariable> studyDetailVariables = Lists.newArrayList(studyDetailVariable);
 		final List<MeasurementVariable> environmentVariables =
 			Lists.newArrayList(environmentDetailsVariable, experimentalDesignVariable, environmentConditionsVariable);
-		final List<MeasurementVariable> plotVariables = Lists.newArrayList(germplasmDescriptorVariable);
+		final List<MeasurementVariable> plotVariables = Lists.newArrayList(germplasmDescriptorVariable, germplasmPassportsVariable,
+			germplasmAttributesVariable);
 		final List<MeasurementVariable> datasetVariables = Lists.newArrayList(observationUnitVariable, traitsVariable, selectionVariable);
 
 		this.messageSource = new ResourceBundleMessageSource();
@@ -190,7 +203,8 @@ public class DatasetExcelGeneratorTest {
 
 		when(this.datasetService.getMeasurementVariables(PLOT_DATASET_ID, Lists
 			.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
-				VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()))).thenReturn(plotVariables);
+				VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId(), VariableType.GERMPLASM_ATTRIBUTE.getId(),
+				VariableType.GERMPLASM_PASSPORT.getId()))).thenReturn(plotVariables);
 
 		when(this.datasetService
 			.getMeasurementVariables(dataSet.getId(), Lists
@@ -229,7 +243,8 @@ public class DatasetExcelGeneratorTest {
 						VariableType.ENVIRONMENT_CONDITION.getId()));
 		Mockito.verify(this.datasetService).getMeasurementVariables(INSTANCE_ID, Lists
 			.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
-				VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
+				VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId(), VariableType.GERMPLASM_ATTRIBUTE.getId(),
+				VariableType.GERMPLASM_PASSPORT.getId()));
 		Mockito.verify(this.datasetService)
 			.getMeasurementVariables(INSTANCE_ID, Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
@@ -273,9 +288,11 @@ public class DatasetExcelGeneratorTest {
 		assertEquals(ENVIRONMENTAL_DETAILS_TEST, descriptionSheet.getRow(14).getCell(valueIndex).getStringCellValue());
 		assertEquals(ENVIRONMENTAL_CONDITIONS_TEST, descriptionSheet.getRow(17).getCell(valueIndex).getStringCellValue());
 		assertEquals(GERMPLASM_DESCRIPTORS_TEST, descriptionSheet.getRow(20).getCell(valueIndex).getStringCellValue());
-		assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(25).getCell(valueIndex).getStringCellValue());
-		assertEquals(TRAITS_TEST, descriptionSheet.getRow(28).getCell(valueIndex).getStringCellValue());
-		assertEquals(SELECTION_TEST, descriptionSheet.getRow(31).getCell(valueIndex).getStringCellValue());
+		assertEquals(GERMPLASM_PASSPORTS_TEST, descriptionSheet.getRow(23).getCell(valueIndex).getStringCellValue());
+		assertEquals(GERMPLASM_ATTRIBUTES_TEST, descriptionSheet.getRow(26).getCell(valueIndex).getStringCellValue());
+		assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(31).getCell(valueIndex).getStringCellValue());
+		assertEquals(TRAITS_TEST, descriptionSheet.getRow(34).getCell(valueIndex).getStringCellValue());
+		assertEquals(SELECTION_TEST, descriptionSheet.getRow(37).getCell(valueIndex).getStringCellValue());
 		assertEquals(VARIABLE_ALIAS_1, observationSheet.getRow(0).getCell(0).getStringCellValue());
 		assertEquals(VARIABLE_ALIAS_2, observationSheet.getRow(0).getCell(1).getStringCellValue());
 		assertEquals(VARIABLE_VALUE_1, observationSheet.getRow(1).getCell(0).getStringCellValue());
