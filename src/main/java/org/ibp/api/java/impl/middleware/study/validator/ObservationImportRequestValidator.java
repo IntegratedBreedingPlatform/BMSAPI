@@ -118,7 +118,6 @@ public class ObservationImportRequestValidator {
 				this.isObservationVariableDbIdInvalid(variableDTOMap, dto, index) ||
 				this.isStudyDbIdInvalid(studyInstancesMap, dto, index) ||
 				this.hasNoExistingObservationUnit(observationUnitDtoMap, dto, index) ||
-				this.isObservationVariableNotInStudy(variableSearchRequestDTO, studyVariableIdsMap, dto, observationUnitDtoMap, index) ||
 				this.isValueInvalid(dto, variableDTOMap, index) ||
 				this.isObservationAlreadyExisting(dto, existingObservationsMap, index) ||
 				this.isAnyExternalReferenceInvalid(dto, index);
@@ -133,29 +132,6 @@ public class ObservationImportRequestValidator {
 			&& existingObservationsMap.get(dto.getObservationUnitDbId()).containsKey(dto.getObservationVariableDbId())) {
 			this.errors.reject("observation.import.already.existing",
 				new String[] {index.toString(), dto.getObservationUnitDbId(), dto.getObservationVariableDbId()}, "");
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isObservationVariableNotInStudy(
-		final VariableSearchRequestDTO variableSearchRequestDTO, final Map<String, List<String>> studyVariableIdsMap,
-		final ObservationDto dto, final Map<String, ObservationUnitDto> observationUnitDtoMap, final Integer index) {
-		if (!studyVariableIdsMap.containsKey(dto.getStudyDbId())) {
-			final String studyDbId = StringUtils.isEmpty(dto.getStudyDbId()) ?
-				observationUnitDtoMap.get(dto.getObservationUnitDbId()).getStudyDbId() : dto.getStudyDbId();
-			variableSearchRequestDTO.setStudyDbId(Collections.singletonList(studyDbId));
-			final List<VariableDTO> variableDTOS =
-				this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT);
-			List<String> studyVariableIds = new ArrayList<>();
-			if (!CollectionUtils.isEmpty(variableDTOS)) {
-				studyVariableIds = variableDTOS.stream().map(VariableDTO::getObservationVariableDbId)
-					.collect(Collectors.toList());
-			}
-			studyVariableIdsMap.put(dto.getStudyDbId(), studyVariableIds);
-		}
-		if (!studyVariableIdsMap.get(dto.getStudyDbId()).contains(dto.getObservationVariableDbId())) {
-			this.errors.reject("observation.import.observationVariableDbId.not.in.study", new String[] {index.toString()}, "");
 			return true;
 		}
 		return false;

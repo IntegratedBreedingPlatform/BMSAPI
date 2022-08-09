@@ -237,19 +237,6 @@ public class ObservationImportRequestValidatorTest {
     }
 
     @Test
-    public void testPruneObservationInvalidForImport_ObservationVariableDbIdNotInStudy() {
-        final List<ObservationDto> observationDtos = this.createObservationDtoList();
-        final VariableSearchRequestDTO variableSearchRequestDTOUsingStudyDbId = new VariableSearchRequestDTO();
-        variableSearchRequestDTOUsingStudyDbId.setObservationVariableDbIds(Collections.singletonList(VARIABLE_DBID));
-        variableSearchRequestDTOUsingStudyDbId.setStudyDbId(Collections.singletonList(STUDY_DBID));
-        Mockito.when(this.variableServiceBrapi.getVariables(variableSearchRequestDTOUsingStudyDbId, null, VariableTypeGroup.TRAIT))
-                .thenReturn(new ArrayList<>());
-        final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
-        Assert.assertTrue(result.hasErrors());
-        Assert.assertEquals("observation.import.observationVariableDbId.not.in.study", result.getAllErrors().get(0).getCode());
-    }
-
-    @Test
     public void testPruneObservationInvalidForImport_WhereExternalReferenceHasMissingInfo() {
         final List<ObservationDto> observationDtos = this.createObservationDtoList();
         final List<ExternalReferenceDTO> externalReferenceDTOS = new ArrayList<>();
