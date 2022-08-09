@@ -32,7 +32,7 @@ public class ObservationResourceBrapi {
 	private DatasetTypeService datasetTypeService;
 
 	@ApiOperation(value = "Get observation levels", notes = "Returns a list of supported observation levels")
-	@RequestMapping(value = "/{crop}/brapi/v1/observationLevels", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/brapi/v1/observationlevels", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<String>> getObservationLevels(
 		@PathVariable final String crop,
