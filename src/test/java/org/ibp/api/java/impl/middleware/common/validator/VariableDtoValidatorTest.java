@@ -370,6 +370,7 @@ public class VariableDtoValidatorTest {
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(5));
 		variableDTO.getContextOfUse().add(VariableDTO.ContextOfUseEnum.MEANS.toString());
 		variableDTO.getContextOfUse().add(VariableDTO.ContextOfUseEnum.PLOT.toString());
+		variableDTO.getContextOfUse().add(VariableDTO.ContextOfUseEnum.SUMMARY.toString());
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), VariableDTO.class.getName());
 		this.variableDtoValidator.validateContextOfUse(variableDTO, errors);
