@@ -80,6 +80,14 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			}
 			ModelMapper mapper = OntologyMapper.getInstance();
 			MethodDetails methodDetails = mapper.map(method, MethodDetails.class);
+
+			if(method.toCVTerm().getIsSystem()){
+				methodDetails.getMetadata().setDeletable(false);
+				methodDetails.getMetadata().setEditable(false);
+				methodDetails.getMetadata().getUsage().setSystem(true);
+				return methodDetails;
+			}
+
 			if (!deletable) {
 				methodDetails.getMetadata().addEditableField(FIELD_TO_BE_EDITABLE_IF_TERM_REFERRED);
 			} else {
