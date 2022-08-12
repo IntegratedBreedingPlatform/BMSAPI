@@ -84,7 +84,7 @@ public class MethodServiceImpl extends ServiceBaseImpl implements MethodService 
 			if(method.toCVTerm().getIsSystem()){
 				methodDetails.getMetadata().setDeletable(false);
 				methodDetails.getMetadata().setEditable(false);
-				methodDetails.getMetadata().getUsage().setSystem(true);
+				methodDetails.getMetadata().getUsage().setSystemTerm(true);
 				return methodDetails;
 			}
 

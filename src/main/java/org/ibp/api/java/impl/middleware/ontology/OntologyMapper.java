@@ -145,7 +145,7 @@ public class OntologyMapper {
 				this.map().getMetadata().setGermplasm(this.source.getGermplasm());
 				this.map().getMetadata().setBreedingMethods(this.source.getBreedingMethods());
 				this.map().getMetadata().setLists(this.source.getLists());
-				this.map().getMetadata().getUsage().setSystem(this.source.getIsSystem());
+				this.map().getMetadata().getUsage().setSystemTerm(this.source.getIsSystem());
 			}
 		});
 	}
