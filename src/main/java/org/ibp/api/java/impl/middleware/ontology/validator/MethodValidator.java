@@ -62,6 +62,12 @@ public class MethodValidator extends OntologyValidator implements org.springfram
 				return;
 			}
 
+			// should not be a System method
+			if(existingMethod.toCVTerm().getIsSystem()){
+				this.addCustomError(errors, VariableValidator.METHOD_NOT_DELETABLE_AND_EDITABLE, new Object[] {method.getId()});
+				return;
+			}
+
 			boolean isEditable = !this.termDataManager.isTermReferred(StringUtil.parseInt(method.getId(), null));
 			if (isEditable) {
 				return;
