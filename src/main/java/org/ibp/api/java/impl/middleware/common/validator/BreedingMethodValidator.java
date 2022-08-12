@@ -60,12 +60,12 @@ public class BreedingMethodValidator {
 		if (StringUtils.isNotBlank(breedingMethod.getGroup())) {
 			final String group = breedingMethod.getGroup();
 			final MethodGroup methodGroup = MethodGroup.getMethodGroup(group);
-			validateMethodGroup(group, methodGroup);
+			this.validateMethodGroup(group, methodGroup);
 		}
 
 		final Integer methodClassId = breedingMethod.getMethodClass();
 		final MethodClass methodClass = MethodClass.getMethodClass(methodClassId);
-		validateMethodClass(methodClassId, methodClass);
+		this.validateMethodClass(methodClassId, methodClass);
 
 		this.validateClassTypeDuo(methodClass, methodType);
 
@@ -120,7 +120,7 @@ public class BreedingMethodValidator {
 		}
 
 		// We avoid count for now as it can be slow
-		Optional<Germplasm> germplasmOptional = this.germplasmMiddlewareService.findOneByMethodId(breedingMethodDbId);
+		final Optional<Germplasm> germplasmOptional = this.germplasmMiddlewareService.findOneByMethodId(breedingMethodDbId);
 		if (germplasmOptional.isPresent()) {
 			throw new ApiRequestValidationException("breeding.methods.delete.has.germplasm",
 				new String[] {germplasmOptional.get().getGid().toString()});
