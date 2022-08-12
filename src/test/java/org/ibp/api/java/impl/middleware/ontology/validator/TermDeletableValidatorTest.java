@@ -3,8 +3,10 @@ package org.ibp.api.java.impl.middleware.ontology.validator;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -37,6 +39,9 @@ public class TermDeletableValidatorTest {
 
 	@Mock
 	private FormulaService formulaService;
+
+	@Mock
+	private OntologyMethodDataManager ontologyMethodDataManager;
 
 	@InjectMocks
 	private TermDeletableValidator termDeletableValidator;
@@ -78,12 +83,17 @@ public class TermDeletableValidatorTest {
 	public void testWithTermNotReferred() throws MiddlewareException {
 
 		Term methodTerm = TestDataProvider.getMethodTerm();
+		Method method = new Method(methodTerm);
+		method.setSystem(false);
 		final Variable ontologyVariable = TestDataProvider.getTestVariable();
 
 		doReturn(methodTerm).when(this.termDataManager).getTermById(methodTerm.getId());
 		doReturn(false).when(this.termDataManager).isTermReferred(methodTerm.getId());
 		Mockito.doReturn(ontologyVariable).when(this.ontologyVariableDataManager).getVariable(null, methodTerm.getId(),
 			true);
+		Mockito.doReturn(method).when(this.ontologyMethodDataManager).getMethod(methodTerm.getId(),
+			true);
+
 		BindingResult bindingResult = new MapBindingResult(new HashMap<String, String>(), "Method");
 		this.termDeletableValidator.validate(new TermRequest(String.valueOf(methodTerm.getId()), "method", CvId.METHODS.getId()),
 				bindingResult);
