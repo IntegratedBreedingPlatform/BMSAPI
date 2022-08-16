@@ -117,8 +117,8 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.content().string(
 				"[{\"id\":1,\"vocabularyId\":0,\"name\":\"VAR1\",\"definition\":null,\"obsolete\":false,\"dateCreated\":null,"
-					+ "\"dateLastModified\":null,\"targetTermId\":3},{\"id\":2,\"vocabularyId\":0,\"name\":\"VAR2\",\"definition\":null,"
-					+ "\"obsolete\":false,\"dateCreated\":null,\"dateLastModified\":null,\"targetTermId\":3}]"));
+					+ "\"dateLastModified\":null,\"targetTermId\":3,\"system\":false},{\"id\":2,\"vocabularyId\":0,\"name\":\"VAR2\",\"definition\":null,"
+					+ "\"obsolete\":false,\"dateCreated\":null,\"dateLastModified\":null,\"targetTermId\":3,\"system\":false}]"));
 
 	}
 
@@ -142,8 +142,8 @@ public class DerivedVariableResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.content().string(
 				"[{\"id\":1,\"vocabularyId\":0,\"name\":\"VAR1\",\"definition\":null,\"obsolete\":false,\"dateCreated\":null,"
-					+ "\"dateLastModified\":null,\"targetTermId\":3},{\"id\":2,\"vocabularyId\":0,\"name\":\"VAR2\",\"definition\":null,"
-					+ "\"obsolete\":false,\"dateCreated\":null,\"dateLastModified\":null,\"targetTermId\":3}]"));
+					+ "\"dateLastModified\":null,\"targetTermId\":3,\"system\":false},{\"id\":2,\"vocabularyId\":0,\"name\":\"VAR2\",\"definition\":null,"
+					+ "\"obsolete\":false,\"dateCreated\":null,\"dateLastModified\":null,\"targetTermId\":3,\"system\":false}]"));
 
 	}
 
