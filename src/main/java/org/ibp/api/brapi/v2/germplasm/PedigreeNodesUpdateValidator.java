@@ -172,6 +172,13 @@ public class PedigreeNodesUpdateValidator {
 			return false;
 		}
 
+		if (pedigreeNodeDTO.getParents().stream().map(PedigreeNodeReferenceDTO::getGermplasmDbId)
+			.filter(StringUtils::isNotEmpty).collect(Collectors.toSet())
+			.contains(pedigreeNodeDTO.getGermplasmDbId())) {
+			errors.reject("pedigree.nodes.update.progenitors.can.not.be.equals.to.germplasmdbid", new String[] {String.valueOf(index)}, "");
+			return false;
+		}
+
 		if (pedigreeNodeDTO.getParents().stream().anyMatch(p -> ParentType.fromString(p.getParentType()) == null)) {
 			errors.reject("pedigree.nodes.invalid.parent.type", new String[] {String.valueOf(index)}, "");
 			return false;
@@ -244,27 +251,15 @@ public class PedigreeNodesUpdateValidator {
 				new String[] {String.valueOf(index), femaleParent.get(0).getGermplasmDbId()}, "");
 			return false;
 		}
-		boolean isMaleParentInvalidGermplasmDbId = false;
-		boolean isMaleParentGermplasmDbIdIsSameAsTheGermplasm = false;
+
 		for (final PedigreeNodeReferenceDTO maleParent : maleParents) {
 			if (StringUtils.isNotEmpty(maleParent.getGermplasmDbId()) && !germplasmMapByUUIDs.containsKey(maleParent.getGermplasmDbId())) {
 				errors.reject("pedigree.nodes.update.male.parent.invalid.germplasmdbid",
 					new String[] {String.valueOf(index), maleParent.getGermplasmDbId()}, "");
-				isMaleParentInvalidGermplasmDbId = true;
-			}
-			if (StringUtils.isNotEmpty(maleParent.getGermplasmDbId()) && maleParent.getGermplasmDbId()
-				.equals(pedigreeNodeDTO.getGermplasmDbId())) {
-				errors.reject("pedigree.nodes.update.male.progenitors.can.not.be.equals.to.germplasmdbid",
-					new String[] {String.valueOf(index), maleParent.getGermplasmDbId()}, "");
-				isMaleParentGermplasmDbIdIsSameAsTheGermplasm = true;
+				return false;
 			}
 		}
-		if (isMaleParentInvalidGermplasmDbId) {
-			return false;
-		}
-		if (isMaleParentGermplasmDbIdIsSameAsTheGermplasm) {
-			return false;
-		}
+
 		return true;
 	}
 
