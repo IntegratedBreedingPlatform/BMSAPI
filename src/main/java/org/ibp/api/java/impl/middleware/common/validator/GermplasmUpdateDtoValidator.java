@@ -4,6 +4,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.DateUtil;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.MethodType;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
@@ -31,6 +33,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator.NAME_MAX_LENGTH;
@@ -57,16 +60,24 @@ public class GermplasmUpdateDtoValidator {
 
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), GermplasmUpdateDTO.class.getName());
 
+		final BreedingMethodSearchRequest breedingMethodSearchRequest = new BreedingMethodSearchRequest();
+		breedingMethodSearchRequest.setMethodAbbreviations(
+			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethodAbbr()))
+				.map(GermplasmUpdateDTO::getBreedingMethodAbbr).collect(Collectors.toList()));
+		final List<BreedingMethodDTO> breedingMethodDTOList =
+			this.breedingMethodService.searchBreedingMethods(breedingMethodSearchRequest, null, null);
+
 		this.validateEmptyList(errors, germplasmUpdateDTOList);
 		this.validateAttributeAndNameCodes(errors, programUUID, germplasmUpdateDTOList);
 		this.validateAttributeAndNameValues(errors, germplasmUpdateDTOList);
 		final Optional<Set<Germplasm>> germplasmSet = this.validateGermplasmIdAndGermplasmUUID(errors, germplasmUpdateDTOList);
 		this.validateLocationAbbreviation(errors, germplasmUpdateDTOList);
-		this.validateBreedingMethod(errors, germplasmUpdateDTOList);
+		this.validateBreedingMethod(errors, germplasmUpdateDTOList, breedingMethodDTOList);
 		this.validateCreationDate(errors, germplasmUpdateDTOList);
 		this.validateProgenitorsBothMustBeSpecified(errors, germplasmUpdateDTOList);
 		this.validateCannotAssignSelfAsProgenitor(errors, germplasmUpdateDTOList, germplasmSet);
 		this.validateProgenitorsGids(errors, germplasmUpdateDTOList);
+		this.validateGermplasmHasExistingDerivativeProgeny(errors, germplasmUpdateDTOList, germplasmSet, breedingMethodDTOList);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -146,7 +157,8 @@ public class GermplasmUpdateDtoValidator {
 		germplasmUpdateDTOList.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
 			.forEach(
 				g -> attributesCodes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
-		this.variableValidator.validateAttributeCodes(errors, programUUID, attributesCodes, VariableType.getGermplasmAttributeVariableTypes());
+		this.variableValidator.validateAttributeCodes(errors, programUUID, attributesCodes,
+			VariableType.getGermplasmAttributeVariableTypes());
 
 		final List<String> ambiguousCodes =
 			new ArrayList<>(CollectionUtils.intersection(existingNamesCodes, existingVariablesNamesAndAlias));
@@ -228,7 +240,8 @@ public class GermplasmUpdateDtoValidator {
 
 	}
 
-	protected void validateBreedingMethod(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	protected void validateBreedingMethod(final BindingResult errors, final List<GermplasmUpdateDTO> germplasmUpdateDTOList,
+		final List<BreedingMethodDTO> breedingMethodDTOList) {
 
 		final List<String> breedingMethodsAbbrs =
 			germplasmUpdateDTOList.stream().filter(dto -> StringUtils.isNotEmpty(dto.getBreedingMethodAbbr()))
@@ -236,11 +249,7 @@ public class GermplasmUpdateDtoValidator {
 
 		final BreedingMethodSearchRequest breedingMethodSearchRequest = new BreedingMethodSearchRequest();
 		breedingMethodSearchRequest.setMethodAbbreviations(breedingMethodsAbbrs);
-		final List<String> abbreviations =
-			this.breedingMethodService.searchBreedingMethods(breedingMethodSearchRequest, null, null)
-				.stream()
-				.map(BreedingMethodDTO::getCode).collect(
-					Collectors.toList());
+		final List<String> abbreviations = breedingMethodDTOList.stream().map(BreedingMethodDTO::getCode).collect(Collectors.toList());
 
 		breedingMethodsAbbrs.removeAll(abbreviations);
 
@@ -291,6 +300,45 @@ public class GermplasmUpdateDtoValidator {
 			}).count();
 		if (progenitorsWithEmptyValuesCount > 0) {
 			errors.reject("germplasm.update.invalid.progenitors", "");
+		}
+	}
+
+	protected void validateGermplasmHasExistingDerivativeProgeny(final BindingResult errors,
+		final List<GermplasmUpdateDTO> germplasmUpdateDTOList, final Optional<Set<Germplasm>> germplasmSetOptional,
+		final List<BreedingMethodDTO> breedingMethodDTOList) {
+
+		if (germplasmSetOptional.isPresent()) {
+
+			final Map<String, BreedingMethodDTO> breedingMethodDTOByAbbreviationMap =
+				breedingMethodDTOList.stream().collect(Collectors.toMap(
+					BreedingMethodNewRequest::getCode, Function.identity()));
+
+			final Set<Germplasm> germplasmSet = germplasmSetOptional.get();
+			final Map<String, Integer> guuidGidMap =
+				germplasmSet.stream().collect(Collectors.toMap(Germplasm::getGermplasmUUID, Germplasm::getGid));
+
+			final Set<Integer> gids = germplasmSet.stream().map(Germplasm::getGid).collect(Collectors.toSet());
+			final Map<Integer, Integer> germplasmDerivativeProgenyCount =
+				this.germplasmMiddlewareService.countGermplasmDerivativeProgeny(gids);
+
+			// Find any row (GermplasmUpdateDTO) where germplasm has existing derivative progeny
+			final Optional<GermplasmUpdateDTO> germplasmWithDerivativeProgeny =
+				germplasmUpdateDTOList.stream().filter(dto -> {
+					final Integer progenitor1 = dto.getProgenitors().getOrDefault(GermplasmServiceImpl.PROGENITOR_1, null);
+					final Integer progenitor2 = dto.getProgenitors().getOrDefault(GermplasmServiceImpl.PROGENITOR_2, null);
+					final BreedingMethodDTO breedingMethodDTO = breedingMethodDTOByAbbreviationMap.get(dto.getBreedingMethodAbbr());
+					// Only check if germplasm has existing derivative progeny if both progenitors are specified.
+					if (!MethodType.GENERATIVE.getCode().equals(breedingMethodDTO.getType()) && progenitor1 != null
+						&& progenitor2 != null) {
+						final Integer gid = Optional.ofNullable(dto.getGid()).orElse(guuidGidMap.get(dto.getGermplasmUUID()));
+						final int count = germplasmDerivativeProgenyCount.getOrDefault(gid, 0);
+						return count > 0;
+					}
+					return false;
+				}).findAny();
+			if (germplasmWithDerivativeProgeny.isPresent()) {
+				errors.reject("germplasm.update.germplasm.with.derivative.progeny.cannot.be.updated");
+			}
 		}
 
 	}

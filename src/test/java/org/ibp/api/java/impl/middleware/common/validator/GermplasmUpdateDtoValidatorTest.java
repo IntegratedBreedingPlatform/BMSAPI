@@ -207,7 +207,7 @@ public class GermplasmUpdateDtoValidatorTest {
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);
-		this.germplasmUpdateDtoValidator.validateBreedingMethod(errors, germplasmUpdateList);
+		this.germplasmUpdateDtoValidator.validateBreedingMethod(errors, germplasmUpdateList, Arrays.asList(new BreedingMethodDTO()));
 		Mockito.verify(errors).reject("germplasm.update.invalid.breeding.method", new String[] {"UAC"}, "");
 	}
 
