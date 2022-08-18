@@ -70,6 +70,8 @@ public class VariableValidator extends OntologyValidator implements Validator {
 
 	protected static final String VARIABLE_NOT_DELETABLE_AND_EDITABLE = "variable.not.editable.and.deletable";
 
+	protected static final String METHOD_NOT_DELETABLE_AND_EDITABLE = "method.not.editable.and.deletable";
+
 	private static final Integer NAME_TEXT_LIMIT = 32;
 	private static final Integer DESCRIPTION_TEXT_LIMIT = 1024;
 
