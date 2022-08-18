@@ -33,7 +33,7 @@ public class Usage {
 	// lists of variable
 	private Integer lists;
 
-	private boolean isSystemVariable;
+	private boolean systemTerm;
 
 	public void addUsage(final TermSummary variable) {
 		// Note: Do not add null value of variable
@@ -94,11 +94,11 @@ public class Usage {
 		this.lists = lists;
 	}
 
-	public boolean isSystemVariable() {
-		return this.isSystemVariable;
+	public boolean isSystemTerm() {
+		return this.systemTerm;
 	}
 
-	public void setSystemVariable(final boolean systemVariable) {
-		this.isSystemVariable = systemVariable;
+	public void setSystemTerm(final boolean systemTerm) {
+		this.systemTerm = systemTerm;
 	}
 }
