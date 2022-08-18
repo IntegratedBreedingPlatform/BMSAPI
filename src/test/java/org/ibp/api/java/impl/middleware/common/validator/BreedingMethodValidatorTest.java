@@ -4,11 +4,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.MethodGroup;
 import org.generationcp.middleware.pojos.MethodType;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.germplasm.GermplasmService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -32,7 +33,7 @@ public class BreedingMethodValidatorTest {
 	private BreedingMethodService breedingMethodService;
 
 	@Mock
-	private GermplasmService germplasmService;
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	@InjectMocks
 	private BreedingMethodValidator breedingMethodValidator;
@@ -56,7 +57,7 @@ public class BreedingMethodValidatorTest {
 	@Test
 	public void validateCreation_InvalidSnameTypeCode() {
 		final BreedingMethodNewRequest breedingMethod = this.createBreedingMethodNewRequest();
-		breedingMethod.setSnameTypeCode(randomAlphanumeric(10));
+		breedingMethod.setSnameTypeId(1);
 
 		try {
 			this.breedingMethodValidator.validateCreation(breedingMethod);
@@ -232,7 +233,7 @@ public class BreedingMethodValidatorTest {
 	@Test
 	public void validateEdition_Invalid_SnameTypeCode() {
 		final BreedingMethodDTO breedingMethodRequest = this.createBreedingMethod();
-		breedingMethodRequest.setSnameTypeCode(randomAlphanumeric(10));
+		breedingMethodRequest.setSnameTypeId(1);
 
 		try {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);

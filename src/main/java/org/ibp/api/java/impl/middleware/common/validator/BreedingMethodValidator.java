@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.MethodClass;
@@ -16,7 +17,6 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,10 +37,10 @@ public class BreedingMethodValidator {
 	private GermplasmService germplasmMiddlewareService;
 
 	@Autowired
-	private org.ibp.api.java.germplasm.GermplasmService germplasmService;
+	private DatasetService datasetService;
 
 	@Autowired
-	private DatasetService datasetService;
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	public void validateCreation(final BreedingMethodNewRequest breedingMethod) {
 		checkNotNull(breedingMethod, "request.null");
@@ -73,7 +73,7 @@ public class BreedingMethodValidator {
 
 		this.validatePrefix(breedingMethod);
 
-		this.validateSnameTypeCode(breedingMethod);
+		this.validateSnameTypeId(breedingMethod);
 	}
 
 	public void validateEdition(final Integer breedingMethodDbId, final BreedingMethodNewRequest breedingMethodRequest) {
@@ -90,10 +90,9 @@ public class BreedingMethodValidator {
 		final Integer numberOfProgenitors = breedingMethodRequest.getNumberOfProgenitors();
 
 		final String breedingMethodRequestType = breedingMethodRequest.getType();
-		final String type = breedingMethodRequestType;
-		final MethodType methodType = MethodType.getMethodType(type);
+		final MethodType methodType = MethodType.getMethodType(breedingMethodRequestType);
 
-		this.validateMethodType(type, methodType);
+		this.validateMethodType(breedingMethodRequestType, methodType);
 		this.validateProgenitorTypeDuo(numberOfProgenitors, methodType);
 
 		final Integer methodClassId = breedingMethodRequest.getMethodClass();
@@ -110,7 +109,7 @@ public class BreedingMethodValidator {
 
 		this.validateFieldsLength(breedingMethodRequest);
 		this.validatePrefix(breedingMethodRequest);
-		this.validateSnameTypeCode(breedingMethodRequest);
+		this.validateSnameTypeId(breedingMethodRequest);
 	}
 
 	public void validateDeletion(final Integer breedingMethodDbId) {
@@ -206,13 +205,13 @@ public class BreedingMethodValidator {
 		}
 	}
 
-	private void validateSnameTypeCode(final BreedingMethodNewRequest breedingMethodRequest) {
-		if (StringUtils.isNotEmpty(breedingMethodRequest.getSnameTypeCode())) {
-			final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs =
-				this.germplasmService.filterGermplasmNameTypes(Collections.singleton(breedingMethodRequest.getSnameTypeCode()));
-			if (germplasmNameTypeDTOs == null || germplasmNameTypeDTOs.isEmpty()) {
+	private void validateSnameTypeId(final BreedingMethodNewRequest breedingMethodRequest) {
+		if (breedingMethodRequest.getSnameTypeId() != null) {
+			Optional<GermplasmNameTypeDTO> germplasmNameTypeDTOOptional =
+				this.germplasmNameTypeService.getNameTypeById(breedingMethodRequest.getSnameTypeId());
+			if (!germplasmNameTypeDTOOptional.isPresent()) {
 				throw new ApiRequestValidationException(
-					"breeding.methods.invalid.snametype", new String[] {breedingMethodRequest.getSnameTypeCode()});
+					"breeding.methods.invalid.snametype", new String[] {breedingMethodRequest.getSnameTypeId().toString()});
 			}
 		}
 	}
