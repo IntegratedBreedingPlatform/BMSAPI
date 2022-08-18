@@ -27,7 +27,9 @@ import org.springframework.validation.BindingResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -63,6 +65,7 @@ public class GermplasmUpdateDtoValidatorTest {
 		final String programUUID = RandomStringUtils.random(10);
 		final Germplasm germplasm = new Germplasm(1);
 		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
+		germplasm.setGnpgs(-1);
 
 		final LocationDTO location = new LocationDTO();
 		location.setId(1);
@@ -96,6 +99,7 @@ public class GermplasmUpdateDtoValidatorTest {
 		when(this.germplasmMiddlewareService.getGermplasmByGUIDs(Mockito.anyList())).thenReturn(Arrays.asList(germplasm));
 		when(this.germplasmMiddlewareService.getGermplasmByGIDs(Arrays.asList(3, 4)))
 			.thenReturn(Arrays.asList(new Germplasm(3), new Germplasm(4)));
+		when(this.germplasmMiddlewareService.countGermplasmDerivativeProgeny(Mockito.anySet())).thenReturn(new HashMap<>());
 
 		when(this.locationService
 			.searchLocations(new LocationSearchRequest(null, null,
@@ -207,7 +211,7 @@ public class GermplasmUpdateDtoValidatorTest {
 
 		final List<GermplasmUpdateDTO> germplasmUpdateList = Arrays.asList(germplasmUpdateDTO);
 		final BindingResult errors = Mockito.mock(BindingResult.class);
-		this.germplasmUpdateDtoValidator.validateBreedingMethod(errors, germplasmUpdateList, Arrays.asList(new BreedingMethodDTO()));
+		this.germplasmUpdateDtoValidator.validateBreedingMethod(errors, germplasmUpdateList);
 		Mockito.verify(errors).reject("germplasm.update.invalid.breeding.method", new String[] {"UAC"}, "");
 	}
 
@@ -306,5 +310,44 @@ public class GermplasmUpdateDtoValidatorTest {
 		this.germplasmUpdateDtoValidator.validateCannotAssignSelfAsProgenitor(errors, germplasmUpdateList,
 			Optional.of(Collections.singleton(germplasm)));
 		Mockito.verify(errors).reject("germplasm.update.progenitors.can.not.be.equals.to.gid");
+	}
+
+	@Test
+	public void testValidate_DerivativeGermplasmHasExistingDerivativeProgeny() {
+		final String uuid = UUID.randomUUID().toString();
+		final Germplasm germplasm = new Germplasm(1);
+		germplasm.setGermplasmUUID(uuid);
+
+		final Map<Integer, Integer> germplasmDerivativeProgenyCount = new HashMap<>();
+		germplasmDerivativeProgenyCount.put(germplasm.getGid(), 1);
+		when(this.germplasmMiddlewareService.countGermplasmDerivativeProgeny(Mockito.anySet())).thenReturn(germplasmDerivativeProgenyCount);
+
+		final GermplasmUpdateDTO germplasmUpdateDTO = new GermplasmUpdateDTO();
+		germplasmUpdateDTO.setGermplasmUUID(uuid);
+
+		final String expectedMessageCode = "germplasm.update.germplasm.with.derivative.progeny.cannot.be.updated";
+
+		// Progenitors are not specified
+		germplasmUpdateDTO.setProgenitors(new HashMap<>());
+		germplasm.setGnpgs(-1);
+		final BindingResult errors = Mockito.mock(BindingResult.class);
+		this.germplasmUpdateDtoValidator.validateGermplasmHasExistingDerivativeProgeny(errors, Arrays.asList(germplasmUpdateDTO),
+			Optional.of(Collections.singleton(germplasm)));
+		Mockito.verify(errors, times(0)).reject(expectedMessageCode);
+
+		// Progenitors are specified but germplasm is not derivative
+		germplasmUpdateDTO.setProgenitors(new HashMap<>());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 2);
+		germplasm.setGnpgs(2);
+		this.germplasmUpdateDtoValidator.validateGermplasmHasExistingDerivativeProgeny(errors, Arrays.asList(germplasmUpdateDTO),
+			Optional.of(Collections.singleton(germplasm)));
+		Mockito.verify(errors, times(0)).reject(expectedMessageCode);
+
+		// Progenitors are specified and germplasm is derivative
+		germplasm.setGnpgs(-1);
+		this.germplasmUpdateDtoValidator.validateGermplasmHasExistingDerivativeProgeny(errors, Arrays.asList(germplasmUpdateDTO),
+			Optional.of(Collections.singleton(germplasm)));
+		Mockito.verify(errors).reject(expectedMessageCode);
 	}
 }
