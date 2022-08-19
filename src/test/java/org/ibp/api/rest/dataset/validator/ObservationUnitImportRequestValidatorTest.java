@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
@@ -14,7 +15,6 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -416,12 +416,12 @@ public class ObservationUnitImportRequestValidatorTest {
 		observationUnitPosition.setPositionCoordinateY("1");
 		observationUnitPosition.setObservationLevelRelationships(observationLevelRelationships);
 		observationUnitPosition.setObservationLevel(
-			new ObservationLevelRelationship(null, null, DatasetTypeEnum.PLOT_DATA.getName(), null));
+			new ObservationLevelRelationship(null, null, ObservationLevelEnum.PLOT.getLevelName(), null));
 		return observationUnitPosition;
 	}
 
 	private ObservationLevelRelationship createObservationLevelRelationship(final String levelCode) {
-		return new ObservationLevelRelationship(null, levelCode, "PLOT", null);
+		return new ObservationLevelRelationship(null, levelCode, ObservationLevelEnum.PLOT.getLevelName(), null);
 	}
 
 }
