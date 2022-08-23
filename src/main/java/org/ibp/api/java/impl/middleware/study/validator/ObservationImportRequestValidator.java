@@ -108,21 +108,6 @@ public class ObservationImportRequestValidator {
 			this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT).stream()
 				.collect(Collectors.toMap(VariableDTO::getObservationVariableDbId, Function.identity()));
 
-		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
-		observationSearchRequestDto.setObservationUnitDbIds(observationUnitDbIds);
-		observationSearchRequestDto.setObservationVariableDbIds(variableIds);
-
-		final List<ObservationDto> existingObservations =
-			this.observationServiceBrapi.searchObservations(observationSearchRequestDto, null);
-		final Map<String, Map<String, ObservationDto>> existingObservationsMap = new HashMap<>();
-		if (CollectionUtils.isNotEmpty(existingObservations)) {
-			for (final ObservationDto existingObservation : existingObservations) {
-				final String observationUnitDbId = existingObservation.getObservationUnitDbId();
-				existingObservationsMap.putIfAbsent(observationUnitDbId, new HashMap<>());
-				existingObservationsMap.get(observationUnitDbId).put(existingObservation.getObservationVariableDbId(), existingObservation);
-			}
-		}
-
 		final Map<String, List<String>> studyVariableIdsMap = new HashMap<>();
 
 		final Map<ObservationDto, Integer> importRequestByIndexMap = IntStream.range(0, observationDtos.size())
@@ -135,7 +120,6 @@ public class ObservationImportRequestValidator {
 				this.isStudyDbIdInvalid(studyInstancesMap, dto, index) ||
 				this.hasNoExistingObservationUnit(observationUnitDtoMap, dto, index) ||
 				this.isValueInvalid(dto, variableDTOMap, index) ||
-				this.isObservationAlreadyExisting(dto, existingObservationsMap, index) ||
 				this.isAnyExternalReferenceInvalid(dto, index);
 		});
 
