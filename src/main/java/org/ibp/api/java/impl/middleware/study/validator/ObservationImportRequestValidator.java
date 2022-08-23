@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
@@ -11,10 +12,13 @@ import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
+import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.ScaleDTO;
@@ -28,7 +32,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -39,6 +46,12 @@ public class ObservationImportRequestValidator {
 	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
 	private static final int MAX_VALUE_LENGTH = 255;
+
+	public static final List<String> PLOT_SUBPLOT_OBSERVATION_LEVEL_NAMES =
+		ListUtils.unmodifiableList(Arrays.asList(
+			ObservationLevelMapper.ObservationLevelEnum.PLOT.getName(),
+			ObservationLevelMapper.ObservationLevelEnum.PLANT.getName(),
+			ObservationLevelMapper.ObservationLevelEnum.SUB_PLOT.getName()));
 
 	@Autowired
 	private GermplasmServiceBrapi germplasmService;
@@ -54,6 +67,9 @@ public class ObservationImportRequestValidator {
 
 	@Autowired
 	private VariableServiceBrapi variableServiceBrapi;
+
+	@Autowired
+	private OntologyVariableService ontologyVariableService;
 
 	protected BindingResult errors;
 
@@ -99,7 +115,7 @@ public class ObservationImportRequestValidator {
 		final List<ObservationDto> existingObservations =
 			this.observationServiceBrapi.searchObservations(observationSearchRequestDto, null);
 		final Map<String, Map<String, ObservationDto>> existingObservationsMap = new HashMap<>();
-		if(CollectionUtils.isNotEmpty(existingObservations)) {
+		if (CollectionUtils.isNotEmpty(existingObservations)) {
 			for (final ObservationDto existingObservation : existingObservations) {
 				final String observationUnitDbId = existingObservation.getObservationUnitDbId();
 				existingObservationsMap.putIfAbsent(observationUnitDbId, new HashMap<>());
@@ -115,10 +131,9 @@ public class ObservationImportRequestValidator {
 			final Integer index = importRequestByIndexMap.get(dto) + 1;
 			return this.isGermplasmDbIdInvalid(germplasmDTOMap, dto, index) ||
 				this.isObservationUnitDbIdInvalid(observationUnitDtoMap, dto, index) ||
-				this.isObservationVariableDbIdInvalid(variableDTOMap, dto, index) ||
+				this.isObservationVariableDbIdInvalid(observationUnitDtoMap, variableDTOMap, dto, index) ||
 				this.isStudyDbIdInvalid(studyInstancesMap, dto, index) ||
 				this.hasNoExistingObservationUnit(observationUnitDtoMap, dto, index) ||
-				this.isObservationVariableNotInStudy(variableSearchRequestDTO, studyVariableIdsMap, dto, observationUnitDtoMap, index) ||
 				this.isValueInvalid(dto, variableDTOMap, index) ||
 				this.isObservationAlreadyExisting(dto, existingObservationsMap, index) ||
 				this.isAnyExternalReferenceInvalid(dto, index);
@@ -129,33 +144,10 @@ public class ObservationImportRequestValidator {
 
 	private boolean isObservationAlreadyExisting(final ObservationDto dto,
 		final Map<String, Map<String, ObservationDto>> existingObservationsMap, final Integer index) {
-		if(existingObservationsMap.containsKey(dto.getObservationUnitDbId())
+		if (existingObservationsMap.containsKey(dto.getObservationUnitDbId())
 			&& existingObservationsMap.get(dto.getObservationUnitDbId()).containsKey(dto.getObservationVariableDbId())) {
 			this.errors.reject("observation.import.already.existing",
 				new String[] {index.toString(), dto.getObservationUnitDbId(), dto.getObservationVariableDbId()}, "");
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isObservationVariableNotInStudy(
-		final VariableSearchRequestDTO variableSearchRequestDTO, final Map<String, List<String>> studyVariableIdsMap,
-		final ObservationDto dto, final Map<String, ObservationUnitDto> observationUnitDtoMap, final Integer index) {
-		if (!studyVariableIdsMap.containsKey(dto.getStudyDbId())) {
-			final String studyDbId = StringUtils.isEmpty(dto.getStudyDbId()) ?
-				observationUnitDtoMap.get(dto.getObservationUnitDbId()).getStudyDbId() : dto.getStudyDbId();
-			variableSearchRequestDTO.setStudyDbId(Collections.singletonList(studyDbId));
-			final List<VariableDTO> variableDTOS =
-				this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT);
-			List<String> studyVariableIds = new ArrayList<>();
-			if (!CollectionUtils.isEmpty(variableDTOS)) {
-				studyVariableIds = variableDTOS.stream().map(VariableDTO::getObservationVariableDbId)
-					.collect(Collectors.toList());
-			}
-			studyVariableIdsMap.put(dto.getStudyDbId(), studyVariableIds);
-		}
-		if (!studyVariableIdsMap.get(dto.getStudyDbId()).contains(dto.getObservationVariableDbId())) {
-			this.errors.reject("observation.import.observationVariableDbId.not.in.study", new String[] {index.toString()}, "");
 			return true;
 		}
 		return false;
@@ -165,7 +157,8 @@ public class ObservationImportRequestValidator {
 		final Map<String, ObservationUnitDto> observationUnitDtoMap, final ObservationDto dto, final Integer index) {
 		final ObservationUnitDto obsUnit = observationUnitDtoMap.get(dto.getObservationUnitDbId());
 		if ((!StringUtils.isEmpty(dto.getStudyDbId()) && !obsUnit.getStudyDbId().equalsIgnoreCase(dto.getStudyDbId()))
-			|| (!StringUtils.isEmpty(dto.getGermplasmDbId()) && !obsUnit.getGermplasmDbId().equalsIgnoreCase(dto.getGermplasmDbId()))) {
+			|| (!DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getName().equalsIgnoreCase(obsUnit.getObservationLevel()) && !StringUtils.isEmpty(
+			dto.getGermplasmDbId()) && !obsUnit.getGermplasmDbId().equalsIgnoreCase(dto.getGermplasmDbId()))) {
 			this.errors.reject("observation.import.no.observationUnit", new String[] {index.toString()}, "");
 			return true;
 		}
@@ -204,13 +197,38 @@ public class ObservationImportRequestValidator {
 	}
 
 	private boolean isObservationVariableDbIdInvalid(
-		final Map<String, VariableDTO> variableDTOMap, final ObservationDto dto, final Integer index) {
+		final Map<String, ObservationUnitDto> observationUnitDtoMap, final Map<String, VariableDTO> variableDTOMap,
+		final ObservationDto dto, final Integer index) {
 		if (StringUtils.isEmpty(dto.getObservationVariableDbId())) {
 			this.errors.reject("observation.import.observationVariableDbId.required", new String[] {index.toString()}, "");
 			return true;
 		}
 		if (!variableDTOMap.containsKey(dto.getObservationVariableDbId())) {
 			this.errors.reject("observation.import.observationVariableDbId.invalid", new String[] {index.toString()}, "");
+			return true;
+		}
+
+		final VariableDTO variableDTO = variableDTOMap.get(dto.getObservationVariableDbId());
+		final ObservationUnitDto observationUnitDto = observationUnitDtoMap.get(dto.getObservationUnitDbId());
+
+		if (variableDTO.getContextOfUse().contains(VariableDTO.ContextOfUseEnum.MEANS.name()) && !observationUnitDto.getObservationLevel()
+			.equalsIgnoreCase(DatasetTypeEnum.MEANS_DATA.getName())) {
+			this.errors.reject("observation.import.observationVariableDbId.invalid.analysis.variable", new String[] {
+				index.toString(),
+				VariableDTO.ContextOfUseEnum.MEANS.name()}, "");
+			return true;
+		}
+		if (variableDTO.getContextOfUse().contains(VariableDTO.ContextOfUseEnum.SUMMARY.name()) && !observationUnitDto.getObservationLevel()
+			.equalsIgnoreCase(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getName())) {
+			this.errors.reject("observation.import.observationVariableDbId.invalid.analysis.summary.variable",
+				new String[] {index.toString(), VariableDTO.ContextOfUseEnum.SUMMARY.name()}, "");
+			return true;
+		}
+		if (variableDTO.getContextOfUse().contains(VariableDTO.ContextOfUseEnum.PLOT.name())
+			&& !PLOT_SUBPLOT_OBSERVATION_LEVEL_NAMES.contains(
+			observationUnitDto.getObservationLevel().toUpperCase())) {
+			this.errors.reject("observation.import.observationVariableDbId.invalid.trait.selection.method.variable",
+				new String[] {index.toString(), VariableDTO.ContextOfUseEnum.PLOT.name()}, "");
 			return true;
 		}
 		return false;
