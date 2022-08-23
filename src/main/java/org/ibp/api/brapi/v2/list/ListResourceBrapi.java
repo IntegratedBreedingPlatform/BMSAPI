@@ -85,8 +85,9 @@ public class ListResourceBrapi {
 			return new ResponseEntity<>(entityListResponse, HttpStatus.BAD_REQUEST);
 		}
 
-		final GermplasmListSearchRequestDTO	requestDTO = new GermplasmListSearchRequestDTO(listType, listName,
-			Collections.singletonList(listDbId), listSource, externalReferenceID, externalReferenceSource);
+		final List<String> listDbIds = StringUtils.isNotEmpty(listDbId) ? Collections.singletonList(listDbId) : null;
+		final GermplasmListSearchRequestDTO requestDTO = new GermplasmListSearchRequestDTO(listType, listName,
+			listDbIds, listSource, externalReferenceID, externalReferenceSource);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
