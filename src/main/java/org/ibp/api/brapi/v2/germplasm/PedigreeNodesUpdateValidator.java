@@ -52,6 +52,10 @@ public class PedigreeNodesUpdateValidator {
 
 		final Map<String, GermplasmDto> germplasmMapByUUIDs = this.getGermplasmMapByUUIDs(pedigreeNodeDTOMap);
 		final Map<String, BreedingMethodDTO> breedingMethodDTOMapByIds = this.getBreedingMethodMapByIds(pedigreeNodeDTOMap);
+		final Map<Integer, Integer> germplasmDerivativeProgenyCount =
+			this.germplasmMiddlewareService.countGermplasmDerivativeProgeny(
+				germplasmMapByUUIDs.values().stream().map(GermplasmDto::getGid).collect(
+					Collectors.toSet()));
 
 		final List<PedigreeNodeDTO> pedigreeNodeDTOList = new ArrayList<>(pedigreeNodeDTOMap.values());
 		final Map<PedigreeNodeDTO, Integer> indexMap = IntStream.range(0, pedigreeNodeDTOMap.size()).boxed()
@@ -65,7 +69,9 @@ public class PedigreeNodesUpdateValidator {
 			final PedigreeNodeDTO pedigreeNodeDTO = entry.getValue();
 			return !this.validateGermplasmDbId(germplasmDbIdMapKey, pedigreeNodeDTO, germplasmMapByUUIDs, errors, index)
 				|| !this.validateBreedingMethod(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs, errors, index)
-				|| !this.validateParents(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs, errors, index);
+				|| !this.validateParents(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs, errors, index)
+				|| !this.validateGermplasmHasExistingDerivativeProgeny(pedigreeNodeDTO, germplasmMapByUUIDs, breedingMethodDTOMapByIds,
+				germplasmDerivativeProgenyCount, errors, index);
 		});
 
 		return errors;
@@ -260,6 +266,26 @@ public class PedigreeNodesUpdateValidator {
 			}
 		}
 
+		return true;
+	}
+
+	protected boolean validateGermplasmHasExistingDerivativeProgeny(final PedigreeNodeDTO pedigreeNodeDTO,
+		final Map<String, GermplasmDto> germplasmMapByUUIDs, final Map<String, BreedingMethodDTO> breedingMethodDTOMapByIds,
+		final Map<Integer, Integer> germplasmDerivativeProgenyCount, final BindingResult errors, final int index) {
+
+		final GermplasmDto germplasmDto = germplasmMapByUUIDs.get(pedigreeNodeDTO.getGermplasmDbId());
+		final BreedingMethodDTO breedingMethodDTO = breedingMethodDTOMapByIds.get(germplasmDto.getBreedingMethodId().toString());
+		final Integer gid = germplasmDto.getGid();
+
+		// Check if a derivative germplasm has existing derivative progeny,
+		if (!GENERATIVE.equals(breedingMethodDTO.getType())) {
+			final int count = germplasmDerivativeProgenyCount.getOrDefault(gid, 0);
+			if (count > 0) {
+				errors.reject("pedigree.nodes.update.germplasm.with.derivative.progeny.cannot.be.updated",
+					new String[] {String.valueOf(index)}, "");
+				return false;
+			}
+		}
 		return true;
 	}
 
