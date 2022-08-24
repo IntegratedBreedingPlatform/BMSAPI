@@ -352,7 +352,7 @@ public class PedigreeNodesUpdateValidatorTest {
 	}
 
 	@Test
-	public void testValidateParents_Generative_MaleParentDbIdIsEqualToTheGermplasmToBeUpdated() {
+	public void testValidateParents_ParentDbIdIsEqualToTheGermplasmToBeUpdated() {
 		final int breedingMethodId = this.random.nextInt();
 		final int femaleParentDbId = this.random.nextInt();
 		final int maleParentDbId = this.random.nextInt();
@@ -370,8 +370,8 @@ public class PedigreeNodesUpdateValidatorTest {
 			this.pedigreeNodesUpdateValidatorUnderTest.validateParents(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs,
 				this.errors, 1));
 		Mockito.verify(this.errors)
-			.reject("pedigree.nodes.update.male.progenitors.can.not.be.equals.to.germplasmdbid",
-				new String[] {"1", String.valueOf(pedigreeNodeDTO.getGermplasmDbId())}, "");
+			.reject("pedigree.nodes.update.progenitors.can.not.be.equals.to.germplasmdbid",
+				new String[] {"1"}, "");
 
 	}
 
