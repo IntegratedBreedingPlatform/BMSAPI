@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodNewRequest;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.MethodGroup;
 import org.generationcp.middleware.pojos.MethodType;
@@ -30,6 +31,9 @@ public class BreedingMethodValidatorTest {
 	@Mock
 	private BreedingMethodService breedingMethodService;
 
+	@Mock
+	private GermplasmNameTypeService germplasmNameTypeService;
+
 	@InjectMocks
 	private BreedingMethodValidator breedingMethodValidator;
 
@@ -47,6 +51,19 @@ public class BreedingMethodValidatorTest {
 	public void validateCreation_Ok() {
 		final BreedingMethodNewRequest breedingMethod = this.createBreedingMethodNewRequest();
 		this.breedingMethodValidator.validateCreation(breedingMethod);
+	}
+
+	@Test
+	public void validateCreation_InvalidSnameTypeCode() {
+		final BreedingMethodNewRequest breedingMethod = this.createBreedingMethodNewRequest();
+		breedingMethod.setSnameTypeId(1);
+
+		try {
+			this.breedingMethodValidator.validateCreation(breedingMethod);
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception.getErrors().get(0).getCode(), is("breeding.methods.invalid.snametype"));
+		}
+
 	}
 
 	@Test
@@ -209,6 +226,18 @@ public class BreedingMethodValidatorTest {
 			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception.getErrors().get(0).getCode(), is("breeding.methods.invalid.group"));
+		}
+	}
+
+	@Test
+	public void validateEdition_Invalid_SnameTypeCode() {
+		final BreedingMethodDTO breedingMethodRequest = this.createBreedingMethod();
+		breedingMethodRequest.setSnameTypeId(1);
+
+		try {
+			this.breedingMethodValidator.validateEdition(this.breedingMethodDbId, breedingMethodRequest);
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception.getErrors().get(0).getCode(), is("breeding.methods.invalid.snametype"));
 		}
 	}
 
