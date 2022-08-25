@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.ibp.api.java.impl.middleware.germplasm.validator.GermplasmImportRequestDtoValidator.NAME_MAX_LENGTH;
@@ -67,6 +68,7 @@ public class GermplasmUpdateDtoValidator {
 		this.validateProgenitorsBothMustBeSpecified(errors, germplasmUpdateDTOList);
 		this.validateCannotAssignSelfAsProgenitor(errors, germplasmUpdateDTOList, germplasmSet);
 		this.validateProgenitorsGids(errors, germplasmUpdateDTOList);
+		this.validateGermplasmHasExistingDerivativeProgeny(errors, germplasmUpdateDTOList, germplasmSet);
 
 		if (errors.hasErrors()) {
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -146,7 +148,8 @@ public class GermplasmUpdateDtoValidator {
 		germplasmUpdateDTOList.stream().filter(germ -> germ.getAttributes() != null).collect(Collectors.toList())
 			.forEach(
 				g -> attributesCodes.addAll(g.getAttributes().keySet().stream().map(n -> n.toUpperCase()).collect(Collectors.toList())));
-		this.variableValidator.validateAttributeCodes(errors, programUUID, attributesCodes, VariableType.getGermplasmAttributeVariableTypes());
+		this.variableValidator.validateAttributeCodes(errors, programUUID, attributesCodes,
+			VariableType.getGermplasmAttributeVariableTypes());
 
 		final List<String> ambiguousCodes =
 			new ArrayList<>(CollectionUtils.intersection(existingNamesCodes, existingVariablesNamesAndAlias));
@@ -292,7 +295,42 @@ public class GermplasmUpdateDtoValidator {
 		if (progenitorsWithEmptyValuesCount > 0) {
 			errors.reject("germplasm.update.invalid.progenitors", "");
 		}
+	}
 
+	protected void validateGermplasmHasExistingDerivativeProgeny(final BindingResult errors,
+		final List<GermplasmUpdateDTO> germplasmUpdateDTOList, final Optional<Set<Germplasm>> germplasmSetOptional) {
+
+		if (germplasmSetOptional.isPresent()) {
+
+			final Set<Germplasm> germplasmSet = germplasmSetOptional.get();
+			final Map<String, Integer> guuidGidMap =
+				germplasmSet.stream().collect(Collectors.toMap(Germplasm::getGermplasmUUID, Germplasm::getGid));
+
+			final Map<Integer, Germplasm> germplasmMap =
+				germplasmSet.stream().collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
+			final Map<Integer, Integer> germplasmDerivativeProgenyCount =
+				this.germplasmMiddlewareService.countGermplasmDerivativeProgeny(germplasmMap.keySet());
+
+			// Find any row (GermplasmUpdateDTO) where germplasm has existing derivative progeny
+			final Optional<GermplasmUpdateDTO> germplasmWithDerivativeProgeny =
+				germplasmUpdateDTOList.stream().filter(dto -> {
+					final Integer gid = Optional.ofNullable(dto.getGid()).orElse(guuidGidMap.get(dto.getGermplasmUUID()));
+					final Germplasm germplasm = germplasmMap.get(gid);
+					final Integer progenitor1 = dto.getProgenitors().getOrDefault(GermplasmServiceImpl.PROGENITOR_1, null);
+					final Integer progenitor2 = dto.getProgenitors().getOrDefault(GermplasmServiceImpl.PROGENITOR_2, null);
+					// Check if a derivative germplasm has existing derivative progeny only when both progenitors are specified.
+					// gnpgs == -1 means the germplasm is derivative.
+					if (germplasm.getGnpgs() == -1 && progenitor1 != null
+						&& progenitor2 != null) {
+						final int count = germplasmDerivativeProgenyCount.getOrDefault(gid, 0);
+						return count > 0;
+					}
+					return false;
+				}).findAny();
+			if (germplasmWithDerivativeProgeny.isPresent()) {
+				errors.reject("germplasm.update.germplasm.with.derivative.progeny.cannot.be.updated");
+			}
+		}
 	}
 
 }

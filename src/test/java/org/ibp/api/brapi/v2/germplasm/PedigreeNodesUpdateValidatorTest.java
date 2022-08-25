@@ -30,6 +30,7 @@ import java.util.Random;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -74,6 +75,7 @@ public class PedigreeNodesUpdateValidatorTest {
 		final List<GermplasmDto> germplasmDtos = Arrays.asList(germplasmDto, femaleGermplasmDto, maleGermplasmDto);
 		when(this.mockGermplasmService.findGermplasmMatches(any(GermplasmMatchRequestDto.class), eq(null))).thenReturn(
 			germplasmDtos);
+		when(this.mockGermplasmMiddlewareService.countGermplasmDerivativeProgeny(anySet())).thenReturn(new HashMap<>());
 
 		final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO();
 		breedingMethodDTO.setMid(breedingMethodDbId);
@@ -350,7 +352,7 @@ public class PedigreeNodesUpdateValidatorTest {
 	}
 
 	@Test
-	public void testValidateParents_Generative_MaleParentDbIdIsEqualToTheGermplasmToBeUpdated() {
+	public void testValidateParents_ParentDbIdIsEqualToTheGermplasmToBeUpdated() {
 		final int breedingMethodId = this.random.nextInt();
 		final int femaleParentDbId = this.random.nextInt();
 		final int maleParentDbId = this.random.nextInt();
@@ -368,8 +370,8 @@ public class PedigreeNodesUpdateValidatorTest {
 			this.pedigreeNodesUpdateValidatorUnderTest.validateParents(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs,
 				this.errors, 1));
 		Mockito.verify(this.errors)
-			.reject("pedigree.nodes.update.male.progenitors.can.not.be.equals.to.germplasmdbid",
-				new String[] {"1", String.valueOf(pedigreeNodeDTO.getGermplasmDbId())}, "");
+			.reject("pedigree.nodes.update.progenitors.can.not.be.equals.to.germplasmdbid",
+				new String[] {"1"}, "");
 
 	}
 
@@ -476,6 +478,69 @@ public class PedigreeNodesUpdateValidatorTest {
 		assertTrue(
 			this.pedigreeNodesUpdateValidatorUnderTest.validateParents(pedigreeNodeDTO, breedingMethodDTOMapByIds, germplasmMapByUUIDs,
 				this.errors, 1));
+		Mockito.verifyNoMoreInteractions(this.errors);
+
+	}
+
+	@Test
+	public void testValidateGermplasmHasExistingDerivativeProgeny_PedigreeNodeIsDerivative() {
+		final int breedingMethodId = this.random.nextInt();
+		final int groupSourceParentDbId = this.random.nextInt();
+		final int immediateSourceParentDbId = this.random.nextInt();
+		final int gid = this.random.nextInt();
+		final PedigreeNodeDTO pedigreeNodeDTO =
+			this.createPedigreeNodeDerivative(breedingMethodId, groupSourceParentDbId, immediateSourceParentDbId);
+		final Map<String, BreedingMethodDTO> breedingMethodDTOMapByIds =
+			this.createBreedingMethodMap(breedingMethodId, MethodType.DERIVATIVE);
+		final Map<String, GermplasmDto> germplasmMapByUUIDs = new HashMap<>();
+		final GermplasmDto germplasmDto = new GermplasmDto();
+		germplasmDto.setGid(gid);
+		germplasmDto.setBreedingMethodId(breedingMethodId);
+		germplasmMapByUUIDs.put(String.valueOf(pedigreeNodeDTO.getGermplasmDbId()), germplasmDto);
+
+		final Map<Integer, Integer> germplasmDerivativeProgenyCount = new HashMap<>();
+
+		// Germplasm is derivative but has no existing derivative progeny
+		germplasmDerivativeProgenyCount.put(gid, 0);
+		assertTrue(
+			this.pedigreeNodesUpdateValidatorUnderTest.validateGermplasmHasExistingDerivativeProgeny(pedigreeNodeDTO, germplasmMapByUUIDs,
+				breedingMethodDTOMapByIds, germplasmDerivativeProgenyCount, this.errors, 1));
+		Mockito.verifyNoMoreInteractions(this.errors);
+
+		// Germplasm is derivative and it has existing derivative progeny
+		germplasmDerivativeProgenyCount.put(gid, 1);
+		assertFalse(
+			this.pedigreeNodesUpdateValidatorUnderTest.validateGermplasmHasExistingDerivativeProgeny(pedigreeNodeDTO, germplasmMapByUUIDs,
+				breedingMethodDTOMapByIds, germplasmDerivativeProgenyCount, this.errors, 1));
+		Mockito.verify(this.errors)
+			.reject("pedigree.nodes.update.germplasm.with.derivative.progeny.cannot.be.updated",
+				new String[] {"1"}, "");
+
+	}
+
+	@Test
+	public void testValidateGermplasmHasExistingDerivativeProgeny_PedigreeNodeIsGenerative() {
+		final int breedingMethodId = this.random.nextInt();
+		final int femaleParentDbId = this.random.nextInt();
+		final int maleParentDbId = this.random.nextInt();
+		final int gid = this.random.nextInt();
+		final PedigreeNodeDTO pedigreeNodeDTO =
+			this.createPedigreeNodeGenerative(breedingMethodId, femaleParentDbId, maleParentDbId);
+		final Map<String, BreedingMethodDTO> breedingMethodDTOMapIds =
+			this.createBreedingMethodMap(breedingMethodId, MethodType.GENERATIVE);
+		final Map<String, GermplasmDto> germplasmMapByUUIDs = new HashMap<>();
+		final GermplasmDto germplasmDto = new GermplasmDto();
+		germplasmDto.setGid(gid);
+		germplasmDto.setBreedingMethodId(breedingMethodId);
+		germplasmMapByUUIDs.put(String.valueOf(pedigreeNodeDTO.getGermplasmDbId()), germplasmDto);
+
+		final Map<Integer, Integer> germplasmDerivativeProgenyCount = new HashMap<>();
+
+		// If germplasm is generative, it sould not check if germplasm has existing derivative progeny
+		germplasmDerivativeProgenyCount.put(gid, 0);
+		assertTrue(
+			this.pedigreeNodesUpdateValidatorUnderTest.validateGermplasmHasExistingDerivativeProgeny(pedigreeNodeDTO, germplasmMapByUUIDs,
+				breedingMethodDTOMapIds, germplasmDerivativeProgenyCount, this.errors, 1));
 		Mockito.verifyNoMoreInteractions(this.errors);
 
 	}
