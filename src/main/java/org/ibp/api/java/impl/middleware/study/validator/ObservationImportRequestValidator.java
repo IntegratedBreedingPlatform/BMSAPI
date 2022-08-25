@@ -49,7 +49,8 @@ public class ObservationImportRequestValidator {
 
 	public static final List<String> PLOT_SUBPLOT_OBSERVATION_LEVEL_NAMES =
 		ListUtils.unmodifiableList(Arrays.asList(ObservationLevelEnum.PLOT.getLevelName(), ObservationLevelEnum.PLANT.getLevelName(),
-			ObservationLevelEnum.SUB_PLOT.getLevelName(), ObservationLevelEnum.CUSTOM.getLevelName()));
+			ObservationLevelEnum.SUB_PLOT.getLevelName(), ObservationLevelEnum.CUSTOM.getLevelName(),
+			ObservationLevelEnum.TIMESERIES.getLevelName()));
 
 	@Autowired
 	private GermplasmServiceBrapi germplasmService;
