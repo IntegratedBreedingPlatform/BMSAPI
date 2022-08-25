@@ -125,7 +125,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 							}
 							final Instant end = Instant.now();
 							debug("pedigree retrieved: gid=%d, Duration: %s", gid1, formatDurationHMS(between(start, end).toMillis()));
-							copCalculation.populateOrder(gid1Tree, 0);
+							CopCalculation.populateOrder(gid1Tree, 0);
 							trackNodes(gid1Tree, nodes);
 						} else {
 							gid1Tree = nodes.get(gid1);
@@ -142,7 +142,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 							}
 							final Instant end = Instant.now();
 							debug("pedigree retrieved: gid=%d, Duration: %s", gid2, formatDurationHMS(between(start, end).toMillis()));
-							copCalculation.populateOrder(gid2Tree, 0);
+							CopCalculation.populateOrder(gid2Tree, 0);
 							trackNodes(gid2Tree, nodes);
 						} else {
 							gid2Tree = nodes.get(gid2);
