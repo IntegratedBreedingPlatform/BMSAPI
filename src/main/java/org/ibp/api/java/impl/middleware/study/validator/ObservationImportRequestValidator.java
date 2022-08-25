@@ -12,7 +12,7 @@ import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
-import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -48,10 +48,8 @@ public class ObservationImportRequestValidator {
 	private static final int MAX_VALUE_LENGTH = 255;
 
 	public static final List<String> PLOT_SUBPLOT_OBSERVATION_LEVEL_NAMES =
-		ListUtils.unmodifiableList(Arrays.asList(
-			ObservationLevelMapper.ObservationLevelEnum.PLOT.getName(),
-			ObservationLevelMapper.ObservationLevelEnum.PLANT.getName(),
-			ObservationLevelMapper.ObservationLevelEnum.SUB_PLOT.getName()));
+		ListUtils.unmodifiableList(Arrays.asList(ObservationLevelEnum.PLOT.getLevelName(), ObservationLevelEnum.PLANT.getLevelName(),
+			ObservationLevelEnum.SUB_PLOT.getLevelName(), ObservationLevelEnum.CUSTOM.getLevelName()));
 
 	@Autowired
 	private GermplasmServiceBrapi germplasmService;
@@ -227,7 +225,7 @@ public class ObservationImportRequestValidator {
 		if (variableDTO.getContextOfUse().contains(VariableDTO.ContextOfUseEnum.PLOT.name())
 			&& !PLOT_SUBPLOT_OBSERVATION_LEVEL_NAMES.contains(
 			observationUnitDto.getObservationLevel().toUpperCase())) {
-			this.errors.reject("observation.import.observationVariableDbId.invalid.trait.selection.method.variable",
+			this.errors.reject("observation.import.observationVariableDbId.invalid.trait.and.selection.method.variable",
 				new String[] {index.toString(), VariableDTO.ContextOfUseEnum.PLOT.name()}, "");
 			return true;
 		}
