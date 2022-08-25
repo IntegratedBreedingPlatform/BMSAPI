@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.germplasm.brapi;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeSearchRequest;
@@ -39,9 +40,12 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 			final Set<String> updatedGermplasmDbIds =
 				this.pedigreeMiddlewareServiceBrapi.updatePedigreeNodes(pedigreeNodeDTOMap, conflictErrors);
 
-			final PedigreeNodeSearchRequest pedigreeNodeSearchRequest = new PedigreeNodeSearchRequest();
-			pedigreeNodeSearchRequest.setGermplasmDbIds(new ArrayList<>(updatedGermplasmDbIds));
-			final List<PedigreeNodeDTO> result = this.pedigreeMiddlewareServiceBrapi.searchPedigreeNodes(pedigreeNodeSearchRequest, null);
+			final List<PedigreeNodeDTO> result = new ArrayList<>();
+			if (!CollectionUtils.isEmpty(updatedGermplasmDbIds)) {
+				final PedigreeNodeSearchRequest pedigreeNodeSearchRequest = new PedigreeNodeSearchRequest();
+				pedigreeNodeSearchRequest.setGermplasmDbIds(new ArrayList<>(updatedGermplasmDbIds));
+				result.addAll(this.pedigreeMiddlewareServiceBrapi.searchPedigreeNodes(pedigreeNodeSearchRequest, null));
+			}
 
 			// Add the middleware conflict errors if there's any
 			conflictErrors.entries().forEach(erorrEntry -> validationErrors.reject(erorrEntry.getKey(), erorrEntry.getValue(), ""));
