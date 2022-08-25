@@ -46,15 +46,9 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	public static final int COP_MAX_JOB_COUNT;
 	private static final int COP_MAX_JOB_COUNT_DEFAULT = 1;
 
-	public static final Integer LEVEL;
-	private static final Integer LEVEL_DEFAULT = 40;
-
 	static {
 		final String envVar = System.getenv("COP_MAX_JOB_COUNT");
 		COP_MAX_JOB_COUNT = !isBlank(envVar) ? Integer.parseInt(envVar) : COP_MAX_JOB_COUNT_DEFAULT;
-
-		final String levelVar = System.getenv("COP_PEDIGREE_LEVEL");
-		LEVEL = !isBlank(levelVar) ? Integer.parseInt(levelVar) : LEVEL_DEFAULT;
 	}
 	public static final Semaphore semaphore = new Semaphore(COP_MAX_JOB_COUNT);
 
@@ -125,7 +119,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 							debug("retrieving pedigree: gid=%d", gid1);
 							final Instant start = Instant.now();
 							try {
-								gid1Tree = this.copServiceAsyncMiddleware.getGermplasmPedigreeTree(gid1, LEVEL, INCLUDE_DERIVATIVE_LINES);
+								gid1Tree = this.copServiceAsyncMiddleware.getGermplasmPedigreeTree(gid1, null, INCLUDE_DERIVATIVE_LINES);
 							} catch (final MiddlewareRequestException ex) {
 								continue outer;
 							}
@@ -142,7 +136,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 							debug("retrieving pedigree: gid=%d", gid2);
 							final Instant start = Instant.now();
 							try {
-								gid2Tree = this.copServiceAsyncMiddleware.getGermplasmPedigreeTree(gid2, LEVEL, INCLUDE_DERIVATIVE_LINES);
+								gid2Tree = this.copServiceAsyncMiddleware.getGermplasmPedigreeTree(gid2, null, INCLUDE_DERIVATIVE_LINES);
 							} catch (final MiddlewareRequestException ex) {
 								continue inner;
 							}
