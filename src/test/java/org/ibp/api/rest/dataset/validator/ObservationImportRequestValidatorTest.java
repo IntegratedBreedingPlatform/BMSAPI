@@ -277,17 +277,6 @@ public class ObservationImportRequestValidatorTest {
 	}
 
 	@Test
-	public void testPruneObservationInvalidForImport_ObservationAlreadyExisting() {
-		Mockito.when(this.observationServiceBrapi.searchObservations(ArgumentMatchers.any(ObservationSearchRequestDto.class),
-				ArgumentMatchers.eq(null)))
-			.thenReturn(this.createObservationDtoList());
-		final List<ObservationDto> observationDtos = this.createObservationDtoList();
-		final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
-		Assert.assertTrue(result.hasErrors());
-		Assert.assertEquals("observation.import.already.existing", result.getAllErrors().get(0).getCode());
-	}
-
-	@Test
 	public void testPruneObservationInvalidForImport_ObservationUnitDbIdInvalid_MeansVariableIsNotUsedAtMeansLevel() {
 
 		final VariableDTO variableDTO = new VariableDTO();
