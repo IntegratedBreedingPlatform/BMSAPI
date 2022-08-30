@@ -4,13 +4,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -40,8 +40,9 @@ public class ObservationUnitImportRequestValidator {
 
 	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
-	public static final String PLOT = "PLOT";
-	private static final List<String> OBSERVATION_LEVEL_NAMES = Arrays.asList(PLOT, "BLOCK", "REP");
+	private static final List<String> VALID_OBSERVATION_RELATIONSHIP_LEVEL_NAMES =
+		Arrays.asList(ObservationLevelEnum.PLOT.getLevelName(), ObservationLevelEnum.BLOCK.getLevelName(),
+			ObservationLevelEnum.REP.getLevelName());
 
 	@Autowired
 	private StudyServiceBrapi studyServiceBrapi;
@@ -172,7 +173,7 @@ public class ObservationUnitImportRequestValidator {
 				continue;
 			}
 
-			if (position.getObservationLevel().getLevelName().equalsIgnoreCase(DatasetTypeEnum.PLOT_DATA.getName())) {
+			if (position.getObservationLevel().getLevelName().equalsIgnoreCase(ObservationLevelEnum.PLOT.getLevelName())) {
 
 				if (!this.isObservationLevelRelationshipNamesValid(position.getObservationLevelRelationships(), index)) {
 					iterator.remove();
@@ -184,8 +185,9 @@ public class ObservationUnitImportRequestValidator {
 						.stream().anyMatch(
 							levelRelationship -> {
 								final String levelCode = levelRelationship.getLevelCode();
-								return levelRelationship.getLevelName().equalsIgnoreCase(PLOT) && (!isNumber(levelCode)
-									|| parseInt(levelCode) < 1);
+								return levelRelationship.getLevelName().equalsIgnoreCase(ObservationLevelEnum.PLOT.getLevelName()) && (
+									!isNumber(levelCode)
+										|| parseInt(levelCode) < 1);
 							}
 						);
 				if (isPlotLevelCodeInValid) {
@@ -207,8 +209,9 @@ public class ObservationUnitImportRequestValidator {
 					final Optional<ObservationLevelRelationship> duplicatedPlot =
 						dto.getObservationUnitPosition().getObservationLevelRelationships()
 							.stream()
-							.filter(levelRelationship -> levelRelationship.getLevelName().equalsIgnoreCase(PLOT) &&
-								validPlotLevelCodes.contains(levelRelationship.getLevelCode()))
+							.filter(levelRelationship ->
+								levelRelationship.getLevelName().equalsIgnoreCase(ObservationLevelEnum.PLOT.getLevelName()) &&
+									validPlotLevelCodes.contains(levelRelationship.getLevelCode()))
 							.findFirst();
 					if (duplicatedPlot.isPresent()) {
 						this.errors.reject("observation.unit.import.plot.levelCode.duplicated", new String[] {index.toString()}, "");
@@ -223,7 +226,8 @@ public class ObservationUnitImportRequestValidator {
 				if (!CollectionUtils.isEmpty(position.getObservationLevelRelationships())) {
 					position.getObservationLevelRelationships()
 						.stream()
-						.filter(levelRelationship -> levelRelationship.getLevelName().equalsIgnoreCase(PLOT))
+						.filter(levelRelationship -> levelRelationship.getLevelName()
+							.equalsIgnoreCase(ObservationLevelEnum.PLOT.getLevelName()))
 						.forEach(levelRelationship ->
 							validPlotObservationLevelRelationshipsByStudyDbIds.get(dto.getStudyDbId())
 								.add(levelRelationship.getLevelCode()));
@@ -242,8 +246,8 @@ public class ObservationUnitImportRequestValidator {
 			return false;
 		}
 		// Support PLOT and MEANS level for now
-		if (DatasetTypeEnum.MEANS_DATA.getName().equalsIgnoreCase(observationLevel.getLevelName())
-			|| DatasetTypeEnum.PLOT_DATA.getName().equalsIgnoreCase(observationLevel.getLevelName())) {
+		if (ObservationLevelEnum.MEANS.getLevelName().equalsIgnoreCase(observationLevel.getLevelName())
+			|| ObservationLevelEnum.PLOT.getLevelName().equalsIgnoreCase(observationLevel.getLevelName())) {
 			return true;
 		}
 		this.errors.reject("observation.unit.import.invalid.observation.level.name", new String[] {index.toString()}, "");
@@ -255,10 +259,10 @@ public class ObservationUnitImportRequestValidator {
 		boolean hasPlot = false;
 		if (!CollectionUtils.isEmpty(observationLevelRelationships)) {
 			for (final ObservationLevelRelationship relationship : observationLevelRelationships) {
-				if (relationship.getLevelName().equalsIgnoreCase(PLOT)) {
+				if (relationship.getLevelName().equalsIgnoreCase(ObservationLevelEnum.PLOT.getLevelName())) {
 					hasPlot = true;
 				}
-				if (!OBSERVATION_LEVEL_NAMES.contains(relationship.getLevelName().toUpperCase())) {
+				if (!VALID_OBSERVATION_RELATIONSHIP_LEVEL_NAMES.contains(relationship.getLevelName().toUpperCase())) {
 					this.errors.reject("observation.unit.import.invalid.observation.level.relationship.level.name",
 						new String[] {index.toString()}, "");
 					return false;
@@ -303,7 +307,7 @@ public class ObservationUnitImportRequestValidator {
 
 		final Optional<ObservationLevelRelationship> existingPlotLevelRelationship = importedObservationLevelRelationships
 			.stream()
-			.filter(levelRelationship -> levelRelationship.getLevelName().equalsIgnoreCase(PLOT) &&
+			.filter(levelRelationship -> levelRelationship.getLevelName().equalsIgnoreCase(ObservationLevelEnum.PLOT.getLevelName()) &&
 				existingPlotObservationLevelRelationships.contains(levelRelationship.getLevelCode()))
 			.findFirst();
 		return existingPlotLevelRelationship.isPresent();

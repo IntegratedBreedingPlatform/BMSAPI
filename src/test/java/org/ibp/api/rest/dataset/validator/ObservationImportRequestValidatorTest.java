@@ -10,7 +10,7 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
-import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
@@ -85,7 +85,7 @@ public class ObservationImportRequestValidatorTest {
 		observationUnitDto.setGermplasmDbId(GERMPLASM_DBID);
 		observationUnitDto.setObservationUnitDbId(OBSERVATION_UNIT_DBID);
 		observationUnitDto.setStudyDbId(STUDY_DBID);
-		observationUnitDto.setObservationLevel(ObservationLevelMapper.ObservationLevelEnum.PLOT.getName());
+		observationUnitDto.setObservationLevel(ObservationLevelEnum.PLOT.getLevelName());
 		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO = new ObservationUnitSearchRequestDTO();
 		observationUnitSearchRequestDTO.setObservationUnitDbIds(Collections.singletonList(OBSERVATION_UNIT_DBID));
 		Mockito.when(this.observationUnitService.searchObservationUnits(null, null, observationUnitSearchRequestDTO))
@@ -218,7 +218,7 @@ public class ObservationImportRequestValidatorTest {
 		observationUnitDto.setGermplasmDbId(RandomStringUtils.randomAlphabetic(5));
 		observationUnitDto.setObservationUnitDbId(OBSERVATION_UNIT_DBID);
 		observationUnitDto.setStudyDbId(STUDY_DBID);
-		observationUnitDto.setObservationLevel(ObservationLevelMapper.ObservationLevelEnum.PLOT.getName());
+		observationUnitDto.setObservationLevel(ObservationLevelEnum.PLOT.getLevelName());
 		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO = new ObservationUnitSearchRequestDTO();
 		observationUnitSearchRequestDTO.setObservationUnitDbIds(Collections.singletonList(OBSERVATION_UNIT_DBID));
 		Mockito.when(this.observationUnitService.searchObservationUnits(null, null, observationUnitSearchRequestDTO))
@@ -277,17 +277,6 @@ public class ObservationImportRequestValidatorTest {
 	}
 
 	@Test
-	public void testPruneObservationInvalidForImport_ObservationAlreadyExisting() {
-		Mockito.when(this.observationServiceBrapi.searchObservations(ArgumentMatchers.any(ObservationSearchRequestDto.class),
-				ArgumentMatchers.eq(null)))
-			.thenReturn(this.createObservationDtoList());
-		final List<ObservationDto> observationDtos = this.createObservationDtoList();
-		final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
-		Assert.assertTrue(result.hasErrors());
-		Assert.assertEquals("observation.import.already.existing", result.getAllErrors().get(0).getCode());
-	}
-
-	@Test
 	public void testPruneObservationInvalidForImport_ObservationUnitDbIdInvalid_MeansVariableIsNotUsedAtMeansLevel() {
 
 		final VariableDTO variableDTO = new VariableDTO();
@@ -313,7 +302,7 @@ public class ObservationImportRequestValidatorTest {
 		observationUnitDto.setGermplasmDbId(GERMPLASM_DBID);
 		observationUnitDto.setObservationUnitDbId(OBSERVATION_UNIT_DBID);
 		observationUnitDto.setStudyDbId(STUDY_DBID);
-		observationUnitDto.setObservationLevel(ObservationLevelMapper.ObservationLevelEnum.PLOT.getName());
+		observationUnitDto.setObservationLevel(ObservationLevelEnum.PLOT.getLevelName());
 		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO = new ObservationUnitSearchRequestDTO();
 		observationUnitSearchRequestDTO.setObservationUnitDbIds(Collections.singletonList(OBSERVATION_UNIT_DBID));
 		Mockito.when(this.observationUnitService.searchObservationUnits(null, null, observationUnitSearchRequestDTO))
@@ -343,7 +332,7 @@ public class ObservationImportRequestValidatorTest {
 		observationUnitDto.setGermplasmDbId(GERMPLASM_DBID);
 		observationUnitDto.setObservationUnitDbId(OBSERVATION_UNIT_DBID);
 		observationUnitDto.setStudyDbId(STUDY_DBID);
-		observationUnitDto.setObservationLevel(ObservationLevelMapper.ObservationLevelEnum.STUDY.getName());
+		observationUnitDto.setObservationLevel(ObservationLevelEnum.STUDY.getLevelName());
 		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO = new ObservationUnitSearchRequestDTO();
 		observationUnitSearchRequestDTO.setObservationUnitDbIds(Collections.singletonList(OBSERVATION_UNIT_DBID));
 		Mockito.when(this.observationUnitService.searchObservationUnits(null, null, observationUnitSearchRequestDTO))
@@ -362,7 +351,7 @@ public class ObservationImportRequestValidatorTest {
 
 		final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
 		Assert.assertTrue(result.hasErrors());
-		Assert.assertEquals("observation.import.observationVariableDbId.invalid.trait.selection.method.variable",
+		Assert.assertEquals("observation.import.observationVariableDbId.invalid.trait.and.selection.method.variable",
 			result.getAllErrors().get(0).getCode());
 	}
 
