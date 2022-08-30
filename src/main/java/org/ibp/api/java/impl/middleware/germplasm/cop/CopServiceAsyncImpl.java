@@ -46,15 +46,9 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	public static final int COP_MAX_JOB_COUNT;
 	private static final int COP_MAX_JOB_COUNT_DEFAULT = 1;
 
-	public static final Integer LEVEL;
-	private static final Integer LEVEL_DEFAULT = 40;
-
 	static {
 		final String envVar = System.getenv("COP_MAX_JOB_COUNT");
 		COP_MAX_JOB_COUNT = !isBlank(envVar) ? Integer.parseInt(envVar) : COP_MAX_JOB_COUNT_DEFAULT;
-
-		final String levelVar = System.getenv("COP_PEDIGREE_LEVEL");
-		LEVEL = !isBlank(levelVar) ? Integer.parseInt(levelVar) : LEVEL_DEFAULT;
 	}
 	public static final Semaphore semaphore = new Semaphore(COP_MAX_JOB_COUNT);
 
@@ -125,13 +119,13 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 							debug("retrieving pedigree: gid=%d", gid1);
 							final Instant start = Instant.now();
 							try {
-								gid1Tree = this.copServiceAsyncMiddleware.getGermplasmPedigreeTree(gid1, LEVEL, INCLUDE_DERIVATIVE_LINES);
+								gid1Tree = this.copServiceAsyncMiddleware.getGermplasmPedigreeTree(gid1, null, INCLUDE_DERIVATIVE_LINES);
 							} catch (final MiddlewareRequestException ex) {
 								continue outer;
 							}
 							final Instant end = Instant.now();
 							debug("pedigree retrieved: gid=%d, Duration: %s", gid1, formatDurationHMS(between(start, end).toMillis()));
-							copCalculation.populateOrder(gid1Tree, 0);
+							CopCalculation.populateOrder(gid1Tree, 0);
 							trackNodes(gid1Tree, nodes);
 						} else {
 							gid1Tree = nodes.get(gid1);
@@ -142,13 +136,13 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 							debug("retrieving pedigree: gid=%d", gid2);
 							final Instant start = Instant.now();
 							try {
-								gid2Tree = this.copServiceAsyncMiddleware.getGermplasmPedigreeTree(gid2, LEVEL, INCLUDE_DERIVATIVE_LINES);
+								gid2Tree = this.copServiceAsyncMiddleware.getGermplasmPedigreeTree(gid2, null, INCLUDE_DERIVATIVE_LINES);
 							} catch (final MiddlewareRequestException ex) {
 								continue inner;
 							}
 							final Instant end = Instant.now();
 							debug("pedigree retrieved: gid=%d, Duration: %s", gid2, formatDurationHMS(between(start, end).toMillis()));
-							copCalculation.populateOrder(gid2Tree, 0);
+							CopCalculation.populateOrder(gid2Tree, 0);
 							trackNodes(gid2Tree, nodes);
 						} else {
 							gid2Tree = nodes.get(gid2);
