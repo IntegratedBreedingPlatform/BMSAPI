@@ -117,7 +117,7 @@ public class CopServiceImpl implements CopService {
 
 		if (requiresProcessing) {
 			if (this.copServiceAsync.threadExists(gids)) {
-				throw new MiddlewareRequestException("", "cop.gids.in.queue", this.copServiceAsync.getProgress(gids));
+				return new CopResponse(this.copServiceAsync.getProgress(gids));
 			}
 
 			this.copServiceAsync.prepareExecution(gids);
