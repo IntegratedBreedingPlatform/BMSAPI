@@ -30,7 +30,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
@@ -236,6 +235,7 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		}
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, variableIds);
+		this.datasetValidator.validateNotDeletingSystemEntryDetailToAlreadyGeneratedExperiment(datasetId, variableIds);
 		this.middlewareDatasetService.removeDatasetVariables(studyId, datasetId, variableIds);
 	}
 
