@@ -99,6 +99,7 @@ public class DatasetValidator {
 
 		this.validateVariable(standardVariable, variableType);
 		this.validateIfDatasetVariableAlreadyExists(variableId, shouldBeDatasetVariable, measurementVariableMap, datasetType);
+		this.validateNotAddingSystemEntryDetailsToAlreadyGeneratedExperiment(standardVariable, studyHasExperimentDesign);
 
 		return standardVariable;
 	}
@@ -232,4 +233,13 @@ public class DatasetValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
+
+	private void validateNotAddingSystemEntryDetailsToAlreadyGeneratedExperiment(final StandardVariable variable,
+		final boolean studyHasExperimentDesign) {
+		if (studyHasExperimentDesign && variable.getVariableTypes().contains(VariableType.ENTRY_DETAIL) && variable.isSystem()) {
+			this.errors.reject("system-variable.cannot.add", new String[] {String.valueOf(variable.getName())},  "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
 }
