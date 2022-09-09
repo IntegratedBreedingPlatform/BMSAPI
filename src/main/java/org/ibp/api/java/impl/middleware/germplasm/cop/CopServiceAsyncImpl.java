@@ -110,7 +110,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 				inner: for (final Integer gid2 : gids) {
 					if (!(matrix.contains(gid1, gid2) || matrix.contains(gid2, gid1))) {
 
-						if (Thread.currentThread().isInterrupted()) {
+						if (this.isJobInterrupted()) {
 							return new AsyncResult<>(Boolean.FALSE);
 						}
 
@@ -176,6 +176,9 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 
 				for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : matrixNew.rowMap().entrySet()) {
 					for (final Integer column : rowEntrySet.getValue().keySet()) {
+						if (this.isJobInterrupted()) {
+							throw new ApiRuntime2Exception("", "cop.async.interrupted");
+						}
 						final Integer row = rowEntrySet.getKey();
 						final CopMatrix copMatrix = new CopMatrix(row, column, matrixNew.get(row, column));
 						this.copServiceAsyncMiddleware.saveOrUpdate(copMatrix);
@@ -216,6 +219,10 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 		} finally {
 			cleanup(gids);
 		}
+	}
+
+	private boolean isJobInterrupted() {
+		return Thread.currentThread().isInterrupted();
 	}
 
 	@Override

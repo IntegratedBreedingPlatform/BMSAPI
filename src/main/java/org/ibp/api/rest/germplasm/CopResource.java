@@ -30,7 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -54,14 +55,14 @@ public class CopResource {
 	@ResponseBody
 	public ResponseEntity<CopResponse> calculateCopMatrix(
 		@PathVariable final String cropName,
-		@RequestBody final Set<Integer> gids,
+		@RequestBody final List<Integer> gids,
 		@ApiParam("whether to use or ignore pre-existing cop values. If true, re-calculate everything from scratch")
 		@RequestParam(required = false, defaultValue = "false") final boolean reset
 	) {
 		BaseValidator.checkNotNull(gids, "param.null", new String[] {"gids"});
 		BaseValidator.checkArgument(gids.size() > 0, "param.null", new String[] {"gids"});
 		BaseValidator.checkArgument(gids.size() <= this.copMaxEntries, "cop.calculation.max.entries", new Integer[] {this.copMaxEntries});
-		final CopResponse results = this.copService.calculateCoefficientOfParentage(gids, null, reset);
+		final CopResponse results = this.copService.calculateCoefficientOfParentage(new LinkedHashSet<>(gids), null, reset);
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
@@ -85,12 +86,12 @@ public class CopResource {
 	@ResponseBody
 	public ResponseEntity<Void> cancelJobs(
 		@PathVariable final String cropName,
-		@RequestParam(required = false) final Set<Integer> gids,
+		@RequestParam(required = false) final List<Integer> gids,
 		@RequestParam(required = false) final Integer listId
 	) {
 		// Either listId or gids param
 		BaseValidator.checkArgument(isEmpty(gids) != (listId == null), "cop.params.gids.or.listid");
-		this.copService.cancelJobs(gids, listId);
+		this.copService.cancelJobs(new LinkedHashSet<>(gids), listId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -99,14 +100,14 @@ public class CopResource {
 	@ResponseBody
 	public ResponseEntity<CopResponse> getCopMatrix(
 		@PathVariable final String cropName,
-		@RequestParam(required = false) final Set<Integer> gids,
+		@RequestParam(required = false) final List<Integer> gids,
 		@RequestParam(required = false) final Integer listId,
 		final HttpServletRequest request,
 		final HttpServletResponse response
 	) throws IOException {
 		// Either listId or gids param
 		BaseValidator.checkArgument(isEmpty(gids) != (listId == null), "cop.params.gids.or.listid");
-		final CopResponse results = this.copService.viewCoefficientOfParentage(gids, listId, request, response);
+		final CopResponse results = this.copService.viewCoefficientOfParentage(new LinkedHashSet<>(gids), listId, request, response);
 		return new ResponseEntity<>(results, HttpStatus.OK);
 	}
 
@@ -132,10 +133,10 @@ public class CopResource {
 	@ResponseBody
 	public ResponseEntity<FileSystemResource> getCopMatrixAsCsv(
 		@PathVariable final String cropName,
-		@RequestParam final Set<Integer> gids,
+		@RequestParam final List<Integer> gids,
 		@RequestParam final String nameKeySelected
 	) throws IOException {
-		final CopResponse results = this.copService.viewCoefficientOfParentage(gids, null, null, null);
+		final CopResponse results = this.copService.viewCoefficientOfParentage(new LinkedHashSet<>(gids), null, null, null);
 
 		// FIXME avoid writing to disk
 		final File temporaryFolder = Files.createTempDir();
