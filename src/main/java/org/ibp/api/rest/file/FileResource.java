@@ -157,6 +157,7 @@ public class FileResource {
 
 	public static void verifyHasAuthorityLots(final HttpServletRequest request) {
 		if (!(request.isUserInRole(PermissionsEnum.ADMIN.name())
+			|| request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())
 			|| request.isUserInRole(PermissionsEnum.MANAGE_INVENTORY.name())
 			|| request.isUserInRole(PermissionsEnum.MANAGE_LOTS.name())
 			|| request.isUserInRole(PermissionsEnum.UPDATE_LOTS.name())
