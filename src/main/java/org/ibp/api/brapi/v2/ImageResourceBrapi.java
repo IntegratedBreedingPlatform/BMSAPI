@@ -1,9 +1,11 @@
-package org.ibp.api.brapi.v1.image;
+package org.ibp.api.brapi.v2;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.file.FileStorageService;
@@ -17,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api("BrAPI v1 Image services")
+@Api("BrAPI v2 Image services")
 @RestController()
-@RequestMapping("/{cropName}/brapi/v1")
+@RequestMapping("/{cropName}/brapi/v2")
 public class ImageResourceBrapi {
 
 	@Autowired
@@ -30,6 +32,7 @@ public class ImageResourceBrapi {
 
 	@ApiOperation("Create a new image meta data object")
 	@RequestMapping(value = "/images", method = RequestMethod.POST)
+	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<SingleEntityResponse<Image>> createImage(
 		@PathVariable final String cropName,
 		@RequestBody final ImageNewRequest body
@@ -43,37 +46,4 @@ public class ImageResourceBrapi {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
-	@ApiOperation("Update an image meta data")
-	@RequestMapping(value = "/images/{imageDbId}", method = RequestMethod.PUT)
-	public ResponseEntity<SingleEntityResponse<Image>> updateImage(
-		@PathVariable final String cropName,
-		@PathVariable("imageDbId") final String imageDbId,
-		@RequestBody final ImageNewRequest body
-	) {
-		this.fileValidator.validateFileStorage();
-		this.fileValidator.validateImage(body);
-
-		final Image result = this.fileMetadataService.updateImage(imageDbId, body);
-		final SingleEntityResponse<Image> response = new SingleEntityResponse<>();
-		response.setResult(result);
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
-	}
-
-	@ApiOperation("Update an image with the image file content")
-	@RequestMapping(value = "/images/{imageDbId}/imagecontent",
-		produces = {"application/json"},
-		consumes = {"image/*"},
-		method = RequestMethod.PUT)
-	public ResponseEntity<SingleEntityResponse<Image>> updateImageContent(
-		@PathVariable final String cropName,
-		@PathVariable("imageDbId") final String imageDbId,
-		@RequestBody final byte[] imageContent
-	) {
-		this.fileValidator.validateFileStorage();
-
-		final Image result = this.fileMetadataService.updateImageContent(imageDbId, imageContent);
-		final SingleEntityResponse<Image> response = new SingleEntityResponse<>();
-		response.setResult(result);
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
-	}
 }

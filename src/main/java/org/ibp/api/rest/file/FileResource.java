@@ -67,7 +67,7 @@ public class FileResource {
 		}  else {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
-		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
+		this.fileValidator.validateFile(file);
 		//Check if only one of the parameters has value
 		final boolean valid = ((isBlank(observationUnitUUID)? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1) + ((lotId == null)? 0 : 1)) == 1;
 		BaseValidator.checkArgument(valid, "file.upload.entity.invalid");

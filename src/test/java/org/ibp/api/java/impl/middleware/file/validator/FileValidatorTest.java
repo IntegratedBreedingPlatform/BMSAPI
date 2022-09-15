@@ -26,12 +26,10 @@ public class FileValidatorTest {
 	@Test
 	public void validateFile() {
 		ReflectionTestUtils.setField(this.fileValidator, "supportedFileTypes", Arrays.asList("jpg","png"));
-		this.fileValidator.validateFile(Mockito.mock(BindingResult.class), this.mockMultipartFile("name.jpg"));
-		this.fileValidator.validateFile(Mockito.mock(BindingResult.class), this.mockMultipartFile("name.png"));
+		this.fileValidator.validateFile(this.mockMultipartFile("name.png"));
 
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		try {
-			this.fileValidator.validateFile(errors, this.mockMultipartFile("name.pdf"));
+			this.fileValidator.validateFile(this.mockMultipartFile("name.pdf"));
 		} catch (ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.upload.not-supported"));
 		}
