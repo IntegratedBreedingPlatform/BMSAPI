@@ -56,6 +56,7 @@ public class FileValidator {
 	}
 
 	public void validateImage(final ImageNewRequest body) {
+		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		checkNotNull(body.getObservationUnitDbId(), "file.upload.brapi.images.observationunitdbid.required");
 		final String imageFileName = body.getImageFileName();
 		checkNotNull(imageFileName, "file.upload.brapi.images.filename.required");
@@ -64,7 +65,6 @@ public class FileValidator {
 	}
 
 	private void validateExternalReferences(final List<ExternalReferenceDTO> externalReferenceDTOS) {
-		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		if (!CollectionUtils.isEmpty(externalReferenceDTOS)) {
 			for(final ExternalReferenceDTO externalReferenceDTO: externalReferenceDTOS) {
 				if (externalReferenceDTO == null || StringUtils.isEmpty(externalReferenceDTO.getReferenceID()) || StringUtils.isEmpty(externalReferenceDTO.getReferenceSource())) {
