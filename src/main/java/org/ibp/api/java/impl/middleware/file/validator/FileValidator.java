@@ -37,7 +37,7 @@ public class FileValidator {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		if (file == null) {
 			this.errors.reject("file.upload.required", "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		this.validateExtension(file.getOriginalFilename());
@@ -47,7 +47,7 @@ public class FileValidator {
 		final String extension = FilenameUtils.getExtension(fileName);
 		if (!this.supportedFileTypes.contains(extension.toLowerCase())) {
 			this.errors.reject("file.upload.not-supported",  new String[] {StringUtils.join(this.supportedFileTypes, ", ")}, "");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 

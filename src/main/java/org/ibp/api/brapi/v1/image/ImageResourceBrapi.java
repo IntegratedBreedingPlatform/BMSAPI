@@ -6,7 +6,6 @@ import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.java.file.FileMetadataService;
-import org.ibp.api.java.file.FileStorageService;
 import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

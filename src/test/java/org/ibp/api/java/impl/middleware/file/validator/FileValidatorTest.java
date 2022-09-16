@@ -43,7 +43,7 @@ public class FileValidatorTest {
 
 		try {
 			this.fileValidator.validateFile(this.mockMultipartFile("name.pdf"));
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.upload.not-supported"));
 		}
 	}
@@ -53,7 +53,7 @@ public class FileValidatorTest {
 		try {
 			Mockito.when(this.fileStorageService.isConfigured()).thenReturn(true);
 			this.fileValidator.validateFileStorage();
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			Assert.fail("No error should be thrown");
 		}
 	}
@@ -62,7 +62,7 @@ public class FileValidatorTest {
 	public void testValidateFileStorage_UnconfiguredFileStorage() {
 		try {
 			this.fileValidator.validateFileStorage();
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.storage.not.configured"));
 		}
 	}
@@ -71,7 +71,7 @@ public class FileValidatorTest {
 	public void testValidateImage_Success() {
 		try {
 			this.fileValidator.validateImage(this.createImageNewRequest());
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			Assert.fail("No error should be thrown");
 		}
 	}
@@ -82,7 +82,7 @@ public class FileValidatorTest {
 			final ImageNewRequest imageNewRequest= this.createImageNewRequest();
 			imageNewRequest.setObservationUnitDbId(null);
 			this.fileValidator.validateImage(imageNewRequest);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.upload.brapi.images.observationunitdbid.required"));
 		}
 	}
@@ -93,7 +93,7 @@ public class FileValidatorTest {
 			final ImageNewRequest imageNewRequest= this.createImageNewRequest();
 			imageNewRequest.setImageFileName(null);
 			this.fileValidator.validateImage(imageNewRequest);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.upload.brapi.images.filename.required"));
 		}
 	}
@@ -104,7 +104,7 @@ public class FileValidatorTest {
 			final ImageNewRequest imageNewRequest= this.createImageNewRequest();
 			imageNewRequest.setImageFileName("name.pdf");
 			this.fileValidator.validateImage(imageNewRequest);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.upload.not-supported"));
 		}
 	}
@@ -115,7 +115,7 @@ public class FileValidatorTest {
 			final ImageNewRequest imageNewRequest= this.createImageNewRequest();
 			imageNewRequest.getExternalReferences().get(0).setReferenceID(null);
 			this.fileValidator.validateImage(imageNewRequest);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.upload.reference.null"));
 		}
 	}
@@ -126,7 +126,7 @@ public class FileValidatorTest {
 			final ImageNewRequest imageNewRequest= this.createImageNewRequest();
 			imageNewRequest.getExternalReferences().get(0).setReferenceID(RandomStringUtils.randomAlphanumeric(2001));
 			this.fileValidator.validateImage(imageNewRequest);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.upload.reference.id.exceeded.length"));
 		}
 	}
@@ -137,7 +137,7 @@ public class FileValidatorTest {
 			final ImageNewRequest imageNewRequest= this.createImageNewRequest();
 			imageNewRequest.getExternalReferences().get(0).setReferenceSource(RandomStringUtils.randomAlphanumeric(256));
 			this.fileValidator.validateImage(imageNewRequest);
-		} catch (ApiRequestValidationException e) {
+		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.upload.reference.source.exceeded.length"));
 		}
 	}
