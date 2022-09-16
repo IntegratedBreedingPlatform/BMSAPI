@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Api("BrAPI v2 Image services")
-@Controller
+@Controller(value = "ImageResourceBrapiV2")
 public class ImageResourceBrapi {
 
 	@Autowired
