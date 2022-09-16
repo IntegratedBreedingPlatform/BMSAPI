@@ -32,7 +32,7 @@ public class ImageResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/images", method = RequestMethod.POST)
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<SingleEntityResponse<Image>> createImage(
-		@PathVariable final String cropName,
+		@PathVariable final String crop,
 		@RequestBody final ImageNewRequest body
 	) {
 		this.fileValidator.validateFileStorage();
