@@ -235,7 +235,7 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		}
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, variableIds);
-		this.datasetValidator.validateNotDeletingSystemEntryDetailToAlreadyGeneratedExperiment(datasetId, variableIds);
+		this.datasetValidator.validateNotRemovingSystemEntryDetailToAlreadyGeneratedExperiment(datasetId, variableIds);
 		this.middlewareDatasetService.removeDatasetVariables(studyId, datasetId, variableIds);
 	}
 

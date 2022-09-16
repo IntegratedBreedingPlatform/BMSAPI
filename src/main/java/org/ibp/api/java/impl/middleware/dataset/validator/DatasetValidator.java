@@ -236,7 +236,7 @@ public class DatasetValidator {
 		}
 	}
 
-	public void validateNotDeletingSystemEntryDetailToAlreadyGeneratedExperiment(final Integer datasetId,
+	public void validateNotRemovingSystemEntryDetailToAlreadyGeneratedExperiment(final Integer datasetId,
 		final List<Integer> variableIds) {
 
 		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
@@ -250,7 +250,7 @@ public class DatasetValidator {
 				.map(StandardVariable::getName)
 				.collect(Collectors.joining(", "));
 			if (!StringUtils.isEmpty(systemVariableNames)) {
-				this.errors.reject("system-variable.cannot.delete", new String[] {String.valueOf(systemVariableNames)},  "");
+				this.errors.reject("system-variable.cannot.remove", new String[] {String.valueOf(systemVariableNames)},  "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		}
