@@ -8,6 +8,7 @@ import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.java.file.FileMetadataService;
+import org.ibp.api.java.impl.middleware.common.validator.ImageValidator;
 import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,9 @@ public class ImageResourceBrapi {
 	@Autowired
 	private FileValidator fileValidator;
 
+	@Autowired
+	private ImageValidator imageValidator;
+
 	@ApiOperation("Create a new image meta data object")
 	@RequestMapping(value = "/{crop}/brapi/v2/images", method = RequestMethod.POST)
 	@JsonView(BrapiView.BrapiV2.class)
@@ -36,7 +40,7 @@ public class ImageResourceBrapi {
 		@RequestBody final ImageNewRequest body
 	) {
 		this.fileValidator.validateFileStorage();
-		this.fileValidator.validateImage(body);
+		this.imageValidator.validateImage(body);
 
 		final Image result = this.fileMetadataService.createImage(body);
 		final SingleEntityResponse<Image> response = new SingleEntityResponse<>();
