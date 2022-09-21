@@ -126,7 +126,9 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		this.datasetValidator.validateExistingDatasetVariables(studyId, dataSet.getId(), Arrays.asList(stockPropertyData.getVariableId()));
 		this.studyEntryValidator.validateStudyContainsEntries(studyId, Arrays.asList(stockPropertyData.getStockId()));
 
-		this.validateExperimentalDesginWasNotGenerated(studyId);
+		if (variable.isSystem()) {
+			this.validateExperimentalDesginWasNotGenerated(studyId);
+		}
 	}
 
 	private void validateStudyEntryVariableShouldExist(final Integer entryId, final Integer variableId) {
