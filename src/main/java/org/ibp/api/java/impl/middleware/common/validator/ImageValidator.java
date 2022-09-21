@@ -21,6 +21,9 @@ public class ImageValidator {
 
 	private static final int MAX_REFERENCE_ID_LENGTH = 2000;
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
+	private static final int MAX_DESCRIPTION_LENGTH = 255;
+	private static final int MAX_COPYRIGHT_LENGTH = 255;
+	private static final int MAX_FILENAME_LENGTH = 255;
 
 	@Value("#{'${file.upload.supported.types}'.toLowerCase().split(',')}")
 	private List<String> supportedFileTypes;
@@ -38,10 +41,34 @@ public class ImageValidator {
 	public void validateImage(final ImageNewRequest body) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		checkNotNull(body.getObservationUnitDbId(), "file.upload.brapi.images.observationunitdbid.required");
-		final String imageFileName = body.getImageFileName();
+		this.validateFileName(body.getImageFileName());
+		this.validateCopyright(body.getCopyright());
+		this.validateDescription(body.getDescription());
+		this.validateExternalReferences(body.getExternalReferences());
+	}
+
+	private void validateFileName(final String imageFileName) {
 		checkNotNull(imageFileName, "file.upload.brapi.images.filename.required");
 		this.validateExtension(imageFileName);
-		this.validateExternalReferences(body.getExternalReferences());
+
+		if (imageFileName.length() > MAX_FILENAME_LENGTH) {
+			this.errors.reject("file.upload.filename.exceeded.length","");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateCopyright(final String copyright) {
+		if (StringUtils.isNotEmpty(copyright) && copyright.length() > MAX_COPYRIGHT_LENGTH) {
+			this.errors.reject("file.upload.copyright.exceeded.length","");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateDescription(final String description) {
+		if (StringUtils.isNotEmpty(description) && description.length() > MAX_DESCRIPTION_LENGTH) {
+			this.errors.reject("file.upload.description.exceeded.length","");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	private void validateExternalReferences(final List<ExternalReferenceDTO> externalReferenceDTOS) {

@@ -105,6 +105,41 @@ public class ImageValidatorTest {
 		}
 	}
 
+	@Test
+	public void testValidateImage_CopyrightExceedsMaxLength() {
+		try {
+			final ImageNewRequest imageNewRequest= this.createImageNewRequest();
+			imageNewRequest.setCopyright(RandomStringUtils.randomAlphanumeric(256));
+			this.imageValidator.validateImage(imageNewRequest);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.upload.copyright.exceeded.length"));
+		}
+	}
+
+	@Test
+	public void testValidateImage_FilenameExceedsMaxLength() {
+		try {
+			final ImageNewRequest imageNewRequest= this.createImageNewRequest();
+			imageNewRequest.setImageFileName(RandomStringUtils.randomAlphanumeric(256) + ".jpg");
+			this.imageValidator.validateImage(imageNewRequest);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.upload.filename.exceeded.length"));
+		}
+	}
+
+
+	@Test
+	public void testValidateImage_DescriptionExceedsMaxLength() {
+		try {
+			final ImageNewRequest imageNewRequest= this.createImageNewRequest();
+			imageNewRequest.setDescription(RandomStringUtils.randomAlphanumeric(256) + ".jpg");
+			this.imageValidator.validateImage(imageNewRequest);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("file.upload.description.exceeded.length"));
+		}
+	}
+
+
 	private ImageNewRequest createImageNewRequest() {
 		final ImageNewRequest imageNewRequest = new ImageNewRequest();
 		imageNewRequest.setImageFileName("image.jpg");

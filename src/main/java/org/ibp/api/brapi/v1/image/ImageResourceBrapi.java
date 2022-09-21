@@ -1,9 +1,11 @@
 package org.ibp.api.brapi.v1.image;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
+import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.impl.middleware.common.validator.ImageValidator;
@@ -33,6 +35,7 @@ public class ImageResourceBrapi {
 
 	@ApiOperation("Create a new image meta data object")
 	@RequestMapping(value = "/images", method = RequestMethod.POST)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<SingleEntityResponse<Image>> createImage(
 		@PathVariable final String cropName,
 		@RequestBody final ImageNewRequest body
@@ -48,6 +51,7 @@ public class ImageResourceBrapi {
 
 	@ApiOperation("Update an image meta data")
 	@RequestMapping(value = "/images/{imageDbId}", method = RequestMethod.PUT)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<SingleEntityResponse<Image>> updateImage(
 		@PathVariable final String cropName,
 		@PathVariable("imageDbId") final String imageDbId,
@@ -67,6 +71,7 @@ public class ImageResourceBrapi {
 		produces = {"application/json"},
 		consumes = {"image/*"},
 		method = RequestMethod.PUT)
+	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<SingleEntityResponse<Image>> updateImageContent(
 		@PathVariable final String cropName,
 		@PathVariable("imageDbId") final String imageDbId,
