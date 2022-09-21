@@ -39,7 +39,7 @@ public class PhenotypeSearchResource {
 	@JsonView(BrapiView.BrapiV1_2.class)
 	public ResponseEntity<EntityListResponse<ObservationUnitDto>> searchPhenotypes(@PathVariable final String crop,
 		@RequestBody final ObservationUnitSearchRequestDTO requestDTO) {
-
+		requestDTO.setIncludeObservations(true);
 		final PagedResult<ObservationUnitDto> resultPage =
 			new PaginatedSearch().executeBrapiSearch(requestDTO.getPage(), requestDTO.getPageSize(), new SearchSpec<ObservationUnitDto>() {
 

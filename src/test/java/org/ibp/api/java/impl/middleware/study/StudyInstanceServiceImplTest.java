@@ -93,7 +93,7 @@ public class StudyInstanceServiceImplTest {
 				RandomStringUtils.random(
 					BOUND),
 				instanceNumber,
-				RandomStringUtils.random(BOUND), false);
+				RandomStringUtils.random(BOUND));
 
 		final int nextInstanceNumber = existingStudyInstance.getInstanceNumber() + 1;
 		final org.generationcp.middleware.service.impl.study.StudyInstance newStudyInstance =
@@ -102,7 +102,7 @@ public class StudyInstanceServiceImplTest {
 				RandomStringUtils.random(
 					BOUND),
 				nextInstanceNumber,
-				RandomStringUtils.random(BOUND), false);
+				RandomStringUtils.random(BOUND));
 
 		final LocationDTO programDefaultLocation = new LocationDTO();
 		programDefaultLocation.setId(1);
@@ -127,7 +127,7 @@ public class StudyInstanceServiceImplTest {
 		assertEquals(result.get(0).getLocationName(), newStudyInstance.getLocationName());
 		assertEquals(result.get(0).getLocationAbbreviation(), newStudyInstance.getLocationAbbreviation());
 		assertEquals(result.get(0).getCustomLocationAbbreviation(), newStudyInstance.getCustomLocationAbbreviation());
-		assertEquals(result.get(0).getHasFieldmap(), newStudyInstance.isHasFieldmap());
+		assertEquals(result.get(0).getHasFieldLayout(), newStudyInstance.getHasFieldLayout());
 
 	}
 
@@ -142,7 +142,7 @@ public class StudyInstanceServiceImplTest {
 				RandomStringUtils.random(
 					BOUND),
 				1,
-				RandomStringUtils.random(BOUND), this.random.nextBoolean());
+				RandomStringUtils.random(BOUND));
 
 		final org.generationcp.middleware.service.impl.study.StudyInstance studyInstance2 =
 			new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND),
@@ -150,7 +150,7 @@ public class StudyInstanceServiceImplTest {
 				RandomStringUtils.random(
 					BOUND),
 				2,
-				RandomStringUtils.random(BOUND), this.random.nextBoolean());
+				RandomStringUtils.random(BOUND));
 
 		when(this.middlewareStudyInstanceService.getStudyInstances(studyId))
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
@@ -166,7 +166,7 @@ public class StudyInstanceServiceImplTest {
 		assertEquals(result1.getLocationName(), studyInstance.getLocationName());
 		assertEquals(result1.getLocationAbbreviation(), studyInstance.getLocationAbbreviation());
 		assertEquals(result1.getCustomLocationAbbreviation(), studyInstance.getCustomLocationAbbreviation());
-		assertEquals(result1.getHasFieldmap(), studyInstance.isHasFieldmap());
+		assertEquals(result1.getHasFieldLayout(), studyInstance.getHasFieldLayout());
 
 		final org.ibp.api.domain.study.StudyInstance result2 = studyInstances.get(1);
 		assertEquals(result2.getInstanceId(), studyInstance2.getInstanceId());
@@ -174,7 +174,7 @@ public class StudyInstanceServiceImplTest {
 		assertEquals(result2.getLocationName(), studyInstance2.getLocationName());
 		assertEquals(result2.getLocationAbbreviation(), studyInstance2.getLocationAbbreviation());
 		assertEquals(result2.getCustomLocationAbbreviation(), studyInstance2.getCustomLocationAbbreviation());
-		assertEquals(result2.getHasFieldmap(), studyInstance2.isHasFieldmap());
+		assertEquals(result2.getHasFieldLayout(), studyInstance2.getHasFieldLayout());
 	}
 
 	@Test
@@ -188,7 +188,7 @@ public class StudyInstanceServiceImplTest {
 				RandomStringUtils.random(
 					BOUND),
 				1,
-				RandomStringUtils.random(BOUND), this.random.nextBoolean());
+				RandomStringUtils.random(BOUND));
 
 		final org.generationcp.middleware.service.impl.study.StudyInstance studyInstance2 =
 			new StudyInstance(this.random.nextInt(BOUND), this.random.nextInt(BOUND),
@@ -196,7 +196,7 @@ public class StudyInstanceServiceImplTest {
 				RandomStringUtils.random(
 					BOUND),
 				2,
-				RandomStringUtils.random(BOUND), this.random.nextBoolean());
+				RandomStringUtils.random(BOUND));
 
 		when(this.middlewareStudyInstanceService.getStudyInstance(studyId, 101))
 			.thenReturn(Optional.of(studyInstance));
@@ -211,7 +211,7 @@ public class StudyInstanceServiceImplTest {
 		assertEquals(result1.getLocationName(), studyInstance.getLocationName());
 		assertEquals(result1.getLocationAbbreviation(), studyInstance.getLocationAbbreviation());
 		assertEquals(result1.getCustomLocationAbbreviation(), studyInstance.getCustomLocationAbbreviation());
-		assertEquals(result1.getHasFieldmap(), studyInstance.isHasFieldmap());
+		assertEquals(result1.getHasFieldLayout(), studyInstance.getHasFieldLayout());
 
 		final org.ibp.api.domain.study.StudyInstance result2 = this.studyInstanceService.getStudyInstance(studyId, 102).get();
 		assertEquals(result2.getInstanceId(), studyInstance2.getInstanceId());
@@ -219,7 +219,7 @@ public class StudyInstanceServiceImplTest {
 		assertEquals(result2.getLocationName(), studyInstance2.getLocationName());
 		assertEquals(result2.getLocationAbbreviation(), studyInstance2.getLocationAbbreviation());
 		assertEquals(result2.getCustomLocationAbbreviation(), studyInstance2.getCustomLocationAbbreviation());
-		assertEquals(result2.getHasFieldmap(), studyInstance2.isHasFieldmap());
+		assertEquals(result2.getHasFieldLayout(), studyInstance2.getHasFieldLayout());
 
 		Assert.assertFalse(this.middlewareStudyInstanceService.getStudyInstance(studyId, 103).isPresent());
 		Mockito.verify(this.studyValidator, Mockito.times(2)).validate(studyId, false);

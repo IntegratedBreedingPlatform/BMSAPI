@@ -14,7 +14,6 @@ public class StudyInstance {
 	private String customLocationAbbreviation;
 	private Integer locationDescriptorDataId;
 	private int instanceNumber;
-	private boolean hasFieldmap;
 	private Boolean hasGeoJSON;
 	/** has X/Y coordinates */
 	private Boolean hasFieldLayout;
@@ -29,13 +28,12 @@ public class StudyInstance {
 	}
 
 	public StudyInstance(final int instanceId, final String locationName, final String locationAbbreviation,
-		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldmap) {
+		final int instanceNumber, final String customLocationAbbreviation) {
 		this.instanceId = instanceId;
 		this.locationName = locationName;
 		this.locationAbbreviation = locationAbbreviation;
 		this.instanceNumber = instanceNumber;
 		this.customLocationAbbreviation = customLocationAbbreviation;
-		this.hasFieldmap = hasFieldmap;
 	}
 
 	public String getLocationName() {
@@ -68,14 +66,6 @@ public class StudyInstance {
 
 	public void setCustomLocationAbbreviation(final String customLocationAbbreviation) {
 		this.customLocationAbbreviation = customLocationAbbreviation;
-	}
-
-	public boolean getHasFieldmap() {
-		return this.hasFieldmap;
-	}
-
-	public void setHasFieldmap(final boolean hasFieldmap) {
-		this.hasFieldmap = hasFieldmap;
 	}
 
 	public Boolean getHasGeoJSON() {
