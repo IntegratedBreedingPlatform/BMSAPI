@@ -114,4 +114,25 @@ public class ObservationUnitResourceBrapiTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", is("25008")))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialName", is("Trial Name")));
 	}
+
+	@Test
+	public void testGetObservationUnits() throws Exception {
+
+		final ObservationUnitDto observationUnitDto = new ObservationUnitDto();
+		observationUnitDto.setProgramDbId("04136e3f-55f9-4a80-9c24-5066a253ce6f");
+		observationUnitDto.setTrialDbId("25008");
+		observationUnitDto.setTrialName("Trial Name");
+
+		when(this.observationUnitService
+			.searchObservationUnits(Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_SIZE), Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_NUMBER), any(
+				ObservationUnitSearchRequestDTO.class))).thenReturn(Arrays.asList(observationUnitDto));
+
+		this.mockMvc.perform(
+				MockMvcRequestBuilders.get("/{crop}/brapi/v2/observationunits", this.cropName)
+					.contentType(this.contentType)).andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].programDbId", is("04136e3f-55f9-4a80-9c24-5066a253ce6f")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].treatments", empty()))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialDbId", is("25008")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.result.data[0].trialName", is("Trial Name")));
+	}
 }
