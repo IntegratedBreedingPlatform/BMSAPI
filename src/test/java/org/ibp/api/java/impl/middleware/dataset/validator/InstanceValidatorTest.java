@@ -100,9 +100,9 @@ public class InstanceValidatorTest extends ApiUnitTestBase {
 	@Test
 	public void testValidateInstanceNumbersFail_InstanceNumbersDontExistInStudy() {
 		final List<StudyInstance> instances = new ArrayList<>();
-		instances.add(new StudyInstance(101, 1, false, false, false, true));
-		instances.add(new StudyInstance(202, 2, false, false, false, true));
-		instances.add(new StudyInstance(303, 3, false, false, false, true));
+		instances.add(new StudyInstance(101, 1, false, false, true));
+		instances.add(new StudyInstance(202, 2, false, false, true));
+		instances.add(new StudyInstance(303, 3, false, false, true));
 		Mockito.doReturn(instances).when(this.studyInstanceService).getStudyInstances(ArgumentMatchers.anyInt());
 		try {
 			this.instanceValidator.validateInstanceNumbers(this.random.nextInt(), new HashSet<>(Arrays.asList(1, 102)));
