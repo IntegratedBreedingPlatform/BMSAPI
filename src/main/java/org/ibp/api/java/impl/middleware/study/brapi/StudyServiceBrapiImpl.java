@@ -89,7 +89,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		try {
 			// TODO: Validate request
 			studyUpdateResponse.setEntityObject(
-				this.middlewareStudyServiceBrapi.updateObservationVariable(Integer.valueOf(studyDbId), studyUpdateRequestDTO));
+				this.middlewareStudyServiceBrapi.updateStudyInstance(Integer.valueOf(studyDbId), studyUpdateRequestDTO));
 		} catch (final ApiRequestValidationException e) {
 			studyUpdateResponse.setErrors(e.getErrors());
 		}
