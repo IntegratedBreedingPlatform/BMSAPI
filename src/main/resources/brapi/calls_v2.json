@@ -370,6 +370,18 @@
     "versions": [
       "2.1"
     ]
+  },
+  {
+    "call": "images",
+    "dataTypes": [
+      "application/json"
+    ],
+    "methods": [
+      "POST"
+    ],
+    "versions": [
+      "2.0"
+    ]
   }
 ]
 }
