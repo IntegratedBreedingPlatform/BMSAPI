@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
@@ -11,6 +12,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
@@ -99,6 +101,7 @@ public class DatasetValidator {
 
 		this.validateVariable(standardVariable, variableType);
 		this.validateIfDatasetVariableAlreadyExists(variableId, shouldBeDatasetVariable, measurementVariableMap, datasetType);
+		this.validateNotAddingSystemEntryDetailsToAlreadyGeneratedExperiment(standardVariable, studyHasExperimentDesign);
 
 		return standardVariable;
 	}
@@ -232,4 +235,33 @@ public class DatasetValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
+
+	public void validateNotRemovingSystemEntryDetailToAlreadyGeneratedExperiment(final Integer datasetId,
+		final List<Integer> variableIds) {
+
+		final DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
+		final boolean studyHasExperimentDesign = dataSet.getInstances().stream().anyMatch(StudyInstance::isHasExperimentalDesign);
+
+		if (studyHasExperimentDesign) {
+			final List<StandardVariable> variables =
+				this.ontologyDataManager.getStandardVariables(variableIds, ContextHolder.getCurrentProgram());
+			final String systemVariableNames = variables.stream()
+				.filter(variable -> variable.getVariableTypes().contains(VariableType.ENTRY_DETAIL) && variable.isSystem())
+				.map(StandardVariable::getName)
+				.collect(Collectors.joining(", "));
+			if (!StringUtils.isEmpty(systemVariableNames)) {
+				this.errors.reject("system-variable.cannot.remove", new String[] {String.valueOf(systemVariableNames)},  "");
+				throw new ApiRequestValidationException(this.errors.getAllErrors());
+			}
+		}
+	}
+
+	private void validateNotAddingSystemEntryDetailsToAlreadyGeneratedExperiment(final StandardVariable variable,
+		final boolean studyHasExperimentDesign) {
+		if (studyHasExperimentDesign && variable.getVariableTypes().contains(VariableType.ENTRY_DETAIL) && variable.isSystem()) {
+			this.errors.reject("system-variable.cannot.add", new String[] {String.valueOf(variable.getName())},  "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
 }

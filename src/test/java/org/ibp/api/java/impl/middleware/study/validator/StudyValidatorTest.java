@@ -147,13 +147,13 @@ public class StudyValidatorTest {
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,
-			RandomStringUtils.randomAlphabetic(10), false);
+			RandomStringUtils.randomAlphabetic(10));
 		studyInstance.setCanBeDeleted(false);
 		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,
-			RandomStringUtils.randomAlphabetic(10), false);
+			RandomStringUtils.randomAlphabetic(10));
 		studyInstance2.setCanBeDeleted(true);
 		Mockito.when(this.studyInstanceService.getStudyInstances(studyId))
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
@@ -182,13 +182,13 @@ public class StudyValidatorTest {
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,
-			RandomStringUtils.randomAlphabetic(10), false);
+			RandomStringUtils.randomAlphabetic(10));
 		studyInstance.setCanBeDeleted(true);
 		final StudyInstance studyInstance2 = new StudyInstance(ran.nextInt(), ran.nextInt(),
 			RandomStringUtils.randomAlphabetic(10),
 			RandomStringUtils.randomAlphabetic(10),
 			1,
-			RandomStringUtils.randomAlphabetic(10), false);
+			RandomStringUtils.randomAlphabetic(10));
 		studyInstance2.setCanBeDeleted(true);
 		Mockito.when(this.studyInstanceService.getStudyInstances(studyId))
 			.thenReturn(Arrays.asList(studyInstance, studyInstance2));
