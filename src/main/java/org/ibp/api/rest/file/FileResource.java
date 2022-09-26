@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -63,11 +61,11 @@ public class FileResource {
 		if (!isBlank(observationUnitUUID) || instanceId != null) {
 			FileResource.verifyHasAuthorityStudy(this.request);
 		} else if(lotId != null) {
-			verifyHasAuthorityLots(request);
+			verifyHasAuthorityLots(this.request);
 		}  else {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
-		this.fileValidator.validateFile(new MapBindingResult(new HashMap<>(), String.class.getName()), file);
+		this.fileValidator.validateFile(file);
 		//Check if only one of the parameters has value
 		final boolean valid = ((isBlank(observationUnitUUID)? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1) + ((lotId == null)? 0 : 1)) == 1;
 		BaseValidator.checkArgument(valid, "file.upload.entity.invalid");
@@ -110,7 +108,7 @@ public class FileResource {
 		if (!isBlank(fileMetadataDTO.getObservationUnitUUID())) {
 			verifyHasAuthorityStudy(this.request);
 		} else if(fileMetadataDTO.getLotId() != null) {
-			verifyHasAuthorityLots(request);
+			verifyHasAuthorityLots(this.request);
 		} else {
 			verifyHasAuthorityGermplasm(this.request);
 		}
