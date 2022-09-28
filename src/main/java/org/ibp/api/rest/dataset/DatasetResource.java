@@ -219,7 +219,6 @@ public class DatasetResource {
 		Preconditions
 			.checkArgument(Collections.isEmpty(searchDTO.getFilterColumns()), "filterColumns should be null or empty");
 
-		final Integer instanceId = searchDTO.getInstanceId();
 		final Boolean draftMode = searchDTO.getDraftMode();
 
 		final PagedResult<ObservationUnitRow> pageResult =
@@ -227,13 +226,13 @@ public class DatasetResource {
 
 				@Override
 				public long getCount() {
-					return DatasetResource.this.studyDatasetService.countAllObservationUnitsForDataset(datasetId, instanceId, draftMode);
+					return DatasetResource.this.studyDatasetService.countAllObservationUnitsForDataset(datasetId, searchDTO.getInstanceIds(), draftMode);
 				}
 
 				@Override
 				public long getFilteredCount() {
 					return DatasetResource.this.studyDatasetService
-						.countFilteredObservationUnitsForDataset(datasetId, instanceId, searchDTO.getDraftMode(), searchDTO.getFilter());
+						.countFilteredObservationUnitsForDataset(datasetId, searchDTO.getInstanceIds(), searchDTO.getDraftMode(), searchDTO.getFilter());
 				}
 
 				@Override

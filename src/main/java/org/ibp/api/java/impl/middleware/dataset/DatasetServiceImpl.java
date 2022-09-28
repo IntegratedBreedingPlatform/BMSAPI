@@ -319,15 +319,15 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Integer countAllObservationUnitsForDataset(
-		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
-		return this.middlewareDatasetService.countAllObservationUnitsForDataset(datasetId, instanceId, draftMode);
+		final Integer datasetId, final List<Integer> instanceIds, final Boolean draftMode) {
+		return this.middlewareDatasetService.countAllObservationUnitsForDataset(datasetId, instanceIds, draftMode);
 	}
 
 	@Override
 	public long countFilteredObservationUnitsForDataset(
-		final Integer datasetId, final Integer instanceId, final Boolean draftMode,
+		final Integer datasetId, final List<Integer> instanceIds, final Boolean draftMode,
 		final ObservationUnitsSearchDTO.Filter filter) {
-		return this.middlewareDatasetService.countFilteredObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
+		return this.middlewareDatasetService.countFilteredObservationUnitsForDataset(datasetId, instanceIds, draftMode, filter);
 	}
 
 	@Override
@@ -394,11 +394,7 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		}
 
-		List<Integer> instanceIds = null;
-		if (searchDTO.getInstanceId() != null) {
-			instanceIds = Arrays.asList(searchDTO.getInstanceId());
-		}
-		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
+		this.validateStudyDatasetAndInstances(studyId, datasetId, searchDTO.getInstanceIds());
 
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO, convertedPageable);
@@ -415,11 +411,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<Map<String, Object>> getObservationUnitRowsAsMapList(
 		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 
-		List<Integer> instanceIds = null;
-		if (searchDTO.getInstanceId() != null) {
-			instanceIds = Arrays.asList(searchDTO.getInstanceId());
-		}
-		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
+		this.validateStudyDatasetAndInstances(studyId, datasetId, searchDTO.getInstanceIds());
 
 		return this.middlewareDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO, null);
 	}
