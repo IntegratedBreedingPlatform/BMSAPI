@@ -5,6 +5,8 @@ import org.ibp.api.brapi.v2.BrapiUpdateResponse;
 
 public class StudyUpdateResponse extends BrapiUpdateResponse<StudyInstanceDto> {
 
+	private String entityName;
+
 	@Override
 	public String getEntity() {
 		return "entity.study";
@@ -12,6 +14,10 @@ public class StudyUpdateResponse extends BrapiUpdateResponse<StudyInstanceDto> {
 
 	@Override
 	public String getEntityName() {
-		return null;
+		return this.entityName;
+	}
+
+	public void setEntityName(final String entityName) {
+		this.entityName = entityName;
 	}
 }

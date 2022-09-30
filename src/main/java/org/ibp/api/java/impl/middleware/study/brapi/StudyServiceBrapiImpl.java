@@ -96,8 +96,9 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 			if (bindingResult.hasErrors()) {
 				throw new ApiRequestValidationException(bindingResult.getAllErrors());
 			}
-			studyUpdateResponse.setEntityObject(
-				this.middlewareStudyServiceBrapi.updateStudyInstance(Integer.valueOf(studyDbId), studyUpdateRequestDTO));
+			final StudyInstanceDto studyInstanceDto = this.middlewareStudyServiceBrapi.updateStudyInstance(Integer.valueOf(studyDbId), studyUpdateRequestDTO);
+			studyUpdateResponse.setEntityObject(studyInstanceDto);
+			studyUpdateResponse.setEntityName(studyInstanceDto.getStudyName());
 		} catch (final ApiRequestValidationException e) {
 			studyUpdateResponse.setErrors(e.getErrors());
 		}
