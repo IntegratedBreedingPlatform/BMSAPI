@@ -722,6 +722,18 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public void deleteVariableValues(
+		final Integer studyId, final Integer datasetId, final ObservationUnitsSearchDTO searchDTO) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+		final Integer variableId = searchDTO.getFilter().getVariableId();
+		this.datasetValidator
+			.validateExistingDatasetVariables(
+				studyId, datasetId, Lists.newArrayList(variableId));
+		this.middlewareDatasetService.deleteVariableValues(studyId, datasetId, searchDTO);
+	}
+
+	@Override
 	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);

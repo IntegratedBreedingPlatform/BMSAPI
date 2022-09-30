@@ -322,13 +322,22 @@ public interface DatasetService {
 		final ObservationUnitsSearchDTO searchDTO);
 
 	/**
-	 * Set an specific variable to an specific variable
+	 * Set value to a specific variable
 	 *
 	 * @param datasetId
 	 * @param searchDTO
 	 * @param studyId
 	 */
 	void setValueToVariable(Integer studyId, Integer datasetId, ObservationUnitsParamDTO searchDTO);
+
+	/**
+	 * Delete specific variable value
+	 *
+	 * @param datasetId
+	 * @param searchDTO
+	 * @param studyId
+	 */
+	void deleteVariableValues(Integer studyId, Integer datasetId, ObservationUnitsSearchDTO searchDTO);
 
 	List<MeasurementVariable> getAllDatasetVariables(int studyId, int datasetId);
 
