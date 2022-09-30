@@ -5,7 +5,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>bmsapi</artifactId>
 	<packaging>${packaging.type}</packaging>
-        <version>22.0</version>
+        <version>22.1</version>
 	<name>BMS API</name>
 
 	<properties>
