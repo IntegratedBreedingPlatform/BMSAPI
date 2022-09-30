@@ -377,7 +377,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			variableInfo.setPropertyId(propertyId);
 			variableInfo.setScaleId(scaleId);
 			variableInfo.setIsFavorite(variable.isFavourite());
-			variableInfo.setProgramUuid(variable.getProgramUuid());
+			variableInfo.setObsolete(variable.isObsolete());
 
 			if (!Strings.isNullOrEmpty(variable.getExpectedRange().getMin())) {
 				variableInfo.setExpectedMin(variable.getExpectedRange().getMin());
