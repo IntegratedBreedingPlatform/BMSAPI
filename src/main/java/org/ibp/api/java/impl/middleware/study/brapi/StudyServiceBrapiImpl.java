@@ -12,6 +12,7 @@ import org.ibp.api.brapi.v2.study.StudyUpdateResponse;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.study.validator.StudyImportRequestValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyUpdateRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,9 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 	@Autowired
 	private StudyImportRequestValidator studyImportRequestValidator;
+
+	@Autowired
+	private StudyUpdateRequestValidator studyUpdateRequestValidator;
 
 	@Autowired
 	private SecurityService securityService;
@@ -87,7 +91,11 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		final StudyUpdateRequestDTO studyUpdateRequestDTO) {
 		final StudyUpdateResponse studyUpdateResponse = new StudyUpdateResponse();
 		try {
-			// TODO: Validate request
+			final BindingResult bindingResult =
+				this.studyUpdateRequestValidator.validate(Integer.valueOf(studyDbId), studyUpdateRequestDTO);
+			if (bindingResult.hasErrors()) {
+				throw new ApiRequestValidationException(bindingResult.getAllErrors());
+			}
 			studyUpdateResponse.setEntityObject(
 				this.middlewareStudyServiceBrapi.updateStudyInstance(Integer.valueOf(studyDbId), studyUpdateRequestDTO));
 		} catch (final ApiRequestValidationException e) {
