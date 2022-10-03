@@ -2,11 +2,11 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import com.beust.jcommander.internal.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.commons.ruleengine.RuleException;
-import org.generationcp.commons.ruleengine.RuleFactory;
-import org.generationcp.commons.ruleengine.coding.CodingRuleExecutionContext;
-import org.generationcp.commons.ruleengine.service.RulesService;
-import org.generationcp.commons.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.RuleException;
+import org.generationcp.middleware.ruleengine.RuleFactory;
+import org.generationcp.middleware.ruleengine.coding.CodingRuleExecutionContext;
+import org.generationcp.middleware.ruleengine.service.RulesService;
+import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
