@@ -229,7 +229,7 @@ public class StudyResourceBrapi {
 		@PathVariable final String studyDbId,
 		@RequestBody final StudyUpdateRequestDTO studyUpdateRequestDTO) {
 		BaseValidator.checkNotNull(studyUpdateRequestDTO, "study.update.request.null");
-		BaseValidator.checkNotEmpty(studyDbId, "study.update.request.studyDbId");
+		BaseValidator.checkNotEmpty(studyDbId, "study.update.request.studyDbId.null");
 		final StudyUpdateResponse
 			studyUpdateResponse = this.studyServiceBrapi.updateStudy(crop, studyDbId, studyUpdateRequestDTO);
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(studyUpdateResponse));

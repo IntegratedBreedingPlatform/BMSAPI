@@ -2,20 +2,20 @@ package org.ibp.api.rest.dataset.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
-import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
-import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.study.StudyUpdateRequestDTO;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
+import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.service.api.study.EnvironmentParameter;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.ibp.api.java.impl.middleware.study.validator.StudyUpdateRequestValidator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +31,9 @@ import org.springframework.validation.BindingResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StudyUpdateRequestValidatorTest {
@@ -48,7 +50,7 @@ public class StudyUpdateRequestValidatorTest {
 	private LocationService locationService;
 
 	@Mock
-	private VariableServiceBrapi variableServiceBrapi;
+	private OntologyVariableService ontologyVariableService;
 
 	@InjectMocks
 	private StudyUpdateRequestValidator validator;
@@ -69,14 +71,13 @@ public class StudyUpdateRequestValidatorTest {
 		Mockito.when(this.locationService.searchLocations(locationSearchRequest, null, null))
 			.thenReturn(Collections.singletonList(new LocationDTO()));
 
-		final VariableDTO variableDTO = new VariableDTO();
-		variableDTO.setObservationVariableDbId(VARIABLE_DBID);
-		variableDTO.getScale().setDataType(DataType.NUMERIC_VARIABLE.getBrapiName());
-		variableDTO.getContextOfUse().add(VariableDTO.ContextOfUseEnum.PLOT.name());
+		final Variable variable = new Variable();
+		variable.setId(Integer.valueOf(VARIABLE_DBID));
+		final Map<Integer, Variable> variablesMap = new HashMap<>();
+		variablesMap.put(variable.getId(), variable);
 		final VariableSearchRequestDTO variableSearchRequestDTOUsingVariableId = new VariableSearchRequestDTO();
 		variableSearchRequestDTOUsingVariableId.setObservationVariableDbIds(Collections.singletonList(VARIABLE_DBID));
-		Mockito.when(this.variableServiceBrapi.getVariables(variableSearchRequestDTOUsingVariableId, null, VariableTypeGroup.TRAIT))
-			.thenReturn(Collections.singletonList(variableDTO));
+		Mockito.when(this.ontologyVariableService.getVariablesWithFilterById(Mockito.any())).thenReturn(variablesMap);
 	}
 
 	@Test
@@ -180,6 +181,27 @@ public class StudyUpdateRequestValidatorTest {
 		final BindingResult result = this.validator.validate(Integer.valueOf(STUDY_DBID), studyUpdateRequestDTO);
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("study.update.environment.parameter.pui.null", result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
+	public void testValidate_WhereEnvironmentParametersPUIIsInvalid() {
+
+		final Integer invalidEnvironmentTermId = 1234;
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addVariableId(invalidEnvironmentTermId);
+		variableFilter.addVariableType(VariableType.ENVIRONMENT_DETAIL);
+		variableFilter.addVariableType(VariableType.ENVIRONMENT_CONDITION);
+		Mockito.when(this.ontologyVariableService.getVariablesWithFilterById(variableFilter)).thenReturn(new HashMap<>());
+
+		final StudyUpdateRequestDTO studyUpdateRequestDTO = this.createStudyUpdateRequestDTO();
+		final List<EnvironmentParameter> environmentParameters = new ArrayList<>();
+		final EnvironmentParameter environmentParameter = new EnvironmentParameter();
+		environmentParameter.setParameterPUI(String.valueOf(invalidEnvironmentTermId));
+		environmentParameters.add(environmentParameter);
+		studyUpdateRequestDTO.setEnvironmentParameters(environmentParameters);
+		final BindingResult result = this.validator.validate(Integer.valueOf(STUDY_DBID), studyUpdateRequestDTO);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("study.update.environment.parameter.pui.invalid", result.getAllErrors().get(0).getCode());
 	}
 
 	@Test
