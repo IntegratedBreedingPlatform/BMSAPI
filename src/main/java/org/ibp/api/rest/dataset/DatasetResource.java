@@ -432,12 +432,12 @@ public class DatasetResource {
 	@ApiOperation(value = "Count Filtered Phenotypes and Instances per Variable", notes = "Returns count of phenotypes for variables")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/observations/filter/count", method = RequestMethod.POST)
-	public ResponseEntity<FilteredPhenotypesInstancesCountDTO> countFilteredPhenotypesAndInstances(
+	public ResponseEntity<FilteredPhenotypesInstancesCountDTO> countFilteredInstancesAndObservationUnits(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestBody final ObservationUnitsSearchDTO filterParams) {
 
 		final FilteredPhenotypesInstancesCountDTO
-			result = this.studyDatasetService.countFilteredInstancesAndPhenotypes(studyId, datasetId, filterParams);
+			result = this.studyDatasetService.countFilteredInstancesAndObservationUnits(studyId, datasetId, filterParams);
 
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}

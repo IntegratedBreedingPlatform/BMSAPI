@@ -750,7 +750,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
+	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndObservationUnits(
 		final Integer studyId,
 		final Integer datasetId, final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
 		this.studyValidator.validate(studyId, true);
@@ -760,7 +760,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validateDataset(studyId, datasetId);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId,
 			Lists.newArrayList(observationUnitsSearchDTO.getFilter().getVariableId()));
-		return this.middlewareDatasetService.countFilteredInstancesAndPhenotypes(datasetId, observationUnitsSearchDTO);
+		return this.middlewareDatasetService.countFilteredInstancesAndObservationUnits(datasetId, observationUnitsSearchDTO);
 	}
 
 	private BindingResult processObservationsDataWarningsAsErrors(
