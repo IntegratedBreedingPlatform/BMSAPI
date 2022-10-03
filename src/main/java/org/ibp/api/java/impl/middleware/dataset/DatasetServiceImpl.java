@@ -205,7 +205,6 @@ public class DatasetServiceImpl implements DatasetService {
 		datasetVariables.forEach(datasetVariable -> {
 			final StandardVariable traitVariable =
 				this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
-			final String alias = this.getAlias(datasetVariable, traitVariable);
 
 			this.middlewareDatasetService.addDatasetVariable(datasetId, datasetVariable.getVariableId(),
 				VariableType.getById(datasetVariable.getVariableTypeId()), this.getAlias(datasetVariable, traitVariable));

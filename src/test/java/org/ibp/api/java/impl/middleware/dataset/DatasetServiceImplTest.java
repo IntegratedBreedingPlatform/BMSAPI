@@ -791,6 +791,28 @@ public class DatasetServiceImplTest {
 	}
 
 	@Test
+	public void testDeleteVariableValues() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final ObservationDto observationDto = new ObservationDto();
+		observationDto.setCategoricalValueId(random.nextInt());
+		observationDto.setValue(random.toString());
+		final int instanceId = random.nextInt(10000);
+
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		searchDTO.setInstanceId(instanceId);
+
+		searchDTO.setDatasetId(datasetId);
+		searchDTO.getFilter().setVariableId(555);
+		this.studyDatasetService.deleteVariableValues(studyId, datasetId, searchDTO);
+		Mockito.verify(this.studyValidator).validate(studyId, true);
+		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
+
+		Mockito.verify(this.middlewareDatasetService).deleteVariableValues(studyId, datasetId, searchDTO);
+	}
+
+	@Test
 	public void testAcceptDraftDataAndSetOutOfBoundsToMissing() {
 		final Random random = new Random();
 		final int studyId = random.nextInt();
