@@ -95,6 +95,7 @@ public class StudyUpdateRequestValidator {
 				variableFilter.addVariableId(Integer.valueOf(observationVariableId));
 			});
 			variableFilter.addVariableType(VariableType.TRAIT);
+			variableFilter.addVariableType(VariableType.SELECTION_METHOD);
 			final Map<Integer, Variable> existingVariables =
 				this.ontologyVariableService.getVariablesWithFilterById(variableFilter);
 
