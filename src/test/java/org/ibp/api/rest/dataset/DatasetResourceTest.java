@@ -882,7 +882,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testCountFilteredPhenotypesAndInstances_Ok() throws Exception {
+	public void testCountFilteredInstancesAndObservationUnits_Ok() throws Exception {
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
 		final int datasetId = random.nextInt(10000);
@@ -895,7 +895,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final FilteredPhenotypesInstancesCountDTO result = new FilteredPhenotypesInstancesCountDTO(totalPhenotypes, totalInstances);
 
 		Mockito.when(this.studyDatasetService
-			.countFilteredInstancesAndPhenotypes(Mockito.anyInt(), Mockito.anyInt(), Mockito.any(ObservationUnitsSearchDTO.class)))
+			.countFilteredInstancesAndObservationUnits(Mockito.anyInt(), Mockito.anyInt(), Mockito.any(ObservationUnitsSearchDTO.class)))
 			.thenReturn(result);
 
 		this.mockMvc

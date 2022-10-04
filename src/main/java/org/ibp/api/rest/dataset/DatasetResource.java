@@ -431,12 +431,12 @@ public class DatasetResource {
 	@ApiOperation(value = "Count Filtered Phenotypes and Instances per Variable", notes = "Returns count of phenotypes for variables")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/observations/filter/count", method = RequestMethod.POST)
-	public ResponseEntity<FilteredPhenotypesInstancesCountDTO> countFilteredPhenotypesAndInstances(
+	public ResponseEntity<FilteredPhenotypesInstancesCountDTO> countFilteredInstancesAndObservationUnits(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestBody final ObservationUnitsSearchDTO filterParams) {
 
 		final FilteredPhenotypesInstancesCountDTO
-			result = this.studyDatasetService.countFilteredInstancesAndPhenotypes(studyId, datasetId, filterParams);
+			result = this.studyDatasetService.countFilteredInstancesAndObservationUnits(studyId, datasetId, filterParams);
 
 		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
@@ -454,7 +454,7 @@ public class DatasetResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Move draft value to saved value in sub-observation dataset", notes = "Save information for the imported dataset")
+	@ApiOperation(value = "Set value to the selected variable", notes = "Set value to the selected variable")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/filter/set-value", method = RequestMethod.POST)
 	@ResponseBody
@@ -464,6 +464,19 @@ public class DatasetResource {
 		@RequestBody final ObservationUnitsParamDTO paramDTO) {
 
 		this.studyDatasetService.setValueToVariable(studyId, datasetId, paramDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Delete values of the selected variable", notes = "Delete values of the selected variable")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/filter/delete-value", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<Void> deleteVariableValues(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId,
+		@RequestBody final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
+
+		this.studyDatasetService.deleteVariableValues(studyId, datasetId, observationUnitsSearchDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

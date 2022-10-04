@@ -205,7 +205,6 @@ public class DatasetServiceImpl implements DatasetService {
 		datasetVariables.forEach(datasetVariable -> {
 			final StandardVariable traitVariable =
 				this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
-			final String alias = this.getAlias(datasetVariable, traitVariable);
 
 			this.middlewareDatasetService.addDatasetVariable(datasetId, datasetVariable.getVariableId(),
 				VariableType.getById(datasetVariable.getVariableTypeId()), this.getAlias(datasetVariable, traitVariable));
@@ -714,6 +713,18 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
+	public void deleteVariableValues(
+		final Integer studyId, final Integer datasetId, final ObservationUnitsSearchDTO searchDTO) {
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+		final Integer variableId = searchDTO.getFilter().getVariableId();
+		this.datasetValidator
+			.validateExistingDatasetVariables(
+				studyId, datasetId, Lists.newArrayList(variableId));
+		this.middlewareDatasetService.deleteVariableValues(studyId, datasetId, searchDTO);
+	}
+
+	@Override
 	public void acceptAllDatasetDraftData(final Integer studyId, final Integer datasetId) {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
@@ -730,7 +741,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
+	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndObservationUnits(
 		final Integer studyId,
 		final Integer datasetId, final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
 		this.studyValidator.validate(studyId, true);
@@ -740,7 +751,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validateDataset(studyId, datasetId);
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId,
 			Lists.newArrayList(observationUnitsSearchDTO.getFilter().getVariableId()));
-		return this.middlewareDatasetService.countFilteredInstancesAndPhenotypes(datasetId, observationUnitsSearchDTO);
+		return this.middlewareDatasetService.countFilteredInstancesAndObservationUnits(datasetId, observationUnitsSearchDTO);
 	}
 
 	private BindingResult processObservationsDataWarningsAsErrors(
