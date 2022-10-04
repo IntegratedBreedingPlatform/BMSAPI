@@ -498,6 +498,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter) {
 
 		middlewareVariableFilter.setProgramUuid(variableFilter.getProgramUuid());
+		middlewareVariableFilter.setShowObsoletes(variableFilter.isShowObsoletes());
 
 		if (!Util.isNullOrEmpty(variableFilter.getPropertyIds())) {
 			variableFilter.getPropertyIds().forEach(middlewareVariableFilter::addPropertyId);
