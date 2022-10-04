@@ -11,7 +11,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
-import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.rest.dataset.DatasetDTO;
@@ -251,7 +250,7 @@ public interface DatasetService {
 	 * @param filter    Filter
 	 * @return FilteredPhenotypesInstancesCountDTO
 	 */
-	FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(Integer studyId, Integer datasetId,
+	FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndObservationUnits(Integer studyId, Integer datasetId,
 		ObservationUnitsSearchDTO filter);
 
 	/**
@@ -322,13 +321,22 @@ public interface DatasetService {
 		final ObservationUnitsSearchDTO searchDTO);
 
 	/**
-	 * Set an specific variable to an specific variable
+	 * Set value to a specific variable
 	 *
 	 * @param datasetId
 	 * @param searchDTO
 	 * @param studyId
 	 */
 	void setValueToVariable(Integer studyId, Integer datasetId, ObservationUnitsParamDTO searchDTO);
+
+	/**
+	 * Delete specific variable value
+	 *
+	 * @param datasetId
+	 * @param searchDTO
+	 * @param studyId
+	 */
+	void deleteVariableValues(Integer studyId, Integer datasetId, ObservationUnitsSearchDTO searchDTO);
 
 	List<MeasurementVariable> getAllDatasetVariables(int studyId, int datasetId);
 
