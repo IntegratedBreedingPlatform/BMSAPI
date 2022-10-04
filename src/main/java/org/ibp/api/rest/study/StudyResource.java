@@ -12,7 +12,6 @@ import org.generationcp.middleware.api.study.MyStudiesService;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
@@ -51,23 +50,23 @@ public class StudyResource {
 	private SecurityService securityService;
 
 	@ApiOperation(value = "Check if a study is sampled.",
-			notes = "Returns boolean indicating if there are samples associated to the study.")
+		notes = "Returns boolean indicating if there are samples associated to the study.")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/sampled", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<Boolean> hasSamples(final @PathVariable String cropName, @PathVariable final String programUUID,
-			@PathVariable final Integer studyId) {
+		@PathVariable final Integer studyId) {
 		final Boolean hasSamples = this.studyService.isSampled(studyId);
 		return new ResponseEntity<>(hasSamples, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Partially modifies a study",
-			notes = "As of now, it only allows to update the status")
+		notes = "As of now, it only allows to update the status")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}", method = RequestMethod.PATCH)
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
-	public ResponseEntity<Void> patchStudy (final @PathVariable String cropName, @PathVariable final String programUUID,
-			@PathVariable final Integer studyId, @RequestBody final Study study) {
+	public ResponseEntity<Void> patchStudy(final @PathVariable String cropName, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId, @RequestBody final Study study) {
 		// TODO Properly define study entity, Identify which attributes of the Study entity can be updated, Implement patch accordingly
 		study.setId(studyId);
 		this.studyService.updateStudy(study);
@@ -120,7 +119,7 @@ public class StudyResource {
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add("X-Total-Count", Long.toString(result.getTotalResults()));
 
-		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK );
+		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Delete a study", notes = "Delete a study")

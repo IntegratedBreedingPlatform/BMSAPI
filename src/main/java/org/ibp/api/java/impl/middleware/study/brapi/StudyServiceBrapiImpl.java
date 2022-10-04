@@ -1,14 +1,18 @@
 package org.ibp.api.java.impl.middleware.study.brapi;
 
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
+import org.generationcp.middleware.api.brapi.v2.study.StudyUpdateRequestDTO;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.brapi.StudyServiceBrapi;
 import org.ibp.api.brapi.v2.study.StudyImportResponse;
+import org.ibp.api.brapi.v2.study.StudyUpdateResponse;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.study.validator.StudyImportRequestValidator;
+import org.ibp.api.java.impl.middleware.study.validator.StudyUpdateRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +33,9 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 	@Autowired
 	private StudyImportRequestValidator studyImportRequestValidator;
+
+	@Autowired
+	private StudyUpdateRequestValidator studyUpdateRequestValidator;
 
 	@Autowired
 	private SecurityService securityService;
@@ -77,5 +84,24 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		response.setCreatedSize(noOfCreatedStudies);
 		response.setImportListSize(originalListSize);
 		return response;
+	}
+
+	@Override
+	public StudyUpdateResponse updateStudy(final String cropName, final String studyDbId,
+		final StudyUpdateRequestDTO studyUpdateRequestDTO) {
+		final StudyUpdateResponse studyUpdateResponse = new StudyUpdateResponse();
+		try {
+			final BindingResult bindingResult =
+				this.studyUpdateRequestValidator.validate(Integer.valueOf(studyDbId), studyUpdateRequestDTO);
+			if (bindingResult.hasErrors()) {
+				throw new ApiRequestValidationException(bindingResult.getAllErrors());
+			}
+			final StudyInstanceDto studyInstanceDto = this.middlewareStudyServiceBrapi.updateStudyInstance(Integer.valueOf(studyDbId), studyUpdateRequestDTO);
+			studyUpdateResponse.setEntityObject(studyInstanceDto);
+			studyUpdateResponse.setEntityName(studyInstanceDto.getStudyName());
+		} catch (final ApiRequestValidationException e) {
+			studyUpdateResponse.setErrors(e.getErrors());
+		}
+		return studyUpdateResponse;
 	}
 }
