@@ -801,7 +801,7 @@ public class DatasetServiceImplTest {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-		searchDTO.setInstanceId(instanceId);
+		searchDTO.setInstanceIds(Arrays.asList(instanceId));
 
 		searchDTO.setDatasetId(datasetId);
 		searchDTO.getFilter().setVariableId(555);
