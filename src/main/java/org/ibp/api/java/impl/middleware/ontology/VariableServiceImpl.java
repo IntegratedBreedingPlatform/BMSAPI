@@ -112,6 +112,7 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter middlewareVariableFilter =
 				new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
 			middlewareVariableFilter.setProgramUuid(programId);
+			middlewareVariableFilter.setShowObsoletes(true);
 			if (favourite != null) {
 				middlewareVariableFilter.setFavoritesOnly(favourite);
 			}
