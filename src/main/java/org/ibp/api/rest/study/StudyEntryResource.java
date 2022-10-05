@@ -55,6 +55,7 @@ public class StudyEntryResource {
 	@ApiOperation(value = "Replace germplasm entry in study",
 		notes = "Replace germplasm entry in study")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}", method = RequestMethod.PUT)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<Void> replaceStudyEntry(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
@@ -66,6 +67,7 @@ public class StudyEntryResource {
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm ids",
 		notes = "Create germplasm entries in study based on the specified germplasm ids")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.PUT)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<Void> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID, @PathVariable final Integer studyId,
@@ -80,6 +82,7 @@ public class StudyEntryResource {
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list id",
 		notes = "Create germplasm entries in study based on the specified germplasm list id ")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<Void> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID, @PathVariable final Integer studyId,
@@ -93,6 +96,7 @@ public class StudyEntryResource {
 	@ApiOperation(value = "Delete germplasm entries in study",
 		notes = "Delete germplasm entries in study")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity deleteStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
@@ -103,12 +107,12 @@ public class StudyEntryResource {
 		this.studyEntryService.fillWithCrossExpansion(studyId, null);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
 	}
 
 	@ApiOperation(value = "Update germplasm entries property",
 		notes = "Update germplasm entries property")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/properties", method = RequestMethod.PUT)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity updateStudyEntriesProperty(final @PathVariable String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final StudyEntryPropertyBatchUpdateRequest updateRequestDto) {
