@@ -1,12 +1,12 @@
 
 package org.ibp.api.java.ruleengine;
 
-import org.generationcp.commons.ruleengine.Rule;
-import org.generationcp.commons.ruleengine.RuleFactory;
-import org.generationcp.commons.ruleengine.coding.expression.BaseCodingExpression;
-import org.generationcp.commons.ruleengine.coding.expression.CodingExpressionFactory;
-import org.generationcp.commons.ruleengine.naming.expression.Expression;
-import org.generationcp.commons.ruleengine.naming.impl.ProcessCodeFactory;
+import org.generationcp.middleware.ruleengine.Rule;
+import org.generationcp.middleware.ruleengine.RuleFactory;
+import org.generationcp.middleware.ruleengine.coding.expression.BaseCodingExpression;
+import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionFactory;
+import org.generationcp.middleware.ruleengine.naming.expression.Expression;
+import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -19,9 +19,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ComponentScan(basePackages = {
-	"org.generationcp.commons.ruleengine.coding.expression",
-	"org.generationcp.commons.ruleengine.coding",
-	"org.generationcp.commons.ruleengine.stockid"
+	"org.generationcp.middleware.ruleengine.coding.expression",
+	"org.generationcp.middleware.ruleengine.coding",
+	"org.generationcp.middleware.ruleengine.stockid"
 })
 public class RulesPostProcessor implements BeanPostProcessor {
 
@@ -51,7 +51,7 @@ public class RulesPostProcessor implements BeanPostProcessor {
 			this.processCodeFactory.addExpression((Expression) o);
 		}
 		if (o instanceof BaseCodingExpression) {
-			this.codingExpressionFactory.addExpression((org.generationcp.commons.ruleengine.Expression) o);
+			this.codingExpressionFactory.addExpression((org.generationcp.middleware.ruleengine.Expression) o);
 		}
 
 		return o;
