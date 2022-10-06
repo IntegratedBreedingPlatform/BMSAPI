@@ -29,7 +29,7 @@ public class ObservationUnitMapper {
 
 				this.map().setGermplasmDbIds(this.source.getGermplasmDbIds());
 				this.map().setLocationDbIds(this.source.getLocationDbIds());
-				this.map().setObservationLevel(this.source.getObservationLevel());
+				this.map().setObservationLevels(this.source.getObservationLevels());
 				this.map().setObservationUnitDbIds(this.source.getObservationUnitDbIds());
 				this.map().setProgramDbIds(this.source.getProgramDbIds());
 				this.map().setStudyDbIds(this.source.getStudyDbIds());
