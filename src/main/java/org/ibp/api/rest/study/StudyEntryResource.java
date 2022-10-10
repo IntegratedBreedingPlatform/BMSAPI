@@ -136,7 +136,6 @@ public class StudyEntryResource {
 				"Multiple sort criteria are supported.")
 	})
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryDto>> getStudyEntries(final @PathVariable String cropName,
 		@PathVariable final String programUUID,
