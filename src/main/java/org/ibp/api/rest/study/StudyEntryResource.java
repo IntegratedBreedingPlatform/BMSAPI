@@ -173,7 +173,6 @@ public class StudyEntryResource {
 
 	@ApiOperation(value = "Get Entry Descriptors as Columns", notes = "Retrieves ALL MeasurementVariables associated to the entry plus "
 		+ "some calculated inventory columns")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/table/columns", method = RequestMethod.GET)
 	public ResponseEntity<List<MeasurementVariable>> getEntryTableHeader(@PathVariable final String crop,
 		@PathVariable final String programUUID,
@@ -187,7 +186,6 @@ public class StudyEntryResource {
 
 	@ApiOperation(value = "Get Study Entries metadata",
 		notes = "Get Study Entries metadata")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/metadata", method = RequestMethod.GET)
 	public ResponseEntity<StudyEntryMetadata> countStudyTestEntries(@PathVariable final String crop,
 		@PathVariable final String programUUID, @PathVariable final Integer studyId) {
@@ -212,7 +210,6 @@ public class StudyEntryResource {
 	}
 
 	@ApiOperation("Get cross expansion level for study")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/pedigree-generation-level", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<Integer> getCrossExpansionLevel(@PathVariable final String crop,
@@ -223,7 +220,6 @@ public class StudyEntryResource {
 	}
 
 	@ApiIgnore
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/entries/columns", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<StudyEntryColumnDTO>> getStudyEntriesColumns(@PathVariable final String crop,
@@ -233,7 +229,6 @@ public class StudyEntryResource {
 	}
 
 	@ApiOperation(value = "Get the variables associated to the study filtered by variableType", notes = "Get the list variables filtered by variableType")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries/variables", method = RequestMethod.GET)
 	public ResponseEntity<List<Variable>> getVariables(
 		@PathVariable final String cropName, @PathVariable final Integer studyId,
