@@ -447,8 +447,7 @@ public class StudyResourceBrapi {
 
 		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO = new ObservationUnitSearchRequestDTO();
 		observationUnitSearchRequestDTO.setStudyDbIds(Lists.newArrayList(String.valueOf(studyDbId)));
-		observationUnitSearchRequestDTO.setObservationLevels(Lists.newArrayList(new ObservationLevelRelationship(null,
-			null, observationLevel, null)));
+		observationUnitSearchRequestDTO.setObservationLevel(observationLevel);
 		observationUnitSearchRequestDTO.setIncludeObservations(true);
 
 		final BrapiPagedResult<ObservationUnitDto> resultPage = new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize,
