@@ -100,33 +100,41 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 		final String germplasmDetailsPropValue = this.getMessage("label.printing.germplasm.details");
 		final String entryDetailsPropValue = this.getMessage("label.printing.entry.details");
 		final String attributesPropValue = this.getMessage("label.printing.attributes.details");
+		final String namesPropValue = this.getMessage("label.printing.names.details");
 
 		final LabelType germplasmLabelType = new LabelType(germplasmDetailsPropValue, germplasmDetailsPropValue);
 		final LabelType entryDetailsLabelType = new LabelType(entryDetailsPropValue, entryDetailsPropValue);
 		final LabelType attributesType = new LabelType(attributesPropValue, attributesPropValue);
+		final LabelType namesType = new LabelType(namesPropValue, namesPropValue);
 
 		final List<Field> germplasmFields = new LinkedList<>();
 		final List<Field> entryDetailsFields = new LinkedList<>();
 		final List<Field> attributeFields = new LinkedList<>();
+		final List<Field> nameFields = new LinkedList<>();
 
 		germplasmLabelType.setFields(germplasmFields);
 		entryDetailsLabelType.setFields(entryDetailsFields);
 		attributesType.setFields(attributeFields);
+		namesType.setFields(nameFields);
 
 		labelTypes.add(germplasmLabelType);
 		labelTypes.add(entryDetailsLabelType);
 		labelTypes.add(attributesType);
+		labelTypes.add(namesType);
 
 		final List<MeasurementVariable> variables = this.studyEntryService.getEntryTableHeader(labelsInfoInput.getStudyId());
 
-		variables.forEach((Variable) -> {
-			final Field field = new Field(Variable);
-			if (VariableType.GERMPLASM_DESCRIPTOR.equals(Variable.getVariableType())) {
+		variables.forEach((variable) -> {
+			final Field field = new Field(variable);
+			if (VariableType.GERMPLASM_DESCRIPTOR.equals(variable.getVariableType())) {
 				germplasmFields.add(field);
-			} else if (VariableType.ENTRY_DETAIL.equals(Variable.getVariableType())) {
+			} else if (VariableType.ENTRY_DETAIL.equals(variable.getVariableType())) {
 				entryDetailsFields.add(field);
-			} else if (VariableType.GERMPLASM_PASSPORT.equals(Variable.getVariableType()) || VariableType.GERMPLASM_ATTRIBUTE.equals(Variable.getVariableType())) {
+			} else if (VariableType.GERMPLASM_PASSPORT.equals(variable.getVariableType()) ||
+					   VariableType.GERMPLASM_ATTRIBUTE.equals(variable.getVariableType())) {
 				attributeFields.add(field);
+			} else if (variable.getTermId() > 0 && null == variable.getVariableType()) {
+				nameFields.add(field);
 			}
 		});
 
