@@ -393,11 +393,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
-		final MeasurementVariable sampleColumn = new MeasurementVariable();
-		sampleColumn.setName(name);
-		sampleColumn.setAlias(name);
-		sampleColumn.setTermId(termId.getId());
-		sampleColumn.setFactor(true);
-		return sampleColumn;
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName(name);
+		measurementVariable.setAlias(name);
+		measurementVariable.setTermId(termId.getId());
+		measurementVariable.setFactor(true);
+		return measurementVariable;
 	}
 }
