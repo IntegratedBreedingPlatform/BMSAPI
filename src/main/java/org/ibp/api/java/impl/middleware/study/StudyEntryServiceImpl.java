@@ -266,6 +266,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		attributes.sort(Comparator.comparing(MeasurementVariable::getName));
 		sortedColumns.addAll(attributes);
 
+		// TODO: Comfirm which is the correct places?
+		final List<MeasurementVariable> nameTypes = this.middlewareDatasetService.getNameTypes(studyId, plotDatasetId);
+		nameTypes.sort(Comparator.comparing(MeasurementVariable::getName));
+		sortedColumns.addAll(nameTypes);
+
 		//Add Inventory related columns
 		sortedColumns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
 		sortedColumns.add(this.buildVirtualColumn("AVAILABLE", TermId.GID_AVAILABLE_BALANCE));
