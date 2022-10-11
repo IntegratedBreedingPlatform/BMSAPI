@@ -152,6 +152,15 @@ public class GermplasmNameTypeValidator {
 		return germplasmNameTypeDTO.get();
 	}
 
+	public void validate(final Integer nameTypeId) {
+		final Optional<GermplasmNameTypeDTO> germplasmNameTypeDTO = this.germplasmNameTypeService.getNameTypeById(nameTypeId);
+
+		if (!germplasmNameTypeDTO.isPresent()) {
+			this.errors.reject("germplasm.name.type.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
 	private boolean isNameTypeInUse(final GermplasmNameTypeDTO germplasmNameTypeDTO) {
 		final boolean isSystem = SystemNameTypes.getTypes().contains(germplasmNameTypeDTO.getCode());
 		final boolean isNameTypeUsedInGermplasmName = this.germplasmNameService.isNameTypeUsedAsGermplasmName(germplasmNameTypeDTO.getId());

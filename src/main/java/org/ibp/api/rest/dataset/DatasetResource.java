@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiParam;
 import org.fest.util.Collections;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -537,8 +538,8 @@ public class DatasetResource {
 	public ResponseEntity<Void> updatePlotDatasetProperties(@PathVariable final String crop,
 		@PathVariable final Integer studyId,
 		@PathVariable final String programUUID,
-		@RequestBody final List<Integer> variableIds) {
-		this.studyDatasetService.updatePlotDatasetProperties(studyId, variableIds, programUUID);
+		@RequestBody final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO) {
+		this.studyDatasetService.updatePlotDatasetProperties(studyId, plotDatasetPropertiesDTO, programUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

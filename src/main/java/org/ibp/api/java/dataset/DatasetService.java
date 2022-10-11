@@ -17,6 +17,7 @@ import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -346,6 +347,6 @@ public interface DatasetService {
 
 	Long countObservationUnits(Integer dataSetId);
 
-	void updatePlotDatasetProperties(Integer studyId, List<Integer> variableIds, final String programUUID);
+	void updatePlotDatasetProperties(Integer studyId, final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID);
 
 }

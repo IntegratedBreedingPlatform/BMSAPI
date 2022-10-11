@@ -45,6 +45,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
+import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
@@ -54,6 +55,7 @@ import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -139,6 +141,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private TermValidator termValidator;
+
+	@Autowired
+	private GermplasmNameTypeValidator germplasmNameTypeValidator;
 
 	static final String PLOT_DATASET_NAME = "Observations";
 
@@ -1005,13 +1010,15 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void updatePlotDatasetProperties(final Integer studyId, final List<Integer> variableIds, final String programUUID) {
+	public void updatePlotDatasetProperties(final Integer studyId, final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID) {
 		this.studyValidator.validate(studyId, true);
-		variableIds.forEach(this.termValidator::validate);
-		this.studyValidator.validateUpdateStudyEntryColumnsWithSupportedVariableTypes(variableIds, programUUID);
-		this.studyValidator.validateMaxStudyEntryColumnsAllowed(variableIds, programUUID);
+		plotDatasetPropertiesDTO.getVariableIds().forEach(this.termValidator::validate);
+		plotDatasetPropertiesDTO.getNameTypeIds().forEach(this.germplasmNameTypeValidator::validate);
+		this.studyValidator.validateUpdateStudyEntryColumnsWithSupportedVariableTypes(plotDatasetPropertiesDTO.getVariableIds(), programUUID);
+		// TODO: Is needed to include NameTypes here?
+		this.studyValidator.validateMaxStudyEntryColumnsAllowed(plotDatasetPropertiesDTO.getVariableIds(), programUUID);
 
-		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, variableIds, programUUID);
+		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, plotDatasetPropertiesDTO, programUUID);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
