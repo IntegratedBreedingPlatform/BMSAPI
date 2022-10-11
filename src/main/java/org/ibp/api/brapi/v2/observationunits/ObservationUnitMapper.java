@@ -6,6 +6,7 @@ import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
 
+@Deprecated
 public class ObservationUnitMapper {
 
 	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();

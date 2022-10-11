@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.brapi.v1.observation.NewObservationRequest;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
@@ -446,7 +447,8 @@ public class StudyResourceBrapi {
 
 		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO = new ObservationUnitSearchRequestDTO();
 		observationUnitSearchRequestDTO.setStudyDbIds(Lists.newArrayList(String.valueOf(studyDbId)));
-		observationUnitSearchRequestDTO.setObservationLevels(observationLevel);
+		observationUnitSearchRequestDTO.setObservationLevels(Lists.newArrayList(new ObservationLevelRelationship(null,
+			null, observationLevel, null)));
 		observationUnitSearchRequestDTO.setIncludeObservations(true);
 
 		final BrapiPagedResult<ObservationUnitDto> resultPage = new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize,
