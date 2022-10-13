@@ -388,7 +388,11 @@ public class DatasetServiceImpl implements DatasetService {
 				final String sortProperty;
 				if (NumberUtils.isNumber(sort.getProperty()) && Integer.valueOf(sort.getProperty()) > 0) {
 					final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
-					sortProperty = term.getName();
+					if (null == term) {
+						sortProperty = String.format("NAME_%s", sort.getProperty());
+					} else {
+						sortProperty = term.getName();
+					}
 				} else {
 					sortProperty = sort.getProperty();
 				}
