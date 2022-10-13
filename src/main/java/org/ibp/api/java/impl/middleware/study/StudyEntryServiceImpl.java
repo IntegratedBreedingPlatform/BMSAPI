@@ -188,7 +188,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				if (NumberUtils.isNumber(sort.getProperty()) && Integer.valueOf(sort.getProperty()) > 0) {
 					final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
 					if (null == term) {
-						sortProperty = "NAME_" + sort.getProperty();
+						sortProperty = String.format("NAME_%s", sort.getProperty());
 					} else {
 						sortProperty = term.getName();
 					}
