@@ -261,15 +261,14 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		descriptors.sort(Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
 
+		final List<MeasurementVariable> nameTypes = this.middlewareDatasetService.getNameTypes(studyId, plotDatasetId);
+		nameTypes.sort(Comparator.comparing(MeasurementVariable::getName));
+		sortedColumns.addAll(nameTypes);
+
 		passports.sort(Comparator.comparing(MeasurementVariable::getName));
 		sortedColumns.addAll(passports);
 		attributes.sort(Comparator.comparing(MeasurementVariable::getName));
 		sortedColumns.addAll(attributes);
-
-		// TODO: Comfirm which is the correct places?
-		final List<MeasurementVariable> nameTypes = this.middlewareDatasetService.getNameTypes(studyId, plotDatasetId);
-		nameTypes.sort(Comparator.comparing(MeasurementVariable::getName));
-		sortedColumns.addAll(nameTypes);
 
 		//Add Inventory related columns
 		sortedColumns.add(this.buildVirtualColumn("LOTS", TermId.GID_ACTIVE_LOTS_COUNT));
