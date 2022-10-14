@@ -347,6 +347,6 @@ public interface DatasetService {
 
 	Long countObservationUnits(Integer dataSetId);
 
-	void updatePlotDatasetProperties(Integer studyId, final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID);
+	void updatePlotDatasetProperties(Integer studyId, PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, String programUUID);
 
 }
