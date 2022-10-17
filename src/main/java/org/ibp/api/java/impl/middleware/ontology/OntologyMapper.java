@@ -129,6 +129,7 @@ public class OntologyMapper {
 				this.map().setName(this.source.getName());
 				this.map().setDescription(this.source.getDefinition());
 				this.map().setFavourite(this.source.getIsFavorite());
+				this.map().setObsolete(this.source.isObsolete());
 				this.map().setAlias(this.source.getAlias());
 				this.map().setObservations(this.source.getObservations());
 				this.map().setStudies(this.source.getStudies());

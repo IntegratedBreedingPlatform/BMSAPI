@@ -28,6 +28,7 @@ public class VariableDetails extends TermSummary {
 	private final ExpectedRange expectedRange = new ExpectedRange();
 	private FormulaDto formula;
 	private boolean allowsFormula = false;
+	private boolean obsolete;
 
 	public MetadataDetails getMetadata() {
 		return this.metadata;
@@ -147,6 +148,14 @@ public class VariableDetails extends TermSummary {
 
 	public boolean hasVariableType(final String variableTypeName) {
 		return this.getVariableTypes().stream().anyMatch(variableType -> variableType.getName().equals(variableTypeName));
+	}
+
+	public boolean isObsolete() {
+		return this.obsolete;
+	}
+
+	public void setObsolete(boolean obsolete) {
+		this.obsolete = obsolete;
 	}
 
 }
