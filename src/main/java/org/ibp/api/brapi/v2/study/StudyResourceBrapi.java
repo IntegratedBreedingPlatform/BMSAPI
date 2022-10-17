@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
+import org.generationcp.middleware.api.brapi.v2.study.StudyUpdateRequestDTO;
 import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
@@ -72,7 +73,6 @@ public class StudyResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
 		@PathVariable final Integer studyDbId) {
-
 
 		final Optional<StudyDetailsDto> mwStudyDetailsOptional = this.studyServiceBrapi.getStudyDetailsByInstance(studyDbId);
 		if (!mwStudyDetailsOptional.isPresent()) {
@@ -218,6 +218,24 @@ public class StudyResourceBrapi {
 		final EntityListResponse<StudyInstanceDto> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Update an existing Study", notes = "Update an existing Study with new data.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/brapi/v2/studies/{studyDbId}", method = RequestMethod.PUT)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2_1.class)
+	public ResponseEntity<SingleEntityResponse<StudyInstanceDto>> updateStudy(@PathVariable final String crop,
+		@PathVariable final String studyDbId,
+		@RequestBody final StudyUpdateRequestDTO studyUpdateRequestDTO) {
+		BaseValidator.checkNotNull(studyUpdateRequestDTO, "study.update.request.null");
+		BaseValidator.checkNotEmpty(studyDbId, "study.update.request.studyDbId.null");
+		final StudyUpdateResponse
+			studyUpdateResponse = this.studyServiceBrapi.updateStudy(crop, studyDbId, studyUpdateRequestDTO);
+		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(studyUpdateResponse));
+		final SingleEntityResponse<StudyInstanceDto> response =
+			new SingleEntityResponse<StudyInstanceDto>(studyUpdateResponse.getEntityObject()).withMetadata(metadata);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	private String parameterValidation(final String crop, final String commonCropName, final String sortBy,

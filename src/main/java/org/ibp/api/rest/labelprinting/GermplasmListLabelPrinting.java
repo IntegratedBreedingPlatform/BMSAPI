@@ -239,18 +239,18 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 	public void getEntryDetailDataRowValue(
 		final GermplasmListDataSearchResponse listData,
 		final Map<Integer, Map<Integer, String>> entryDetailValues, final Map<Integer, String> columns, final Integer key, final int id) {
-		// Not part of the fixed columns
-		// Entry Details
-		final Map<Integer, String> entryDetails = entryDetailValues.get(listData.getListDataId());
-		if (entryDetails != null) {
-			final String entryDetailValue = entryDetails.get(id);
-			if (entryDetailValue != null) {
-				columns.put(key, entryDetailValue);
-			} else {
-				// Especial case for ENTRY NO.
-				final TermId term = TermId.getById(id);
-				if (TermId.ENTRY_NO.equals(term)) {
-					columns.put(key, Objects.toString(listData.getData().get(GermplasmListLabelPrinting.SORT_BY_ENTRY_NO), ""));
+		// Especial case for ENTRY NO.
+		final TermId term = TermId.getById(id);
+		if (TermId.ENTRY_NO.equals(term)) {
+			columns.put(key, Objects.toString(listData.getData().get(GermplasmListLabelPrinting.SORT_BY_ENTRY_NO), ""));
+		} else {
+			// Not part of the fixed columns
+			// Entry Details
+			final Map<Integer, String> entryDetails = entryDetailValues.get(listData.getListDataId());
+			if (entryDetails != null) {
+				final String entryDetailValue = entryDetails.get(id);
+				if (entryDetailValue != null) {
+					columns.put(key, entryDetailValue);
 				}
 			}
 		}

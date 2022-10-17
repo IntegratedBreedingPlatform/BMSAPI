@@ -1,12 +1,12 @@
 package org.ibp.api.java.ruleengine;
 
-import org.generationcp.commons.ruleengine.ProcessCodeRuleFactory;
-import org.generationcp.commons.ruleengine.coding.expression.CodingExpressionFactory;
-import org.generationcp.commons.ruleengine.coding.expression.CodingExpressionResolver;
-import org.generationcp.commons.ruleengine.naming.impl.ProcessCodeFactory;
-import org.generationcp.commons.ruleengine.provider.PropertyFileRuleConfigurationProvider;
-import org.generationcp.commons.service.GermplasmNamingProperties;
-import org.generationcp.commons.ruleengine.generator.BreedersCrossIDGenerator;
+import org.generationcp.middleware.ruleengine.ProcessCodeRuleFactory;
+import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionFactory;
+import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionResolver;
+import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
+import org.generationcp.middleware.ruleengine.provider.PropertyFileRuleConfigurationProvider;
+import org.generationcp.middleware.ruleengine.service.GermplasmNamingProperties;
+import org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
