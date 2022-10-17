@@ -2,7 +2,6 @@ package org.ibp.api.rest.labelprinting;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.commons.util.DateUtil;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
