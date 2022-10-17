@@ -3,6 +3,7 @@ package org.ibp.api.rest.labelprinting;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -42,6 +43,16 @@ public abstract class ObservationLabelPrintingHelper {
 			if (field.getId().equals(TermId.SEASON_VAR.getId())) {
 				field.setName("Season");
 			}
+			fields.add(field);
+		}
+		return fields;
+	}
+
+	public static List<Field> transformNameTypesToFields(final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs) {
+		final List<Field> fields = new LinkedList<>();
+		for (final GermplasmNameTypeDTO germplasmNameTypeDTO : germplasmNameTypeDTOs) {
+			final Field field = new Field(germplasmNameTypeDTO.getId(),germplasmNameTypeDTO.getCode());
+
 			fields.add(field);
 		}
 		return fields;

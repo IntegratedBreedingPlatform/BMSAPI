@@ -6,6 +6,7 @@ import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -243,7 +244,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
 			.getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));
 
-		final List<MeasurementVariable> nameTypes = this.middlewareDatasetService.getNameTypes(labelsInfoInput.getStudyId(), plotDatasetId);
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.middlewareDatasetService.getDatasetNameTypes(plotDatasetId);
 
 		final LabelType studyDetailsLabelType = new LabelType(studyDetailsPropValue, studyDetailsPropValue);
 		final LabelType lotDetailsLabelType = new LabelType(lotDetailsPropValue, lotDetailsPropValue);
@@ -251,7 +252,7 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final LabelType namesType = new LabelType(namesPropValue, namesPropValue);
 
 		final List<Field> nameFields = new LinkedList<>();
-		nameFields.addAll(ObservationLabelPrintingHelper.transform(nameTypes));
+		nameFields.addAll(ObservationLabelPrintingHelper.transformNameTypesToFields(germplasmNameTypeDTOs));
 		namesType.setFields(nameFields);
 
 
