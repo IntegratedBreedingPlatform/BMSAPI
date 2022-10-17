@@ -138,6 +138,7 @@ public class VariableResource {
 			+ " to retrieve possible property class values that can be supplied here as a comma separated list.")
 		@RequestParam(value = "propertyClasses", required = false) final Set<String> propertyClasses,
 
+		@RequestParam(value = "showObsoletes", defaultValue = "false") final boolean showObsoletes,
 		@RequestParam(required = false) final Set<Integer> datasetIds,
 		@RequestParam(required = false) final Set<String> germplasmUUIDs,
 		@RequestParam(required = false) final Set<Integer> lotIds
@@ -145,6 +146,7 @@ public class VariableResource {
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(programUUID);
+		variableFilter.setShowObsoletes(showObsoletes);
 
 		if (!Util.isNullOrEmpty(propertyIds)) {
 			propertyIds.forEach(variableFilter::addPropertyId);
