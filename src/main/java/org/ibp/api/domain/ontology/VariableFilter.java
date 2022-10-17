@@ -12,7 +12,7 @@ public class VariableFilter {
 	private String programUuid;
 	private boolean fetchAll;
 	private boolean favoritesOnly;
-	private boolean showObsoletes = true;
+	private boolean showObsoletes = false;
 
 	private final List<Integer> methodIds = new ArrayList<>();
 	private final List<Integer> propertyIds = new ArrayList<>();
