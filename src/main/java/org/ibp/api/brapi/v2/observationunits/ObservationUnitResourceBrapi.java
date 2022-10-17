@@ -11,7 +11,6 @@ import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLeve
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
-import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
@@ -66,10 +65,10 @@ public class ObservationUnitResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchObservationUnits(
 		@PathVariable final String crop,
-		@RequestBody final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto) {
+		@RequestBody final ObservationUnitSearchRequestDTO ObservationUnitSearchRequestDTO) {
 
 		final String searchRequestId =
-			this.searchRequestService.saveSearchRequest(observationUnitsSearchRequestDto, ObservationUnitsSearchRequestDto.class)
+			this.searchRequestService.saveSearchRequest(ObservationUnitSearchRequestDTO, ObservationUnitSearchRequestDTO.class)
 				.toString();
 
 		final BrapiSearchDto searchDto = new BrapiSearchDto(searchRequestId);
@@ -92,24 +91,20 @@ public class ObservationUnitResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize
 	) {
-		final ObservationUnitsSearchRequestDto observationUnitsSearchRequestDto;
+		final ObservationUnitSearchRequestDTO ObservationUnitSearchRequestDTO;
 
 		try {
-			observationUnitsSearchRequestDto =
-				(ObservationUnitsSearchRequestDto) this.searchRequestService
-					.getSearchRequest(Integer.valueOf(searchResultsDbId), ObservationUnitsSearchRequestDto.class);
+			ObservationUnitSearchRequestDTO =
+				(ObservationUnitSearchRequestDTO) this.searchRequestService
+					.getSearchRequest(Integer.valueOf(searchResultsDbId), ObservationUnitSearchRequestDTO.class);
 		} catch (final NumberFormatException | MiddlewareException e) {
 			return new ResponseEntity<>(
 				new EntityListResponse<>(new Result<>(new ArrayList<ObservationUnitDto>())).withMessage("no search request found"),
 				HttpStatus.NOT_FOUND);
 		}
 
-		final ModelMapper mapper = ObservationUnitMapper.getInstance();
-		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO =
-			mapper.map(observationUnitsSearchRequestDto, ObservationUnitSearchRequestDTO.class);
-
 		final PagedResult<ObservationUnitDto> resultPage =
-			this.getObservationUnitDtoPagedResult(observationUnitSearchRequestDTO, currentPage, pageSize);
+			this.getObservationUnitDtoPagedResult(ObservationUnitSearchRequestDTO, currentPage, pageSize);
 
 		final Result<ObservationUnitDto> results = new Result<ObservationUnitDto>().withData(resultPage.getPageResults());
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
@@ -296,7 +291,7 @@ public class ObservationUnitResourceBrapi {
 			|| !StringUtils.isEmpty(observationUnitLevelOrder)
 			|| !StringUtils.isEmpty(observationUnitLevelCode)) {
 			final Integer order = NumberUtils.isNumber(observationUnitLevelOrder) ? NumberUtils.createInteger(observationUnitLevelOrder) : null;
-			observationUnitSearchRequestDTO.setObservationLevelRelationships(
+			observationUnitSearchRequestDTO.setObservationLevels(
 				Lists.newArrayList(new ObservationLevelRelationship(
 					null, observationUnitLevelCode, observationUnitLevelName, order)));
 		}
