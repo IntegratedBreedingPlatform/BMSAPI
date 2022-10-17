@@ -47,6 +47,7 @@ public class GermplasmNameTypeValidator {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.validateExistingNameType(nameTypeId);
 		this.validateNameTypeBelongsToSystem(germplasmNameTypeDTO.getCode());
 		this.validateNameTypeBelongsToGermplasm(nameTypeId);
+		this.validateNameTypeBelongsToStudy(nameTypeId);
 	}
 
 	public void validateNameTypeModification(final Integer nameTypeId, final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
@@ -178,6 +179,14 @@ public class GermplasmNameTypeValidator {
 		final boolean isNameTypeUsedInGermplasmName = this.germplasmNameService.isNameTypeUsedAsGermplasmName(nameTypeId);
 		if (isNameTypeUsedInGermplasmName) {
 			this.errors.reject("germplasm.name.type.is.in.use", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void validateNameTypeBelongsToStudy(final Integer nameTypeId) {
+		final boolean isNameTypeUsedInGermplasmName = this.germplasmNameService.isNameTypeUsedInStudies(nameTypeId);
+		if (isNameTypeUsedInGermplasmName) {
+			this.errors.reject("germplasm.name.type.used.in.projectprop", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
