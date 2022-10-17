@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
+import org.generationcp.middleware.api.nametype.NameTypeMetaData;
 import org.generationcp.middleware.api.nametype.NameTypeMetadataFilterRequest;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -86,5 +87,14 @@ public class GermplasmNameTypeResource {
 		return new PaginatedSearch().getPagedResult(() -> this.germplasmNameTypeService.countSearchNameTypes(nameTypeMetadataFilterRequest),
 			() -> this.germplasmNameTypeService.searchNameTypes(nameTypeMetadataFilterRequest, pageable),
 			pageable);
+	}
+
+	@ApiOperation(value = "It will retrieve metadata for Name Type", notes = "It will retrieve metadata for Name Type")
+	@RequestMapping(value = "/crops/{cropName}/name-types/{nameTypeId}/metadata", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_SETTINGS')")
+	@ResponseBody
+	public ResponseEntity<NameTypeMetaData> getMetadaNameType(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId) {
+		return new ResponseEntity<>(this.germplasmNameTypeService.getNameTypeMetaData(nameTypeId), HttpStatus.OK);
 	}
 }
