@@ -1,6 +1,7 @@
 package org.ibp.api.java.dataset;
 
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -349,4 +350,7 @@ public interface DatasetService {
 
 	void updatePlotDatasetProperties(Integer studyId, PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, String programUUID);
 
+	List<GermplasmNameTypeDTO> getAllPlotDatasetNames(Integer datasetId);
+
+	void deleteNameTypeFromStudies(Integer nameTypeId);
 }

@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -1023,6 +1024,24 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validateMaxStudyEntryColumnsAllowed(plotDatasetPropertiesDTO.getVariableIds(), programUUID);
 
 		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, plotDatasetPropertiesDTO, programUUID);
+	}
+
+	@Override
+	public List<GermplasmNameTypeDTO> getAllPlotDatasetNames(final Integer datasetId) {
+		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
+		final int plotDatasetId;
+		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+			plotDatasetId = datasetDTO.getDatasetId();
+		} else {
+			plotDatasetId = datasetDTO.getParentDatasetId();
+		}
+		return this.middlewareDatasetService.getDatasetNameTypes(plotDatasetId);
+	}
+
+	@Override
+	public void deleteNameTypeFromStudies(final Integer nameTypeId) {
+		this.germplasmNameTypeValidator.validate(nameTypeId);
+		this.middlewareDatasetService.deleteNameTypeFromStudies(nameTypeId);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {

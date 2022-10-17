@@ -10,6 +10,7 @@ import org.fest.util.Collections;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
+import org.generationcp.middleware.domain.dataset.ProjectPropertiesDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -482,14 +483,15 @@ public class DatasetResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get all Dataset Variables", notes = "Get all Dataset Variables")
+	@ApiOperation(value = "Get all Dataset properties", notes = "Get all Dataset properties")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.GET)
-	public ResponseEntity<List<MeasurementVariable>> getAllVariables(@PathVariable final String crop, @PathVariable final String programUUID,
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/properties", method = RequestMethod.GET)
+	public ResponseEntity<ProjectPropertiesDTO> getAllproperties(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId) {
-
-		final List<MeasurementVariable> columns = this.studyDatasetService.getAllDatasetVariables(studyId, datasetId);
-		return new ResponseEntity<>(columns, HttpStatus.OK);
+		final ProjectPropertiesDTO projectPropertiesDTO = new ProjectPropertiesDTO();
+		projectPropertiesDTO.setVariables(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
+		projectPropertiesDTO.setNameTypes(this.studyDatasetService.getAllPlotDatasetNames(datasetId));
+		return new ResponseEntity<>(projectPropertiesDTO, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Replace the entry (gid) for a set of observation units", notes = "Replace the entry (gid) for a set of observation units")
@@ -541,6 +543,16 @@ public class DatasetResource {
 		@RequestBody final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO) {
 		this.studyDatasetService.updatePlotDatasetProperties(studyId, plotDatasetPropertiesDTO, programUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Delete a name type asociated to studies", notes = "Delete a name type asociated to studies")
+	@RequestMapping(value = "/crops/{cropName}/studies/name-types/{nameTypeId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_SETTINGS')")
+	@ResponseBody
+	public ResponseEntity<Void> deleteNameTypeFromStudies(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId) {
+		this.studyDatasetService.deleteNameTypeFromStudies(nameTypeId);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 
