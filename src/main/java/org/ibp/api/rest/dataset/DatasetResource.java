@@ -546,7 +546,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Delete a name type asociated to studies", notes = "Delete a name type asociated to studies")
-	@RequestMapping(value = "/crops/{cropName}/studies/name-types/{nameTypeId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/{cropName}/studies/name-types/{nameTypeId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_SETTINGS')")
 	@ResponseBody
 	public ResponseEntity<Void> deleteNameTypeFromStudies(@PathVariable final String cropName,
