@@ -399,4 +399,14 @@ public class GermplasmListResource {
 		this.germplasmListService.deleteGermplasmList(crop, programUUID, listId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
+
+	@ApiOperation(value = "Delete a name type asociated to germplasm list", notes = "Delete a name type asociated to germplasm list")
+	@RequestMapping(value = "/{cropName}/germplasm-lists/name-types/{nameTypeId}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_SETTINGS')")
+	@ResponseBody
+	public ResponseEntity<Void> deleteNameTypeFromStudies(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId) {
+		this.germplasmListService.deleteNameTypeFromGermplasmList(nameTypeId);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
 }
