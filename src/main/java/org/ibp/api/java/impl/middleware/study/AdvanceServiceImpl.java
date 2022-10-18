@@ -23,7 +23,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 	@Override
 	public List<Integer> advanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 		// TODO: implment validations
-		this.advanceValidator.addValidations();
+		this.advanceValidator.addValidations(request);
 		return this.advanceService.advanceStudy(studyId, request);
 	}
 
