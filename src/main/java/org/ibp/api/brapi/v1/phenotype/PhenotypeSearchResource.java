@@ -3,6 +3,7 @@ package org.ibp.api.brapi.v1.phenotype;
 import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.domain.search_request.brapi.v1.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
@@ -10,10 +11,12 @@ import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v2.observationunits.ObservationUnitMapper;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,20 +41,23 @@ public class PhenotypeSearchResource {
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_2.class)
 	public ResponseEntity<EntityListResponse<ObservationUnitDto>> searchPhenotypes(@PathVariable final String crop,
-		@RequestBody final ObservationUnitSearchRequestDTO requestDTO) {
-		requestDTO.setIncludeObservations(true);
+		@RequestBody final PhenotypeSearchRequestDTO requestDTO) {
+		final ModelMapper mapper = ObservationUnitMapper.getInstance();
+		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO =
+			mapper.map(requestDTO, ObservationUnitSearchRequestDTO.class);
+
 		final PagedResult<ObservationUnitDto> resultPage =
 			new PaginatedSearch().executeBrapiSearch(requestDTO.getPage(), requestDTO.getPageSize(), new SearchSpec<ObservationUnitDto>() {
 
 				@Override
 				public long getCount() {
-					return PhenotypeSearchResource.this.observationUnitService.countObservationUnits(requestDTO);
+					return PhenotypeSearchResource.this.observationUnitService.countObservationUnits(observationUnitSearchRequestDTO);
 				}
 
 				@Override
 				public List<ObservationUnitDto> getResults(final PagedResult<ObservationUnitDto> pagedResult) {
 					return PhenotypeSearchResource.this.observationUnitService
-						.searchObservationUnits(pagedResult.getPageSize(), pagedResult.getPageNumber(), requestDTO);
+						.searchObservationUnits(pagedResult.getPageSize(), pagedResult.getPageNumber(), observationUnitSearchRequestDTO);
 				}
 			});
 

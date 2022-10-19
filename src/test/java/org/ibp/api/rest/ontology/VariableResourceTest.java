@@ -127,6 +127,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].method.name", is(variables.get(0).getMethod().getName())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].scale.id", is(String.valueOf(variables.get(0).getScale().getId()))))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].scale.name", is(variables.get(0).getScale().getName())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0].obsolete", is(variables.get(0).isObsolete())))
 			.andExpect(MockMvcResultMatchers
 				.jsonPath("$[0].scale.dataType.id", is(String.valueOf(variables.get(0).getScale().getDataType().getId()))))
 			.andExpect(MockMvcResultMatchers.jsonPath("$[0].scale.dataType.name", is(variables.get(0).getScale().getDataType().getName())))
@@ -187,6 +188,7 @@ public class VariableResourceTest extends ApiUnitTestBase {
 			.andExpect(MockMvcResultMatchers.jsonPath("$.formula.target.id", is(ontologyVariable.getFormula().getTarget().getId())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.formula.definition", is(ontologyVariable.getFormula().getDefinition())))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.allowsFormula", is(ontologyVariable.isAllowsFormula())))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.obsolete", is(ontologyVariable.isObsolete())))
 		;
 
 		Mockito.verify(this.ontologyVariableDataManager, Mockito.times(1)).getVariable(this.programUuid, ontologyVariable.getId(), true);

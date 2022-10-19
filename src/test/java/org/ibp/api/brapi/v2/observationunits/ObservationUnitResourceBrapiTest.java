@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPatchRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
-import org.generationcp.middleware.domain.search_request.brapi.v2.ObservationUnitsSearchRequestDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
@@ -101,8 +100,8 @@ public class ObservationUnitResourceBrapiTest extends ApiUnitTestBase {
 		observationUnitDto.setTrialDbId("25008");
 		observationUnitDto.setTrialName("Trial Name");
 		final int searchResultsDbId = nextInt();
-		doReturn(new ObservationUnitsSearchRequestDto()).when(this.searchRequestService)
-			.getSearchRequest(searchResultsDbId, ObservationUnitsSearchRequestDto.class);
+		doReturn(new ObservationUnitSearchRequestDTO()).when(this.searchRequestService)
+			.getSearchRequest(searchResultsDbId, ObservationUnitSearchRequestDTO.class);
 		when(this.observationUnitService
 			.searchObservationUnits(Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_SIZE), Mockito.eq(BrapiPagedResult.DEFAULT_PAGE_NUMBER), any(
 				ObservationUnitSearchRequestDTO.class))).thenReturn(Arrays.asList(observationUnitDto));
