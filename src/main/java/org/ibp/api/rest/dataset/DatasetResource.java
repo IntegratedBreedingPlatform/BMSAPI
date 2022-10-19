@@ -340,7 +340,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Exports the dataset to a specified file type", notes = "Exports the dataset to a specified file type")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')"  + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/{fileType}", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> exportDataset(
 		@PathVariable final String crop, @PathVariable final String programUUID,
