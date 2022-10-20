@@ -35,6 +35,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -85,6 +86,9 @@ public class DatasetExcelGeneratorTest {
 
 	@Mock
 	private DatasetService datasetService;
+
+	@Mock
+	private org.generationcp.middleware.service.api.dataset.DatasetService datasetServiceMiddleService;
 
 	@Mock
 	private DatasetTypeService datasetTypeService;
@@ -288,11 +292,11 @@ public class DatasetExcelGeneratorTest {
 		assertEquals(ENVIRONMENTAL_DETAILS_TEST, descriptionSheet.getRow(14).getCell(valueIndex).getStringCellValue());
 		assertEquals(ENVIRONMENTAL_CONDITIONS_TEST, descriptionSheet.getRow(17).getCell(valueIndex).getStringCellValue());
 		assertEquals(GERMPLASM_DESCRIPTORS_TEST, descriptionSheet.getRow(20).getCell(valueIndex).getStringCellValue());
-		assertEquals(GERMPLASM_PASSPORTS_TEST, descriptionSheet.getRow(23).getCell(valueIndex).getStringCellValue());
-		assertEquals(GERMPLASM_ATTRIBUTES_TEST, descriptionSheet.getRow(26).getCell(valueIndex).getStringCellValue());
-		assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(31).getCell(valueIndex).getStringCellValue());
-		assertEquals(TRAITS_TEST, descriptionSheet.getRow(34).getCell(valueIndex).getStringCellValue());
-		assertEquals(SELECTION_TEST, descriptionSheet.getRow(37).getCell(valueIndex).getStringCellValue());
+		assertEquals(GERMPLASM_PASSPORTS_TEST, descriptionSheet.getRow(25).getCell(valueIndex).getStringCellValue());
+		assertEquals(GERMPLASM_ATTRIBUTES_TEST, descriptionSheet.getRow(28).getCell(valueIndex).getStringCellValue());
+		assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(33).getCell(valueIndex).getStringCellValue());
+		assertEquals(TRAITS_TEST, descriptionSheet.getRow(36).getCell(valueIndex).getStringCellValue());
+		assertEquals(SELECTION_TEST, descriptionSheet.getRow(39).getCell(valueIndex).getStringCellValue());
 		assertEquals(VARIABLE_ALIAS_1, observationSheet.getRow(0).getCell(0).getStringCellValue());
 		assertEquals(VARIABLE_ALIAS_2, observationSheet.getRow(0).getCell(1).getStringCellValue());
 		assertEquals(VARIABLE_VALUE_1, observationSheet.getRow(1).getCell(0).getStringCellValue());
