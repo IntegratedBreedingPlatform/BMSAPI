@@ -73,6 +73,7 @@ public abstract class UserTestDataGenerator {
 		user.setPerson(person);
 		user.setUserid(userId);
 		user.setPerson(person);
+		user.setStatus(0);
 
 		final String username = RandomStringUtils.randomAlphanumeric(30);
 		user.setName(username);
