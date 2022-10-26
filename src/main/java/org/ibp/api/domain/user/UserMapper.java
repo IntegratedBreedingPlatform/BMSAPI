@@ -82,6 +82,7 @@ public class UserMapper {
 				this.using(toStatusConvert).map().setStatus(this.source.getStatus().toString());
 				this.map().setEmail(this.source.getEmail());
 				this.map().setCrops(this.source.getCrops());
+				this.map().setMultiFactorAuthenticationEnabled(this.source.isMultiFactorAuthenticationEnabled());
 			}
 		});
 
@@ -98,6 +99,7 @@ public class UserMapper {
 				this.using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
 				this.using(authoritiesConverter).map(this.source.getPermissions()).setAuthorities(null);
 				this.using(cropsConverter).map(this.source.getPerson().getCrops()).setCrops(null);
+				this.map().setMultiFactorAuthenticationEnabled(this.source.isMultiFactorAuthenticationEnabled());
 			}
 		});
 
@@ -114,6 +116,7 @@ public class UserMapper {
 				this.using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
 				this.using(authoritiesConverter).map(this.source.getPermissions()).setAuthorities(null);
 				this.using(cropsConverter).map(this.source.getPerson().getCrops()).setCrops(null);
+				this.map().setMultiFactorAuthenticationEnabled(this.source.isMultiFactorAuthenticationEnabled());
 			}
 		});
 	}

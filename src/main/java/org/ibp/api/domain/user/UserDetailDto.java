@@ -22,6 +22,7 @@ public class UserDetailDto implements Serializable, Comparable<UserDetailDto> {
 	private String email;
 	private Set<CropDto> crops;
 	private Set<String> authorities;
+	private boolean multiFactorAuthenticationEnabled;
 
 	public Integer getId() {
 		return this.id;
@@ -87,6 +88,14 @@ public class UserDetailDto implements Serializable, Comparable<UserDetailDto> {
 		this.authorities = authorities;
 	}
 
+	public boolean isMultiFactorAuthenticationEnabled() {
+		return multiFactorAuthenticationEnabled;
+	}
+
+	public void setMultiFactorAuthenticationEnabled(boolean multiFactorAuthenticationEnabled) {
+		this.multiFactorAuthenticationEnabled = multiFactorAuthenticationEnabled;
+	}
+
 	@Override
 	public int compareTo(final UserDetailDto o) {
 		final int compareId = o.getId();
@@ -134,6 +143,7 @@ public class UserDetailDto implements Serializable, Comparable<UserDetailDto> {
 			.append("status", this.status)
 			.append("email", this.email)
 			.append("crops", this.crops)
+			.append("isMultiFactorAuthenticationEnabled", this.multiFactorAuthenticationEnabled)
 			.toString();
 	}
 
