@@ -5,6 +5,7 @@ import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 import com.rits.cloning.Cloner;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
+import org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator;
 import org.generationcp.middleware.ruleengine.impl.RulesServiceImpl;
 import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.generationcp.commons.service.BreedingViewImportService;
@@ -926,6 +927,11 @@ public class MiddlewareFactory {
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
 		return new HibernateSessionPerRequestProvider(this.WORKBENCH_SessionFactory);
+	}
+
+	@Bean
+	public SeedSourceGenerator getSeedSourceGenerator() {
+		return new SeedSourceGenerator();
 	}
 
 }
