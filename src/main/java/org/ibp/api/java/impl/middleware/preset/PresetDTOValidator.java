@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.preset;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
@@ -38,9 +37,6 @@ public class PresetDTOValidator {
 
 	@Autowired
 	private VariableService variableService;
-
-	@Autowired
-	private GermplasmNameTypeService germplasmNameTypeService;
 
 	private BindingResult errors;
 
@@ -210,10 +206,10 @@ public class PresetDTOValidator {
 	}
 
 	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final Integer fieldId) {
-		return this.isValidateFieldId(labelPrintingPresetDTO) && //
-			!LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId) && //
-			(this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), String.valueOf(fieldId)) == null || //
-			 this.germplasmNameTypeService.getNameTypeById(fieldId) == null);
+		return this.isValidateFieldId(labelPrintingPresetDTO)
+			&& !LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId)
+			&& this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), String.valueOf(fieldId))
+			== null;
 	}
 
 	private boolean isValidateFieldId(final LabelPrintingPresetDTO labelPrintingPresetDTO) {

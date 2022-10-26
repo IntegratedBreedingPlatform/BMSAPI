@@ -6,7 +6,6 @@ import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -221,8 +220,6 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final String lotDetailsPropValue = this.getMessage("label.printing.study.lot.list.details");
 		final String transactionDetailsPropValue = this.getMessage("label.printing.study.transaction.list.details");
 
-		final String namesPropValue = this.getMessage("label.printing.names.details");
-
 		final DatasetDTO dataSetDTO = this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
 
 		final int environmentDatasetId =
@@ -250,16 +247,9 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 				labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId(), VariableType.SELECTION_METHOD
 					.getId(), VariableType.TRAIT.getId()));
 
-		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.middlewareDatasetService.getDatasetNameTypes(plotDatasetId);
-
 		final LabelType studyDetailsLabelType = new LabelType(studyDetailsPropValue, studyDetailsPropValue);
 		final LabelType lotDetailsLabelType = new LabelType(lotDetailsPropValue, lotDetailsPropValue);
 		final LabelType transactionDetailsLabelType = new LabelType(transactionDetailsPropValue, transactionDetailsPropValue);
-		final LabelType namesType = new LabelType(namesPropValue, namesPropValue);
-
-		final List<Field> nameFields = new LinkedList<>();
-		nameFields.addAll(ObservationLabelPrintingHelper.transformNameTypesToFields(germplasmNameTypeDTOs));
-		namesType.setFields(nameFields);
 
 		lotDetailsLabelType.setFields(this.defaultLotDetailsFields);
 		transactionDetailsLabelType.setFields(this.defaultTransactioNDetailsFields);
@@ -289,7 +279,6 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		labelTypes.add(lotDetailsLabelType);
 		labelTypes.add(transactionDetailsLabelType);
 		ObservationLabelPrintingHelper.removePairIdVariables(labelTypes);
-		labelTypes.add(namesType);
 		return labelTypes;
 	}
 
