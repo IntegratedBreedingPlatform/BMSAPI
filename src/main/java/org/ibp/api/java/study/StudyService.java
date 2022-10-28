@@ -3,6 +3,7 @@ package org.ibp.api.java.study;
 
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.domain.dms.Study;
@@ -36,4 +37,5 @@ public interface StudyService {
 
 	long countFilteredStudies(String programUUID, StudySearchRequest studySearchRequest);
 
+	void deleteNameTypeFromStudies(Integer nameTypeId);
 }

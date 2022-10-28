@@ -545,17 +545,6 @@ public class DatasetResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Delete a name type asociated to studies", notes = "Delete a name type asociated to studies")
-	@RequestMapping(value = "/{cropName}/studies/name-types/{nameTypeId}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_SETTINGS')")
-	@ResponseBody
-	public ResponseEntity<Void> deleteNameTypeFromStudies(@PathVariable final String cropName,
-		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId) {
-		this.studyDatasetService.deleteNameTypeFromStudies(nameTypeId);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
-
 	public ResourceBundleMessageSource getMessageSource() {
 		return this.messageSource;
 	}

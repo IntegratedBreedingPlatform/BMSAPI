@@ -1037,12 +1037,6 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.middlewareDatasetService.getDatasetNameTypes(plotDatasetId);
 	}
 
-	@Override
-	public void deleteNameTypeFromStudies(final Integer nameTypeId) {
-		this.germplasmNameTypeValidator.validate(nameTypeId);
-		this.middlewareDatasetService.deleteNameTypeFromStudies(nameTypeId);
-	}
-
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
 		if (searchDTO.getItemIds() != null && !searchDTO.getItemIds().isEmpty()) {
 			final ObservationUnitsSearchDTO searchRequest = new ObservationUnitsSearchDTO();
