@@ -404,9 +404,9 @@ public class GermplasmListResource {
 	@RequestMapping(value = "/{cropName}/germplasm-lists/name-types/{nameTypeId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_SETTINGS')")
 	@ResponseBody
-	public ResponseEntity<Void> deleteNameTypeFromStudies(@PathVariable final String cropName,
+	public ResponseEntity<Void> deleteGermplasmListNameTypes(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId) {
-		this.germplasmListService.deleteNameTypeFromGermplasmList(nameTypeId);
+		this.germplasmListDataService.deleteNameTypeFromGermplasmList(nameTypeId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }

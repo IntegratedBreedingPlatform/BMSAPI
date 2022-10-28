@@ -498,13 +498,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.germplasmListService.editListMetadata(germplasmListDto);
 	}
 
-	@Override
-	public void deleteNameTypeFromGermplasmList(final Integer nameTypeId) {
-		this.germplasmNameTypeValidator.validate(nameTypeId);
-		this.germplasmListService.deleteNameTypeFromGermplasmList(nameTypeId);
-
-	}
-
 	private void validateListNonEditableFields(final GermplasmListDto germplasmListDto, final GermplasmList germplasmList) {
 		if (germplasmListDto.getOwnerId() != null && !germplasmListDto.getOwnerId().equals(germplasmList.getUserId())) {
 			this.errors.reject(LIST_FIELD_UPDATE_NOT_SUPPORTED, new String[] {"ownerId"}, "");

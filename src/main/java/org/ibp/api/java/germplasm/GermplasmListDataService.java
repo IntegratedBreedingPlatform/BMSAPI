@@ -29,4 +29,6 @@ public interface GermplasmListDataService {
 	List<GermplasmListDataDetail> getGermplasmListDataDetailList(Integer listId);
 
 	void reOrderEntries(Integer listId, GermplasmListReorderEntriesRequest request);
+
+	void deleteNameTypeFromGermplasmList(Integer nameTypeId);
 }

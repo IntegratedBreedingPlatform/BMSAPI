@@ -56,5 +56,4 @@ public interface GermplasmListService {
 
 	void editListMetadata(GermplasmListDto germplasmListDto, String programUUID);
 
-	void deleteNameTypeFromGermplasmList(Integer nameTypeId);
 }
