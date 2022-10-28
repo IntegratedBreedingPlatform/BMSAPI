@@ -152,7 +152,7 @@ import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFac
 import org.generationcp.middleware.service.api.permission.PermissionServiceImpl;
 import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
 import org.generationcp.middleware.service.api.rpackage.RPackageService;
-import org.generationcp.middleware.service.api.study.AdvanceService;
+import org.generationcp.middleware.service.api.study.advance.AdvanceService;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -176,7 +176,7 @@ import org.generationcp.middleware.service.impl.inventory.PlantingServiceImpl;
 import org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl;
 import org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl;
 import org.generationcp.middleware.service.impl.rpackage.RPackageServiceImpl;
-import org.generationcp.middleware.service.impl.study.AdvanceServiceImpl;
+import org.generationcp.middleware.service.impl.study.advance.AdvanceServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyEntryServiceImpl;

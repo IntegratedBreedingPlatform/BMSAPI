@@ -18,7 +18,7 @@ public class AdvanceServiceImpl implements AdvanceService {
 	private AdvanceValidator advanceValidator;
 
 	@Autowired
-	private org.generationcp.middleware.service.api.study.AdvanceService advanceService;
+	private org.generationcp.middleware.service.api.study.advance.AdvanceService advanceService;
 
 	@Override
 	public List<Integer> advanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
