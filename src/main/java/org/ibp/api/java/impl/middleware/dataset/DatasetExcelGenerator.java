@@ -87,7 +87,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	private DatasetService datasetService;
 
 	@Resource
-	private org.generationcp.middleware.service.api.dataset.DatasetService datasetServiceMiddleService;
+	private org.generationcp.middleware.service.api.dataset.DatasetService datasetServiceMiddlewareService;
 
 	@Resource
 	private DatasetTypeService datasetTypeService;
@@ -272,7 +272,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 
-		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs  = this.datasetServiceMiddleService.getDatasetNameTypes(plotDatasetId);
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs  = this.datasetServiceMiddlewareService.getDatasetNameTypes(plotDatasetId);
 
 		currentRowNum = this.writeStudyDetails(currentRowNum, xlsBook, xlsSheet, studyDetails);
 		xlsSheet.createRow(currentRowNum++);
