@@ -1026,7 +1026,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<GermplasmNameTypeDTO> getAllPlotDatasetNames(final Integer datasetId) {
+	public List<GermplasmNameTypeDTO> getAllPlotDatasetNameTypes(final Integer datasetId) {
 		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
 		final int plotDatasetId;
 		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {

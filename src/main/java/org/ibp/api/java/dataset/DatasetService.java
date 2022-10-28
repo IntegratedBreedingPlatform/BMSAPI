@@ -350,6 +350,6 @@ public interface DatasetService {
 
 	void updatePlotDatasetProperties(Integer studyId, PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, String programUUID);
 
-	List<GermplasmNameTypeDTO> getAllPlotDatasetNames(Integer datasetId);
+	List<GermplasmNameTypeDTO> getAllPlotDatasetNameTypes(Integer datasetId);
 
 }

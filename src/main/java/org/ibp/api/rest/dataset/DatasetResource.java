@@ -490,7 +490,7 @@ public class DatasetResource {
 		@PathVariable final Integer studyId, @PathVariable final Integer datasetId) {
 		final ProjectPropertiesDTO projectPropertiesDTO = new ProjectPropertiesDTO();
 		projectPropertiesDTO.setVariables(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
-		projectPropertiesDTO.setNameTypes(this.studyDatasetService.getAllPlotDatasetNames(datasetId));
+		projectPropertiesDTO.setNameTypes(this.studyDatasetService.getAllPlotDatasetNameTypes(datasetId));
 		return new ResponseEntity<>(projectPropertiesDTO, HttpStatus.OK);
 	}
 
