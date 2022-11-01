@@ -401,10 +401,10 @@ public class GermplasmListResource {
 	}
 
 	@ApiOperation(value = "Delete a name type asociated to germplasm list", notes = "Delete a name type asociated to germplasm list")
-	@RequestMapping(value = "/{cropName}/germplasm-lists/name-types/{nameTypeId}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/crops/{crop}/germplasm-lists/name-types/{nameTypeId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_SETTINGS')")
 	@ResponseBody
-	public ResponseEntity<Void> deleteGermplasmListNameTypes(@PathVariable final String cropName,
+	public ResponseEntity<Void> deleteGermplasmListNameTypes(@PathVariable final String crop,
 		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId) {
 		this.germplasmListDataService.deleteNameTypeFromGermplasmList(nameTypeId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
