@@ -389,7 +389,7 @@ public class UserValidator {
 	}
 
 	public void validateNumberOfActiveUsers(final BindingResult errors) {
-		if ((int)this.userService.countAllActiveUsers() >= this.maximumActiveUsers) {
+		if (this.userService.countAllActiveUsers() >= this.maximumActiveUsers) {
 			errors.reject("max.number.of.active.users.reached");
 		}
 	}
