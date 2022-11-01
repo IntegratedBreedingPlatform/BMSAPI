@@ -55,7 +55,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public NameTypeMetadata getNameTypeMetaData(final Integer nameTypeId) {
-		return this.germplasmNameTypeService.getNameTypeMetaData(nameTypeId);
+	public NameTypeMetadata getNameTypeMetadata(final Integer nameTypeId) {
+		return this.germplasmNameTypeService.getNameTypeMetadata(nameTypeId);
 	}
 }
