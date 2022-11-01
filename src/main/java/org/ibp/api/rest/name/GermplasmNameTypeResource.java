@@ -93,8 +93,8 @@ public class GermplasmNameTypeResource {
 	@RequestMapping(value = "/crops/{cropName}/name-types/{nameTypeId}/metadata", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_SETTINGS')")
 	@ResponseBody
-	public ResponseEntity<NameTypeMetadata> getMetadaNameType(@PathVariable final String cropName,
+	public ResponseEntity<NameTypeMetadata> getNameTypeMetadata(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId) {
-		return new ResponseEntity<>(this.germplasmNameTypeService.getNameTypeMetaData(nameTypeId), HttpStatus.OK);
+		return new ResponseEntity<>(this.germplasmNameTypeService.getNameTypeMetadata(nameTypeId), HttpStatus.OK);
 	}
 }
