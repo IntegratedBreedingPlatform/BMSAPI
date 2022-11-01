@@ -2,7 +2,7 @@ package org.ibp.api.java.impl.middleware.name;
 
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
-import org.generationcp.middleware.api.nametype.NameTypeMetaData;
+import org.generationcp.middleware.api.nametype.NameTypeMetadata;
 import org.generationcp.middleware.api.nametype.NameTypeMetadataFilterRequest;
 import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public NameTypeMetaData getNameTypeMetaData(final Integer nameTypeId) {
+	public NameTypeMetadata getNameTypeMetaData(final Integer nameTypeId) {
 		return this.germplasmNameTypeService.getNameTypeMetaData(nameTypeId);
 	}
 }
