@@ -159,7 +159,7 @@ public class StudyResource {
 			pageable);
 	}
 
-	@ApiOperation(value = "Delete a name type asociated to studies", notes = "Delete a name type asociated to studies")
+	@ApiOperation(value = "Delete a name type associated to studies", notes = "Delete a name type associated to studies")
 	@RequestMapping(value = "/{cropName}/studies/name-types/{nameTypeId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_SETTINGS')")
 	@ResponseBody

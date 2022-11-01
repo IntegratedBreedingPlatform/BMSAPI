@@ -400,7 +400,7 @@ public class GermplasmListResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Delete a name type asociated to germplasm list", notes = "Delete a name type asociated to germplasm list")
+	@ApiOperation(value = "Delete a name type associated to germplasm list", notes = "Delete a name type associated to germplasm list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists/name-types/{nameTypeId}", method = RequestMethod.DELETE)
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_CROP_SETTINGS')")
 	@ResponseBody
