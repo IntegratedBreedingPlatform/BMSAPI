@@ -21,7 +21,8 @@ import org.springframework.stereotype.Component;
 @ComponentScan(basePackages = {
 	"org.generationcp.middleware.ruleengine.coding.expression",
 	"org.generationcp.middleware.ruleengine.coding",
-	"org.generationcp.middleware.ruleengine.stockid"
+	"org.generationcp.middleware.ruleengine.stockid",
+	"org.generationcp.middleware.ruleengine.naming"
 })
 public class RulesPostProcessor implements BeanPostProcessor {
 

@@ -933,20 +933,9 @@ public class MiddlewareFactory {
 		return new HibernateSessionPerRequestProvider(this.WORKBENCH_SessionFactory);
 	}
 
-	// TODO: It's ok to add this beans here?
 	@Bean
 	public SeedSourceGenerator getSeedSourceGenerator() {
 		return new SeedSourceGenerator();
-	}
-
-	@Bean
-	public NamingConventionService getNamingConventionService() {
-		return new NamingConventionServiceImpl();
-	}
-
-	@Bean
-	public ProcessCodeService getProcessCodeService() {
-		return new ProcessCodeServiceImpl();
 	}
 
 }
