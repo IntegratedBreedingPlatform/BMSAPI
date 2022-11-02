@@ -1017,6 +1017,7 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void updatePlotDatasetProperties(final Integer studyId, final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID) {
 		this.studyValidator.validate(studyId, true);
+		// TODO: Replace Validator for a newone that validate all variable together
 		plotDatasetPropertiesDTO.getVariableIds().forEach(this.termValidator::validate);
 		if (!CollectionUtils.isEmpty(plotDatasetPropertiesDTO.getNameTypeIds())) {
 			this.germplasmNameTypeValidator.validate(new HashSet<>(plotDatasetPropertiesDTO.getNameTypeIds()));
