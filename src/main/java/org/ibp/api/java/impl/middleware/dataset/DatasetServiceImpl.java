@@ -1018,7 +1018,9 @@ public class DatasetServiceImpl implements DatasetService {
 	public void updatePlotDatasetProperties(final Integer studyId, final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID) {
 		this.studyValidator.validate(studyId, true);
 		plotDatasetPropertiesDTO.getVariableIds().forEach(this.termValidator::validate);
-		plotDatasetPropertiesDTO.getNameTypeIds().forEach(this.germplasmNameTypeValidator::validate);
+		if (!CollectionUtils.isEmpty(plotDatasetPropertiesDTO.getNameTypeIds())) {
+			this.germplasmNameTypeValidator.validate(new HashSet<>(plotDatasetPropertiesDTO.getNameTypeIds()));
+		}
 		this.studyValidator.validateUpdateStudyEntryColumnsWithSupportedVariableTypes(plotDatasetPropertiesDTO.getVariableIds(), programUUID);
 		this.studyValidator.validateMaxStudyEntryColumnsAllowed(plotDatasetPropertiesDTO, programUUID);
 
