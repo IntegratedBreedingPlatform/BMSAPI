@@ -19,6 +19,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -69,6 +70,9 @@ public class UserValidator {
 	public static final int EMAIL_MAX_LENGTH = 255;
 	public static final int STATUS_MAX_LENGTH = 11;
 
+	@Value("${active.users.max.number}")
+	public int maximumActiveUsers;
+
 	@Autowired
 	protected RoleService roleService;
 
@@ -107,6 +111,7 @@ public class UserValidator {
 		if (createUser) {
 			if (usernameIsValid) this.validateUsernameIfExists(user.getUsername());
 			if (emailIsValid) this.validatePersonEmailIfExists(user.getEmail());
+			this.validateNumberOfActiveUsers(this.errors);
 		} else {
 			if (this.validateUserId(user.getId())) this.validateUserUpdate(user);
 		}
@@ -151,6 +156,10 @@ public class UserValidator {
 		// TODO change frontend status type to integer
 		if (loggedInUser.equals(userUpdate) && "false".equals(user.getStatus())) {
 			this.errors.reject(USER_AUTO_DEACTIVATION);
+		}
+
+		if (userUpdate.getStatus() == 1 && "true".equals(user.getStatus())) {
+			this.validateNumberOfActiveUsers(this.errors);
 		}
 
 		if (!userUpdate.getName().equalsIgnoreCase(user.getUsername())) {
@@ -379,6 +388,12 @@ public class UserValidator {
 		this.validatePersonEmailIfExists(errors, email);
 	}
 
+	public void validateNumberOfActiveUsers(final BindingResult errors) {
+		if (this.userService.countAllActiveUsers() >= this.maximumActiveUsers) {
+			errors.reject("max.number.of.active.users.reached");
+		}
+	}
+
 	public void setRoleService(final RoleService roleService) {
 		this.roleService = roleService;
 	}
@@ -389,6 +404,10 @@ public class UserValidator {
 
 	public void setUserService(final UserService userService) {
 		this.userService = userService;
+	}
+
+	public void setMaximumActiveUsers(final int maximumActiveUsers) {
+		this.maximumActiveUsers = maximumActiveUsers;
 	}
 
 }
