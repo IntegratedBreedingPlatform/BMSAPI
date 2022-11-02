@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -47,7 +48,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
@@ -56,7 +57,6 @@ import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
-import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,7 +141,7 @@ public class DatasetServiceImpl implements DatasetService {
 	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	@Autowired
-	private TermValidator termValidator;
+	private VariableValidator variableValidator;
 
 	@Autowired
 	private GermplasmNameTypeValidator germplasmNameTypeValidator;
@@ -1017,8 +1017,11 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void updatePlotDatasetProperties(final Integer studyId, final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID) {
 		this.studyValidator.validate(studyId, true);
-		// TODO: Replace Validator for a newone that validate all variable together
-		plotDatasetPropertiesDTO.getVariableIds().forEach(this.termValidator::validate);
+
+		if (!CollectionUtils.isEmpty(plotDatasetPropertiesDTO.getVariableIds())) {
+			this.variableValidator.validate(new HashSet<>(plotDatasetPropertiesDTO.getVariableIds()));
+		}
+
 		if (!CollectionUtils.isEmpty(plotDatasetPropertiesDTO.getNameTypeIds())) {
 			this.germplasmNameTypeValidator.validate(new HashSet<>(plotDatasetPropertiesDTO.getNameTypeIds()));
 		}
