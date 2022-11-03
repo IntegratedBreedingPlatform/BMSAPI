@@ -172,10 +172,10 @@ public class GermplasmNameTypeValidator {
 		}
 	}
 
-	public void validate(final Set<Integer> nameTypeId) {
+	public void validate(final Set<Integer> nameTypeIds) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmNameTypeRequestDTO.class.getName());
-		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.getNameTypesByNameTypeListIds(nameTypeId);
-		if (Collections.isEmpty(germplasmNameTypeDTOs) || nameTypeId.size() != germplasmNameTypeDTOs.size()) {
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.getNameTypesByNameTypeListIds(nameTypeIds);
+		if (Collections.isEmpty(germplasmNameTypeDTOs) || nameTypeIds.size() != germplasmNameTypeDTOs.size()) {
 			this.errors.reject("germplasm.name.types.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
