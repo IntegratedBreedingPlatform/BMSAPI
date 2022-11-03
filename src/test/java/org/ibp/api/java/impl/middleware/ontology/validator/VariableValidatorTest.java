@@ -988,7 +988,7 @@ public class VariableValidatorTest {
 	}
 
 	@Test
-	public void testValidate_InvalidVariableIds() {
+	public void testValidate_ThrowsException_WhenSomeVariableIdsDoNotExists() {
 		try {
 			this.variableValidator.validate(Collections.singleton(1));
 		} catch (ApiRequestValidationException e) {
