@@ -9,12 +9,14 @@ import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
-import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
@@ -42,7 +44,7 @@ public class ObservationImportRequestValidatorTest {
 
 	private static final String GERMPLASM_DBID = RandomStringUtils.randomAlphabetic(8);
 	private static final String STUDY_DBID = "1";
-	private static final String VARIABLE_DBID = RandomStringUtils.randomAlphabetic(5);
+	private static final String VARIABLE_DBID = RandomStringUtils.randomNumeric(5);
 	private static final String VALUE = RandomStringUtils.randomNumeric(5);
 	private static final String OBSERVATION_UNIT_DBID = RandomStringUtils.randomAlphabetic(5);
 
@@ -63,6 +65,9 @@ public class ObservationImportRequestValidatorTest {
 
 	@InjectMocks
 	private ObservationImportRequestValidator observationImportRequestValidator;
+
+	@Mock
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Before
 	public void setUp() {
@@ -100,6 +105,13 @@ public class ObservationImportRequestValidatorTest {
 		Mockito.when(this.variableServiceBrapi.getVariables(variableSearchRequestDTOUsingVariableId, null, VariableTypeGroup.TRAIT))
 			.thenReturn(Collections.singletonList(variableDTO));
 
+		final Variable variable = new Variable();
+		variable.setId(Integer.parseInt(VARIABLE_DBID));
+		final VariableFilter variableFilterOptions = new VariableFilter();
+		variableFilterOptions.addVariableId(Integer.parseInt(VARIABLE_DBID));
+		variableFilterOptions.setShowObsoletes(false);
+		Mockito.when(this.ontologyVariableDataManager.getWithFilter(variableFilterOptions))
+			.thenReturn(Collections.singletonList(variable));
 	}
 
 	@Test
@@ -353,6 +365,24 @@ public class ObservationImportRequestValidatorTest {
 		Assert.assertTrue(result.hasErrors());
 		Assert.assertEquals("observation.import.observationVariableDbId.invalid.trait.and.selection.method.variable",
 			result.getAllErrors().get(0).getCode());
+	}
+
+	@Test
+	public void testPruneObservationInvalidForImport_ObsoleteVariableDbIdNotInStudy() {
+		final VariableFilter variableFilterOptions = new VariableFilter();
+		variableFilterOptions.addVariableId(Integer.parseInt(VARIABLE_DBID));
+		variableFilterOptions.setShowObsoletes(false);
+		Mockito.when(this.ontologyVariableDataManager.getWithFilter(variableFilterOptions))
+			.thenReturn(Collections.emptyList());
+		final List<ObservationDto> observationDtos = this.createObservationDtoList();
+		final VariableSearchRequestDTO variableSearchRequestDTOUsingStudyDbId = new VariableSearchRequestDTO();
+		variableSearchRequestDTOUsingStudyDbId.setObservationVariableDbIds(Collections.singletonList(VARIABLE_DBID));
+		variableSearchRequestDTOUsingStudyDbId.setStudyDbId(Collections.singletonList(STUDY_DBID));
+		Mockito.when(this.variableServiceBrapi.getVariables(variableSearchRequestDTOUsingStudyDbId, null, VariableTypeGroup.TRAIT))
+			.thenReturn(new ArrayList<>());
+		final BindingResult result = this.observationImportRequestValidator.pruneObservationsInvalidForImport(observationDtos);
+		Assert.assertTrue(result.hasErrors());
+		Assert.assertEquals("observation.import.obsolete.observationVariableDbId.not.in.study", result.getAllErrors().get(0).getCode());
 	}
 
 	private List<ObservationDto> createObservationDtoList() {
