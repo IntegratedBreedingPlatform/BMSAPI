@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.name.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fest.util.Collections;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
@@ -173,8 +174,8 @@ public class GermplasmNameTypeValidator {
 
 	public void validate(final Set<Integer> nameTypeId) {
 		this.errors = new MapBindingResult(new HashMap<>(), GermplasmNameTypeRequestDTO.class.getName());
-		final Optional<List<GermplasmNameTypeDTO>> germplasmNameTypeDTOs = this.germplasmNameTypeService.getNameTypesByNameTypeListIds(nameTypeId);
-		if (!germplasmNameTypeDTOs.isPresent() || nameTypeId.size() != germplasmNameTypeDTOs.get().size()) {
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.getNameTypesByNameTypeListIds(nameTypeId);
+		if (Collections.isEmpty(germplasmNameTypeDTOs) || nameTypeId.size() != germplasmNameTypeDTOs.size()) {
 			this.errors.reject("germplasm.name.types.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
