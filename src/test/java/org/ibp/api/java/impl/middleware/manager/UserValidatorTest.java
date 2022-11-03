@@ -16,6 +16,7 @@ import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
@@ -65,6 +66,12 @@ public class UserValidatorTest {
 
 	@Mock
 	private CropService cropService;
+
+	@Before
+	public void setUp() {
+		Mockito.when(this.userService.countAllActiveUsers()).thenReturn(new Long(300));
+		this.uservalidator.setMaximumActiveUsers(500);
+	}
 
 	@After
 	public void validate() {
@@ -159,7 +166,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateEmail_FAIL() {
-		UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
+		final UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
 			LAST_NAME_VALID, "cuenya.diego!@leafnode.io", STATUS_VALID);
 
 		this.assertValidateException(userDto, true, "signup.field.email.invalid", null);
@@ -180,7 +187,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void test_validateUserId_notExistsForUpdate_FAIL() {
-		Integer userId = new Random().nextInt(Integer.MAX_VALUE);
+		final Integer userId = new Random().nextInt(Integer.MAX_VALUE);
 
 		final UserDetailDto userDetailDto = this.createDummyUserDetailDto();
 		userDetailDto.setId(userId);
@@ -197,7 +204,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateStatus() {
-		UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
+		final UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
 			LAST_NAME_VALID, EMAIL_VALID, "truee");
 
 		this.assertValidateException(userDto, true, "signup.field.invalid.status", null);
@@ -216,6 +223,7 @@ public class UserValidatorTest {
 
 		Mockito.verify(this.userService).isUsernameExists(userDto.getUsername());
 		Mockito.verify(this.userService).isPersonWithEmailExists(userDto.getEmail());
+		Mockito.verify(this.userService).countAllActiveUsers();
 		Mockito.verifyNoMoreInteractions(this.userService);
 	}
 
@@ -232,6 +240,7 @@ public class UserValidatorTest {
 
 		Mockito.verify(this.userService).isUsernameExists(userDto.getUsername());
 		Mockito.verify(this.userService).isPersonWithEmailExists(userDto.getEmail());
+		Mockito.verify(this.userService).countAllActiveUsers();
 		Mockito.verifyNoMoreInteractions(this.userService);
 	}
 
@@ -322,7 +331,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateUpdateUserForExistingSuperAdminUser() {
-		Integer userId = new Random().nextInt(Integer.MAX_VALUE);
+		final Integer userId = new Random().nextInt(Integer.MAX_VALUE);
 
 		final UserDetailDto userDetailDto = this.createDummyUserDetailDto();
 		userDetailDto.setId(userId);
@@ -449,11 +458,20 @@ public class UserValidatorTest {
 		Mockito.verify(result).reject("signup.field.invalid.userId");
 	}
 
+	@Test
+	public void testValidateNumberOfActiveUsers() {
+		this.uservalidator.setMaximumActiveUsers(400);
+		final BindingResult result = Mockito.mock(BindingResult.class);
+		Mockito.doReturn(new Long(400)).when(this.userService).countAllActiveUsers();
+		this.uservalidator.validateNumberOfActiveUsers(result);
+		Mockito.verify(result).reject("max.number.of.active.users.reached");
+	}
+
 	private void assertValidateException(final UserDetailDto userDto, final boolean createUser, final String message, final List<String> errorArgs) {
 		try {
 			this.uservalidator.validate(userDto, createUser);
 			Assert.fail("Should has failed");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			final ApiRequestValidationException exception = (ApiRequestValidationException) e;
 			assertThat(exception.getErrors(), hasSize(1));
