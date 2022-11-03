@@ -106,6 +106,7 @@ public class VariableDtoValidator {
 			return;
 		}
 		final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
+		variableSearchRequestDTO.setFilterObsoletes(true);
 		variableSearchRequestDTO.setObservationVariableDbIds(Collections.singletonList(variableDTO.getObservationVariableDbId()));
 		final List<VariableDTO> variableDTOS =
 			this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT);

@@ -128,7 +128,7 @@ public class VariableResourceBrapi {
 		if (!StringUtils.isEmpty(externalReferenceSource)) {
 			requestDTO.setExternalReferenceSources(Collections.singletonList(externalReferenceSource));
 		}
-
+		requestDTO.setFilterObsoletes(true);
 		return this.getSearchResults(crop, requestDTO, currentPage, pageSize);
 	}
 
