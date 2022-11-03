@@ -4,6 +4,7 @@ import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.ibp.api.brapi.ObservationServiceBrapi;
 import org.ibp.api.brapi.v2.observation.ObservationImportResponse;
+import org.ibp.api.brapi.v2.observation.ObservationUpdateResponse;
 import org.ibp.api.java.impl.middleware.study.validator.ObservationImportRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
@@ -53,5 +56,27 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		}
 		return response;
 
+	}
+
+	@Override
+	public ObservationUpdateResponse updateObservations(Map<String, ObservationDto> observations) {
+		// Set key to observationDbId, so we can just work with List instead of Map
+		observations.keySet().forEach(key -> observations.get(key).setObservationDbId(key));
+
+		final ObservationUpdateResponse response = new ObservationUpdateResponse();
+		response.setUpdateListSize(observations.size());
+		final List<ObservationDto> observationDtos = observations.values().stream().collect(Collectors.toList());
+		final BindingResult bindingResult = this.observationImportRequestValidator.pruneObservationsInvalidForUpdate(observationDtos);
+		if (bindingResult.hasErrors()) {
+			response.setErrors(bindingResult.getAllErrors());
+		}
+
+		if (!CollectionUtils.isEmpty(observationDtos)) {
+			final List<ObservationDto> results =
+					this.observationServiceBrapi.updateObservations(observationDtos);
+			response.setEntityList(results);
+			response.setUpdatedSize(results.size());
+		}
+		return response;
 	}
 }
