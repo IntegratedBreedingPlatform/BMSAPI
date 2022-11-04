@@ -28,7 +28,7 @@ import java.util.Optional;
 @Component
 public class EntryListOrderDesignTypeServiceImpl implements ExperimentalDesignTypeService {
 
-	protected static final List<Integer> DESIGN_FACTOR_VARIABLES = Arrays.asList(TermId.PLOT_NO.getId());
+	protected static final List<Integer> DESIGN_FACTOR_VARIABLES = Arrays.asList(TermId.PLOT_NO.getId(), TermId.OBS_UNIT_ID.getId());
 
 	protected static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId());

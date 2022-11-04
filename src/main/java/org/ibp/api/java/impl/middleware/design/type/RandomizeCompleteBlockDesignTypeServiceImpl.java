@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 public class RandomizeCompleteBlockDesignTypeServiceImpl implements ExperimentalDesignTypeService {
 
 	protected static final List<Integer> DESIGN_FACTOR_VARIABLES =
-		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId());
+		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId(), TermId.OBS_UNIT_ID.getId());
 
 	protected static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId());

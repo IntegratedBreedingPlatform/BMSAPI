@@ -221,18 +221,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			this.middlewareDatasetService.getDatasets(studyId, new HashSet<>(Arrays.asList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
 				.getDatasetId();
 
-		final List<Integer> termsToRemove = Lists
-			.newArrayList(TermId.OBS_UNIT_ID.getId());
-
 		final List<MeasurementVariable> columns =
 			this.middlewareDatasetService.getObservationSetVariables(plotDatasetId,
 				Lists.newArrayList(VariableType.GERMPLASM_ATTRIBUTE.getId(),
 					VariableType.GERMPLASM_PASSPORT.getId(),
 					VariableType.GERMPLASM_DESCRIPTOR.getId(),
 					VariableType.ENTRY_DETAIL.getId()));
-
-		//Remove OBS_UNIT_ID column if present
-		columns.removeIf(entry -> termsToRemove.contains(entry.getTermId()));
 
 		final List<MeasurementVariable> descriptors = new ArrayList<>();
 		final List<MeasurementVariable> passports = new ArrayList<>();

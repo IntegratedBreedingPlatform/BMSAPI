@@ -444,7 +444,7 @@ public class DatasetExcelGeneratorTest {
 
 		final MeasurementVariable observationUnitVariable = new MeasurementVariable();
 		observationUnitVariable.setTermId(TermId.OBS_UNIT_ID.getId());
-		observationUnitVariable.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
+		observationUnitVariable.setVariableType(VariableType.EXPERIMENTAL_DESIGN);
 		observationUnitVariable.setName("OBS_UNIT");
 		columns.add(observationUnitVariable);
 
