@@ -27,7 +27,6 @@ import java.util.Date;
 	havingValue = "org.ibp.api.java.impl.middleware.design.runner.BVDesignLicenseService")
 public class BVDesignLicenseService implements DesignLicenseService {
 
-	static final String LICENSE_DATE_FORMAT = "dd-MMM-yyyy";
 	static final String LICENSE_SUCCESS_CODE = "0";
 	private static final Logger LOG = LoggerFactory.getLogger(BVDesignLicenseService.class);
 
