@@ -31,6 +31,8 @@ public class AdvanceValidator {
 		// TODO: validate request.getSelectionTraitRequest()
 		//  	-> validate given dataset corresponds to the study
 		//		-> validate given variableId corresponds to the given dataset
+
+		// TODO: if experiment design has replication, then validate that it should have at least one selected
 	}
 
 }
