@@ -65,6 +65,8 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 
 		final ObservationUpdateResponse response = new ObservationUpdateResponse();
 		response.setUpdateListSize(observations.size());
+		response.setUpdatedSize(0);
+
 		final List<ObservationDto> observationDtos = observations.values().stream().collect(Collectors.toList());
 		final BindingResult bindingResult = this.observationImportRequestValidator.pruneObservationsInvalidForUpdate(observationDtos);
 		if (bindingResult.hasErrors()) {
