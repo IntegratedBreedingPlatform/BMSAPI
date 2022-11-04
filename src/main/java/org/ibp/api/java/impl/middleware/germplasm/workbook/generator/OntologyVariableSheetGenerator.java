@@ -86,6 +86,13 @@ public class OntologyVariableSheetGenerator {
 			cell = row.createCell(7, CellType.STRING);
 			cell.setCellStyle(cellStyle);
 			cell.setCellValue(expectedRange);
+
+			final String isObsolete = this.getMessageSource().getMessage(
+				variable.isObsolete() ? "common.form.yes.text" : "common.form.no.text", null, locale);
+			cell = row.createCell(8, CellType.STRING);
+			cell.setCellStyle(cellStyle);
+			cell.setCellValue(isObsolete);
+
 			count--;
 		}
 
@@ -135,6 +142,11 @@ public class OntologyVariableSheetGenerator {
 		cell.setCellStyle(this.sheetStyles.getCellStyle(ExcelCellStyleBuilder.ExcelCellStyle.HEADING_STYLE_OLIVE_GREEN));
 		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.expected.values", null, locale));
 		sheet.setColumnWidth(7, (cell.getStringCellValue().length() + COLUMN_WIDTH_PADDING) * CHARACTER_WIDTH * 2);
+
+		cell = row.createCell(8, CellType.STRING);
+		cell.setCellStyle(this.sheetStyles.getCellStyle(ExcelCellStyleBuilder.ExcelCellStyle.HEADING_STYLE_OLIVE_GREEN));
+		cell.setCellValue(this.getMessageSource().getMessage("export.germplasm.list.template.is.obsolete", null, locale));
+		sheet.setColumnWidth(8, (cell.getStringCellValue().length() + COLUMN_WIDTH_PADDING) * CHARACTER_WIDTH * 2);
 
 		return rowNumIndex;
 	}

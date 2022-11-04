@@ -14,11 +14,13 @@ import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
-import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.ScaleDTO;
@@ -32,10 +34,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -68,7 +73,7 @@ public class ObservationImportRequestValidator {
 	private VariableServiceBrapi variableServiceBrapi;
 
 	@Autowired
-	private OntologyVariableService ontologyVariableService;
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	protected BindingResult errors;
 
@@ -107,6 +112,14 @@ public class ObservationImportRequestValidator {
 			this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT).stream()
 				.collect(Collectors.toMap(VariableDTO::getObservationVariableDbId, Function.identity()));
 
+		final VariableFilter variableFilterOptions = new VariableFilter();
+		variableFilterOptions.addVariableIds(variableIds.stream().map(Integer::parseInt).collect(Collectors.toList()));
+		variableFilterOptions.setShowObsoletes(false);
+		final Set<Integer> nonObsoleteVariables = this.ontologyVariableDataManager.getWithFilter(variableFilterOptions)
+			.stream().map(Variable::getId).collect(Collectors.toSet());
+
+		final Map<String, List<String>> studyVariableIdsMap = new HashMap<>();
+
 		final Map<ObservationDto, Integer> importRequestByIndexMap = IntStream.range(0, observationDtos.size())
 			.boxed().collect(Collectors.toMap(observationDtos::get, i -> i));
 		observationDtos.removeIf(dto -> {
@@ -117,7 +130,9 @@ public class ObservationImportRequestValidator {
 				this.isStudyDbIdInvalid(studyInstancesMap, dto, index) ||
 				this.hasNoExistingObservationUnit(observationUnitDtoMap, dto, index) ||
 				this.isValueInvalid(dto, variableDTOMap, index) ||
-				this.isAnyExternalReferenceInvalid(dto, index);
+				this.isAnyExternalReferenceInvalid(dto, index) ||
+				this.isObservationVariableNotInStudy(variableSearchRequestDTO, studyVariableIdsMap, dto, observationUnitDtoMap,
+					index, nonObsoleteVariables);
 		});
 
 		return this.errors;
@@ -328,6 +343,35 @@ public class ObservationImportRequestValidator {
 				}
 				return false;
 			});
+		}
+		return false;
+	}
+
+	private boolean isObservationVariableNotInStudy(
+		final VariableSearchRequestDTO variableSearchRequestDTO, final Map<String, List<String>> studyVariableIdsMap,
+		final ObservationDto dto, final Map<String, ObservationUnitDto> observationUnitDtoMap, final Integer index,
+		final Set<Integer> nonObsoleteVariables) {
+		if (nonObsoleteVariables.contains(Integer.parseInt(dto.getObservationVariableDbId()))){
+			// skip validation on active variables
+			return false;
+		}
+
+		if (!studyVariableIdsMap.containsKey(dto.getStudyDbId())) {
+			final String studyDbId = StringUtils.isEmpty(dto.getStudyDbId()) ?
+				observationUnitDtoMap.get(dto.getObservationUnitDbId()).getStudyDbId() : dto.getStudyDbId();
+			variableSearchRequestDTO.setStudyDbId(Collections.singletonList(studyDbId));
+			final List<VariableDTO> variableDTOS =
+				this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT);
+			List<String> studyVariableIds = new ArrayList<>();
+			if (!CollectionUtils.isEmpty(variableDTOS)) {
+				studyVariableIds = variableDTOS.stream().map(VariableDTO::getObservationVariableDbId)
+					.collect(Collectors.toList());
+			}
+			studyVariableIdsMap.put(dto.getStudyDbId(), studyVariableIds);
+		}
+		if (!studyVariableIdsMap.get(dto.getStudyDbId()).contains(dto.getObservationVariableDbId())) {
+			this.errors.reject("observation.import.obsolete.observationVariableDbId.not.in.study", new String[] {index.toString()}, "");
+			return true;
 		}
 		return false;
 	}
