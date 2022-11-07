@@ -59,7 +59,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 	}
 
 	@Override
-	public ObservationUpdateResponse updateObservations(Map<String, ObservationDto> observations) {
+	public ObservationUpdateResponse updateObservations(final Map<String, ObservationDto> observations) {
 		// Set key to observationDbId, so we can just work with List instead of Map
 		observations.keySet().forEach(key -> observations.get(key).setObservationDbId(key));
 
