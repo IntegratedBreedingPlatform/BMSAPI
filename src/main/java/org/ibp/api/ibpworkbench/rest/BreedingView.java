@@ -24,7 +24,6 @@ import org.ibp.api.java.design.DesignLicenseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -61,13 +60,10 @@ public class BreedingView {
 	@Resource
 	private DesignLicenseService designLicenseService;
 
-	@Value("${bv.design.validation.on.login.enabled}")
-	private Boolean bvDesignValidationEnabled;
-
 	public static final String SUCCESS = "success";
 	public static final String ERRORS = "errors";
 
-	public static final String CONTACT_SUPPORT_MESSAGE = "<br/><br/>Please contact <a "
+	public static final String CONTACT_SUPPORT_MESSAGE = " Please contact <a "
 		+ "href=\"https://ibplatform.atlassian.net/servicedesk/customer/portal/4/group/25/create/51\" target=\"_blank\">"
 		+ "IBP support</a>.";
 
@@ -151,33 +147,31 @@ public class BreedingView {
 		final Map<String, Object> out = new LinkedHashMap<>();
 		HttpStatus isSuccess = HttpStatus.BAD_REQUEST;
 
-		if (this.bvDesignValidationEnabled) {
-			try {
-				final License designLicenseInfo = this.designLicenseService.getLicenseInfo();
-				final String expiry = designLicenseInfo.getExpiry();
-				if (!StringUtils.isEmpty(expiry)) {
-					final Format formatter = new SimpleDateFormat(DesignLicenseService.LICENSE_DATE_FORMAT);
-					final Date expiryDate = (Date) formatter.parseObject(expiry);
-					final Date currentDate = DateUtil.getCurrentDateWithZeroTime();
+		try {
+			final License designLicenseInfo = this.designLicenseService.getLicenseInfo();
+			final String expiry = designLicenseInfo.getExpiry();
+			if (!StringUtils.isEmpty(expiry)) {
+				final Format formatter = new SimpleDateFormat(DesignLicenseService.LICENSE_DATE_FORMAT);
+				final Date expiryDate = (Date) formatter.parseObject(expiry);
+				final Date currentDate = DateUtil.getCurrentDateWithZeroTime();
 
-					if (currentDate.compareTo(expiryDate) > 0) {
-						out.put(SUCCESS, Boolean.FALSE);
-						out.put(ERRORS, "Login unauthorized: No BMS license has been found or has been expired."
-							+ CONTACT_SUPPORT_MESSAGE);
-						return new ResponseEntity<>(out, isSuccess);
-					}
-
-					final long daysDifference = TimeUnit.DAYS.convert(Math.abs(expiryDate.getTime() - currentDate.getTime()),
-						TimeUnit.MILLISECONDS);
-
-					if (daysDifference <= 30) {
-						out.put("warnings", "Your organization’s BMS licence is going to expire soon (" + expiry + ")."
-							+ CONTACT_SUPPORT_MESSAGE);
-					}
+				if (currentDate.compareTo(expiryDate) > 0) {
+					out.put(SUCCESS, Boolean.FALSE);
+					out.put(ERRORS, "Login unauthorized: No BMS license has been found or has been expired."
+						+ CONTACT_SUPPORT_MESSAGE);
+					return new ResponseEntity<>(out, isSuccess);
 				}
-			} catch (final ParseException e) {
-				LOG.error(e.getMessage(), e);
+
+				final long daysDifference = TimeUnit.DAYS.convert(Math.abs(expiryDate.getTime() - currentDate.getTime()),
+					TimeUnit.MILLISECONDS);
+
+				if (daysDifference <= 30) {
+					out.put("warnings", "Your organization’s BMS licence is going to expire soon (" + expiry + ")."
+						+ CONTACT_SUPPORT_MESSAGE);
+				}
 			}
+		} catch (final ParseException e) {
+			LOG.error(e.getMessage(), e);
 		}
 
 		isSuccess = HttpStatus.OK;
