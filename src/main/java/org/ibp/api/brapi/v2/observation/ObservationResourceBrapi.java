@@ -167,7 +167,7 @@ public class ObservationResourceBrapi {
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<ObservationDto>> updateObservations(@PathVariable final String crop,
-																				 @RequestBody final Map<String, ObservationDto> observations) {
+		@RequestBody final Map<String, ObservationDto> observations) {
 
 		final ObservationUpdateResponse observationUpdateResponse = this.observationServiceBrapi.updateObservations(observations);
 		final Result<ObservationDto> results =

@@ -5,13 +5,11 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
-import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
-import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitService;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -65,9 +63,6 @@ public class ObservationImportRequestValidator {
 
 	@Autowired
 	private ObservationUnitService observationUnitService;
-
-	@Autowired
-	private ObservationServiceBrapi observationServiceBrapi;
 
 	@Autowired
 	private VariableServiceBrapi variableServiceBrapi;
@@ -136,89 +131,6 @@ public class ObservationImportRequestValidator {
 		});
 
 		return this.errors;
-	}
-
-	public BindingResult pruneObservationsInvalidForUpdate(final List<ObservationDto> observationDtos) {
-		BaseValidator.checkNotEmpty(observationDtos, "observation.import.request.null");
-		this.errors = new MapBindingResult(new HashMap<>(), ObservationDto.class.getName());
-
-		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
-		observationSearchRequestDto.setObservationDbIds(observationDtos.stream().filter(obs -> NumberUtils.isNumber(obs.getObservationDbId()))
-				.map(obs -> Integer.valueOf(obs.getObservationDbId())).collect(Collectors.toList()));
-		final Map<String, ObservationDto> existingObservations = this.observationServiceBrapi.searchObservations(observationSearchRequestDto, null)
-				.stream().collect(Collectors.toMap(ObservationDto::getObservationDbId, Function.identity()));
-
-		final List<String> variableIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getObservationVariableDbId()))
-				.map(ObservationDto::getObservationVariableDbId).collect(Collectors.toList());
-		final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
-		variableSearchRequestDTO.setObservationVariableDbIds(variableIds);
-		final Map<String, VariableDTO> variableDTOMap =
-				this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT).stream()
-						.collect(Collectors.toMap(VariableDTO::getObservationVariableDbId, Function.identity()));
-
-		final Map<ObservationDto, Integer> importRequestByIndexMap = IntStream.range(0, observationDtos.size())
-				.boxed().collect(Collectors.toMap(observationDtos::get, i -> i));
-
-		observationDtos.removeIf(dto -> {
-			final Integer index = importRequestByIndexMap.get(dto) + 1;
-
-			return this.hasNoExistingObservation(dto, existingObservations, index) ||
-				this.isGermplasmDbIdInvalidForUpdate(dto, existingObservations.get(dto.getObservationDbId()), index) ||
-				this.isObservationUnitDbIdInvalidForUpdate(dto, existingObservations.get(dto.getObservationDbId()), index) ||
-				this.isObservationVariableDbIdInvalidForUpdate(dto, existingObservations.get(dto.getObservationDbId()), index) ||
-				this.isStudyDbIdInvalidForUpdate(dto, existingObservations.get(dto.getObservationDbId()), index) ||
-				this.isValueInvalid(dto, variableDTOMap, index) ||
-				this.isAnyExternalReferenceInvalid(dto, index);
-		});
-		return this.errors;
-	}
-
-	private boolean hasNoExistingObservation(final ObservationDto dto, final Map<String, ObservationDto> observationDtoMap, final Integer index) {
-		if (!observationDtoMap.containsKey(dto.getObservationDbId())) {
-			this.errors.reject("observation.update.no.observation", new String[] {index.toString()}, "");
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isGermplasmDbIdInvalidForUpdate(final ObservationDto dto, final ObservationDto existingObservation, final Integer index) {
-		if (StringUtils.isNotEmpty(dto.getGermplasmDbId()) && !dto.getGermplasmDbId().equalsIgnoreCase(existingObservation.getGermplasmDbId())) {
-			this.errors.reject("observation.update.germplasmDbId.invalid", new String[] {index.toString()}, "");
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isObservationUnitDbIdInvalidForUpdate(final ObservationDto dto, final ObservationDto existingObservation, final Integer index) {
-		if (StringUtils.isEmpty(dto.getObservationUnitDbId())) {
-			this.errors.reject("observation.import.observationUnitDbId.required", new String[] {index.toString()}, "");
-			return true;
-		}
-		if (!dto.getObservationUnitDbId().equalsIgnoreCase(existingObservation.getObservationUnitDbId())) {
-			this.errors.reject("observation.update.observationUnitDbId.invalid", new String[] {index.toString()}, "");
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isObservationVariableDbIdInvalidForUpdate(final ObservationDto dto, final ObservationDto existingObservation, final Integer index) {
-		if (StringUtils.isEmpty(dto.getObservationVariableDbId())) {
-			this.errors.reject("observation.import.observationVariableDbId.required", new String[] {index.toString()}, "");
-			return true;
-		}
-		if (!dto.getObservationVariableDbId().equals(existingObservation.getObservationVariableDbId())) {
-			this.errors.reject("observation.update.observationVariableDbId.invalid", new String[] {index.toString()}, "");
-			return true;
-		}
-		return false;
-	}
-
-	private boolean isStudyDbIdInvalidForUpdate(final ObservationDto dto, final ObservationDto existingObservation, final Integer index) {
-		if (StringUtils.isNotEmpty(dto.getStudyDbId()) && !dto.getStudyDbId().equals(existingObservation.getStudyDbId())) {
-			this.errors.reject("observation.update.studyDbId.invalid", new String[] {index.toString()}, "");
-			return true;
-		}
-		return false;
 	}
 
 	private boolean hasNoExistingObservationUnit(

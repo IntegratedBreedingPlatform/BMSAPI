@@ -6,6 +6,7 @@ import org.ibp.api.brapi.ObservationServiceBrapi;
 import org.ibp.api.brapi.v2.observation.ObservationImportResponse;
 import org.ibp.api.brapi.v2.observation.ObservationUpdateResponse;
 import org.ibp.api.java.impl.middleware.study.validator.ObservationImportRequestValidator;
+import org.ibp.api.java.impl.middleware.study.validator.ObservationUpdateRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 
 	@Autowired
 	private ObservationImportRequestValidator observationImportRequestValidator;
+
+	@Autowired
+	private ObservationUpdateRequestValidator observationUpdateRequestValidator;
 
 	@Override
 	public List<ObservationDto> searchObservations(final ObservationSearchRequestDto observationSearchRequestDto,
@@ -68,7 +72,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		response.setUpdatedSize(0);
 
 		final List<ObservationDto> observationDtos = observations.values().stream().collect(Collectors.toList());
-		final BindingResult bindingResult = this.observationImportRequestValidator.pruneObservationsInvalidForUpdate(observationDtos);
+		final BindingResult bindingResult = this.observationUpdateRequestValidator.pruneObservationsInvalidForUpdate(observationDtos);
 		if (bindingResult.hasErrors()) {
 			response.setErrors(bindingResult.getAllErrors());
 		}
