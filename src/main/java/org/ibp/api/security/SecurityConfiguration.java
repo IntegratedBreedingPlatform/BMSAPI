@@ -73,6 +73,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 					"/token",
 					"/brapi/**/token",
 					"/breeding_view/**",
+					"/breeding-view-licenses",
 					"/**/brapi/authorize",
 					"/**/.well-known/openid-configuration"
 				).permitAll()
