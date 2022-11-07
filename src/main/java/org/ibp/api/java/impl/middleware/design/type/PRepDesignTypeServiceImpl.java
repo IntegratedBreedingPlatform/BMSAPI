@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService {
 
 	protected static final List<Integer> DESIGN_FACTOR_VARIABLES =
-		Arrays.asList(TermId.BLOCK_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId());
+		Arrays.asList(TermId.BLOCK_NO.getId(), TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId(), TermId.OBS_UNIT_ID.getId());
 
 	protected static final List<Integer> EXPERIMENT_DESIGN_VARIABLES =
 		Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(),
