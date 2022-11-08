@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
@@ -228,10 +229,10 @@ public class StudyValidator {
 		}
 	}
 
-	public void validateMaxStudyEntryColumnsAllowed(final List<Integer> variableIds, final String programUUID) {
+	public void validateMaxStudyEntryColumnsAllowed(final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID) {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
-		final List<StandardVariable> variables = this.ontologyDataManager.getStandardVariables(variableIds, programUUID)
+		final List<StandardVariable> variables = this.ontologyDataManager.getStandardVariables(plotDatasetPropertiesDTO.getVariableIds(), programUUID)
 			.stream()
 			.filter(standardVariable -> standardVariable.getVariableTypes().stream().anyMatch(variableType ->
 				VariableType.GERMPLASM_ATTRIBUTE == variableType ||
@@ -239,7 +240,8 @@ public class StudyValidator {
 			)
 			.collect(Collectors.toList());
 
-		if (variables.size() > MAX_NUMBER_OF_COLUMNS_ALLOWED) {
+		final int total = variables.size() + plotDatasetPropertiesDTO.getNameTypeIds().size();
+		if (total > MAX_NUMBER_OF_COLUMNS_ALLOWED) {
 			this.errors.reject("study.entry.update.columns.exceeded.maximum.allowed",
 				new String[] { String.valueOf(variables.size()), String.valueOf(MAX_NUMBER_OF_COLUMNS_ALLOWED) },"");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());

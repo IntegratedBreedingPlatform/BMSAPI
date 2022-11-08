@@ -55,4 +55,5 @@ public interface GermplasmListService {
 	void removeGermplasmEntriesFromList(Integer germplasmListId, SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 
 	void editListMetadata(GermplasmListDto germplasmListDto, String programUUID);
+
 }

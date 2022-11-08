@@ -1,6 +1,7 @@
 package org.ibp.api.java.dataset;
 
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -17,6 +18,7 @@ import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -346,6 +348,8 @@ public interface DatasetService {
 
 	Long countObservationUnits(Integer dataSetId);
 
-	void updatePlotDatasetProperties(Integer studyId, List<Integer> variableIds, final String programUUID);
+	void updatePlotDatasetProperties(Integer studyId, PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, String programUUID);
+
+	List<GermplasmNameTypeDTO> getAllPlotDatasetNameTypes(Integer datasetId);
 
 }

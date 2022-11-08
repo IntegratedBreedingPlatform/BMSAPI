@@ -228,6 +228,41 @@ public class GermplasmNameTypeValidatorTest {
 		}
 	}
 
+	@Test
+	public void testValidateNameTypeDeletion_ThrowsException_WhenNameTypeIdBelongsToGermplasmList() {
+		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
+		germplasmNameTypeDTO.setCode(RandomStringUtils.randomAlphabetic(15));
+
+		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
+			.thenReturn(Optional.of(germplasmNameTypeDTO));
+
+		Mockito.when(this.germplasmNameTypeService.isNameTypeUsedInGermplasmList(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
+			.thenReturn(true);
+
+		try {
+			this.germplasmNameTypeValidator.validateNameTypeDeletion(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.used.in.germplasm.list"));
+		}
+	}
+
+	@Test
+	public void testValidateNameTypeDeletion_ThrowsException_WhenNameTypeIdBelongsToStudy() {
+		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.buildGermplasmNameTypeDTO();
+		germplasmNameTypeDTO.setCode(RandomStringUtils.randomAlphabetic(15));
+
+		Mockito.when(this.germplasmNameTypeService.getNameTypeById(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
+			.thenReturn(Optional.of(germplasmNameTypeDTO));
+
+		Mockito.when(this.germplasmNameTypeService.isNameTypeUsedInStudies(GermplasmNameTypeValidatorTest.NAME_TYPE_ID))
+			.thenReturn(true);
+
+		try {
+			this.germplasmNameTypeValidator.validateNameTypeDeletion(GermplasmNameTypeValidatorTest.NAME_TYPE_ID);
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.used.in.study"));
+		}
+	}
 	private GermplasmNameTypeRequestDTO buildGermplasmNameTypeRequestDTO() {
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = new GermplasmNameTypeRequestDTO();
 		germplasmNameTypeRequestDTO.setCode(RandomStringUtils.randomAlphabetic(GermplasmNameTypeValidator.CODE_OR_NAME_MAX_LENGTH));

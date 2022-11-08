@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.germplasmlist.data.GermplasmListReorderEn
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
+import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +34,8 @@ public class GermplasmListDataServiceImplTest {
 	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
 	private static final Integer USER_ID = new Random().nextInt();
 
+	private static final int NAME_TYPE_ID = new Random().nextInt(Integer.MAX_VALUE);
+
 	@InjectMocks
 	private GermplasmListDataServiceImpl germplasmListDataService;
 
@@ -41,6 +44,9 @@ public class GermplasmListDataServiceImplTest {
 
 	@Mock
 	private GermplasmListValidator germplasmListValidator;
+
+	@Mock
+	private GermplasmNameTypeValidator germplasmNameTypeValidator;
 
 	@Before
 	public void init() {
@@ -307,6 +313,15 @@ public class GermplasmListDataServiceImplTest {
 		final int listId = 1;
 		this.germplasmListDataService.getGermplasmListDataDetailList(1);
 		Mockito.verify(this.germplasmListDataServiceMiddleware).getGermplasmListDataDetailList(listId);
+	}
+
+	@Test
+	public void testDeleteNameTypeFromGermplasmList_OK() {
+		this.germplasmListDataService.deleteNameTypeFromGermplasmList(NAME_TYPE_ID);
+		Mockito.verify(this.germplasmNameTypeValidator).validate(NAME_TYPE_ID);
+		Mockito.verify(this.germplasmListDataServiceMiddleware).deleteNameTypeFromGermplasmList(NAME_TYPE_ID);
+		Mockito.verifyNoMoreInteractions(this.germplasmNameTypeValidator);
+		Mockito.verifyNoMoreInteractions(this.germplasmListDataServiceMiddleware);
 	}
 
 	private GermplasmList createGermplasmListMock(final boolean isLocked) {
