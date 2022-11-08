@@ -1,7 +1,7 @@
 package org.ibp.api.rest.user;
 
 import io.swagger.annotations.ApiOperation;
-import org.ibp.api.domain.user.UserDetailDto;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.java.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,7 @@ public class UserResource {
 	@RequestMapping(value = "/users", method = RequestMethod.GET)
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
-	public ResponseEntity<List<UserDetailDto>> listUsers() {
+	public ResponseEntity<List<UserDto>> listUsers() {
 		return new ResponseEntity<>(this.userService.getAllUsersSortedByLastName(), HttpStatus.OK);
 	}
 
@@ -37,7 +37,7 @@ public class UserResource {
 	@RequestMapping(value = "/users/filter", method = RequestMethod.GET)
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
-	public ResponseEntity<List<UserDetailDto>> filterUsers(@RequestParam final String cropName, @RequestParam final String programUUID) {
+	public ResponseEntity<List<UserDto>> filterUsers(@RequestParam final String cropName, @RequestParam final String programUUID) {
 		return new ResponseEntity<>(this.userService.getUsersByProjectUUID(programUUID), HttpStatus.OK);
 	}
 
@@ -46,7 +46,7 @@ public class UserResource {
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
 	public ResponseEntity<Integer> createUser(@RequestBody final
-	UserDetailDto user) {
+	UserDto user) {
 		return new ResponseEntity<>(this.userService.createUser(user), HttpStatus.CREATED);
 	}
 
@@ -55,7 +55,7 @@ public class UserResource {
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN')")
 	public ResponseEntity<Integer> updateUser(final @PathVariable
-	String id, @RequestBody final UserDetailDto user) {
+	String id, @RequestBody final UserDto user) {
 		return new ResponseEntity<>(this.userService.updateUser(user), HttpStatus.OK);
 	}
 }

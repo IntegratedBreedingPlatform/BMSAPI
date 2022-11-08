@@ -1,8 +1,8 @@
 package org.ibp.api.java.impl.middleware.program.validator;
 
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.RoleType;
-import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
@@ -75,7 +75,7 @@ public class AddProgramMemberRequestDtoValidator {
 
 		//all users are eligible to be program members
 		final List<Integer> eligibleUserIds =
-			this.userService.getProgramMembersEligibleUsers(programUUID, null, null).stream().map(UserDto::getUserId)
+			this.userService.getProgramMembersEligibleUsers(programUUID, null, null).stream().map(UserDto::getId)
 				.collect(Collectors.toList());
 		if (!eligibleUserIds.containsAll(addProgramMemberRequestDto.getUserIds())) {
 			final List<Integer> invalidUsers = new ArrayList<>(addProgramMemberRequestDto.getUserIds());

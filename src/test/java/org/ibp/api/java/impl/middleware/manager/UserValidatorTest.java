@@ -2,14 +2,14 @@ package org.ibp.api.java.impl.middleware.manager;
 
 import liquibase.util.StringUtils;
 import org.apache.commons.lang.RandomStringUtils;
-import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.hamcrest.MatcherAssert;
-import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
@@ -81,29 +81,29 @@ public class UserValidatorTest {
 
 	@Test
 	public void test_validateUsername_OK() {
-		final UserDetailDto user1 = this.createDummyUserDetailDto("user-name");
+		final UserDto user1 = this.createDummyUserDetailDto("user-name");
 		this.uservalidator.validate(user1, true);
 
-		final UserDetailDto user2 = this.createDummyUserDetailDto("user.name");
+		final UserDto user2 = this.createDummyUserDetailDto("user.name");
 		this.uservalidator.validate(user2, true);
 
-		final UserDetailDto user3 = this.createDummyUserDetailDto("user_name.company");
+		final UserDto user3 = this.createDummyUserDetailDto("user_name.company");
 		this.uservalidator.validate(user3, true);
 	}
 
 	@Test
 	public void test_validateUserName_FAIL() {
-		final UserDetailDto user1 = this.createDummyUserDetailDto("[]%&");
+		final UserDto user1 = this.createDummyUserDetailDto("[]%&");
 		this.assertValidateException(user1, true, "user.invalid.username", null);
 
-		final UserDetailDto user2 = this.createDummyUserDetailDto("user_name.company.");
+		final UserDto user2 = this.createDummyUserDetailDto("user_name.company.");
 		this.assertValidateException(user2, true, "user.invalid.username", null);
 	}
 
 	@Test
 	public void test_validateFieldLength_firstNameBlank_FAIL() {
 		final String firstName = "            ";
-		final UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, firstName,
+		final UserDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, firstName,
 			LAST_NAME_VALID, EMAIL_VALID, STATUS_VALID);
 
 		this.assertValidateException(userDto, true, UserValidator.SIGNUP_FIELD_REQUIRED,
@@ -113,7 +113,7 @@ public class UserValidatorTest {
 	@Test
 	public void test_validateFieldLength_lastNameBlank_FAIL() {
 		final String lastName = "            ";
-		final UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
+		final UserDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
 			lastName, EMAIL_VALID, STATUS_VALID);
 
 		this.assertValidateException(userDto, true, UserValidator.SIGNUP_FIELD_REQUIRED,
@@ -123,7 +123,7 @@ public class UserValidatorTest {
 	@Test
 	public void test_validateFieldLength_firstNameExceedLength_FAIL() {
 		final String firstName = StringUtils.repeat("0", UserValidator.FIRST_NAME_MAX_LENGTH + 1);
-		final UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, firstName,
+		final UserDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, firstName,
 			LAST_NAME_VALID, EMAIL_VALID, STATUS_VALID);
 
 		this.assertValidateException(userDto, true, UserValidator.SIGNUP_FIELD_LENGTH_EXCEED,
@@ -133,7 +133,7 @@ public class UserValidatorTest {
 	@Test
 	public void test_validateFieldLength_lastNameExceedLength_FAIL() {
 		final String lastName = StringUtils.repeat("0", UserValidator.LAST_NAME_MAX_LENGTH + 1);
-		final UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
+		final UserDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
 			lastName, EMAIL_VALID, STATUS_VALID);
 
 		this.assertValidateException(userDto, true, UserValidator.SIGNUP_FIELD_LENGTH_EXCEED,
@@ -143,7 +143,7 @@ public class UserValidatorTest {
 	@Test
 	public void test_validateFieldLength_userNameExceedLength_FAIL() {
 		final String username = StringUtils.repeat("0", UserValidator.USERNAME_MAX_LENGTH + 1);
-		final UserDetailDto userDto = this.createDummyUserDetailDto(username, FIRST_NAME_VALID,
+		final UserDto userDto = this.createDummyUserDetailDto(username, FIRST_NAME_VALID,
 			LAST_NAME_VALID, EMAIL_VALID, STATUS_VALID);
 
 		this.assertValidateException(userDto, true, UserValidator.SIGNUP_FIELD_LENGTH_EXCEED,
@@ -153,7 +153,7 @@ public class UserValidatorTest {
 	@Test
 	public void test_validateFieldLength_emailExceedLength_FAIL() {
 		final String email = RandomStringUtils.randomAlphabetic(247) + "@test.com";
-		final UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
+		final UserDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
 			LAST_NAME_VALID, email, STATUS_VALID);
 
 		this.assertValidateException(userDto, true, UserValidator.SIGNUP_FIELD_LENGTH_EXCEED,
@@ -166,7 +166,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateEmail_FAIL() {
-		final UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
+		final UserDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
 			LAST_NAME_VALID, "cuenya.diego!@leafnode.io", STATUS_VALID);
 
 		this.assertValidateException(userDto, true, "signup.field.email.invalid", null);
@@ -176,7 +176,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void test_validateUserId_notPresentForUpdate_FAIL() {
-		final UserDetailDto userDetailDto = this.createDummyUserDetailDto();
+		final UserDto userDetailDto = this.createDummyUserDetailDto();
 		this.assertValidateException(userDetailDto, false, "signup.field.invalid.userId", null);
 
 		Mockito.verifyZeroInteractions(this.userService);
@@ -189,7 +189,7 @@ public class UserValidatorTest {
 	public void test_validateUserId_notExistsForUpdate_FAIL() {
 		final Integer userId = new Random().nextInt(Integer.MAX_VALUE);
 
-		final UserDetailDto userDetailDto = this.createDummyUserDetailDto();
+		final UserDto userDetailDto = this.createDummyUserDetailDto();
 		userDetailDto.setId(userId);
 
 		Mockito.when(this.userService.getUserById(userId)).thenReturn(null);
@@ -204,7 +204,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void testValidateStatus() {
-		final UserDetailDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
+		final UserDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
 			LAST_NAME_VALID, EMAIL_VALID, "truee");
 
 		this.assertValidateException(userDto, true, "signup.field.invalid.status", null);
@@ -215,7 +215,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void test_validate_create_usernameExists_FAIL() {
-		final UserDetailDto userDto = this.createDummyUserDetailDto();
+		final UserDto userDto = this.createDummyUserDetailDto();
 		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(true);
 		Mockito.when(this.userService.isPersonWithEmailExists(userDto.getEmail())).thenReturn(false);
 
@@ -232,7 +232,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void test_validate_create_emailsExists_FAIL() {
-		final UserDetailDto userDto = this.createDummyUserDetailDto();
+		final UserDto userDto = this.createDummyUserDetailDto();
 		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(false);
 		Mockito.when(this.userService.isPersonWithEmailExists(userDto.getEmail())).thenReturn(true);
 
@@ -249,7 +249,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void test_validate_updateUser_OK() {
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final UserDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
 
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
@@ -276,7 +276,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void test_validate_updateUserEmailExists_FAIL() {
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final UserDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
 
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
@@ -304,7 +304,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void test_validate_UpdateUserUsernameExists_FAIL() {
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final UserDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
 		user.setName("Nahuel");
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
@@ -333,7 +333,7 @@ public class UserValidatorTest {
 	public void testValidateUpdateUserForExistingSuperAdminUser() {
 		final Integer userId = new Random().nextInt(Integer.MAX_VALUE);
 
-		final UserDetailDto userDetailDto = this.createDummyUserDetailDto();
+		final UserDto userDetailDto = this.createDummyUserDetailDto();
 		userDetailDto.setId(userId);
 
 		final WorkbenchUser workbenchUser = Mockito.mock(WorkbenchUser.class);
@@ -350,7 +350,7 @@ public class UserValidatorTest {
 	 */
 	@Test
 	public void test_validate_createUser_OK() {
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(0, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final UserDto userDto = UserTestDataGenerator.initializeUserDetailDto(0, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(0,UserTestDataGenerator.initializeUserRoleAdmin());
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
 		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
@@ -359,7 +359,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testValidateUserCannotAutoDeactivate() {
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final UserDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
 
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
@@ -374,7 +374,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testValidateSuperAdminUserCannotAssignable() {
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoSuperAdmin());
+		final UserDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoSuperAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleSuperAdmin());
 
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
@@ -385,7 +385,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testValidateUserInvalidRole() {
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
+		final UserDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
@@ -395,7 +395,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testValidateUserCropNotAssociated() {
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"),
+		final UserDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("wheat"),
 			UserTestDataGenerator.initializeUserRoleDtoBreeder(new CropDto(new CropType("maize"))));
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleBreeder());
 
@@ -412,7 +412,7 @@ public class UserValidatorTest {
 
 	@Test
 	public void testValidateUserCropNotExists() {
-		final UserDetailDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("bean"),
+		final UserDto userDto = UserTestDataGenerator.initializeUserDetailDto(10, new CropType("bean"),
 			UserTestDataGenerator.initializeUserRoleDtoBreeder(new CropDto(new CropType("bean"))));
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleBreeder());
 
@@ -467,7 +467,7 @@ public class UserValidatorTest {
 		Mockito.verify(result).reject("max.number.of.active.users.reached");
 	}
 
-	private void assertValidateException(final UserDetailDto userDto, final boolean createUser, final String message, final List<String> errorArgs) {
+	private void assertValidateException(final UserDto userDto, final boolean createUser, final String message, final List<String> errorArgs) {
 		try {
 			this.uservalidator.validate(userDto, createUser);
 			Assert.fail("Should has failed");
@@ -487,17 +487,17 @@ public class UserValidatorTest {
 		}
 	}
 
-	private UserDetailDto createDummyUserDetailDto() {
+	private UserDto createDummyUserDetailDto() {
 		return this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID, LAST_NAME_VALID, EMAIL_VALID, STATUS_VALID);
 	}
 
-	private UserDetailDto createDummyUserDetailDto(final String userName) {
+	private UserDto createDummyUserDetailDto(final String userName) {
 		return this.createDummyUserDetailDto(userName, FIRST_NAME_VALID, LAST_NAME_VALID, EMAIL_VALID, STATUS_VALID);
 	}
 
-	private UserDetailDto createDummyUserDetailDto(final String userName, final String firstName, final String lastName, final String email,
+	private UserDto createDummyUserDetailDto(final String userName, final String firstName, final String lastName, final String email,
 		final String status) {
-		final UserDetailDto userDto = new UserDetailDto();
+		final UserDto userDto = new UserDto();
 		userDto.setUsername(userName);
 		userDto.setFirstName(firstName);
 		userDto.setLastName(lastName);
