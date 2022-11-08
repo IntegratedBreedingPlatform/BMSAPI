@@ -18,7 +18,7 @@ public class MockDesignLicenseService implements DesignLicenseService {
 
 	@Override
 	public License getLicenseInfo() {
-		return new License("Succesful license checkout", "73", "1-NOV-2022");
+		return new License("Succesful license checkout", "73", "30-NOV-2022");
 	}
 
 }
