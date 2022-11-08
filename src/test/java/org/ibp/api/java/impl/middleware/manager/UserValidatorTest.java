@@ -470,7 +470,7 @@ public class UserValidatorTest {
 	private void assertValidateException(final UserDto userDto, final boolean createUser, final String message, final List<String> errorArgs) {
 		try {
 			this.uservalidator.validate(userDto, createUser);
-			Assert.fail("Should has failed");
+			Assert.fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
 			final ApiRequestValidationException exception = (ApiRequestValidationException) e;
@@ -498,6 +498,7 @@ public class UserValidatorTest {
 	private UserDto createDummyUserDetailDto(final String userName, final String firstName, final String lastName, final String email,
 		final String status) {
 		final UserDto userDto = new UserDto();
+		userDto.setId(null);
 		userDto.setUsername(userName);
 		userDto.setFirstName(firstName);
 		userDto.setLastName(lastName);
