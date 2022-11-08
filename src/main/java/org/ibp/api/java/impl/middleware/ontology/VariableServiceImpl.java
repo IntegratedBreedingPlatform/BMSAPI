@@ -114,6 +114,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 			middlewareVariableFilter.setProgramUuid(programId);
 			if (favourite != null) {
 				middlewareVariableFilter.setFavoritesOnly(favourite);
+				if (favourite) {
+					middlewareVariableFilter.setShowObsoletes(false);
+				}
 			}
 
 			final Integer property = StringUtil.parseInt(propertyId, null);
