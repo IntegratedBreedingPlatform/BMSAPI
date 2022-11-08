@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.name.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fest.util.Collections;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
@@ -47,6 +48,16 @@ public class GermplasmNameTypeValidator {
 		final GermplasmNameTypeDTO germplasmNameTypeDTO = this.validateExistingNameType(nameTypeId);
 		this.validateNameTypeBelongsToSystem(germplasmNameTypeDTO.getCode());
 		this.validateNameTypeBelongsToGermplasm(nameTypeId);
+		this.isNameTypeUsedInStudy(nameTypeId);
+		this.isNameTypeUsedInGermplasmList(nameTypeId);
+	}
+
+	private void isNameTypeUsedInGermplasmList(final Integer nameTypeId) {
+		final boolean isNameTypeUsedInGermplasmName = this.germplasmNameTypeService.isNameTypeUsedInGermplasmList(nameTypeId);
+		if (isNameTypeUsedInGermplasmName) {
+			this.errors.reject("germplasm.name.type.used.in.germplasm.list", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 	}
 
 	public void validateNameTypeModification(final Integer nameTypeId, final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
@@ -152,6 +163,24 @@ public class GermplasmNameTypeValidator {
 		return germplasmNameTypeDTO.get();
 	}
 
+	public void validate(final Integer nameTypeId) {
+		final Optional<GermplasmNameTypeDTO> germplasmNameTypeDTO = this.germplasmNameTypeService.getNameTypeById(nameTypeId);
+
+		if (!germplasmNameTypeDTO.isPresent()) {
+			this.errors.reject("germplasm.name.type.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	public void validate(final Set<Integer> nameTypeIds) {
+		this.errors = new MapBindingResult(new HashMap<>(), GermplasmNameTypeRequestDTO.class.getName());
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.getNameTypesByNameTypeListIds(nameTypeIds);
+		if (Collections.isEmpty(germplasmNameTypeDTOs) || nameTypeIds.size() != germplasmNameTypeDTOs.size()) {
+			this.errors.reject("germplasm.name.types.invalid", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
 	private boolean isNameTypeInUse(final GermplasmNameTypeDTO germplasmNameTypeDTO) {
 		final boolean isSystem = SystemNameTypes.getTypes().contains(germplasmNameTypeDTO.getCode());
 		final boolean isNameTypeUsedInGermplasmName = this.germplasmNameService.isNameTypeUsedAsGermplasmName(germplasmNameTypeDTO.getId());
@@ -169,6 +198,14 @@ public class GermplasmNameTypeValidator {
 		final boolean isNameTypeUsedInGermplasmName = this.germplasmNameService.isNameTypeUsedAsGermplasmName(nameTypeId);
 		if (isNameTypeUsedInGermplasmName) {
 			this.errors.reject("germplasm.name.type.is.in.use", "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+	}
+
+	private void isNameTypeUsedInStudy(final Integer nameTypeId) {
+		final boolean isNameTypeUsedInGermplasmName = this.germplasmNameTypeService.isNameTypeUsedInStudies(nameTypeId);
+		if (isNameTypeUsedInGermplasmName) {
+			this.errors.reject("germplasm.name.type.used.in.study", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}

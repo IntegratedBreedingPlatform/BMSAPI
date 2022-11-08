@@ -15,6 +15,7 @@ import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.Util;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.slf4j.Logger;
@@ -22,11 +23,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
+import org.springframework.validation.MapBindingResult;
 import org.springframework.validation.Validator;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -776,6 +779,20 @@ public class VariableValidator extends OntologyValidator implements Validator {
 				errors.reject("germplasm.update.invalid.attribute.code",
 					new String[] {Util.buildErrorMessageFromList(new ArrayList<>(attributesCodes), 3)}, "");
 			}
+		}
+	}
+
+	public void validate(final Set<Integer> variableIds) {
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.getVariableIds().addAll(variableIds);
+		final List<Variable> existingVariables =
+			this.ontologyVariableDataManager.getWithFilter(variableFilter);
+
+		if (variableIds.size() != existingVariables.size()) {
+			errors.reject("variables.do.not.exist", "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 	}
 }

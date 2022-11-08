@@ -5,6 +5,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -250,6 +251,15 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		descriptors.sort(Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
 
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.middlewareDatasetService.getDatasetNameTypes(plotDatasetId);
+		germplasmNameTypeDTOs.sort(Comparator.comparing(GermplasmNameTypeDTO::getCode));
+		sortedColumns.addAll(
+			germplasmNameTypeDTOs.stream().map(germplasmNameTypeDTO ->
+				new MeasurementVariable(germplasmNameTypeDTO.getCode(), //
+					germplasmNameTypeDTO.getDescription(), germplasmNameTypeDTO.getId(), //
+					null, germplasmNameTypeDTO.getCode(), true)) //
+			.collect(Collectors.toSet()));
+
 		passports.sort(Comparator.comparing(MeasurementVariable::getName));
 		sortedColumns.addAll(passports);
 		attributes.sort(Comparator.comparing(MeasurementVariable::getName));
@@ -387,11 +397,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	private MeasurementVariable buildVirtualColumn(final String name, final TermId termId) {
-		final MeasurementVariable sampleColumn = new MeasurementVariable();
-		sampleColumn.setName(name);
-		sampleColumn.setAlias(name);
-		sampleColumn.setTermId(termId.getId());
-		sampleColumn.setFactor(true);
-		return sampleColumn;
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName(name);
+		measurementVariable.setAlias(name);
+		measurementVariable.setTermId(termId.getId());
+		measurementVariable.setFactor(true);
+		return measurementVariable;
 	}
 }

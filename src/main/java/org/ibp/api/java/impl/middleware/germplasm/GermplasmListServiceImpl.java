@@ -48,6 +48,7 @@ import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
+import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -140,6 +141,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	private GermplasmListDataService germplasmListDataService;
 
 	private BindingResult errors;
+
+	@Autowired
+	private GermplasmNameTypeValidator germplasmNameTypeValidator;
 
 	@Deprecated
 	@Override

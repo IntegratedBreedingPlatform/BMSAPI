@@ -17,6 +17,7 @@ import org.ibp.api.domain.ontology.PropertyDetails;
 import org.ibp.api.domain.ontology.ScaleDetails;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableType;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.AttributeValidator;
 import org.ibp.api.java.impl.middleware.ontology.TestDataProvider;
 import org.junit.After;
@@ -36,6 +37,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VariableValidatorTest {
@@ -981,5 +985,14 @@ public class VariableValidatorTest {
 			RandomStringUtils.randomAlphanumeric(AttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH +1)),
 			errors);
 		Mockito.verify(errors).reject("attribute.value.invalid.length", "");
+	}
+
+	@Test
+	public void testValidate_ThrowsException_WhenSomeVariableIdsDoNotExists() {
+		try {
+			this.variableValidator.validate(Collections.singleton(1));
+		} catch (ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("variables.do.not.exist"));
+		}
 	}
 }

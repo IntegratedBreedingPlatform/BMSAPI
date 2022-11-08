@@ -7,7 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -45,7 +47,8 @@ import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
-import org.ibp.api.java.impl.middleware.ontology.validator.TermValidator;
+import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
+import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
@@ -138,7 +141,10 @@ public class DatasetServiceImpl implements DatasetService {
 	private SearchCompositeDtoValidator searchCompositeDtoValidator;
 
 	@Autowired
-	private TermValidator termValidator;
+	private VariableValidator variableValidator;
+
+	@Autowired
+	private GermplasmNameTypeValidator germplasmNameTypeValidator;
 
 	static final String PLOT_DATASET_NAME = "Observations";
 
@@ -383,7 +389,7 @@ public class DatasetServiceImpl implements DatasetService {
 				final String sortProperty;
 				if (NumberUtils.isNumber(sort.getProperty()) && Integer.valueOf(sort.getProperty()) > 0) {
 					final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
-					sortProperty = term.getName();
+						sortProperty = term.getName();
 				} else {
 					sortProperty = sort.getProperty();
 				}
@@ -997,13 +1003,32 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void updatePlotDatasetProperties(final Integer studyId, final List<Integer> variableIds, final String programUUID) {
+	public void updatePlotDatasetProperties(final Integer studyId, final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID) {
 		this.studyValidator.validate(studyId, true);
-		variableIds.forEach(this.termValidator::validate);
-		this.studyValidator.validateUpdateStudyEntryColumnsWithSupportedVariableTypes(variableIds, programUUID);
-		this.studyValidator.validateMaxStudyEntryColumnsAllowed(variableIds, programUUID);
 
-		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, variableIds, programUUID);
+		if (!CollectionUtils.isEmpty(plotDatasetPropertiesDTO.getVariableIds())) {
+			this.variableValidator.validate(new HashSet<>(plotDatasetPropertiesDTO.getVariableIds()));
+		}
+
+		if (!CollectionUtils.isEmpty(plotDatasetPropertiesDTO.getNameTypeIds())) {
+			this.germplasmNameTypeValidator.validate(new HashSet<>(plotDatasetPropertiesDTO.getNameTypeIds()));
+		}
+		this.studyValidator.validateUpdateStudyEntryColumnsWithSupportedVariableTypes(plotDatasetPropertiesDTO.getVariableIds(), programUUID);
+		this.studyValidator.validateMaxStudyEntryColumnsAllowed(plotDatasetPropertiesDTO, programUUID);
+
+		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, plotDatasetPropertiesDTO, programUUID);
+	}
+
+	@Override
+	public List<GermplasmNameTypeDTO> getAllPlotDatasetNameTypes(final Integer datasetId) {
+		final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
+		final int plotDatasetId;
+		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
+			plotDatasetId = datasetDTO.getDatasetId();
+		} else {
+			plotDatasetId = datasetDTO.getParentDatasetId();
+		}
+		return this.middlewareDatasetService.getDatasetNameTypes(plotDatasetId);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {

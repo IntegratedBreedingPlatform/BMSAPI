@@ -5,6 +5,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,10 +18,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 
 import java.util.Collections;
+import java.util.Random;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StudyServiceImplTest {
 
+	private static final int NAME_TYPE_ID = new Random().nextInt(Integer.MAX_VALUE);
 	@InjectMocks
 	private StudyServiceImpl studyServiceImpl;
 
@@ -35,6 +38,9 @@ public class StudyServiceImplTest {
 
 	@Mock
 	private GermplasmValidator germplasmValidator;
+
+	@Mock
+	private GermplasmNameTypeValidator germplasmNameTypeValidator;
 
 	@Test
 	public void testGetStudyReference() {
@@ -68,5 +74,13 @@ public class StudyServiceImplTest {
 		}
 	}
 
+	@Test
+	public void testDeleteNameTypeFromStudies_OK() {
+		this.studyServiceImpl.deleteNameTypeFromStudies(NAME_TYPE_ID);
+		Mockito.verify(this.germplasmNameTypeValidator).validate(NAME_TYPE_ID);
+		Mockito.verify(this.mockMiddlewareStudyService).deleteNameTypeFromStudies(NAME_TYPE_ID);
+		Mockito.verifyNoMoreInteractions(this.germplasmNameTypeValidator);
+		Mockito.verifyNoMoreInteractions(this.mockMiddlewareStudyService);
+	}
 
 }
