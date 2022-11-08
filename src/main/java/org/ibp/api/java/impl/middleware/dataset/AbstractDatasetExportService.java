@@ -91,7 +91,9 @@ public abstract class AbstractDatasetExportService {
 
 		final Study study = this.studyDataManager.getStudy(studyId);
 		final DatasetDTO dataSet = this.datasetService.getDataset(datasetId);
-
+		final Integer plotDatasetId =
+			dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId()) ? //
+			dataSet.getDatasetId() : dataSet.getParentDatasetId();
 		// Get all variables for the dataset
 		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId());
 
@@ -123,7 +125,7 @@ public abstract class AbstractDatasetExportService {
 		sortedColumns.sort(Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
 
-		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.datasetService.getDatasetNameTypes(dataSet.getDatasetId());
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.datasetService.getDatasetNameTypes(plotDatasetId);
 		germplasmNameTypeDTOs.sort(Comparator.comparing(GermplasmNameTypeDTO::getCode));
 		sortedColumns.addAll(germplasmNameTypeDTOs.stream().map(
 			germplasmNameTypeDTO -> //
