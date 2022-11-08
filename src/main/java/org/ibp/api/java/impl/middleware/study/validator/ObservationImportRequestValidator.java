@@ -5,7 +5,6 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
-import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableTypeGroup;
@@ -66,9 +65,6 @@ public class ObservationImportRequestValidator {
 	private ObservationUnitService observationUnitService;
 
 	@Autowired
-	private ObservationServiceBrapi observationServiceBrapi;
-
-	@Autowired
 	private VariableServiceBrapi variableServiceBrapi;
 
 	@Autowired
@@ -111,7 +107,6 @@ public class ObservationImportRequestValidator {
 			this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT).stream()
 				.collect(Collectors.toMap(VariableDTO::getObservationVariableDbId, Function.identity()));
 
-
 		final VariableFilter variableFilterOptions = new VariableFilter();
 		variableFilterOptions.addVariableIds(variableIds.stream().map(Integer::parseInt).collect(Collectors.toList()));
 		variableFilterOptions.setShowObsoletes(false);
@@ -136,17 +131,6 @@ public class ObservationImportRequestValidator {
 		});
 
 		return this.errors;
-	}
-
-	private boolean isObservationAlreadyExisting(final ObservationDto dto,
-		final Map<String, Map<String, ObservationDto>> existingObservationsMap, final Integer index) {
-		if (existingObservationsMap.containsKey(dto.getObservationUnitDbId())
-			&& existingObservationsMap.get(dto.getObservationUnitDbId()).containsKey(dto.getObservationVariableDbId())) {
-			this.errors.reject("observation.import.already.existing",
-				new String[] {index.toString(), dto.getObservationUnitDbId(), dto.getObservationVariableDbId()}, "");
-			return true;
-		}
-		return false;
 	}
 
 	private boolean hasNoExistingObservationUnit(

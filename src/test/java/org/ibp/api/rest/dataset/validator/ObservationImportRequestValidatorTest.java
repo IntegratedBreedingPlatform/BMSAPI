@@ -2,7 +2,6 @@ package org.ibp.api.rest.dataset.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
-import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableTypeGroup;
@@ -59,9 +58,6 @@ public class ObservationImportRequestValidatorTest {
 
 	@Mock
 	private VariableServiceBrapi variableServiceBrapi;
-
-	@Mock
-	private ObservationServiceBrapi observationServiceBrapi;
 
 	@InjectMocks
 	private ObservationImportRequestValidator observationImportRequestValidator;
