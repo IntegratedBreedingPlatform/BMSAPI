@@ -104,15 +104,19 @@ public class UserServiceImpl implements UserService {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserProfileUpdateRequestDTO.class.getName());
 		final UserDto userDto = new UserDto(workbenchUser);
 
-		if (!StringUtils.isBlank(userProfileUpdateRequestDTO.getFirstName()) && !userDto.getFirstName().equals(userProfileUpdateRequestDTO.getFirstName())) {
+		if (!StringUtils.isBlank(userProfileUpdateRequestDTO.getFirstName()) && !userDto.getFirstName()
+			.equals(userProfileUpdateRequestDTO.getFirstName())) {
 			this.userValidator
-				.validateFieldLength(errors, userProfileUpdateRequestDTO.getFirstName(), UserValidator.FIRST_NAME, UserValidator.FIRST_NAME_MAX_LENGTH);
+				.validateFieldLength(errors, userProfileUpdateRequestDTO.getFirstName(), UserValidator.FIRST_NAME,
+					UserValidator.FIRST_NAME_MAX_LENGTH);
 			userDto.setFirstName(userProfileUpdateRequestDTO.getFirstName());
 		}
 
-		if (!StringUtils.isBlank(userProfileUpdateRequestDTO.getLastName()) && !userDto.getLastName().equals(userProfileUpdateRequestDTO.getLastName())) {
+		if (!StringUtils.isBlank(userProfileUpdateRequestDTO.getLastName()) && !userDto.getLastName()
+			.equals(userProfileUpdateRequestDTO.getLastName())) {
 			this.userValidator
-				.validateFieldLength(errors, userProfileUpdateRequestDTO.getLastName(), UserValidator.LAST_NAME, UserValidator.LAST_NAME_MAX_LENGTH);
+				.validateFieldLength(errors, userProfileUpdateRequestDTO.getLastName(), UserValidator.LAST_NAME,
+					UserValidator.LAST_NAME_MAX_LENGTH);
 			userDto.setLastName(userProfileUpdateRequestDTO.getLastName());
 		}
 

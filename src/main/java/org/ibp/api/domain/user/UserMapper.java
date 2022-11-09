@@ -84,6 +84,7 @@ public class UserMapper {
 				this.using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
 				this.using(authoritiesConverter).map(this.source.getPermissions()).setAuthorities(null);
 				this.using(cropsConverter).map(this.source.getPerson().getCrops()).setCrops(null);
+				this.map().setMultiFactorAuthenticationEnabled(this.source.isMultiFactorAuthenticationEnabled());
 			}
 		});
 	}
