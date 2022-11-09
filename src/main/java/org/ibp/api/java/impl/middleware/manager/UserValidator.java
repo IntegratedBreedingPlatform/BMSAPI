@@ -5,8 +5,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -14,7 +14,6 @@ import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
-import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -43,7 +42,6 @@ public class UserValidator {
 	public static final String SIGNUP_FIELD_EMAIL_EXISTS = "signup.field.email.exists";
 	public static final String SIGNUP_FIELD_USERNAME_EXISTS = "signup.field.username.exists";
 
-	public static final String SIGNUP_FIELD_INVALID_ROLE = "signup.field.invalid.role";
 	public static final String SIGNUP_FIELD_INVALID_STATUS = "signup.field.invalid.status";
 	public static final String SIGNUP_FIELD_INVALID_USER_ID = "signup.field.invalid.userId";
 
@@ -90,7 +88,7 @@ public class UserValidator {
 
 	private BindingResult errors;
 
-	public void validate(final UserDetailDto user, final boolean createUser) {
+	public void validate(final UserDto user, final boolean createUser) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), UserValidator.class.getName());
 
 		if (!USERNAME_PATTERN.matcher(user.getUsername()).matches()) {
@@ -135,7 +133,7 @@ public class UserValidator {
 		errors.reject(SIGNUP_FIELD_INVALID_USER_ID);
 	}
 
-	private void validateUserUpdate(final UserDetailDto user) {
+	private void validateUserUpdate(final UserDto user) {
 		final WorkbenchUser userUpdate = this.userService.getUserById(user.getId());
 		if (Objects.isNull(userUpdate)) {
 			this.errors.reject(SIGNUP_FIELD_INVALID_USER_ID);
@@ -208,7 +206,7 @@ public class UserValidator {
 		}
 	}
 
-	protected void validateUserRoles(final UserDetailDto user) {
+	protected void validateUserRoles(final UserDto user) {
 
 		final List<UserRoleDto> userRoles = user.getUserRoles();
 
