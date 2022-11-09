@@ -13,6 +13,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmListDataService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmListValidator;
+import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,9 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
 	@Autowired
 	public GermplasmListValidator germplasmListValidator;
+
+	@Autowired
+	private GermplasmNameTypeValidator germplasmNameTypeValidator;
 
 	private BindingResult errors;
 
@@ -142,4 +146,9 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		this.germplasmListDataService.reOrderEntries(listId, selectedEntries, position);
 	}
 
+	@Override
+	public void deleteNameTypeFromGermplasmList(final Integer nameTypeId) {
+		this.germplasmNameTypeValidator.validate(nameTypeId);
+		this.germplasmListDataService.deleteNameTypeFromGermplasmList(nameTypeId);
+	}
 }

@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.name;
 
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeRequestDTO;
+import org.generationcp.middleware.api.nametype.NameTypeMetadata;
 import org.generationcp.middleware.api.nametype.NameTypeMetadataFilterRequest;
 import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,5 +52,10 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	public void deleteNameType(final Integer nameTypeId) {
 		this.germplasmNameTypeValidator.validateNameTypeDeletion(nameTypeId);
 		this.germplasmNameTypeService.deleteNameType(nameTypeId);
+	}
+
+	@Override
+	public NameTypeMetadata getNameTypeMetadata(final Integer nameTypeId) {
+		return this.germplasmNameTypeService.getNameTypeMetadata(nameTypeId);
 	}
 }

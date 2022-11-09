@@ -7,6 +7,7 @@ import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -20,6 +21,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +58,9 @@ public class StudyServiceImpl implements StudyService {
 
 	@Autowired
 	private GermplasmValidator germplasmValidator;
+
+	@Autowired
+	private GermplasmNameTypeValidator germplasmNameTypeValidator;
 
 	@Override
 	public String getProgramUUID(final Integer studyIdentifier) {
@@ -146,6 +151,12 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public long countFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
 		return this.middlewareStudyService.countFilteredStudies(programUUID, studySearchRequest);
+	}
+
+	@Override
+	public void deleteNameTypeFromStudies(final Integer nameTypeId) {
+		this.germplasmNameTypeValidator.validate(nameTypeId);
+		this.middlewareStudyService.deleteNameTypeFromStudies(nameTypeId);
 	}
 
 }

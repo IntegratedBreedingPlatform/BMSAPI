@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Api(value = "BrAPI Observation Services")
 @Controller(value = "ObservationResourceBrapiV2")
@@ -156,6 +157,23 @@ public class ObservationResourceBrapi {
 			new Result<ObservationDto>().withData(observationImportResponse.getEntityList());
 
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(observationImportResponse));
+		final EntityListResponse<ObservationDto> entityListResponse = new EntityListResponse<>(metadata, results);
+
+		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Update multiple Observation entities", notes = "Update multiple Observation entities")
+	@RequestMapping(value = "/{crop}/brapi/v2/observations", method = RequestMethod.PUT)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2.class)
+	public ResponseEntity<EntityListResponse<ObservationDto>> updateObservations(@PathVariable final String crop,
+		@RequestBody final Map<String, ObservationDto> observations) {
+
+		final ObservationUpdateResponse observationUpdateResponse = this.observationServiceBrapi.updateObservations(observations);
+		final Result<ObservationDto> results =
+				new Result<ObservationDto>().withData(observationUpdateResponse.getEntityList());
+
+		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(observationUpdateResponse));
 		final EntityListResponse<ObservationDto> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);

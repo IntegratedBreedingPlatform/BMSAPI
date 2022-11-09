@@ -128,8 +128,8 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		this.transactionFieldIds = this.defaultTransactionDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
 
 		this.fieldIds = Stream.of(this.lotFieldIds, this.transactionFieldIds,
-			Arrays.asList(LabelPrintingStaticField.STUDY_NAME.getFieldId(), LabelPrintingStaticField.YEAR.getFieldId(),
-				LabelPrintingStaticField.PARENTAGE.getFieldId(), LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId()))
+				Arrays.asList(LabelPrintingStaticField.STUDY_NAME.getFieldId(), LabelPrintingStaticField.YEAR.getFieldId(),
+					LabelPrintingStaticField.PARENTAGE.getFieldId(), LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId()))
 			.flatMap(Collection::stream).collect(Collectors.toList());
 
 	}

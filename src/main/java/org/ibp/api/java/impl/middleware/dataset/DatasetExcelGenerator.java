@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -86,6 +87,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	private DatasetService datasetService;
 
 	@Resource
+	private org.generationcp.middleware.service.api.dataset.DatasetService datasetServiceMiddlewareService;
+
+	@Resource
 	private DatasetTypeService datasetTypeService;
 
 	@Resource
@@ -135,9 +139,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		for (final MeasurementVariable measurementVariable : columns) {
 			if (TermId.OBS_UNIT_ID.getId() == measurementVariable.getTermId()) {
 				orderedColumns.add(0, measurementVariable);
-			} else if (VariableType.TRAIT.getId().equals(measurementVariable.getVariableType().getId())) {
+			} else if (measurementVariable.getVariableType() != null && VariableType.TRAIT.getId().equals(measurementVariable.getVariableType().getId())) {
 				trait.add(measurementVariable);
-			} else if (VariableType.SELECTION_METHOD.getId().equals(measurementVariable.getVariableType().getId())) {
+			} else if (measurementVariable.getVariableType() != null &&  VariableType.SELECTION_METHOD.getId().equals(measurementVariable.getVariableType().getId())) {
 				selection.add(measurementVariable);
 			} else {
 				orderedColumns.add(measurementVariable);
@@ -268,6 +272,8 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs  = this.datasetServiceMiddlewareService.getDatasetNameTypes(plotDatasetId);
+
 		currentRowNum = this.writeStudyDetails(currentRowNum, xlsBook, xlsSheet, studyDetails);
 		xlsSheet.createRow(currentRowNum++);
 
@@ -329,6 +335,15 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			xlsBook,
 			xlsSheet,
 			filterByVariableType(plotVariables, VariableType.GERMPLASM_DESCRIPTOR), PLOT);
+		xlsSheet.createRow(currentRowNum++);
+
+		this.createNameTypeHeader(xlsBook, xlsSheet, currentRowNum++,"export.study.description.column.name.type",
+			this.getColorIndex(xlsBook, 51, 153, 102));
+		currentRowNum = this.writeNameTypeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			germplasmNameTypeDTOs);
 		xlsSheet.createRow(currentRowNum++);
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.germplasm.passports",
@@ -479,6 +494,24 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return rowNumIndex;
 	}
 
+	private void createNameTypeHeader(
+		HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final int currentRowNum, final String typeLabel, final short color) {
+		final Locale locale = LocaleContextHolder.getLocale();
+		final HSSFRow row = xlsSheet.createRow(currentRowNum);
+
+		HSSFCell cell = row.createCell(VARIABLE_NAME_COLUMN_INDEX, CellType.STRING);
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
+		cell.setCellValue(this.messageSource.getMessage(typeLabel, null, locale));
+
+		cell = row.createCell(DESCRIPTION_COLUMN_INDEX, CellType.STRING);
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
+		cell.setCellValue(this.messageSource.getMessage("export.study.description.column.name", null, locale));
+
+		cell = row.createCell(ONTOLOGY_ID_COLUMN_INDEX, CellType.STRING);
+		cell.setCellStyle(this.getHeaderStyle(xlsBook, color));
+		cell.setCellValue(this.messageSource.getMessage("export.study.description.column.description", null, locale));
+	}
+
 	private void writeSectionHeader(
 		final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final int currentRowNum, final String typeLabel, final short color) {
 		final Locale locale = LocaleContextHolder.getLocale();
@@ -538,6 +571,36 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 				this.writeSectionRow(
 					rowNumIndex++, xlsSheet, variable, datasetColumn,
 					cropOntologyId, backgroundStyle);
+			}
+		}
+		return rowNumIndex;
+	}
+
+	private int writeNameTypeSection(
+		final int currentRowNum, final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet,
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs) {
+
+		final CellStyle backgroundStyle = xlsBook.createCellStyle();
+		final HSSFFont blackFont = xlsBook.createFont();
+		backgroundStyle.setFillBackgroundColor(this.getColorIndex(xlsBook, 231, 230, 230));
+		blackFont.setColor(HSSFColor.HSSFColorPredefined.BLACK.getIndex());
+		backgroundStyle.setFont(blackFont);
+		int rowNumIndex = currentRowNum;
+		if (germplasmNameTypeDTOs != null && !germplasmNameTypeDTOs.isEmpty()) {
+			for (GermplasmNameTypeDTO germplasmNameTypeDTO : germplasmNameTypeDTOs) {
+				final HSSFRow row = xlsSheet.createRow(rowNumIndex++);
+
+				HSSFCell cell = row.createCell(VARIABLE_NAME_COLUMN_INDEX, CellType.STRING);
+				cell.setCellValue(germplasmNameTypeDTO.getCode());
+				cell.setCellStyle(backgroundStyle);
+
+				cell = row.createCell(DESCRIPTION_COLUMN_INDEX, CellType.STRING);
+				cell.setCellValue(germplasmNameTypeDTO.getName());
+				cell.setCellStyle(backgroundStyle);
+
+				cell = row.createCell(ONTOLOGY_ID_COLUMN_INDEX, CellType.STRING);
+				cell.setCellValue(germplasmNameTypeDTO.getDescription());
+				cell.setCellStyle(backgroundStyle);
 			}
 		}
 		return rowNumIndex;

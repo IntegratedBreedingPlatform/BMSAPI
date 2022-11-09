@@ -1,10 +1,10 @@
 package org.ibp.api.rest.user;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.hamcrest.Matchers;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.domain.common.ErrorResponse;
-import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.UserTestDataGenerator;
 import org.ibp.api.java.impl.middleware.manager.UserValidator;
@@ -79,7 +79,7 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testListUsersByProjectUuid() throws Exception {
-		final List<UserDetailDto> users = UserTestDataGenerator.initializeListUserDetailDto();
+		final List<UserDto> users = UserTestDataGenerator.initializeListUserDetailDto();
 		Mockito.when(this.userService.getUsersByProjectUUID(this.programUuid)).thenReturn(users);
 
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/users/filter?cropName=" + this.cropName + "&programUUID=" + this.programUuid).contentType(this.contentType))
@@ -100,7 +100,7 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testListUsers() throws Exception {
-		final List<UserDetailDto> users = UserTestDataGenerator.initializeListUserDetailDto();
+		final List<UserDto> users = UserTestDataGenerator.initializeListUserDetailDto();
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/users").build().encode();
 
 		Mockito.when(this.userService.getAllUsersSortedByLastName()).thenReturn(users);
@@ -123,10 +123,10 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testCreateUser() throws Exception {
 		final Integer id = 10;
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
+		final UserDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/users").build().encode();
 
-		Mockito.when(this.userService.createUser(Mockito.any(UserDetailDto.class))).thenReturn(id);
+		Mockito.when(this.userService.createUser(Mockito.any(UserDto.class))).thenReturn(id);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
@@ -142,13 +142,13 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	 */
 	@Test
 	public void testCreateUserError() throws Exception {
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
+		final UserDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/users").build().encode();
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserValidator.class.getName());
 		errors.reject(UserValidator.SIGNUP_FIELD_INVALID_EMAIL_FORMAT, "");
 		Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(this.userService)
-			.createUser(Mockito.any(UserDetailDto.class));
+			.createUser(Mockito.any(UserDto.class));
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.post(uriComponents.toUriString()).contentType(this.contentType)
@@ -166,9 +166,9 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testUpdateUser() throws Exception {
 		final Integer id = 7;
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
+		final UserDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
 
-		Mockito.when(this.userService.updateUser(Mockito.any(UserDetailDto.class))).thenReturn(id);
+		Mockito.when(this.userService.updateUser(Mockito.any(UserDto.class))).thenReturn(id);
 
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.put("/users/{id}", id).contentType(this.contentType)
@@ -185,12 +185,12 @@ public class UserResourceTest  extends ApiUnitTestBase {
 	@Test
 	public void testUpdateUserError() throws Exception {
 		final Integer id = 7;
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
+		final UserDto user = UserTestDataGenerator.initializeUserDetailWithAdminRoleDto();
 
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), UserValidator.class.getName());
 		errors.reject(UserValidator.SIGNUP_FIELD_INVALID_EMAIL_FORMAT, "");
 		Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(this.userService)
-			.updateUser(Mockito.any(UserDetailDto.class));
+			.updateUser(Mockito.any(UserDto.class));
 		this.mockMvc
 				.perform(MockMvcRequestBuilders.put("/users/{id}", id).contentType(this.contentType)
 						.content(this.convertObjectToByte(user)))

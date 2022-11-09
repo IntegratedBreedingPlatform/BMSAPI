@@ -89,7 +89,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsInfoInput.getStudyId());
 		final String tempFileName = study.getStudyName().concat("_").concat(StudyEntriesLabelPrinting.ORIG_FINAL_NAME);
 		final String fileName = FileNameGenerator.generateFileName(tempFileName);
-			return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
+		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
 	}
 
 	@Override

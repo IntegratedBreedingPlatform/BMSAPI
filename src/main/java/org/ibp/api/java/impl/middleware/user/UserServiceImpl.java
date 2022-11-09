@@ -9,7 +9,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.domain.user.UserMapper;
 import org.ibp.api.domain.user.UserProfileUpdateRequestDTO;
 import org.ibp.api.exception.ApiRuntimeException;
@@ -28,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,41 +52,25 @@ public class UserServiceImpl implements UserService {
 	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	@Override
-	public List<UserDetailDto> getAllUsersSortedByLastName() {
-		final List<UserDetailDto> result = new ArrayList<>();
-		final ModelMapper mapper = UserMapper.getInstance();
-		final List<UserDto> users = this.userService.getAllUsersSortedByLastName();
-
-		for (final UserDto user : users) {
-			final UserDetailDto userDetailDto = mapper.map(user, UserDetailDto.class);
-			result.add(userDetailDto);
-		}
-		return result;
+	public List<UserDto> getAllUsersSortedByLastName() {
+		return this.userService.getAllUsersSortedByLastName();
 	}
 
 	@Override
-	public Integer createUser(final UserDetailDto user) {
+	public Integer createUser(final UserDto user) {
 		this.userValidator.validate(user, true);
-
-		final UserDto userdto = this.translateUserDetailsDtoToUserDto(user);
-		userdto.setPassword(this.passwordEncoder.encode(userdto.getUsername()));
-
-		return this.userService.createUser(userdto);
+		user.setPassword(this.passwordEncoder.encode(user.getUsername()));
+		return this.userService.createUser(user);
 	}
 
 	@Override
-	public Integer updateUser(final UserDetailDto user) {
+	public Integer updateUser(final UserDto user) {
 		this.userValidator.validate(user, false);
-
-		final UserDto userdto = this.translateUserDetailsDtoToUserDto(user);
-		return this.userService.updateUser(userdto);
+		return this.userService.updateUser(user);
 	}
 
 	@Override
-	public List<UserDetailDto> getUsersByProjectUUID(final String projectUUID) {
-		final List<UserDetailDto> result = new ArrayList<>();
-		final ModelMapper mapper = UserMapper.getInstance();
-
+	public List<UserDto> getUsersByProjectUUID(final String projectUUID) {
 		Preconditions.checkNotNull(projectUUID, "The projectUUID must not be empty");
 		try {
 			final Project project = this.programService.getProjectByUuid(projectUUID);
@@ -97,27 +80,23 @@ public class UserServiceImpl implements UserService {
 				Preconditions.checkArgument(!workbenchUsers.isEmpty(), "users don't exists for this projectUUID");
 
 				final List<UserDto> users = workbenchUsers.stream().map(wu -> new UserDto(wu)).collect(Collectors.toList());
-
-				for (final UserDto userDto : users) {
-					final UserDetailDto userInfo = mapper.map(userDto, UserDetailDto.class);
-					result.add(userInfo);
-				}
+				return users;
 			}
 		} catch (final MiddlewareQueryException e) {
 			LOG.info("Error on userService.getUsersByProjectUuid", e);
 			throw new ApiRuntimeException("An internal error occurred while trying to get the users");
 		}
-		return result;
+		return Collections.EMPTY_LIST;
 	}
 
 	@Override
 	@Transactional
-	public UserDetailDto getUserWithAuthorities(final String cropName, final String programUuid) {
+	public UserDto getUserWithAuthorities(final String cropName, final String programUuid) {
 		final String userName = SecurityUtil.getLoggedInUserName();
 		final WorkbenchUser user = this.userService.getUserWithAuthorities(userName, cropName, programUuid);
 		final ModelMapper userMapper = UserMapper.getInstance();
-		final UserDetailDto userDetailDto = userMapper.map(user, UserDetailDto.class);
-		return userDetailDto;
+		final UserDto userDto = userMapper.map(user, UserDto.class);
+		return userDto;
 	}
 
 	@Override
@@ -151,44 +130,14 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDetailDto> getMembersEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest,
+	public List<UserDto> getMembersEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest,
 		final Pageable pageable) {
-
-		final List<UserDetailDto> result = new ArrayList<>();
-		final ModelMapper mapper = UserMapper.getInstance();
-		final List<UserDto> users = this.userService.getProgramMembersEligibleUsers(programUUID, searchRequest, pageable);
-		users.forEach(u -> result.add(mapper.map(u, UserDetailDto.class)));
-		return result;
+		return this.userService.getProgramMembersEligibleUsers(programUUID, searchRequest, pageable);
 	}
 
 	@Override
 	public long countAllMembersEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest) {
 		return this.userService.countProgramMembersEligibleUsers(programUUID, searchRequest);
-	}
-
-	private UserDto translateUserDetailsDtoToUserDto(final UserDetailDto user) {
-		final UserDto userdto = new UserDto();
-		userdto.setUserId(user.getId());
-		userdto.setUsername(user.getUsername());
-		userdto.setFirstName(user.getFirstName());
-		userdto.setLastName(user.getLastName());
-		userdto.setUserRoles(user.getUserRoles());
-		userdto.setEmail(user.getEmail());
-		userdto.setStatus("true".equals(user.getStatus()) ? 0 : 1);
-		userdto.setCrops(user.getCrops());
-		userdto.setMultiFactorAuthenticationEnabled(user.isMultiFactorAuthenticationEnabled());
-
-		if (user.getUserRoles() != null && !user.getUserRoles().isEmpty()) {
-			final String userName = SecurityUtil.getLoggedInUserName();
-			final WorkbenchUser workbenchUser = this.userService.getUserByUsername(userName);
-			userdto.getUserRoles().forEach(userRoleDto -> {
-				if (user.getId() == null || user.getId() == 0 || userRoleDto.getCreatedBy() == null || userRoleDto.getCreatedBy() == 0) {
-					userRoleDto.setCreatedBy(workbenchUser.getUserid());
-				}
-			});
-		}
-
-		return userdto;
 	}
 
 	public void setSecurityService(final SecurityService securityService) {
