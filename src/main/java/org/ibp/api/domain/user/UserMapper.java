@@ -70,38 +70,8 @@ public class UserMapper {
 
 	private static void addUserDetailsDataMapping(final ModelMapper mapper) {
 
-		mapper.addMappings(new PropertyMap<UserDto, UserDetailDto>() {
-
-			@Override
-			protected void configure() {
-				this.map().setFirstName(this.source.getFirstName());
-				this.map().setLastName(this.source.getLastName());
-				this.map().setId(this.source.getUserId());
-				this.map().setUsername(this.source.getUsername());
-				this.map().setUserRoles(this.source.getUserRoles());
-				this.using(toStatusConvert).map().setStatus(this.source.getStatus().toString());
-				this.map().setEmail(this.source.getEmail());
-				this.map().setCrops(this.source.getCrops());
-			}
-		});
 
 		mapper.addMappings(new PropertyMap<WorkbenchUser, UserDto>() {
-
-			@Override
-			protected void configure() {
-				this.map().setUserId(this.source.getUserid());
-				this.map().setUsername(this.source.getName());
-				this.map().setFirstName(this.source.getPerson().getFirstName());
-				this.map().setLastName(this.source.getPerson().getLastName());
-				this.map().setStatus(this.source.getStatus());
-				this.map().setEmail(this.source.getPerson().getEmail());
-				this.using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
-				this.using(authoritiesConverter).map(this.source.getPermissions()).setAuthorities(null);
-				this.using(cropsConverter).map(this.source.getPerson().getCrops()).setCrops(null);
-			}
-		});
-
-		mapper.addMappings(new PropertyMap<WorkbenchUser, UserDetailDto>() {
 
 			@Override
 			protected void configure() {

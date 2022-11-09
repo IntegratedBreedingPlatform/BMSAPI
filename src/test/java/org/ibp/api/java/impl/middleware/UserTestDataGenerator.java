@@ -14,7 +14,6 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
-import org.ibp.api.domain.user.UserDetailDto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,7 +99,7 @@ public abstract class UserTestDataGenerator {
 		final String lastName = RandomStringUtils.randomAlphanumeric(50);
 		user.setLastName(lastName);
 
-		user.setStatus(0);
+		user.setStatus("true");
 		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
 		final UserRoleDto userRoleDto = new UserRoleDto();
 		userRoleDto.setId(1);
@@ -111,7 +110,7 @@ public abstract class UserTestDataGenerator {
 		userRoleDtos.add(userRoleDto);
 
 		user.setUserRoles(userRoleDtos);
-		user.setUserId(userId);
+		user.setId(userId);
 
 		final String username = RandomStringUtils.randomAlphanumeric(30);
 		user.setUsername(username);
@@ -131,8 +130,8 @@ public abstract class UserTestDataGenerator {
 
 	 * @return UserDetailDto
 	 */
-	public static UserDetailDto initializeUserDetailDto(final Integer userId, final CropType cropType, final UserRoleDto userRoleDto) {
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
+	public static UserDto initializeUserDetailDto(final Integer userId, final CropType cropType, final UserRoleDto userRoleDto) {
+		final UserDto user = UserTestDataGenerator.initializeUserDetailDto();
 		user.setId(userId);
 
 		final List<UserRoleDto> userRoleDtoList = new ArrayList<>();
@@ -146,39 +145,18 @@ public abstract class UserTestDataGenerator {
 	}
 
 	/**
-	 * Initialize UserDetailDto with Role Admin
-	 *
-	 * @param userId Integer
-	 * @param cropType CropType
-	 * @return UserDetailDto
-	 */
-	public static UserDetailDto initializeUserDetailWithAdminRoleDto(final Integer userId, final CropType cropType) {
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
-		user.setId(userId);
-
-		final List<UserRoleDto> userRoleDtoList = new ArrayList<>();
-		userRoleDtoList.add(UserTestDataGenerator.initializeUserRoleDtoAdmin());
-		final Set<CropDto> cropDtoList = new HashSet<>();
-		cropDtoList.add(new CropDto(cropType));
-		user.setCrops(cropDtoList);
-		user.setUserRoles(userRoleDtoList);
-
-		return user;
-	}
-
-	/**
 	 * initialize UserDetailDto
 	 *
 	 * @return UserDetailDto
 	 */
-	public static UserDetailDto initializeUserDetailWithAdminRoleDto() {
-		final UserDetailDto user = UserTestDataGenerator.initializeUserDetailDto();
+	public static UserDto initializeUserDetailWithAdminRoleDto() {
+		final UserDto user = UserTestDataGenerator.initializeUserDetailDto();
 		user.setUserRoles(Arrays.asList(UserTestDataGenerator.initializeUserRoleDtoAdmin()));
 		return user;
 	}
 
-	private static UserDetailDto initializeUserDetailDto() {
-		final UserDetailDto user = new UserDetailDto();
+	private static UserDto initializeUserDetailDto() {
+		final UserDto user = new UserDto();
 		final Integer userId = ThreadLocalRandom.current().nextInt();
 
 		final String firstName = RandomStringUtils.randomAlphanumeric(20);
@@ -203,8 +181,8 @@ public abstract class UserTestDataGenerator {
 	 *
 	 * @return List<UserDetailDto>
 	 */
-	public static List<UserDetailDto> initializeListUserDetailDto() {
-		final List<UserDetailDto> users = Lists.newArrayList(UserTestDataGenerator.initializeUserDetailWithAdminRoleDto());
+	public static List<UserDto> initializeListUserDetailDto() {
+		final List<UserDto> users = Lists.newArrayList(UserTestDataGenerator.initializeUserDetailWithAdminRoleDto());
 		return users;
 	}
 

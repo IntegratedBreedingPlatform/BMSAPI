@@ -7,8 +7,8 @@ import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchReque
 import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.domain.user.UserDetailDto;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.java.user.UserService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -76,7 +76,7 @@ public class ProgramMemberResource {
 	@ApiOperation(value = "List users eligible to be program members", notes = "List users eligible to be program members")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/members/eligible-users/search", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
-	public ResponseEntity<List<UserDetailDto>> getMembersEligibleUsers(@PathVariable final String cropName,
+	public ResponseEntity<List<UserDto>> getMembersEligibleUsers(@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@ApiIgnore
 		@PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable,

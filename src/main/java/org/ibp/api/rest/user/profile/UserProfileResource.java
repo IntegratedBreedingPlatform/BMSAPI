@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,7 +44,7 @@ public class UserProfileResource {
 		try {
 			final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(this.securityService.getCurrentlyLoggedInUser().getName(), userProfileUpdateRequestDTO
 				.getPassword());
-			final Authentication authentication = this.authenticationManager.authenticate(credentials);
+			this.authenticationManager.authenticate(credentials);
 		} catch (final AuthenticationException e) {
 			throw new ApiRuntimeException("The password is wrong, please check");
 		}

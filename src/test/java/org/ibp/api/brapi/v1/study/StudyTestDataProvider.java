@@ -28,7 +28,7 @@ public class StudyTestDataProvider {
 
 	public static UserDto getUserDto() {
 		final UserDto user = new UserDto();
-		user.setUserId(1);
+		user.setId(1);
 		user.setEmail("a@a.com");
 		user.setFirstName("admin");
 		user.setLastName("admin");
