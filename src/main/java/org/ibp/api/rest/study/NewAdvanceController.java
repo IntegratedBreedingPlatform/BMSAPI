@@ -24,8 +24,11 @@ public class NewAdvanceController {
 
 	// TODO: define permission
 	@ResponseBody
-	@RequestMapping(value = "/crops/{cropName}/studies/{studyId}/advance", method = RequestMethod.POST)
-	public ResponseEntity<List<Integer>> advanceStudy(@PathVariable final String cropName, @PathVariable final Integer studyId,
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/advance", method = RequestMethod.POST)
+	public ResponseEntity<List<Integer>> advanceStudy(
+		@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
 		@RequestBody final AdvanceStudyRequest request) {
 
 		final List<Integer> advancedGids = this.advanceService.advanceStudy(studyId, request);
