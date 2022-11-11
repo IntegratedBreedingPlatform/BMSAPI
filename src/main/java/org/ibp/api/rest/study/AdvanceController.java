@@ -16,8 +16,7 @@ import java.util.List;
 
 // TODO: add swagger
 @Controller
-// TODO: rename it!
-public class NewAdvanceController {
+public class AdvanceController {
 
 	@Autowired
 	private AdvanceService advanceService;
