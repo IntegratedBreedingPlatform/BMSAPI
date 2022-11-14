@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmOrigin;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.util.serializer.SynonymPropertySerializer;
