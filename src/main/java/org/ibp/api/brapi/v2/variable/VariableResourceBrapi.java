@@ -58,6 +58,7 @@ public class VariableResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchObservationVariables(
 		@PathVariable final String crop,
 		@RequestBody final VariableSearchRequestDTO variableSearchRequestDTO) {
+		variableSearchRequestDTO.setFilterObsoletes(true);
 		final BrapiSearchDto searchDto =
 			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(variableSearchRequestDTO, VariableSearchRequestDTO.class)
 				.toString());
