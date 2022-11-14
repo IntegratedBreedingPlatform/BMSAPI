@@ -8,7 +8,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.MethodType;
-import org.generationcp.middleware.ruleengine.naming.expression.SelectionTraitExpression;
+import org.generationcp.middleware.ruleengine.naming.newexpression.SelectionTraitExpression;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BreedingMethodValidator;
