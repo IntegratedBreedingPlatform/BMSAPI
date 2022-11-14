@@ -5,7 +5,6 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.DataSet;
-import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -339,7 +338,7 @@ public class StudyValidatorTest {
 
 		Mockito.when(this.studyDataManager.findOneDataSetByType(studyId, DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(dataset);
 
-		final DatasetDTO actualDataset = this.studyValidator.validateStudyHasPlotDataset(studyId);
+		final DataSet actualDataset = this.studyValidator.validateStudyHasPlotDataset(studyId);
 		assertThat(actualDataset, is(dataset));
 	}
 

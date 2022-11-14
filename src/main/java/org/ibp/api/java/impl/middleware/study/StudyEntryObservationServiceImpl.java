@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.api.germplasmlist.GermplasmListObservationRequestDto;
-import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -91,8 +91,8 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	public long countObservationsByVariables(final Integer studyId, final List<Integer> variableIds) {
 		this.studyValidator.validate(studyId, false);
 
-		final DatasetDTO dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
-		this.datasetValidator.validateExistingDatasetVariables(studyId, dataSet.getDatasetId(), variableIds);
+		final DataSet dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, dataSet.getId(), variableIds);
 
 		return this.studyEntryObservationService.countObservationsByStudyAndVariables(studyId, variableIds);
 	}
@@ -122,8 +122,8 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 
 		this.studyValidator.validate(studyId, true);
 
-		final DatasetDTO dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
-		this.datasetValidator.validateExistingDatasetVariables(studyId, dataSet.getDatasetId(), Arrays.asList(stockPropertyData.getVariableId()));
+		final DataSet dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
+		this.datasetValidator.validateExistingDatasetVariables(studyId, dataSet.getId(), Arrays.asList(stockPropertyData.getVariableId()));
 		this.studyEntryValidator.validateStudyContainsEntries(studyId, Arrays.asList(stockPropertyData.getStockId()));
 
 		if (variable.isSystem()) {
@@ -190,8 +190,8 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	}
 
 	private void validateExperimentalDesginWasNotGenerated(final Integer studyId) {
-		final DatasetDTO dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
-		if (this.studyDataManager.countExperiments(dataSet.getDatasetId()) > 0) {
+		final DataSet dataSet = this.studyValidator.validateStudyHasPlotDataset(studyId);
+		if (this.studyDataManager.countExperiments(dataSet.getId()) > 0) {
 			this.errors.reject("study.entry.observation.cannot.create-or-edit", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}

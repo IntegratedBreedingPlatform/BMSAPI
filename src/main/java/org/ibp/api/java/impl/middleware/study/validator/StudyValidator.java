@@ -5,7 +5,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
-import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -13,7 +13,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -28,7 +27,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -56,9 +54,6 @@ public class StudyValidator {
 
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
-
-	@Autowired
-	private DatasetService datasetService;
 
 	private BindingResult errors;
 
@@ -205,16 +200,15 @@ public class StudyValidator {
 		}
 	}
 
-	public DatasetDTO validateStudyHasPlotDataset(final Integer studyId) {
+	public DataSet validateStudyHasPlotDataset(final Integer studyId) {
 		this.errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 
-		final List<DatasetDTO> dataSets =
-			this.datasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId()));
-		if (CollectionUtils.isEmpty(dataSets)) {
+		final DataSet dataSet = this.studyDataManager.findOneDataSetByType(studyId, DatasetTypeEnum.PLOT_DATA.getId());
+		if (dataSet == null) {
 			this.errors.reject("study.not.has.plot.dataset", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		return dataSets.get(0);
+		return dataSet;
 	}
 
 	public void validateUpdateStudyEntryColumnsWithSupportedVariableTypes(final List<Integer> variableIds, final String programUUID) {
