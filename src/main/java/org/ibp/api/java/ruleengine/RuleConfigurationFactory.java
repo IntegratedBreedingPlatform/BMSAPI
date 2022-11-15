@@ -3,7 +3,7 @@ package org.ibp.api.java.ruleengine;
 import org.generationcp.middleware.ruleengine.ProcessCodeRuleFactory;
 import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionFactory;
 import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionResolver;
-import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
+import org.generationcp.middleware.ruleengine.naming.newimpl.ProcessCodeFactory;
 import org.generationcp.middleware.ruleengine.provider.PropertyFileRuleConfigurationProvider;
 import org.generationcp.middleware.ruleengine.service.GermplasmNamingProperties;
 import org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator;
