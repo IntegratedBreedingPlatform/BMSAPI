@@ -2,11 +2,6 @@ package org.ibp.api.java.impl.middleware.germplasm;
 
 import com.beust.jcommander.internal.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.ruleengine.RuleException;
-import org.generationcp.middleware.ruleengine.RuleFactory;
-import org.generationcp.middleware.ruleengine.coding.CodingRuleExecutionContext;
-import org.generationcp.middleware.ruleengine.service.RulesService;
-import org.generationcp.middleware.ruleengine.newnaming.service.GermplasmNamingService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -16,6 +11,11 @@ import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
+import org.generationcp.middleware.ruleengine.RuleException;
+import org.generationcp.middleware.ruleengine.RuleFactory;
+import org.generationcp.middleware.ruleengine.coding.CodingRuleExecutionContext;
+import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
+import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.generationcp.middleware.service.api.GermplasmCodingResult;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.api.NamingConfigurationService;
@@ -57,7 +57,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 	private GermplasmGroupingService germplasmGroupingService;
 
 	@Mock
-	private GermplasmNamingService germplasmNamingService;
+	private DeprecatedGermplasmNamingService germplasmNamingService;
 
 	@Mock
 	private NamingConfigurationService namingConfigurationService;

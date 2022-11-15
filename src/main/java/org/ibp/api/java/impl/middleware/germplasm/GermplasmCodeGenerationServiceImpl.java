@@ -4,7 +4,7 @@ import org.generationcp.middleware.ruleengine.RuleException;
 import org.generationcp.middleware.ruleengine.RuleFactory;
 import org.generationcp.middleware.ruleengine.coding.CodingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.service.RulesService;
-import org.generationcp.middleware.ruleengine.newnaming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -64,7 +64,7 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 	private GermplasmGroupingService germplasmGroupingService;
 
 	@Autowired
-	private GermplasmNamingService germplasmNamingService;
+	private DeprecatedGermplasmNamingService germplasmNamingService;
 
 	@Autowired
 	private GermplasmNameTypeService germplasmNameTypeService;
