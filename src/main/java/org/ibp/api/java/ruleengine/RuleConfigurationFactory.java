@@ -3,6 +3,9 @@ package org.ibp.api.java.ruleengine;
 import org.generationcp.middleware.ruleengine.ProcessCodeRuleFactory;
 import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionFactory;
 import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionResolver;
+import org.generationcp.middleware.ruleengine.naming.impl.GermplasmNamingServiceImpl;
+import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
+import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
 import org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedProcessCodeFactory;
 import org.generationcp.middleware.ruleengine.provider.PropertyFileRuleConfigurationProvider;
 import org.generationcp.middleware.ruleengine.service.GermplasmNamingProperties;
@@ -33,8 +36,8 @@ public class RuleConfigurationFactory {
 	}
 
 	@Bean(initMethod = "init")
-	public DeprecatedProcessCodeFactory processCodeFactory() {
-        return new DeprecatedProcessCodeFactory();
+	public ProcessCodeFactory processCodeFactory() {
+        return new ProcessCodeFactory();
 	}
 
 	@Bean
@@ -56,6 +59,11 @@ public class RuleConfigurationFactory {
 	@Bean(initMethod = "init")
 	public CodingExpressionFactory codingExpressionFactory() {
 		return new CodingExpressionFactory();
+	}
+
+	@Bean
+	public GermplasmNamingService germplasmNamingService() {
+		return new GermplasmNamingServiceImpl();
 	}
 
 }
