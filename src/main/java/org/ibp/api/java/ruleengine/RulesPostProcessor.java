@@ -6,7 +6,7 @@ import org.generationcp.middleware.ruleengine.RuleFactory;
 import org.generationcp.middleware.ruleengine.coding.expression.BaseCodingExpression;
 import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionFactory;
 import org.generationcp.middleware.ruleengine.naming.deprecated.expression.DeprecatedExpression;
-import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
+import org.generationcp.middleware.ruleengine.naming.deprecated.impl.DeprecatedProcessCodeFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -29,7 +29,7 @@ public class RulesPostProcessor implements BeanPostProcessor {
 	private RuleFactory ruleFactory;
 
 	@Autowired
-	private ProcessCodeFactory processCodeFactory;
+	private DeprecatedProcessCodeFactory processCodeFactory;
 
 	@Autowired
 	private CodingExpressionFactory codingExpressionFactory;
