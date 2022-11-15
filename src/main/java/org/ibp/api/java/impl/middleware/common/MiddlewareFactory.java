@@ -117,12 +117,8 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator;
 import org.generationcp.middleware.ruleengine.impl.RulesServiceImpl;
-import org.generationcp.middleware.ruleengine.naming.impl.GermplasmNamingServiceImpl;
-import org.generationcp.middleware.ruleengine.naming.impl.NamingConventionServiceImpl;
-import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeServiceImpl;
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
-import org.generationcp.middleware.ruleengine.naming.service.NamingConventionService;
-import org.generationcp.middleware.ruleengine.naming.service.ProcessCodeService;
+import org.generationcp.middleware.ruleengine.newnaming.impl.GermplasmNamingServiceImpl;
+import org.generationcp.middleware.ruleengine.newnaming.service.GermplasmNamingService;
 import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;

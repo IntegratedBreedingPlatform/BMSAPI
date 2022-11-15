@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.newnaming.service.GermplasmNamingService;
 import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
