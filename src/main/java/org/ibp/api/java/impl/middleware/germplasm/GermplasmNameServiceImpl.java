@@ -1,6 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
 import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
@@ -41,7 +41,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	private GermplasmCodeGenerationService germplasmCodeGenerationService;
 
 	@Autowired
-	private GermplasmNamingService germplasmNamingService;
+	private DeprecatedGermplasmNamingService germplasmNamingService;
 
 	@Override
 	public void deleteName(final Integer gid, final Integer nameId) {

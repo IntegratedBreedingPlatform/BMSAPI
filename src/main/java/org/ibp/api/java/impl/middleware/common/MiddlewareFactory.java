@@ -9,11 +9,11 @@ import org.generationcp.middleware.ruleengine.impl.RulesServiceImpl;
 import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.commons.service.CsvExportSampleListService;
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
 import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
-import org.generationcp.middleware.ruleengine.naming.impl.GermplasmNamingServiceImpl;
+import org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedGermplasmNamingServiceImpl;
 import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.brapi.GermplasmListServiceBrapi;
@@ -505,8 +505,8 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public GermplasmNamingService getGermplasmNamingService() {
-		return new GermplasmNamingServiceImpl();
+	public DeprecatedGermplasmNamingService getGermplasmNamingService() {
+		return new DeprecatedGermplasmNamingServiceImpl();
 	}
 
 	@Bean
