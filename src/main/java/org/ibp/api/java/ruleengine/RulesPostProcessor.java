@@ -5,8 +5,8 @@ import org.generationcp.middleware.ruleengine.Rule;
 import org.generationcp.middleware.ruleengine.RuleFactory;
 import org.generationcp.middleware.ruleengine.coding.expression.BaseCodingExpression;
 import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionFactory;
-import org.generationcp.middleware.ruleengine.newnaming.expression.Expression;
-import org.generationcp.middleware.ruleengine.newnaming.impl.ProcessCodeFactory;
+import org.generationcp.middleware.ruleengine.naming.expression.Expression;
+import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 	"org.generationcp.middleware.ruleengine.coding.expression",
 	"org.generationcp.middleware.ruleengine.coding",
 	"org.generationcp.middleware.ruleengine.stockid",
-	"org.generationcp.middleware.ruleengine.newnaming"
+	"org.generationcp.middleware.ruleengine.naming"
 })
 public class RulesPostProcessor implements BeanPostProcessor {
 
