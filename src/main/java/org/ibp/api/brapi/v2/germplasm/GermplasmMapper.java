@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.ibp.api.brapi.v1.germplasm.Germplasm;
-import org.ibp.api.brapi.v1.germplasm.GermplasmOrigin;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmOrigin;
 import org.ibp.api.mapper.ApiMapper;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;

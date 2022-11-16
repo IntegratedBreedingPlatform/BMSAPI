@@ -60,7 +60,6 @@ public class GermplasmImportRequestValidatorTest {
 		importRequest1.setBreedingMethodDbId(String.valueOf(MID));
 		importRequest1.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
 		importRequest1.setAccessionNumber(RandomStringUtils.randomAlphabetic(200));
-		importRequest1.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(200));
 		importRequest1.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(10)));
 		importRequest1.getAdditionalInfo().put(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(50));
 
@@ -194,7 +193,6 @@ public class GermplasmImportRequestValidatorTest {
 		importRequest2.setBreedingMethodDbId(String.valueOf(MID));
 		importRequest2.setCountryOfOriginCode(COUNTRY_OF_ORIGIN_CODE);
 		importRequest2.setAccessionNumber(RandomStringUtils.randomAlphabetic(200));
-		importRequest2.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(200));
 		importRequest2.setGermplasmPUI(RandomStringUtils.randomAlphanumeric(20));
 
 		final String pui2 = RandomStringUtils.randomAlphanumeric(20);
