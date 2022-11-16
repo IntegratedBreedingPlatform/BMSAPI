@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 @Component
 public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 
+	public static final String UNDERSCORE = "_";
+
 	@Override
 	public File generate(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) throws IOException {
 		final File temporaryFolder = Files.createTempDir();
@@ -36,7 +38,7 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 		final String fullFileName = fileName + "." + FileType.XLS.getExtension();
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + fullFileName;
 
-		final Map<Integer, Field> fieldsByKey = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
+		final Map<String, Field> fieldsByKey = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + CSVLabelsFileGenerator.UNDERSCORE + field.getId());
 
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 		final HSSFSheet sheet = xlsBook.createSheet(fileName);
@@ -45,7 +47,7 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 
 		final List<Field> headers = labelsGeneratorInput.getFields().stream()
 			.flatMap(Collection::stream)
-			.map(integer -> fieldsByKey.get(integer))
+			.map(field -> fieldsByKey.get(field))
 			.collect(Collectors.toList());
 
 		int rowIndex = 0;
@@ -62,13 +64,13 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 
 		// values
 
-		for (final Map<Integer, String> dataRow : labelsData.getData()) {
+		for (final Map<String, String> dataRow : labelsData.getData()) {
 			final HSSFRow row = sheet.createRow(rowIndex);
 
 			int colIndex = 0;
 			for (final Field header : headers) {
 				final HSSFCell cell = row.createCell(colIndex);
-				cell.setCellValue(dataRow.get(header.getId()));
+				cell.setCellValue(dataRow.get(header.getFieldType().getName() + CSVLabelsFileGenerator.UNDERSCORE + header.getId()));
 				colIndex++;
 			}
 			rowIndex++;

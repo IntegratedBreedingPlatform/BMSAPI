@@ -26,6 +26,8 @@ import java.util.Map;
 @Component
 public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 
+	public static final String UNDERSCORE = "_";
+
 	private static String BARCODE = "Barcode";
 
 	@Override
@@ -38,7 +40,7 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8),
 				',')) {
 
-			final Map<Integer, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
+			final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + CSVLabelsFileGenerator.UNDERSCORE + field.getId());
 
 			final File newFile = new File(fileNameFullPath);
 			// feed in your array (or convert your data to an array)
@@ -55,16 +57,16 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 		}
 	}
 
-	private String[] getColumnValues(final Map<Integer, String> labels, final LabelsGeneratorInput labelsGeneratorInput, final Integer defaultBarcodeKey) {
+	private String[] getColumnValues(final Map<String, String> labels, final LabelsGeneratorInput labelsGeneratorInput, final String defaultBarcodeKey) {
 		final List<String> values = new LinkedList<>();
-		for (final List<Integer> fieldsList : labelsGeneratorInput.getFields()) {
+		for (final List<String> fieldsList : labelsGeneratorInput.getFields()) {
 			fieldsList.forEach(field -> values.add(labels.get(field)));
 			if (labelsGeneratorInput.isBarcodeRequired()) {
 				if (labelsGeneratorInput.isAutomaticBarcode()) {
 					values.add(labels.get(defaultBarcodeKey));
 				} else {
 					StringBuffer barcode = new StringBuffer();
-					for (Integer barcodeField : labelsGeneratorInput.getBarcodeFields()) {
+					for (String barcodeField : labelsGeneratorInput.getBarcodeFields()) {
 						if (StringUtils.isEmpty(barcode.toString())) {
 							barcode.append(labels.get(barcodeField));
 							continue;
@@ -78,9 +80,9 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 		return values.toArray(new String[] {});
 	}
 
-	protected List<String> getHeaderNames(final LabelsGeneratorInput labelsGeneratorInput, final Map<Integer, Field> termIdFieldMap) {
+	protected List<String> getHeaderNames(final LabelsGeneratorInput labelsGeneratorInput, final Map<String, Field> termIdFieldMap) {
 		final List<String> headerNames = new LinkedList<>();
-		for (final List<Integer> headers : labelsGeneratorInput.getFields()) {
+		for (final List<String> headers : labelsGeneratorInput.getFields()) {
 			headers.forEach(header -> headerNames.add(termIdFieldMap.get(header).getName()));
 		}
 		if (labelsGeneratorInput.isBarcodeRequired()) {

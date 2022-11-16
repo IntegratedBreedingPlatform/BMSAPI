@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class PDFLabelsFileGenerator implements LabelsFileGenerator {
@@ -54,6 +55,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 	public static final String FIELDNAME_VALUE_SEPARATOR = " : ";
 	public static final String BARCODE_SEPARATOR = " | ";
 	public static final int BARCODE_LABEL_LIMIT = 79;
+	public static final String UNDERSCORE = "_";
 
 	@Autowired
 	private LabelPaperFactory labelPaperFactory;
@@ -64,7 +66,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s." + FileType.PDF.getExtension(), labelsGeneratorInput.getFileName()));
 
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
-		final Map<Integer, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
+		final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + CSVLabelsFileGenerator.UNDERSCORE + field.getId());
 
 		final int pageSizeId = Integer.parseInt(labelsGeneratorInput.getSizeOfLabelSheet());
 		final int numberOfLabelPerRow = LabelsGeneratorInput.LABEL_PER_ROW;
@@ -87,8 +89,8 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 
 			final List<File> filesToBeDeleted = new ArrayList<>();
 			final float cellHeight = paper.getCellHeight();
-			final List<Map<Integer, String>> data = labelsData.getData();
-			for(final Map<Integer, String> labels: data) {
+			final List<Map<String, String>> data = labelsData.getData();
+			for(final Map<String, String> labels: data) {
 				i++;
 				String barcodeLabelForCode = "";
 				String barcodeLabel = "";
@@ -159,7 +161,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 					final PdfPTable innerTableInfo = new PdfPTable(2);
 					innerTableInfo.setWidths(new float[] {1, 1});
 					innerTableInfo.setWidthPercentage(85);
-					final List<Integer> leftSelectedFieldIDs = labelsGeneratorInput.getFields().get(0);
+					final List<String> leftSelectedFieldIDs = labelsGeneratorInput.getFields().get(0);
 					final String leftText = this.generateLabelText(labels, leftSelectedFieldIDs,
 						keyFieldMap, row);
 					final PdfPCell cellInnerLeft = new PdfPCell(new Paragraph(leftText, fontNormal));
@@ -171,7 +173,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 
 					innerTableInfo.addCell(cellInnerLeft);
 
-					final List<Integer> rightSelectedFieldIDs = labelsGeneratorInput.getFields().get(1);
+					final List<String> rightSelectedFieldIDs = labelsGeneratorInput.getFields().get(1);
 					final String rightText = this.generateLabelText(labels, rightSelectedFieldIDs,
 						keyFieldMap, row);
 					final PdfPCell cellInnerRight = new PdfPCell(new Paragraph(rightText, fontNormal));
@@ -233,9 +235,9 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 		return file;
 	}
 
-	String getBarcodeLabel(final Map<Integer, String> labels, final List<Integer> barcodeFields, final Map<Integer, Field> keyFieldMap, final boolean includeLabel) {
+	String getBarcodeLabel(final Map<String, String> labels, final List<String> barcodeFields, final Map<String, Field> keyFieldMap, final boolean includeLabel) {
 		final StringBuilder barcode = new StringBuilder();
-		for (final Integer barcodeField : barcodeFields) {
+		for (final String barcodeField : barcodeFields) {
 			if (!StringUtils.isEmpty(barcode.toString())) {
 				barcode.append(BARCODE_SEPARATOR);
 			}
@@ -248,7 +250,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 		return barcode.toString();
 	}
 
-	protected String generateLabelText(final Map<Integer, String> labels, final List<Integer> selectedFields, final Map<Integer, Field> keyFieldMap, final int row) {
+	protected String generateLabelText(final Map<String, String> labels, final List<String> selectedFields, final Map<String, Field> keyFieldMap, final int row) {
 		if(row < selectedFields.size()) {
 			final String value = labels.get(selectedFields.get(row)) != null ? labels.get(selectedFields.get(row)) : StringUtils.EMPTY;
 			return keyFieldMap.get(selectedFields.get(row)).getName() + FIELDNAME_VALUE_SEPARATOR + value;
