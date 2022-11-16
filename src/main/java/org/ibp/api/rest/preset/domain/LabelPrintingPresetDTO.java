@@ -22,13 +22,13 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 		private boolean automaticBarcode;
 
 		@JsonView(PresetDTO.View.Configuration.class)
-		private List<Integer> barcodeFields;
+		private List<String> barcodeFields;
 
 		public BarcodeSetting(){
 			barcodeFields = new ArrayList<>();
 		}
 
-		public BarcodeSetting(final boolean barcodeNeeded, final boolean automaticBarcode, final List<Integer> barcodeFields) {
+		public BarcodeSetting(final boolean barcodeNeeded, final boolean automaticBarcode, final List<String> barcodeFields) {
 			this.barcodeNeeded = barcodeNeeded;
 			this.automaticBarcode = automaticBarcode;
 			this.barcodeFields = barcodeFields;
@@ -50,11 +50,11 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 			this.automaticBarcode = automaticBarcode;
 		}
 
-		public List<Integer> getBarcodeFields() {
+		public List<String> getBarcodeFields() {
 			return barcodeFields;
 		}
 
-		public void setBarcodeFields(final List<Integer> barcodeFields) {
+		public void setBarcodeFields(final List<String> barcodeFields) {
 			if (barcodeFields == null) {
 				this.barcodeFields = new ArrayList<>();
 			} else {
@@ -79,7 +79,7 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 	}
 
 	@JsonView(PresetDTO.View.Configuration.class)
-	private List<List<Integer>> selectedFields;
+	private List<List<String>> selectedFields;
 
 	@JsonView(PresetDTO.View.Configuration.class)
 	private BarcodeSetting barcodeSetting;
@@ -102,11 +102,11 @@ public class LabelPrintingPresetDTO extends PresetDTO {
 		this.fileConfiguration = fileConfiguration;
 	}
 
-	public List<List<Integer>> getSelectedFields() {
+	public List<List<String>> getSelectedFields() {
 		return selectedFields;
 	}
 
-	public void setSelectedFields(final List<List<Integer>> selectedFields) {
+	public void setSelectedFields(final List<List<String>> selectedFields) {
 		this.selectedFields = selectedFields;
 	}
 
