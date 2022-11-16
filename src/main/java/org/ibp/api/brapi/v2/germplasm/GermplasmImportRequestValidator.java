@@ -188,10 +188,6 @@ public class GermplasmImportRequestValidator {
 			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "commonCropName"}, "");
 			return true;
 		}
-		if (!StringUtils.isEmpty(g.getGermplasmOrigin()) && this.attributeExceedsLength(g.getGermplasmOrigin())) {
-			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "germplasmOrigin"}, "");
-			return true;
-		}
 		if (!StringUtils.isEmpty(g.getInstituteCode()) && this.attributeExceedsLength(g.getInstituteCode())) {
 			this.errors.reject(GERMPLASM_CREATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {index.toString(), "instituteCode"}, "");
 			return true;

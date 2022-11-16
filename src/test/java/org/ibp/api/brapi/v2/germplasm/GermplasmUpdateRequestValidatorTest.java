@@ -47,7 +47,6 @@ public class GermplasmUpdateRequestValidatorTest {
 		updateRequest.setBreedingMethodDbId("1012");
 		updateRequest.setCountryOfOriginCode("XYZ");
 		updateRequest.setAccessionNumber(RandomStringUtils.randomAlphabetic(200));
-		updateRequest.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(200));
 		updateRequest.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(10)));
 		updateRequest.getAdditionalInfo().put(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(50));
 
@@ -74,8 +73,6 @@ public class GermplasmUpdateRequestValidatorTest {
 		updateRequest.setAcquisitionDate("20210221");
 		updateRequest.setBreedingMethodDbId("1012");
 		updateRequest.setCountryOfOriginCode("XYZ");
-		updateRequest.setGermplasmOrigin(RandomStringUtils.randomAlphabetic(
-			GermplasmAttributeValidator.ATTRIBUTE_VALUE_MAX_LENGTH + 1));
 		updateRequest.getSynonyms().add(new Synonym("", ""));
 		final String nameType = RandomStringUtils.randomAlphabetic(10);
 		updateRequest.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), nameType));
@@ -99,7 +96,6 @@ public class GermplasmUpdateRequestValidatorTest {
 			assertThat(Arrays.asList(exception.getErrors().get(6).getCodes()), CoreMatchers.hasItem("germplasm.update.name.exceeded.length"));
 			assertThat(Arrays.asList(exception.getErrors().get(6).getArguments()), CoreMatchers.hasItem("synonyms"));
 			assertThat(Arrays.asList(exception.getErrors().get(7).getCodes()), CoreMatchers.hasItem("germplasm.update.attribute.exceeded.length"));
-			assertThat(Arrays.asList(exception.getErrors().get(7).getArguments()), CoreMatchers.hasItem("germplasmOrigin"));
 		}
 	}
 
