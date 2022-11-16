@@ -9,28 +9,28 @@ import java.util.Map;
 @AutoProperty
 public class LabelsData {
 
-	private Integer defaultBarcodeKey;
+	private String defaultBarcodeKey;
 
-	private List<Map<Integer, String>> data;
+	private List<Map<String, String>> data;
 
-	public LabelsData(final Integer defaultBarcodeKey, final List<Map<Integer, String>> data) {
+	public LabelsData(final String defaultBarcodeKey, final List<Map<String, String>> data) {
 		this.defaultBarcodeKey = defaultBarcodeKey;
 		this.data = data;
 	}
 
-	public Integer getDefaultBarcodeKey() {
+	public String getDefaultBarcodeKey() {
 		return defaultBarcodeKey;
 	}
 
-	public void setDefaultBarcodeKey(final Integer defaultBarcodeKey) {
+	public void setDefaultBarcodeKey(final String defaultBarcodeKey) {
 		this.defaultBarcodeKey = defaultBarcodeKey;
 	}
 
-	public List<Map<Integer, String>> getData() {
+	public List<Map<String, String>> getData() {
 		return data;
 	}
 
-	public void setData(final List<Map<Integer, String>> data) {
+	public void setData(final List<Map<String, String>> data) {
 		this.data = data;
 	}
 
