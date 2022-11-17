@@ -8,6 +8,7 @@ import com.lowagie.text.PageSize;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.FieldType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.ibp.api.rest.labelprinting.filegenerator.PDFLabelsFileGenerator;
@@ -38,12 +39,12 @@ public class PDFLabelsFileGeneratorTest {
 
 	@Test
 	public void testGetBarcodeLabel() {
-		final Map<Integer, String> labels = this.mockLabels();
-		final List<Integer> barcodeFields = this.mockBarcodeFields();
-		final Map<Integer, Field> keyFieldMap = this.mockKeyFieldMap();
+		final Map<String, String> labels = this.mockLabels();
+		final List<String> barcodeFields = this.mockBarcodeFields();
+		final Map<String, Field> keyFieldMap = this.mockKeyFieldMap();
 		String expectedBarcodeWithoutLabel = "";
 		String expectedBarcodeWithLabel = "";
-		for(Integer barcodeField: barcodeFields) {
+		for(String barcodeField: barcodeFields) {
 			if(!expectedBarcodeWithLabel.isEmpty()) {
 				expectedBarcodeWithLabel += PDFLabelsFileGenerator.BARCODE_SEPARATOR;
 				expectedBarcodeWithoutLabel += PDFLabelsFileGenerator.BARCODE_SEPARATOR;
@@ -60,10 +61,11 @@ public class PDFLabelsFileGeneratorTest {
 
 	@Test
 	public void testGenerateLabelText() {
-		final Map<Integer, String> labels = this.mockLabels();
-		final Map<Integer, Field> keyFieldMap = this.mockKeyFieldMap();
-		final String expectedLabelText = keyFieldMap.get(TermId.ENTRY_CODE.getId()).getName() + PDFLabelsFileGenerator.FIELDNAME_VALUE_SEPARATOR + labels.get(TermId.ENTRY_CODE.getId());
-		final String labelText = this.pdfLabelsFileGenerator.generateLabelText(labels, Arrays.asList(TermId.ENTRY_CODE.getId()), keyFieldMap, 0);
+		final Map<String, String> labels = this.mockLabels();
+		final Map<String, Field> keyFieldMap = this.mockKeyFieldMap();
+		final String combinedKey = FieldType.VARIABLE.getName() + "_" + TermId.ENTRY_CODE.getId();
+		final String expectedLabelText = keyFieldMap.get(combinedKey).getName() + PDFLabelsFileGenerator.FIELDNAME_VALUE_SEPARATOR + labels.get(combinedKey);
+		final String labelText = this.pdfLabelsFileGenerator.generateLabelText(labels, Arrays.asList(combinedKey), keyFieldMap, 0);
 		Assert.assertEquals(expectedLabelText, labelText);
 	}
 
@@ -112,7 +114,7 @@ public class PDFLabelsFileGeneratorTest {
 		input.setBarcodeRequired(false);
 		input.setNumberOfRowsPerPageOfLabel("7");
 		input.setSizeOfLabelSheet("1");
-		final LabelsData data = new LabelsData(TermId.OBS_UNIT_ID.getId(), Arrays.asList(this.mockLabels()));
+		final LabelsData data = new LabelsData(String.valueOf(TermId.OBS_UNIT_ID.getId()), Arrays.asList(this.mockLabels()));
 		final File file = this.pdfLabelsFileGenerator.generate(input, data);
 		Assert.assertNotNull(file);
 		Assert.assertEquals("filename.pdf", file.getName());
@@ -121,33 +123,33 @@ public class PDFLabelsFileGeneratorTest {
 
 	private Set<Field> mockAvailableFields() {
 		final Set<Field> availableFields = new HashSet<>();
-		availableFields.add(new Field(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.name()));
-		availableFields.add(new Field(TermId.GID.getId(), TermId.GID.name()));
-		availableFields.add(new Field(TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name()));
+		availableFields.add(new Field(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.name(), FieldType.VARIABLE));
+		availableFields.add(new Field(TermId.GID.getId(), TermId.GID.name(), FieldType.VARIABLE));
+		availableFields.add(new Field(TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name(), FieldType.VARIABLE));
 		return availableFields;
 	}
 
-	private Map<Integer, String> mockLabels() {
-		final Map<Integer, String> labels = new HashMap<>();
-		labels.put(TermId.ENTRY_CODE.getId(), "1");
-		labels.put(TermId.GID.getId(), "2");
-		labels.put(TermId.OBS_UNIT_ID.getId(), "123");
+	private Map<String, String> mockLabels() {
+		final Map<String, String> labels = new HashMap<>();
+		labels.put(FieldType.VARIABLE.getName() + "_" + TermId.ENTRY_CODE.getId(), "1");
+		labels.put(FieldType.VARIABLE.getName() + "_" + TermId.GID.getId(), "2");
+		labels.put(FieldType.VARIABLE.getName() + "_" + TermId.OBS_UNIT_ID.getId(), "123");
 		return labels;
 	}
 
-	private List<Integer> mockBarcodeFields() {
-		final List<Integer> barcodeFields = new ArrayList<>();
-		barcodeFields.add(TermId.ENTRY_CODE.getId());
-		barcodeFields.add(TermId.GID.getId());
-		barcodeFields.add(TermId.OBS_UNIT_ID.getId());
+	private List<String> mockBarcodeFields() {
+		final List<String> barcodeFields = new ArrayList<>();
+		barcodeFields.add(FieldType.VARIABLE.getName() + "_" + TermId.ENTRY_CODE.getId());
+		barcodeFields.add(FieldType.VARIABLE.getName() + "_" + TermId.GID.getId());
+		barcodeFields.add(FieldType.VARIABLE.getName() + "_" + TermId.OBS_UNIT_ID.getId());
 		return barcodeFields;
 	}
 
-	private Map<Integer, Field> mockKeyFieldMap() {
-		final Map<Integer, Field> keyFieldMap = new HashMap<>();
-		keyFieldMap.put(TermId.ENTRY_CODE.getId(), new Field(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.name()));
-		keyFieldMap.put(TermId.GID.getId(), new Field(TermId.GID.getId(), TermId.GID.name()));
-		keyFieldMap.put(TermId.OBS_UNIT_ID.getId(), new Field(TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name()));
+	private Map<String, Field> mockKeyFieldMap() {
+		final Map<String, Field> keyFieldMap = new HashMap<>();
+		keyFieldMap.put( FieldType.VARIABLE.getName() + "_" + TermId.ENTRY_CODE.getId(), new Field(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.name(), FieldType.VARIABLE));
+		keyFieldMap.put( FieldType.VARIABLE.getName() + "_" + TermId.GID.getId(), new Field(TermId.GID.getId(), TermId.GID.name(), FieldType.VARIABLE));
+		keyFieldMap.put( FieldType.VARIABLE.getName() + "_" + TermId.OBS_UNIT_ID.getId(), new Field(TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name(), FieldType.VARIABLE));
 		return keyFieldMap;
 	}
 }
