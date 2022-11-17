@@ -43,7 +43,7 @@ public class PresetResourceTest extends ApiUnitTestBase {
 
 	private String type;
 
-	private List<List<Integer>> selectedField;
+	private List<List<String>> selectedField;
 
 	private LabelPrintingPresetDTO.BarcodeSetting barcodeSetting;
 
@@ -71,8 +71,8 @@ public class PresetResourceTest extends ApiUnitTestBase {
 		this.toolId = 23;
 
 		this.type = PresetType.LABEL_PRINTING_PRESET.getName();
-		this.selectedField = Arrays.asList(Arrays.asList(4, 13));
-		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList(2));
+		this.selectedField = Arrays.asList(Arrays.asList("VIRTUAL_VARIABLE_4", "VIRTUAL_VARIABLE_13"));
+		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList("VIRTUAL_VARIABLE_2"));
 		this.filePresetConfigurationDTO = new FilePresetConfigurationDTO();
 		this.filePresetConfigurationDTO.setOutputType("csv");
 	}
