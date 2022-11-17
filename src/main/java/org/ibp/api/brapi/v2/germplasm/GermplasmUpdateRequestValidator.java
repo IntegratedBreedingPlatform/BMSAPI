@@ -104,9 +104,6 @@ public class GermplasmUpdateRequestValidator {
 		if (!StringUtils.isEmpty(g.getCommonCropName()) && this.attributeExceedsLength(g.getCommonCropName())) {
 			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"commonCropName"}, "");
 		}
-		if (!StringUtils.isEmpty(g.getGermplasmOrigin()) && this.attributeExceedsLength(g.getGermplasmOrigin())) {
-			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"germplasmOrigin"}, "");
-		}
 		if (!StringUtils.isEmpty(g.getInstituteCode()) && this.attributeExceedsLength(g.getInstituteCode())) {
 			this.errors.reject(GERMPLASM_UPDATE_ATTRIBUTE_EXCEEDED_LENGTH, new String[] {"instituteCode"}, "");
 		}
