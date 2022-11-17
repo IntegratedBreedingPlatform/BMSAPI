@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.api.exception.ApiRuntimeException;
-import org.ibp.api.rest.preset.domain.PresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
