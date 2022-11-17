@@ -319,7 +319,7 @@ public class AdvanceValidatorTest {
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
-			assertThat(exception.getErrors().get(0).getCode(), is("advance.breeding-method.selection.generative"));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.breeding-method.selection.generative.invalid"));
 		}
 
 		Mockito.verify(this.breedingMethodValidator).validateMethod(BREEDING_METHOD_ID);

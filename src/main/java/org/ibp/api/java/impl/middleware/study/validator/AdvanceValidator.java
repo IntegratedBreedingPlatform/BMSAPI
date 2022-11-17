@@ -87,7 +87,7 @@ public class AdvanceValidator {
 				this.breedingMethodValidator.validateMethod(breedingMethodSelectionRequest.getBreedingMethodId());
 
 			if (MethodType.isGenerative(breedingMethodDTO.getType())) {
-				throw new ApiRequestValidationException("advance.breeding-method.selection.generative", new Object[] {});
+				throw new ApiRequestValidationException("advance.breeding-method.selection.generative.invalid", new Object[] {});
 			}
 		} else {
 			breedingMethodDTO = null;
