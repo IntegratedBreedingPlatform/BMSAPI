@@ -29,7 +29,7 @@ public class PresetMapperTest extends ApiUnitTestBase {
 
 	private String type;
 
-	private List<List<Integer>> selectedField;
+	private List<List<String>> selectedField;
 
 	private LabelPrintingPresetDTO.BarcodeSetting barcodeSetting;
 
@@ -51,13 +51,13 @@ public class PresetMapperTest extends ApiUnitTestBase {
 		programPresetId = RandomUtils.nextInt();
 
 		type = "LabelPrintingPreset";
-		selectedField = Arrays.asList(Arrays.asList(4, 13));
+		selectedField = Arrays.asList(Arrays.asList("VIRTUAL_VARIABLE_4", "VIRTUAL_VARIABLE_13"));
 		barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList(2));
+			new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList("VIRTUAL_VARIABLE_2"));
 		filePresetConfigurationDTO = new FilePresetConfigurationDTO();
 		filePresetConfigurationDTO.setOutputType("csv");
 		configuration =
-			"{\"type\":\"LabelPrintingPreset\",\"selectedFields\":[[4,13]],\"barcodeSetting\":{\"barcodeNeeded\":true,\"automaticBarcode\":false,\"barcodeFields\":[2]},\"includeHeadings\":true,\"fileConfiguration\":{\"outputType\":\"csv\"}}";
+			"{\"type\":\"LabelPrintingPreset\",\"selectedFields\":[[\"VIRTUAL_VARIABLE_4\",\"VIRTUAL_VARIABLE_13\"]],\"barcodeSetting\":{\"barcodeNeeded\":true,\"automaticBarcode\":false,\"barcodeFields\":[\"VIRTUAL_VARIABLE_2\"]},\"includeHeadings\":true,\"fileConfiguration\":{\"outputType\":\"csv\"}}";
 	}
 
 	@Test
