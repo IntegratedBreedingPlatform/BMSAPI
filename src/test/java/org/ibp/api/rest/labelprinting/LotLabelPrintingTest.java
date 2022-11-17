@@ -27,80 +27,80 @@ public class LotLabelPrintingTest {
 	@Test
 	public void testGetDataRow_For_ShortAttributeValues() {
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
+		final Set<String> keys = new HashSet<>(Collections.singletonList("VARIABLE_" + attributeId));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(100);
-		attributeValues.get(GID).put(LotLabelPrinting.toId(attributeId), attributeValue);
+		attributeValues.get(GID).put(attributeId, attributeValue);
 		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
 		labelsGeneratorInput.setFileType(FileType.PDF);
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow =
+		final Map<String, String> dataRow =
 			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
-		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue, dataRow.get("VARIABLE_" + attributeId));
 	}
 
 	@Test
 	public void testGetDataRow_For_LongAttributeValuesNotTruncated_WhenCSVFileType() {
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
+		final Set<String> keys = new HashSet<>(Collections.singletonList("VARIABLE_" + attributeId));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
-		attributeValues.get(GID).put(LotLabelPrinting.toId(attributeId), attributeValue);
+		attributeValues.get(GID).put(attributeId, attributeValue);
 		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
 		labelsGeneratorInput.setFileType(FileType.CSV);
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow =
+		final Map<String, String> dataRow =
 			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is not truncated for CSV file type
-		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue, dataRow.get("VARIABLE_" + attributeId));
 	}
 
 	@Test
 	public void testGetDataRow_For_LongAttributeValuesNotTruncated_WhenXLSFileType() {
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
+		final Set<String> keys = new HashSet<>(Collections.singletonList("VARIABLE_" + attributeId));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
-		attributeValues.get(GID).put(LotLabelPrinting.toId(attributeId), attributeValue);
+		attributeValues.get(GID).put(attributeId, attributeValue);
 		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
 		labelsGeneratorInput.setFileType(FileType.XLS);
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow =
+		final Map<String, String> dataRow =
 			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is not truncated for XLS file type
-		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue, dataRow.get("VARIABLE_" + attributeId));
 	}
 
 	@Test
 	public void testGetDataRow_For_TruncateLongAttributeValues_WhenPDFExportType() {
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
+		final Set<String> keys = new HashSet<>(Collections.singletonList("VARIABLE_" + attributeId));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
-		attributeValues.get(GID).put(LotLabelPrinting.toId(attributeId), attributeValue);
+		attributeValues.get(GID).put(attributeId, attributeValue);
 		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
 		labelsGeneratorInput.setFileType(FileType.PDF);
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow =
+		final Map<String, String> dataRow =
 			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is truncated for PDF file type
-		Assert.assertEquals(attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "...", dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "...", dataRow.get("VARIABLE_" + attributeId));
 	}
 
 }
