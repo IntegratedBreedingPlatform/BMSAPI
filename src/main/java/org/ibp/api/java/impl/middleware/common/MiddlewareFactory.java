@@ -878,7 +878,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public CropGenotypingParameterService getCropGenotypingParameterService() {
-		return new CropGenotypingParameterServiceImpl(this.getWorkbenchSessionProvider());
+		return new CropGenotypingParameterServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean
