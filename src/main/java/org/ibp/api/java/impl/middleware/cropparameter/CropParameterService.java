@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.cropparameter;
 import org.generationcp.middleware.api.cropparameter.CropParameterDTO;
 import org.generationcp.middleware.api.cropparameter.CropParameterEnum;
 import org.generationcp.middleware.api.cropparameter.CropParameterPatchRequestDTO;
-import org.generationcp.middleware.service.impl.crop.CropGenotypingParameterDTO;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -16,7 +15,7 @@ public interface CropParameterService {
 
 	CropParameterDTO getCropParameter(CropParameterEnum cropParameterEnum);
 
-	CropGenotypingParameterDTO getCropGenotypingParameter(String keyFilter);
+	List<CropParameterDTO> getCropParametersByGroupName(String groupName);
 
-	String getToken(String cropName);
+	String getGenotypingToken(String groupName);
 }

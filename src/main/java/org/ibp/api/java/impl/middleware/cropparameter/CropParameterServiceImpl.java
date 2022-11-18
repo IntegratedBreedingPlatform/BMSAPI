@@ -3,11 +3,10 @@ package org.ibp.api.java.impl.middleware.cropparameter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.minidev.json.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.cropparameter.CropParameterDTO;
 import org.generationcp.middleware.api.cropparameter.CropParameterEnum;
 import org.generationcp.middleware.api.cropparameter.CropParameterPatchRequestDTO;
-import org.generationcp.middleware.service.impl.crop.CropGenotypingParameterDTO;
+import org.generationcp.middleware.pojos.CropParameter;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ApiValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -20,8 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLDecoder;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +34,8 @@ public class CropParameterServiceImpl implements CropParameterService {
 
 	@Autowired
 	private RestTemplate restTemplate;
+
+	private static final String UTF_8 = "UTF-8";
 
 	@Override
 	public List<CropParameterDTO> getCropParameters(final Pageable pageable) {
@@ -54,42 +57,34 @@ public class CropParameterServiceImpl implements CropParameterService {
 	}
 
 	@Override
-	public CropGenotypingParameterDTO getCropGenotypingParameter(final String keyFilter) {
-		final Optional<CropGenotypingParameterDTO> cropGenotypingParameterDTOOptional =
-			this.cropParameterService.getCropGenotypingParameter(keyFilter);
-		if (cropGenotypingParameterDTOOptional.isPresent()) {
-			return cropGenotypingParameterDTOOptional.get();
-		} else {
-			// return an empty object
-			return new CropGenotypingParameterDTO();
-		}
+	public List<CropParameterDTO> getCropParametersByGroupName(final String groupName) {
+		return this.cropParameterService.getCropParametersByGroupName(groupName).stream()
+			.map(CropParameterDTO::new).collect(Collectors.toList());
 	}
 
 	@Override
-	public String getToken(final String cropName) {
-		final Optional<CropGenotypingParameterDTO> cropGenotypingParameterDTOOptional =
-			this.cropParameterService.getCropGenotypingParameter(cropName);
-		if (cropGenotypingParameterDTOOptional.isPresent()) {
-			final CropGenotypingParameterDTO cropGenotypingParameterDTO = cropGenotypingParameterDTOOptional.get();
-			try {
-				final HttpEntity<String> request = this.createTokenRequest(cropGenotypingParameterDTO);
-				final String resultAsString =
-					this.restTemplate.postForObject(cropGenotypingParameterDTO.getTokenEndpoint(), request, String.class);
-				final JsonNode jsonNode = new ObjectMapper().readTree(resultAsString);
-				return jsonNode.get("access_token").asText();
-			} catch (final Exception ex) {
-				throw new ApiRequestValidationException("crop.genotyping.parameter.cannot.generate.token", new String[] {});
-			}
+	public String getGenotypingToken(final String groupName) {
+		final Map<String, CropParameter> cropParametersMap = this.cropParameterService.getCropParametersByGroupName(groupName)
+			.stream().collect(Collectors.toMap(CropParameter::getKey, Function.identity()));
+		try {
+			final HttpEntity<String> request = this.createTokenRequest(cropParametersMap);
+			final String tokenEndpoint = cropParametersMap.get(CropParameterEnum.GIGWA_TOKEN_ENDPOINT.getKey()).getValue();
+			final String resultAsString =
+				this.restTemplate.postForObject(URLDecoder.decode(tokenEndpoint, UTF_8), request, String.class);
+			final JsonNode jsonNode = new ObjectMapper().readTree(resultAsString);
+			return jsonNode.get("access_token").asText();
+		} catch (final Exception ex) {
+			throw new ApiRequestValidationException("crop.genotyping.parameter.cannot.generate.token", new String[] {});
 		}
-		return StringUtils.EMPTY;
 	}
 
-	private HttpEntity<String> createTokenRequest(final CropGenotypingParameterDTO cropGenotypingParameterDTO) {
+	private HttpEntity<String> createTokenRequest(final Map<String, CropParameter> cropParametersMap)
+		throws Exception {
 		final HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		final JSONObject data = new JSONObject();
-		data.put("username", cropGenotypingParameterDTO.getUserName());
-		data.put("password", cropGenotypingParameterDTO.getPassword());
+		data.put("username", URLDecoder.decode(cropParametersMap.get(CropParameterEnum.GIGWA_USERNAME.getKey()).getValue(), UTF_8));
+		data.put("password", URLDecoder.decode(cropParametersMap.get(CropParameterEnum.GIGWA_PASSWORD.getKey()).getValue(), UTF_8));
 		return new HttpEntity<>(data.toString(), headers);
 	}
 }

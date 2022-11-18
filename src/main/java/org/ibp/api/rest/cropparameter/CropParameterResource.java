@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.cropparameter.CropParameterDTO;
 import org.generationcp.middleware.api.cropparameter.CropParameterEnum;
 import org.generationcp.middleware.api.cropparameter.CropParameterPatchRequestDTO;
-import org.generationcp.middleware.service.impl.crop.CropGenotypingParameterDTO;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.cropparameter.CropParameterService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +34,6 @@ public class CropParameterResource {
 
 	@Autowired
 	private CropParameterService cropParameterService;
-
-	private static final String GENOTYPING_SERVER = "gigwa";
 
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -79,18 +76,20 @@ public class CropParameterResource {
 		return new ResponseEntity<>(this.cropParameterService.getCropParameter(key), HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get crop genotyping parameter", notes = "")
-	@RequestMapping(value = "/crop-genotyping-parameters", method = RequestMethod.GET)
+	@ApiOperation(value = "Get crop parameter by group", notes = "")
+	@RequestMapping(value = "/crop-parameters/{groupName}/group", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
-	public ResponseEntity<CropGenotypingParameterDTO> getCropGenotypingParameter(@PathVariable final String cropName) {
-		final CropGenotypingParameterDTO parameter = this.cropParameterService.getCropGenotypingParameter(GENOTYPING_SERVER);
+	public ResponseEntity<List<CropParameterDTO>> getCropParametersByGroup(@PathVariable final String cropName,
+		@PathVariable final String groupName) {
+		final List<CropParameterDTO> parameter = this.cropParameterService.getCropParametersByGroupName(groupName);
 		return new ResponseEntity<>(parameter, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Generate token", notes = "Get the token using the credentials in Crop Genotype Parameter configuration")
-	@RequestMapping(value = "/crop-genotyping-parameters/token", method = RequestMethod.GET)
+	@RequestMapping(value = "/crop-parameters/genotyping/{groupName}/token", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
-	public ResponseEntity<String> getToken(@PathVariable final String cropName) {
-		return new ResponseEntity<>(this.cropParameterService.getToken(GENOTYPING_SERVER), HttpStatus.OK);
+	public ResponseEntity<String> getToken(@PathVariable final String cropName,
+		@PathVariable final String groupName) {
+		return new ResponseEntity<>(this.cropParameterService.getGenotypingToken(groupName), HttpStatus.OK);
 	}
 }
