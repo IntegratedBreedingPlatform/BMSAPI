@@ -929,9 +929,4 @@ public class MiddlewareFactory {
 		return new HibernateSessionPerRequestProvider(this.WORKBENCH_SessionFactory);
 	}
 
-	@Bean
-	public SeedSourceGenerator getSeedSourceGenerator() {
-		return new SeedSourceGenerator();
-	}
-
 }

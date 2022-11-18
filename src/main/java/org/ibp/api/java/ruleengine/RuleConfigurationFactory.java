@@ -3,13 +3,14 @@ package org.ibp.api.java.ruleengine;
 import org.generationcp.middleware.ruleengine.ProcessCodeRuleFactory;
 import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionFactory;
 import org.generationcp.middleware.ruleengine.coding.expression.CodingExpressionResolver;
+import org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator;
+import org.generationcp.middleware.ruleengine.generator.DeprecatedBreedersCrossIDGenerator;
+import org.generationcp.middleware.ruleengine.generator.SeedSourceGenerator;
 import org.generationcp.middleware.ruleengine.naming.impl.GermplasmNamingServiceImpl;
 import org.generationcp.middleware.ruleengine.naming.impl.ProcessCodeFactory;
 import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
-import org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedProcessCodeFactory;
 import org.generationcp.middleware.ruleengine.provider.PropertyFileRuleConfigurationProvider;
 import org.generationcp.middleware.ruleengine.service.GermplasmNamingProperties;
-import org.generationcp.middleware.ruleengine.generator.BreedersCrossIDGenerator;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -41,8 +42,8 @@ public class RuleConfigurationFactory {
 	}
 
 	@Bean
-	public BreedersCrossIDGenerator breedersCrossIDGenerator() {
-		return new BreedersCrossIDGenerator();
+	public DeprecatedBreedersCrossIDGenerator deprecatedBreedersCrossIDGenerator() {
+		return new DeprecatedBreedersCrossIDGenerator();
 	}
 
 	@Bean
@@ -65,5 +66,16 @@ public class RuleConfigurationFactory {
 	public GermplasmNamingService germplasmNamingService() {
 		return new GermplasmNamingServiceImpl();
 	}
+
+	@Bean
+	public SeedSourceGenerator getSeedSourceGenerator() {
+		return new SeedSourceGenerator();
+	}
+
+	@Bean
+	public BreedersCrossIDGenerator breedersCrossIDGenerator() {
+		return new BreedersCrossIDGenerator();
+	}
+
 
 }
