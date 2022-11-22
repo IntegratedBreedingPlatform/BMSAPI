@@ -116,6 +116,8 @@ import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.ruleengine.impl.RulesServiceImpl;
+import org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedGermplasmNamingServiceImpl;
+import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
 import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
