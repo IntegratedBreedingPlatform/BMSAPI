@@ -15,4 +15,7 @@ public interface CropParameterService {
 
 	CropParameterDTO getCropParameter(CropParameterEnum cropParameterEnum);
 
+	List<CropParameterDTO> getCropParametersByGroupName(String groupName);
+
+	String getGenotypingToken(String groupName);
 }
