@@ -8,8 +8,8 @@ import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
@@ -215,7 +215,7 @@ public class UserValidator {
 			// Roles in the list must exist
 			final Set<Integer> roleIds = userRoles.stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
 
-			final List<Role> savedRoles = this.roleService.getRoles(new RoleSearchDto(null, null, roleIds));
+			final List<RoleDto> savedRoles = this.roleService.getRoles(new RoleSearchDto(null, null, roleIds));
 
 			if (savedRoles.size() != roleIds.size()) {
 				this.errors.reject("user.invalid.roles", new String[] {
@@ -226,7 +226,7 @@ public class UserValidator {
 			}
 
 			// Roles in the list MUST be assignable
-			final Set<Role> notAssignableRoles = savedRoles.stream().filter(e -> !e.getAssignable()).collect(Collectors.toSet());
+			final Set<RoleDto> notAssignableRoles = savedRoles.stream().filter(e -> !e.getAssignable()).collect(Collectors.toSet());
 
 			if (!notAssignableRoles.isEmpty()) {
 				this.errors.reject("user.not.assignable.roles",
@@ -262,10 +262,10 @@ public class UserValidator {
 			// Instance ROLE can not have neither crop nor program
 			// Crop ROLE MUST have a crop and can not have a program
 			// Program ROLE MUST have crop and program and program MUST belong to the specified crop
-			final Map<Integer, Role> savedRolesMap = savedRoles.stream().collect(
-				Collectors.toMap(Role::getId, Function.identity()));
+			final Map<Integer, RoleDto> savedRolesMap = savedRoles.stream().collect(
+				Collectors.toMap(RoleDto::getId, Function.identity()));
 			for (final UserRoleDto userRoleDto : userRoles) {
-				final Role role = savedRolesMap.get(userRoleDto.getRole().getId());
+				final RoleDto role = savedRolesMap.get(userRoleDto.getRole().getId());
 				if (role.getRoleType().getId().equals(RoleType.INSTANCE.getId())) {
 					if (userRoleDto.getCrop() != null || userRoleDto.getProgram() != null) {
 						this.errors.reject("user.invalid.instance.role", new String[] {role.getId().toString()}, "");

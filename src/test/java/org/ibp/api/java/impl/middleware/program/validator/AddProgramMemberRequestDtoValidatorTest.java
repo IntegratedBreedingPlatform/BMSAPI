@@ -3,11 +3,12 @@ package org.ibp.api.java.impl.middleware.program.validator;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Test;
@@ -20,6 +21,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -100,7 +102,7 @@ public class AddProgramMemberRequestDtoValidatorTest {
 			final AddProgramMemberRequestDto addProgramMemberRequestDto = new AddProgramMemberRequestDto(roleId, Sets.newHashSet(userId));
 			final WorkbenchUser user = new WorkbenchUser(userId);
 			Mockito.when(this.userService.getUsersByIds(Mockito.anyList())).thenReturn(Collections.singletonList(user));
-			Mockito.when(this.roleService.getRoleById(Mockito.eq(roleId))).thenReturn(null);
+			Mockito.when(this.roleService.getRoleById(Mockito.eq(roleId))).thenReturn(Optional.empty());
 			addProgramMemberRequestDtoValidator.validate(programUUID, addProgramMemberRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.member.role.do.not.exist"));
@@ -113,8 +115,9 @@ public class AddProgramMemberRequestDtoValidatorTest {
 			final AddProgramMemberRequestDto addProgramMemberRequestDto = new AddProgramMemberRequestDto(roleId, Sets.newHashSet(userId));
 			final WorkbenchUser user = new WorkbenchUser(userId);
 			Mockito.when(this.userService.getUsersByIds(Mockito.anyList())).thenReturn(Collections.singletonList(user));
+			//FIXME
 			final Role role = this.buildRole(roleId, org.generationcp.middleware.domain.workbench.RoleType.INSTANCE);
-			Mockito.when(this.roleService.getRoleById(Mockito.eq(roleId))).thenReturn(role);
+			Mockito.when(this.roleService.getRoleById(Mockito.eq(roleId))).thenReturn(Optional.of(new RoleDto(role)));
 			addProgramMemberRequestDtoValidator.validate(programUUID, addProgramMemberRequestDto);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("program.member.invalid.user.role"));
@@ -126,9 +129,10 @@ public class AddProgramMemberRequestDtoValidatorTest {
 		try {
 			final AddProgramMemberRequestDto addProgramMemberRequestDto = new AddProgramMemberRequestDto(roleId, Sets.newHashSet(userId));
 			final WorkbenchUser user = new WorkbenchUser(userId);
+			//FIXME
 			final Role role = this.buildRole(roleId, org.generationcp.middleware.domain.workbench.RoleType.PROGRAM);
 			Mockito.when(this.userService.getUsersByIds(Mockito.anyList())).thenReturn(Collections.singletonList(user));
-			Mockito.when(this.roleService.getRoleById(Mockito.eq(roleId))).thenReturn(role);
+			Mockito.when(this.roleService.getRoleById(Mockito.eq(roleId))).thenReturn(Optional.of(new RoleDto(role)));
 			Mockito.when(this.userService.getProgramMembersEligibleUsers(programUUID, null, null)).thenReturn(Collections.emptyList());
 			addProgramMemberRequestDtoValidator.validate(programUUID, addProgramMemberRequestDto);
 		} catch (final ApiRequestValidationException e) {
