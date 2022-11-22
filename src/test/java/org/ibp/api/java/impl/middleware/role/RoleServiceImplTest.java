@@ -3,9 +3,7 @@ package org.ibp.api.java.impl.middleware.role;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
-import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Role;
-import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.RoleGeneratorInput;
@@ -112,10 +110,10 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		final int roleTypeId = 2;
 		final int permissionId = 3;
 
-		final Permission permission = new Permission();
-		permission.setPermissionId(permissionId);
+		final PermissionDto permission = new PermissionDto();
+		permission.setId(permissionId);
 
-		final Role role = this.createTestRole(roleId, 99, new ArrayList<>());
+		final RoleDto role = this.createRoleDto(roleId, 99, new ArrayList<>());
 
 		final RoleGeneratorInput roleGeneratorInput =
 			this.createRoleGeneratorInput(roleId, roleTypeId, Arrays.asList(permissionId));
@@ -123,10 +121,10 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
 
 		when(this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput, false)).thenReturn(errors);
-		when(this.roleService.getRoleById(roleGeneratorInput.getId())).thenReturn(Optional.of(new RoleDto(role)));
+		when(this.roleService.getRoleById(roleGeneratorInput.getId())).thenReturn(Optional.of(role));
 		when(this.roleService.isRoleInUse(roleGeneratorInput.getId())).thenReturn(true);
 
-		when(this.permissionService.getPermissionsByIds(new HashSet<>(roleGeneratorInput.getPermissions())))
+		when(this.permissionService.getPermissionsDtoByIds(new HashSet<>(roleGeneratorInput.getPermissions())))
 			.thenReturn(Arrays.asList(permission));
 
 		try {
@@ -147,13 +145,13 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		final int permissionId1 = 99;
 		final int permissionId2 = 100;
 
-		final Permission permission1 = new Permission();
-		permission1.setPermissionId(permissionId1);
-		final Permission permission2 = new Permission();
-		permission2.setPermissionId(permissionId2);
+		final PermissionDto permission1 = new PermissionDto();
+		permission1.setId(permissionId1);
+		final PermissionDto permission2 = new PermissionDto();
+		permission2.setId(permissionId2);
 
 		// Role to be retrieved from the database has one permission
-		final Role role = this.createTestRole(roleId, roleTypeId, Arrays.asList(permission1));
+		final RoleDto role = this.createRoleDto(roleId, roleTypeId, Arrays.asList(permission1));
 
 		// Add new permission to the role.
 		final RoleGeneratorInput roleGeneratorInput =
@@ -165,9 +163,9 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), RoleGeneratorInput.class.getName());
 
 		when(this.roleValidator.validateRoleGeneratorInput(roleGeneratorInput, false)).thenReturn(errors);
-		when(this.roleService.getRoleById(roleGeneratorInput.getId())).thenReturn(Optional.of(new RoleDto(role)));
+		when(this.roleService.getRoleById(roleGeneratorInput.getId())).thenReturn(Optional.of(role));
 		when(this.roleService.isRoleInUse(roleGeneratorInput.getId())).thenReturn(true);
-		when(this.permissionService.getPermissionsByIds(new HashSet<>(roleGeneratorInput.getPermissions())))
+		when(this.permissionService.getPermissionsDtoByIds(new HashSet<>(roleGeneratorInput.getPermissions())))
 			.thenReturn(Arrays.asList(permission1, permission2));
 
 		try {
@@ -178,16 +176,6 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		}
 		verify(this.roleValidator).validateRoleGeneratorInput(roleGeneratorInput, false);
 		assertEquals("role.permissions.changed", errors.getAllErrors().get(0).getCode());
-	}
-
-	private Role createTestRole(final int roleId, final int roleTypeId, final List<Permission> pemissions) {
-		final Role role = new Role();
-		role.setId(roleId);
-		role.setPermissions(pemissions);
-		final RoleType roleType = new RoleType();
-		roleType.setId(roleTypeId);
-		role.setRoleType(roleType);
-		return role;
 	}
 
 	private RoleDto createRoleDto(final int roleId, final int roleTypeId, final List<PermissionDto> pemissions) {
