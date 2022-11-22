@@ -64,7 +64,7 @@ public class AddProgramMemberRequestDtoValidator {
 
 		//role is a program role
 		final Optional<RoleDto> role = this.roleService.getRoleById(addProgramMemberRequestDto.getRoleId());
-		if (role == null) {
+		if (!role.isPresent()) {
 			errors.reject("program.member.role.do.not.exist", new String[] {String.valueOf(addProgramMemberRequestDto.getRoleId())}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
