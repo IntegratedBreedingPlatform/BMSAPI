@@ -84,7 +84,7 @@ public class CropParameterServiceImpl implements CropParameterService {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		final JSONObject data = new JSONObject();
 		data.put("username", URLDecoder.decode(cropParametersMap.get(CropParameterEnum.GIGWA_USERNAME.getKey()).getValue(), UTF_8));
-		data.put("password", URLDecoder.decode(cropParametersMap.get(CropParameterEnum.GIGWA_PASSWORD.getKey()).getValue(), UTF_8));
+		data.put("password", URLDecoder.decode(cropParametersMap.get(CropParameterEnum.GIGWA_PASSWORD.getKey()).getEncryptedValue(), UTF_8));
 		return new HttpEntity<>(data.toString(), headers);
 	}
 }
