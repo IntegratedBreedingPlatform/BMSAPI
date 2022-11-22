@@ -1,10 +1,13 @@
 package org.ibp.api.rest.study;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.ibp.api.java.study.AdvanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,14 +17,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
-// TODO: add swagger
+@Api(value = "Advance Services")
 @Controller
 public class AdvanceController {
 
 	@Autowired
 	private AdvanceService advanceService;
 
-	// TODO: define permission
+	@ApiOperation(value = "Advance study")
+	// TODO: define granular permission for advance
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
 	@ResponseBody
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/advance", method = RequestMethod.POST)
 	public ResponseEntity<List<Integer>> advanceStudy(
