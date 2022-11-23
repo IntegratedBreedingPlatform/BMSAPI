@@ -48,6 +48,9 @@ public class PedigreeResourceBrapi {
 	private SearchRequestService searchRequestService;
 
 	@Autowired
+	private PedigreeNodeSearchRequestValidator pedigreeNodeSearchRequestValidator;
+
+	@Autowired
 	private BrapiResponseMessageGenerator<PedigreeNodeDTO> responseMessageGenerator;
 
 	@ApiOperation(value = "Send a list of pedigree nodes to update existing information on a server", notes = "Send a list of pedigree nodes to update existing information on a server")
@@ -72,6 +75,9 @@ public class PedigreeResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchPedigree(
 		@PathVariable final String crop,
 		@RequestBody final PedigreeNodeSearchRequest pedigreeNodeSearchRequest) {
+		// Validate the search request since pedigree search is not paginated to avoid returning the whole database
+		this.pedigreeNodeSearchRequestValidator.validatePedigreeNodeSearchRequest(pedigreeNodeSearchRequest);
+
 		final BrapiSearchDto searchDto =
 			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(pedigreeNodeSearchRequest, PedigreeNodeSearchRequest.class)
 				.toString());
@@ -104,6 +110,8 @@ public class PedigreeResourceBrapi {
 				new EntityListResponse<PedigreeNodeDTO>(new Result<>(new ArrayList<>())).withMessage("no search request found"),
 				HttpStatus.NOT_FOUND);
 		}
+		// Validate the search request since pedigree search is not paginated to avoid returning the whole database
+		this.pedigreeNodeSearchRequestValidator.validatePedigreeNodeSearchRequest(pedigreeNodeSearchRequest);
 
 		final PagedResult<PedigreeNodeDTO> resultPage =
 			this.getPedigreeNodeDTOPagedResult(pedigreeNodeSearchRequest, currentPage,

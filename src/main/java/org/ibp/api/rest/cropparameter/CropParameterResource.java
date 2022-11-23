@@ -76,4 +76,20 @@ public class CropParameterResource {
 		return new ResponseEntity<>(this.cropParameterService.getCropParameter(key), HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Get crop parameter by group", notes = "")
+	@RequestMapping(value = "/crop-parameters/{groupName}/group", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
+	public ResponseEntity<List<CropParameterDTO>> getCropParametersByGroup(@PathVariable final String cropName,
+		@PathVariable final String groupName) {
+		final List<CropParameterDTO> parameter = this.cropParameterService.getCropParametersByGroupName(groupName);
+		return new ResponseEntity<>(parameter, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Generate token", notes = "Get the token using the credentials in Crop Genotype Parameter configuration")
+	@RequestMapping(value = "/crop-parameters/genotyping/{groupName}/token", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
+	public ResponseEntity<String> getToken(@PathVariable final String cropName,
+		@PathVariable final String groupName) {
+		return new ResponseEntity<>(this.cropParameterService.getGenotypingToken(groupName), HttpStatus.OK);
+	}
 }
