@@ -239,24 +239,6 @@ public abstract class LabelPrintingStrategy {
 	}
 
 	/**
-	 * Identify non-fixed columns with id = MAX_FIXED_TYPE_INDEX + column-id
-	 * Requires no collision between non-fixed columns id
-	 * Allocates some space for future fixed-columns
-	 */
-	static final Integer MAX_FIXED_TYPE_INDEX = 10000;
-
-	static int toKey(final int id) {
-		return id + MAX_FIXED_TYPE_INDEX;
-	}
-
-	static int toId(final int key) {
-		if (key > MAX_FIXED_TYPE_INDEX) {
-			return key - MAX_FIXED_TYPE_INDEX;
-		}
-		return key;
-	}
-
-	/**
 	 * Given labelInfoInput, it will get a LabelPrintingPresetDTO depending on the LabelPrintingType
 	 *
 	 * @param labelsInfoInput
