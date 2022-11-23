@@ -158,8 +158,8 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 		studyEntryDtos.forEach((studyEntry) -> {
 			final Map<String, String> row = new HashMap<>();
 			combinedKeys.forEach((combinedKey) -> {
-				final String[] field = combinedKey.split(StudyEntriesLabelPrinting.UNDERSCORE);
-				final Integer key = Integer.valueOf(field[1]);
+				final String[] composedKey = combinedKey.split(StudyEntriesLabelPrinting.UNDERSCORE);
+				final Integer key = Integer.valueOf(composedKey[1]);
 				if (TermId.CROSS.getId() == key) {
 					row.put(combinedKey,
 						truncateValueIfPdf(isPdf, studyEntry.getCross(), StudyEntriesLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
