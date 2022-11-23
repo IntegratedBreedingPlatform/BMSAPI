@@ -32,12 +32,16 @@ public class PresetDTOValidator {
 
 	private static final Integer FIELDBOOK_TOOL_ID = 23;
 	private static final int NAME_MAX_LENGTH = 50;
+	private static final String UNDERSCORE = "_";
 
 	@Autowired
 	private PresetService presetService;
 
 	@Autowired
 	private VariableService variableService;
+
+	@Autowired
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	private BindingResult errors;
 
@@ -171,7 +175,7 @@ public class PresetDTOValidator {
 			});
 		});
 
-		final List<Integer> barcodeFields = barcodeSetting.getBarcodeFields();
+		final List<String> barcodeFields = barcodeSetting.getBarcodeFields();
 
 		if (barcodeSetting.isBarcodeNeeded()) {
 			if (barcodeSetting.isAutomaticBarcode()) {
@@ -206,11 +210,13 @@ public class PresetDTOValidator {
 		}
 	}
 
-	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final Integer fieldId) {
-		return this.isValidateFieldId(labelPrintingPresetDTO)
-			&& !LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId)
-			&& this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), String.valueOf(fieldId))
-			== null;
+	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final String combinedKey) {
+		final String[] composedKey = combinedKey.split(UNDERSCORE);
+		final String fieldId = composedKey.length == 3 ? composedKey[2] : composedKey[1];
+		return this.isValidateFieldId(labelPrintingPresetDTO) && //
+			!LabelPrintingStaticField.getAvailableStaticFields().contains(Integer.valueOf(fieldId)) && //
+			!this.germplasmNameTypeService.getNameTypeById(Integer.valueOf(fieldId)).isPresent() && //
+			this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), fieldId) == null;
 	}
 
 	private boolean isValidateFieldId(final LabelPrintingPresetDTO labelPrintingPresetDTO) {
