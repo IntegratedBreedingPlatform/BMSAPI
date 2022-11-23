@@ -3,7 +3,7 @@ package org.ibp.api.rest.labelprinting.domain;
 public enum FieldType {
 
 	VARIABLE("VARIABLE"),
-	VIRTUAL_VARIABLE("VIRTUAL_VARIABLE"),
+	STATIC("STATIC"),
 	NAME("NAME");
 
 	private final String name;
