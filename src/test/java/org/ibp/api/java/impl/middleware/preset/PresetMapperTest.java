@@ -7,9 +7,9 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.rest.preset.domain.FilePresetConfigurationDTO;
-import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
-import org.ibp.api.rest.preset.domain.PresetDTO;
+import org.generationcp.middleware.domain.labelprinting.FilePresetConfigurationDTO;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +51,13 @@ public class PresetMapperTest extends ApiUnitTestBase {
 		programPresetId = RandomUtils.nextInt();
 
 		type = "LabelPrintingPreset";
-		selectedField = Arrays.asList(Arrays.asList("VIRTUAL_VARIABLE_4", "VIRTUAL_VARIABLE_13"));
+		selectedField = Arrays.asList(Arrays.asList("STATIC_4", "STATIC_13"));
 		barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList("VIRTUAL_VARIABLE_2"));
+			new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList("STATIC_2"));
 		filePresetConfigurationDTO = new FilePresetConfigurationDTO();
 		filePresetConfigurationDTO.setOutputType("csv");
 		configuration =
-			"{\"type\":\"LabelPrintingPreset\",\"selectedFields\":[[\"VIRTUAL_VARIABLE_4\",\"VIRTUAL_VARIABLE_13\"]],\"barcodeSetting\":{\"barcodeNeeded\":true,\"automaticBarcode\":false,\"barcodeFields\":[\"VIRTUAL_VARIABLE_2\"]},\"includeHeadings\":true,\"fileConfiguration\":{\"outputType\":\"csv\"}}";
+			"{\"type\":\"LabelPrintingPreset\",\"selectedFields\":[[\"STATIC_4\",\"STATIC_13\"]],\"barcodeSetting\":{\"barcodeNeeded\":true,\"automaticBarcode\":false,\"barcodeFields\":[\"STATIC_2\"]},\"includeHeadings\":true,\"fileConfiguration\":{\"outputType\":\"csv\"}}";
 	}
 
 	@Test

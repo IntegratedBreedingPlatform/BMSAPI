@@ -5,7 +5,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
-import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.ApiUnitTestBase;
@@ -15,11 +14,10 @@ import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.ontology.VariableService;
-import org.ibp.api.java.program.ProgramService;
-import org.ibp.api.rest.preset.domain.FilePresetConfigurationDTO;
-import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
-import org.ibp.api.rest.preset.domain.PresetDTO;
-import org.ibp.api.rest.preset.domain.PresetType;
+import org.generationcp.middleware.domain.labelprinting.FilePresetConfigurationDTO;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -76,8 +74,8 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		this.toolId = 23;
 
 		this.type = PresetType.LABEL_PRINTING_PRESET.getName();
-		this.selectedField = Arrays.asList(Arrays.asList("VIRTUAL_VARIABLE_4", "VIRTUAL_VARIABLE_13"));
-		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList("VIRTUAL_VARIABLE_2"));
+		this.selectedField = Arrays.asList(Arrays.asList("STATIC_4", "STATIC_13"));
+		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList("STATIC_2"));
 		this.filePresetConfigurationDTO = new FilePresetConfigurationDTO();
 		this.filePresetConfigurationDTO.setOutputType("csv");
 		this.presetId = RandomUtils.nextInt();
@@ -244,7 +242,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setFileConfiguration(this.filePresetConfigurationDTO);
 		presetDTO.setBarcodeSetting(this.barcodeSetting);
 
-		final List<List<String>> selectedFields = Arrays.asList(Arrays.asList("VIRTUAL_VARIABLE_-2"));
+		final List<List<String>> selectedFields = Arrays.asList(Arrays.asList("STATIC_-2"));
 		presetDTO.setSelectedFields(selectedFields);
 
 		Mockito.doReturn(null).when(this.variableService).getVariableById(CROP_NAME, presetDTO.getProgramUUID(), "-1");
@@ -275,7 +273,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(true, true, Arrays.asList("VIRTUAL_VARIABLE_1"));
+			new LabelPrintingPresetDTO.BarcodeSetting(true, true, Arrays.asList("STATIC_1"));
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
@@ -333,7 +331,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(true, false, Arrays.asList("VIRTUAL_VARIABLE_-2"));
+			new LabelPrintingPresetDTO.BarcodeSetting(true, false, Arrays.asList("STATIC_-2"));
 		Mockito.doReturn(null).when(this.variableService).getVariableById(CROP_NAME, presetDTO.getProgramUUID(), "-1");
 
 		presetDTO.setBarcodeSetting(barcodeSetting);
@@ -392,7 +390,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(false, false, Arrays.asList("VIRTUAL_VARIABLE_1"));
+			new LabelPrintingPresetDTO.BarcodeSetting(false, false, Arrays.asList("STATIC_1"));
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
