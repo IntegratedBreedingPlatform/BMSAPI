@@ -3,6 +3,7 @@ package org.ibp.api.rest.labelprinting;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -11,6 +12,7 @@ import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.FieldType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -42,6 +44,16 @@ public abstract class ObservationLabelPrintingHelper {
 			if (field.getId().equals(TermId.SEASON_VAR.getId())) {
 				field.setName("Season");
 			}
+			field.setFieldType(FieldType.VARIABLE);
+			fields.add(field);
+		}
+		return fields;
+	}
+
+	public static List<Field> transformNameTypesToFields(final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs) {
+		final List<Field> fields = new LinkedList<>();
+		for (final GermplasmNameTypeDTO germplasmNameTypeDTO : germplasmNameTypeDTOs) {
+			final Field field = new Field(germplasmNameTypeDTO.getId(), germplasmNameTypeDTO.getCode(), FieldType.NAME);
 			fields.add(field);
 		}
 		return fields;
@@ -59,12 +71,12 @@ public abstract class ObservationLabelPrintingHelper {
 		final String transactionUsernamePropValue = messageSource.getMessage("label.printing.field.transaction.username", null, locale);
 
 		return ImmutableList.<Field>builder()
-			.add(new Field(LabelPrintingStaticField.TRN_ID.getFieldId(), transactionIdPropValue))
-			.add(new Field(LabelPrintingStaticField.STATUS.getFieldId(), transactionStatusPropValue))
-			.add(new Field(LabelPrintingStaticField.TYPE.getFieldId(), transactionTypePropValue))
-			.add(new Field(LabelPrintingStaticField.CREATED.getFieldId(), transactionCreationDatePropValue))
-			.add(new Field(LabelPrintingStaticField.TRN_NOTES.getFieldId(), transactionNotesPropValue))
-			.add(new Field(LabelPrintingStaticField.USERNAME.getFieldId(), transactionUsernamePropValue)).build();
+			.add(new Field(LabelPrintingStaticField.TRN_ID.getFieldId(), transactionIdPropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.STATUS.getFieldId(), transactionStatusPropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.TYPE.getFieldId(), transactionTypePropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.CREATED.getFieldId(), transactionCreationDatePropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.TRN_NOTES.getFieldId(), transactionNotesPropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.USERNAME.getFieldId(), transactionUsernamePropValue, FieldType.STATIC)).build();
 	}
 
 	public static List<Field> buildLotDetailsFields(final ResourceBundleMessageSource messageSource){
@@ -81,14 +93,14 @@ public abstract class ObservationLabelPrintingHelper {
 		final String lotNotesPropValue = messageSource.getMessage("label.printing.field.lot.notes", null, locale);
 
 		return ImmutableList.<Field>builder()
-			.add(new Field(LabelPrintingStaticField.LOT_ID.getFieldId(), lotIDPropValue))
-			.add(new Field(LabelPrintingStaticField.LOT_UID.getFieldId(), lotUIDPropValue))
-			.add(new Field(LabelPrintingStaticField.STOCK_ID.getFieldId(), lotStockIdPropValue))
-			.add(new Field(LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId(), lotAvailableBalancePropValue))
-			.add(new Field(LabelPrintingStaticField.UNITS.getFieldId(), lotUnitsPropValue))
-			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId(), lotStorageLocationAbbrPropValue))
-			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION.getFieldId(), lotStorageLocationPropValue))
-			.add(new Field(LabelPrintingStaticField.LOT_NOTES.getFieldId(), lotNotesPropValue)).build();
+			.add(new Field(LabelPrintingStaticField.LOT_ID.getFieldId(), lotIDPropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.LOT_UID.getFieldId(), lotUIDPropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.STOCK_ID.getFieldId(), lotStockIdPropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId(), lotAvailableBalancePropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.UNITS.getFieldId(), lotUnitsPropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId(), lotStorageLocationAbbrPropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION.getFieldId(), lotStorageLocationPropValue, FieldType.STATIC))
+			.add(new Field(LabelPrintingStaticField.LOT_NOTES.getFieldId(), lotNotesPropValue, FieldType.STATIC)).build();
 	}
 
 	public static String getSeason(final String seasonStr) {
