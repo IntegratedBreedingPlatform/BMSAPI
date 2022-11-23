@@ -16,6 +16,7 @@ import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.FieldType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -118,7 +119,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	// Lot fields
 	private static final LabelType LOT_FIXED_LABEL_TYPES = new LabelType("Lot", "Lot")
 		.withFields(Arrays.stream(LOT_FIELD.values())
-			.map(field -> new Field(field.getId(), field.getName()))
+			.map(field -> new Field(field.getId(), field.getName(), FieldType.STATIC))
 			.collect(Collectors.toList()));
 
 
@@ -162,7 +163,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	// Germplasm fields
 	private static final LabelType GERMPLASM_FIXED_LABEL_TYPES = new LabelType("Germplasm", "Germplasm")
 		.withFields(Arrays.stream(GERMPLASM_FIELD.values())
-			.map(field -> new Field(field.getId(), field.getName()))
+			.map(field -> new Field(field.getId(), field.getName(), FieldType.STATIC))
 			.collect(Collectors.toList()));
 
 	@Override
@@ -222,8 +223,8 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			final List<Variable> germplasmAttributeVariables =
 				this.germplasmAttributeService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
 			germplasmLabelTypes.getFields().addAll(germplasmAttributeVariables.stream()
-				.map(attributeVariable -> new Field(toKey(attributeVariable.getId()),
-					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
+				.map(attributeVariable -> new Field(attributeVariable.getId(),
+					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName(), FieldType.VARIABLE))
 				.collect(Collectors.toList()));
 			labelTypes.add(germplasmLabelTypes);
 			this.populateLotAttributesLabelType(programUUID, labelTypes, extendedLotDtos);
@@ -247,14 +248,14 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 				Collectors.toList()));
 
 		// Data to be exported
-		final List<Map<Integer, String>> data = new ArrayList<>();
+		final List<Map<String, String>> data = new ArrayList<>();
 
 		final Map<String, String> pedigreeByGID = new HashMap<>();
-		final Set<Integer> keys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toSet());
+		final Set<String> keys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toSet());
 
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				keys.add(LOT_FIELD.LOT_UID.getId());
+				keys.add(FieldType.STATIC.getName() + LabelPrintingStrategy.UNDERSCORE + LOT_FIELD.LOT_UID.getId());
 			} else {
 				keys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
@@ -265,105 +266,107 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 				this.getDataRow(labelsGeneratorInput, keys, extendedLotDto, germplasmAttributeValues, lotAttributeValues, pedigreeByGID));
 		}
 
-		return new LabelsData(LOT_FIELD.LOT_UID.getId(), data);
+		return new LabelsData(FieldType.STATIC.getName() + LabelPrintingStrategy.UNDERSCORE + LOT_FIELD.LOT_UID.getId(), data);
 	}
 
-	Map<Integer, String> getDataRow(final LabelsGeneratorInput labelsGeneratorInput,
-		final Set<Integer> keys,
+	Map<String, String> getDataRow(final LabelsGeneratorInput labelsGeneratorInput,
+		final Set<String> combinedKeys,
 		final ExtendedLotDto extendedLotDto,
 		final Map<Integer, Map<Integer, String>> germplasmAttributeValues,
 		final Map<Integer, Map<Integer, String>> lotAttributeValues,
 		final Map<String, String> pedigreeByGID) {
 
-		final Map<Integer, String> columns = new HashMap<>();
+		final Map<String, String> columns = new HashMap<>();
 
 		// Select columns
-		for (final Integer key : keys) {
-			final int id = toId(key);
+		for (final String combinedKey : combinedKeys) {
+			final String[] composedKey = combinedKey.split(UNDERSCORE);
+			final String fieldTypeName = composedKey[0];
+			final Integer fieldId = Integer.valueOf(composedKey[1]);
 
-			if (LOT_FIELD.getById(id) != null) {
-				switch (LOT_FIELD.getById(id)) {
+			if (LOT_FIELD.getById(fieldId) != null) {
+				switch (LOT_FIELD.getById(fieldId)) {
 					case LOT_UID:
-						columns.put(key, extendedLotDto.getLotUUID());
+						columns.put(combinedKey, extendedLotDto.getLotUUID());
 						break;
 					case LOT_ID:
-						columns.put(key, Objects.toString(extendedLotDto.getLotId(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getLotId(), ""));
 						break;
 					case STOCK_ID:
-						columns.put(key, extendedLotDto.getStockId());
+						columns.put(combinedKey, extendedLotDto.getStockId());
 						break;
 					case STATUS:
-						columns.put(key, extendedLotDto.getStatus());
+						columns.put(combinedKey, extendedLotDto.getStatus());
 						break;
 					case STORAGE_LOCATION:
-						columns.put(key, extendedLotDto.getLocationName());
+						columns.put(combinedKey, extendedLotDto.getLocationName());
 						break;
 					case UNITS:
-						columns.put(key, extendedLotDto.getUnitName());
+						columns.put(combinedKey, extendedLotDto.getUnitName());
 						break;
 					case ACTUAL_BALANCE:
-						columns.put(key, Objects.toString(extendedLotDto.getActualBalance(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getActualBalance(), ""));
 						break;
 					case AVAILABLE:
-						columns.put(key, Objects.toString(extendedLotDto.getAvailableBalance(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getAvailableBalance(), ""));
 						break;
 					case RESERVED:
-						columns.put(key, Objects.toString(extendedLotDto.getReservedTotal(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getReservedTotal(), ""));
 						break;
 					case TOTAL_WITHDRAWALS:
-						columns.put(key, Objects.toString(extendedLotDto.getWithdrawalTotal(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getWithdrawalTotal(), ""));
 						break;
 					case PENDING_DEPOSITS:
-						columns.put(key, Objects.toString(extendedLotDto.getPendingDepositsTotal(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getPendingDepositsTotal(), ""));
 						break;
 					case NOTES:
-						columns.put(key, extendedLotDto.getNotes());
+						columns.put(combinedKey, extendedLotDto.getNotes());
 						break;
 					case USERNAME:
-						columns.put(key, extendedLotDto.getCreatedByUsername());
+						columns.put(combinedKey, extendedLotDto.getCreatedByUsername());
 						break;
 					case CREATION_DATE:
-						columns.put(key, Objects.toString(extendedLotDto.getCreatedDate(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getCreatedDate(), ""));
 						break;
 					case LAST_DEPOSIT_DATE:
-						columns.put(key, Objects.toString(extendedLotDto.getLastDepositDate(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getLastDepositDate(), ""));
 						break;
 					case LAST_WITHDRAWAL_DATE:
-						columns.put(key, Objects.toString(extendedLotDto.getLastWithdrawalDate(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getLastWithdrawalDate(), ""));
 						break;
 					default:
 						break;
 				}
-			} else if (GERMPLASM_FIELD.getById(id) != null) {
-				switch (GERMPLASM_FIELD.getById(id)) {
+			} else if (GERMPLASM_FIELD.getById(fieldId) != null) {
+				switch (GERMPLASM_FIELD.getById(fieldId)) {
 					case GID:
-						columns.put(key, Objects.toString(extendedLotDto.getGid(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getGid(), ""));
 						break;
 					case GROUP_ID:
-						columns.put(key, Objects.toString(extendedLotDto.getMgid(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getMgid(), ""));
 						break;
 					case DESIGNATION:
-						columns.put(key, Objects.toString(extendedLotDto.getDesignation(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getDesignation(), ""));
 						break;
 					case BREEDING_METHOD:
-						columns.put(key, Objects.toString(extendedLotDto.getGermplasmMethodName(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getGermplasmMethodName(), ""));
 						break;
 					case LOCATION:
-						columns.put(key, Objects.toString(extendedLotDto.getGermplasmLocation(), ""));
+						columns.put(combinedKey, Objects.toString(extendedLotDto.getGermplasmLocation(), ""));
 						break;
 					case CROSS:
-						columns.put(key, this.getPedigree(Objects.toString(extendedLotDto.getGid(), null), pedigreeByGID));
+						columns.put(combinedKey, this.getPedigree(Objects.toString(extendedLotDto.getGid(), null), pedigreeByGID));
 						break;
 					default:
 						break;
 				}
-			} else if (CollectionUtils.isNotEmpty(this.lotAttributeKeys) && this.lotAttributeKeys.contains(key)) {
-				this.addAttributeColumns(labelsGeneratorInput, columns, key, id,
+			} else if (CollectionUtils.isNotEmpty(this.lotAttributeKeys) && this.lotAttributeKeys.contains(combinedKey)) {
+				this.addAttributeColumns(labelsGeneratorInput, columns, combinedKey, fieldId,
 					lotAttributeValues.get(extendedLotDto.getLotId()));
 			} else {
 				// Not part of the fixed columns or lot attributes
 				// Attributes
-				this.addAttributeColumns(labelsGeneratorInput, columns, key, id,
+				this.addAttributeColumns(labelsGeneratorInput, columns, combinedKey, fieldId,
 					germplasmAttributeValues.get(extendedLotDto.getGid()));
 			}
 		}
@@ -371,8 +374,8 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		return columns;
 	}
 
-	private void addAttributeColumns(final LabelsGeneratorInput labelsGeneratorInput, final Map<Integer, String> columns,
-		final Integer key, final int id, final Map<Integer, String> attributesByType) {
+	private void addAttributeColumns(final LabelsGeneratorInput labelsGeneratorInput, final Map<String, String> columns,
+		final String key, final int id, final Map<Integer, String> attributesByType) {
 		if (attributesByType != null) {
 			final String attributeValue = attributesByType.get(id);
 			if (attributeValue != null) {
@@ -391,7 +394,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 		this.populateAttributesLabelType(programUUID, labelTypes, lotIds, attributeVariables);
 		this.lotAttributeKeys = (attributeVariables.stream()
-			.map(var -> toKey(var.getId())).collect(Collectors.toSet()));
+			.map(var -> var.getId()).collect(Collectors.toSet()));
 	}
 
 	@Override

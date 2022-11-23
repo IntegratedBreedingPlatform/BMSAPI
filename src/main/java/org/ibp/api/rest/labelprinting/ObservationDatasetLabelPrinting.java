@@ -6,6 +6,7 @@ import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -25,6 +26,7 @@ import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.FieldType;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -42,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -54,12 +55,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 @Transactional
 public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
+
+	private static final String UNDERSCORE = "_";
 
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
@@ -99,10 +100,6 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	public static List<FileType> SUPPORTED_FILE_TYPES = Arrays.asList(FileType.CSV, FileType.PDF, FileType.XLS);
 
-	private List<Integer> fieldIds;
-	private List<Integer> lotFieldIds;
-	private List<Integer> transactionFieldsIds;
-
 	@PostConstruct
 	void initStaticFields() {
 		final String studyNamePropValue = this.getMessage("label.printing.field.study.name");
@@ -110,23 +107,16 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final String parentagePropValue = this.getMessage("label.printing.field.parentage");
 		final String seasonPropValue = this.getMessage("label.printing.field.season");
 
-		this.studyNameField = new Field(LabelPrintingStaticField.STUDY_NAME.getFieldId(), studyNamePropValue);
-		this.yearField = new Field(LabelPrintingStaticField.YEAR.getFieldId(), yearPropValue);
-		this.parentageField = new Field(LabelPrintingStaticField.PARENTAGE.getFieldId(), parentagePropValue);
-		this.seasonField = new Field(TermId.SEASON_VAR.getId(), seasonPropValue);
+		this.studyNameField = new Field(LabelPrintingStaticField.STUDY_NAME.getFieldId(), studyNamePropValue, FieldType.STATIC);
+		this.yearField = new Field(LabelPrintingStaticField.YEAR.getFieldId(), yearPropValue, FieldType.STATIC);
+		this.parentageField = new Field(LabelPrintingStaticField.PARENTAGE.getFieldId(), parentagePropValue, FieldType.STATIC);
+		this.seasonField = new Field(TermId.SEASON_VAR.getId(), seasonPropValue, FieldType.VARIABLE);
 
 		this.defaultStudyDetailsFields = Arrays.asList(this.studyNameField, this.yearField);
 
 		this.defaultTransactioNDetailsFields = ObservationLabelPrintingHelper.buildTransactionDetailsFields(this.messageSource);
 
 		this.defaultLotDetailsFields = ObservationLabelPrintingHelper.buildLotDetailsFields(this.messageSource);
-
-		this.lotFieldIds = this.defaultLotDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
-		this.transactionFieldsIds = this.defaultTransactioNDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
-
-		this.fieldIds = Stream.of(this.lotFieldIds, this.transactionFieldsIds,
-			Arrays.asList(LabelPrintingStaticField.STUDY_NAME.getFieldId(), LabelPrintingStaticField.YEAR.getFieldId(),
-				LabelPrintingStaticField.PARENTAGE.getFieldId())).flatMap(Collection::stream).collect(Collectors.toList());
 
 	}
 
@@ -219,6 +209,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 		final String lotDetailsPropValue = this.getMessage("label.printing.study.lot.list.details");
 		final String transactionDetailsPropValue = this.getMessage("label.printing.study.transaction.list.details");
+		final String namesPropValue = this.getMessage("label.printing.names.details");
 
 		final DatasetDTO dataSetDTO = this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
 
@@ -247,9 +238,16 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 				labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId(), VariableType.SELECTION_METHOD
 					.getId(), VariableType.TRAIT.getId()));
 
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.middlewareDatasetService.getDatasetNameTypes(plotDatasetId);
+
 		final LabelType studyDetailsLabelType = new LabelType(studyDetailsPropValue, studyDetailsPropValue);
 		final LabelType lotDetailsLabelType = new LabelType(lotDetailsPropValue, lotDetailsPropValue);
 		final LabelType transactionDetailsLabelType = new LabelType(transactionDetailsPropValue, transactionDetailsPropValue);
+		final LabelType namesType = new LabelType(namesPropValue, namesPropValue);
+
+		final List<Field> nameFields = new LinkedList<>();
+		nameFields.addAll(ObservationLabelPrintingHelper.transformNameTypesToFields(germplasmNameTypeDTOs));
+		namesType.setFields(nameFields);
 
 		lotDetailsLabelType.setFields(this.defaultLotDetailsFields);
 		transactionDetailsLabelType.setFields(this.defaultTransactioNDetailsFields);
@@ -279,14 +277,13 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		labelTypes.add(lotDetailsLabelType);
 		labelTypes.add(transactionDetailsLabelType);
 		ObservationLabelPrintingHelper.removePairIdVariables(labelTypes);
+		labelTypes.add(namesType);
 		return labelTypes;
 	}
 
 	@Override
 	public LabelsData getLabelsData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsGeneratorInput.getStudyId());
-
-		final Integer obsDatasetUnitIdFieldKey = TermId.OBS_UNIT_ID.getId();
 
 		final StudyTransactionsRequest studyTransactionsRequest = new StudyTransactionsRequest();
 		final TransactionsSearchDto transactionsSearch = new TransactionsSearchDto();
@@ -301,17 +298,17 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		studyTransactionsDtos.forEach(studyTransactionsDto -> studyTransactionsDto.getObservationUnits().forEach(
 			observationUnitDto -> observationUnitDtoTransactionDtoMap.put(observationUnitDto.getObsUnitId(), studyTransactionsDto)));
 
-		final Map<Integer, Field> termIdFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
+		final Map<String, Field> termIdFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> LabelPrintingStrategy.transformToCombinedKey(field));
 
-		final Set<Integer> allRequiredKeys = new HashSet<>();
+		final Set<String> combinedKeys = new HashSet<>();
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				allRequiredKeys.add(obsDatasetUnitIdFieldKey);
+				combinedKeys.add(TermId.OBS_UNIT_ID.getId() + UNDERSCORE + FieldType.VARIABLE.getName());
 			} else {
-				allRequiredKeys.addAll(labelsGeneratorInput.getBarcodeFields());
+				combinedKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
 		}
-		labelsGeneratorInput.getFields().forEach(allRequiredKeys::addAll);
+		labelsGeneratorInput.getFields().forEach(combinedKeys::addAll);
 
 		final Map<String, String> gidPedigreeMap = new HashMap<>();
 
@@ -325,28 +322,31 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 				.thenComparing(o -> Integer.valueOf(o.getVariables().get(ENTRY_NO).getValue())));
 
 		// Data to be exported
-		final List<Map<Integer, String>> results = new LinkedList<>();
+		final List<Map<String, String>> results = new LinkedList<>();
 
 		for (final ObservationUnitRow observationUnitRow : observationUnitRows) {
-			final Map<Integer, String> row = new HashMap<>();
-			for (final Integer requiredField : allRequiredKeys) {
-				final Field field = termIdFieldMap.get(requiredField);
-				if (!this.fieldIds.contains(field.getId())) {
+			final Map<String, String> row = new HashMap<>();
+			for (final String combinedKey : combinedKeys) {
+				final Field field = termIdFieldMap.get(combinedKey);
+				final String[] composedKey = combinedKey.split(UNDERSCORE);
+				final String fieldTypeName = composedKey[0];
+				final Integer fieldId = Integer.valueOf(composedKey[1]);
+
+				if (FieldType.VARIABLE.getName().equals(fieldTypeName)) {
 					// Special cases: LOCATION_NAME, PLOT OBS_UNIT_ID, CROP_SEASON_CODE
-					final Integer termId = requiredField;
-					if (TermId.getById(termId).equals(TermId.LOCATION_ID)) {
-						row.put(requiredField, observationUnitRow.getVariables().get(LOCATION_ID).getValue());
+					if (TermId.getById(fieldId).equals(TermId.LOCATION_ID)) {
+						row.put(combinedKey, observationUnitRow.getVariables().get(LOCATION_ID).getValue());
 						continue;
 					}
-					if (TermId.getById(termId).equals(TermId.OBS_UNIT_ID)) {
-						row.put(requiredField, observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue());
+					if (TermId.getById(fieldId).equals(TermId.OBS_UNIT_ID)) {
+						row.put(combinedKey, observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue());
 						continue;
 					}
-					if (TermId.getById(termId).equals(TermId.SEASON_VAR)) {
+					if (TermId.getById(fieldId).equals(TermId.SEASON_VAR)) {
 						final ObservationUnitData observationUnitData =
 							observationUnitRow.getEnvironmentVariables().get("Crop_season_Code");
 						row.put(
-							requiredField,
+							combinedKey,
 							ObservationLabelPrintingHelper.getSeason(observationUnitData != null ? observationUnitData.getValue() : null));
 						continue;
 					}
@@ -354,117 +354,115 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 					final Optional<ObservationUnitData> observationVariables =
 						ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(), field);
 					if (observationVariables.isPresent()) {
-						row.put(requiredField, observationVariables.get().getValue());
+						row.put(combinedKey, observationVariables.get().getValue());
 						continue;
 					}
 
 					final Optional<ObservationUnitData> environmentVariables =
 						ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getEnvironmentVariables(), field);
 					if (environmentVariables.isPresent()) {
-						row.put(requiredField, environmentVariables.get().getValue());
+						row.put(combinedKey, environmentVariables.get().getValue());
 						continue;
 					}
 
-				} else {
-					StudyTransactionsDto studyTransactionsDto = null;
-					if (this.lotFieldIds.contains(requiredField) || this.transactionFieldsIds.contains(requiredField)) {
-						studyTransactionsDto = observationUnitDtoTransactionDtoMap.get(observationUnitRow.getObsUnitId());
-
-						if (studyTransactionsDto == null) {
-							continue;
-						}
-					}
-
-					if (LabelPrintingStaticField.LOT_UID.getFieldId().equals(requiredField)) {
-						row.put(requiredField, studyTransactionsDto.getLot().getLotUUID());
-						continue;
-
-					}
-					if (LabelPrintingStaticField.LOT_ID.getFieldId().equals(requiredField)) {
-						row.put(requiredField, Objects.toString(studyTransactionsDto.getLot().getLotId(), ""));
-						continue;
-
-					}
-					if (LabelPrintingStaticField.STOCK_ID.getFieldId().equals(requiredField)) {
-						row.put(requiredField, studyTransactionsDto.getLot().getStockId());
-						continue;
-
-					}
-					if (LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId().equals(requiredField)) {
-						row.put(requiredField, studyTransactionsDto.getLot().getLocationAbbr());
-						continue;
-
-					}
-					if (LabelPrintingStaticField.STORAGE_LOCATION.getFieldId().equals(requiredField)) {
-						row.put(requiredField, studyTransactionsDto.getLot().getLocationName());
-						continue;
-
-					}
-					if (LabelPrintingStaticField.UNITS.getFieldId().equals(requiredField)) {
-						row.put(requiredField, studyTransactionsDto.getLot().getUnitName());
-						continue;
-
-					}
-					if (LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId().equals(requiredField)) {
-						row.put(requiredField, Objects.toString(studyTransactionsDto.getLot().getAvailableBalance(), ""));
-						continue;
-
-					}
-					if (LabelPrintingStaticField.LOT_NOTES.getFieldId().equals(requiredField)) {
-						row.put(requiredField, studyTransactionsDto.getLot().getNotes());
-						continue;
-
-					}
-
-					if (LabelPrintingStaticField.TRN_ID.getFieldId().equals(requiredField)) {
-						row.put(requiredField, studyTransactionsDto.getTransactionId().toString());
-						continue;
-
-					}
-					if (LabelPrintingStaticField.STATUS.getFieldId().equals(requiredField)) {
-						row.put(requiredField, Objects.toString(studyTransactionsDto.getTransactionStatus(), ""));
-						continue;
-
-					}
-					if (LabelPrintingStaticField.TYPE.getFieldId().equals(requiredField)) {
-						row.put(requiredField, Objects.toString(studyTransactionsDto.getTransactionType(), ""));
-						continue;
-
-					}
-					if (LabelPrintingStaticField.CREATED.getFieldId().equals(requiredField)) {
-						row.put(requiredField, Objects.toString(studyTransactionsDto.getCreatedDate(), ""));
-						continue;
-					}
-					if (LabelPrintingStaticField.TRN_NOTES.getFieldId().equals(requiredField)) {
-						row.put(requiredField, studyTransactionsDto.getNotes());
-						continue;
-
-					}
-					if (LabelPrintingStaticField.USERNAME.getFieldId().equals(requiredField)) {
-						row.put(requiredField, studyTransactionsDto.getCreatedByUsername());
-						continue;
-
-					}
-
+				} else if (FieldType.STATIC.getName().equals(fieldTypeName)) {
 					// If it is not a number it is a hardcoded field
-					// Year, Study Name, Parentage, ObsDatasetUnitIdFieldKey
-					if (requiredField.equals(this.yearField.getId())) {
-						row.put(
-							requiredField,
-							(StringUtils.isNotEmpty(study.getStartDate())) ? study.getStartDate().substring(0, 4) : StringUtils.EMPTY);
+					// Year, Study Name, Parentage
+					if (LabelPrintingStaticField.YEAR.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, (StringUtils.isNotEmpty(study.getStartDate())) ? study.getStartDate().substring(0, 4) : StringUtils.EMPTY);
 						continue;
 					}
-					if (requiredField.equals(this.studyNameField.getId())) {
-						row.put(requiredField, study.getStudyName());
+					if (LabelPrintingStaticField.STUDY_NAME.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, study.getStudyName());
 						continue;
 					}
-					if (requiredField.equals(this.parentageField.getId())) {
+					if (LabelPrintingStaticField.PARENTAGE.getFieldId().equals(fieldId)) {
 						final String gid = observationUnitRow.getVariables().get(GID).getValue();
-						row.put(requiredField, this.getPedigree(gid, gidPedigreeMap));
+						row.put(combinedKey, this.getPedigree(gid, gidPedigreeMap));
 						continue;
 					}
-					if (requiredField.equals(obsDatasetUnitIdFieldKey)) {
-						row.put(obsDatasetUnitIdFieldKey, observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue());
+
+					final StudyTransactionsDto studyTransactionsDto = observationUnitDtoTransactionDtoMap.get(observationUnitRow.getObsUnitId());
+
+					//If it does not exist studyTransactionsDto, it isn't necessary to continue
+					// filling in the Lots and Transaction data.
+					if (studyTransactionsDto == null) {
+						continue;
+					}
+
+					if (LabelPrintingStaticField.LOT_UID.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, studyTransactionsDto.getLot().getLotUUID());
+						continue;
+					}
+					if (LabelPrintingStaticField.LOT_ID.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, Objects.toString(studyTransactionsDto.getLot().getLotId(), ""));
+						continue;
+					}
+
+					if (LabelPrintingStaticField.STOCK_ID.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, studyTransactionsDto.getLot().getStockId());
+						continue;
+					}
+					if (LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, studyTransactionsDto.getLot().getLocationAbbr());
+						continue;
+
+					}
+					if (LabelPrintingStaticField.STORAGE_LOCATION.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, studyTransactionsDto.getLot().getLocationName());
+						continue;
+
+					}
+					if (LabelPrintingStaticField.UNITS.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, studyTransactionsDto.getLot().getUnitName());
+						continue;
+					}
+					if (LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, Objects.toString(studyTransactionsDto.getLot().getAvailableBalance(), ""));
+						continue;
+
+					}
+					if (LabelPrintingStaticField.LOT_NOTES.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, studyTransactionsDto.getLot().getNotes());
+						continue;
+					}
+
+					if (LabelPrintingStaticField.TRN_ID.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, studyTransactionsDto.getTransactionId().toString());
+						continue;
+
+					}
+					if (LabelPrintingStaticField.STATUS.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, Objects.toString(studyTransactionsDto.getTransactionStatus(), ""));
+						continue;
+
+					}
+					if (LabelPrintingStaticField.TYPE.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, Objects.toString(studyTransactionsDto.getTransactionType(), ""));
+						continue;
+
+					}
+					if (LabelPrintingStaticField.CREATED.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, Objects.toString(studyTransactionsDto.getCreatedDate(), ""));
+						continue;
+
+					}
+					if (LabelPrintingStaticField.TRN_NOTES.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, studyTransactionsDto.getNotes());
+						continue;
+
+					}
+					if (LabelPrintingStaticField.USERNAME.getFieldId().equals(fieldId)) {
+						row.put(combinedKey, studyTransactionsDto.getCreatedByUsername());
+						continue;
+
+					}
+
+				} else if (FieldType.NAME.getName().equals(fieldTypeName)) {
+					final Optional<ObservationUnitData> observationVariables =
+						ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(), field);
+					if (observationVariables.isPresent()) {
+						row.put(combinedKey, observationVariables.get().getValue());
 						continue;
 					}
 				}
@@ -472,7 +470,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			results.add(row);
 		}
 
-		return new LabelsData(obsDatasetUnitIdFieldKey, results);
+		return new LabelsData(FieldType.VARIABLE.getName() + UNDERSCORE + TermId.OBS_UNIT_ID.getId(), results);
 	}
 
 	@Override
