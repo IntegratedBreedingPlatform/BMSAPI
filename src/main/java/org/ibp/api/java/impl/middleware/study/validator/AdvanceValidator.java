@@ -15,6 +15,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BreedingMethodValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.study.StudyService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -43,9 +44,40 @@ public class AdvanceValidator {
 	@Resource
 	private DatasetValidator datasetValidator;
 
+	@Resource
+	private StudyService studyService;
+
 	public void validateAdvanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 		checkNotNull(request, "request.null");
 
+		final Integer plotDatasetId = this.commonValidations(studyId, request.getInstanceIds());
+
+		final List<MeasurementVariable> plotDatasetVariables = this.datasetService.getObservationSetVariables(plotDatasetId);
+		final BreedingMethodDTO selectedBreedingMethodDTO =
+			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), plotDatasetVariables);
+		this.validateLineSelection(request, selectedBreedingMethodDTO, plotDatasetVariables);
+		this.validateBulkingSelection(request, selectedBreedingMethodDTO, plotDatasetVariables);
+		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
+		this.validateReplicationNumberSelection(request.getSelectedReplications(), plotDatasetVariables);
+	}
+
+	public void validateAdvanceSamples(final Integer studyId, final AdvanceSampledPlantsRequest request) {
+		checkNotNull(request, "request.null");
+
+		final Integer plotDatasetId = this.commonValidations(studyId, request.getInstanceIds());
+
+		final List<MeasurementVariable> plotDatasetVariables = this.datasetService.getObservationSetVariables(plotDatasetId);
+
+		final Boolean hasSamples = this.studyService.isSampled(studyId);
+		if (!hasSamples) {
+			throw new ApiRequestValidationException("advance.samples.required", new Object[] {});
+		}
+
+		this.validateAdvanceSamplesBreedingMethodSelection(request.getBreedingMethodId());
+		this.validateReplicationNumberSelection(request.getSelectedReplications(), plotDatasetVariables);
+	}
+
+	private Integer commonValidations(final Integer studyId, final List<Integer> instanceIds) {
 		this.studyValidator.validate(studyId, true);
 		final DataSet dataset = this.studyValidator.validateStudyHasPlotDataset(studyId);
 		final DatasetDTO plotDataset = this.datasetService.getDataset(dataset.getId());
@@ -56,30 +88,16 @@ public class AdvanceValidator {
 			throw new ApiRequestValidationException("study.not.has.experimental.design.created", new Object[] {});
 		}
 
-		if (CollectionUtils.isEmpty(request.getInstanceIds())) {
+		if (CollectionUtils.isEmpty(instanceIds)) {
 			throw new ApiRequestValidationException("study.instances.required", new Object[] {});
 		}
 
-		this.instanceValidator.validateStudyInstance(studyId, new HashSet<>(request.getInstanceIds()));
+		this.instanceValidator.validateStudyInstance(studyId, new HashSet<>(instanceIds));
 
-		final List<MeasurementVariable> plotDatasetVariables = this.datasetService.getObservationSetVariables(dataset.getId());
-		final BreedingMethodDTO selectedBreedingMethodDTO =
-			this.validateBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), plotDatasetVariables);
-		this.validateLineSelection(request, selectedBreedingMethodDTO, plotDatasetVariables);
-		this.validateBulkingSelection(request, selectedBreedingMethodDTO, plotDatasetVariables);
-		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
-		this.validateReplicationNumberSelection(request.getSelectedReplications(), plotDatasetVariables);
+		return dataset.getId();
 	}
 
-	public void validateAdvanceSamples(final Integer studyId, final AdvanceSampledPlantsRequest request) {
-		// TODO: validate samples are created
-		// TODO: validate instances
-		// TODO: validate non-bulking DER and MAN methods are allowed
-		// TODO: validate replications
-		// TODO: validate harvest date
-	}
-
-	BreedingMethodDTO validateBreedingMethodSelection(
+	BreedingMethodDTO validateAdvanceStudyBreedingMethodSelection(
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest,
 		final List<MeasurementVariable> plotDatasetVariables) {
 		checkNotNull(breedingMethodSelectionRequest, "request.null");
@@ -108,6 +126,21 @@ public class AdvanceValidator {
 		}
 
 		return breedingMethodDTO;
+	}
+
+	void validateAdvanceSamplesBreedingMethodSelection(final Integer breedingMethodId) {
+		if (breedingMethodId == null) {
+			throw new ApiRequestValidationException("advance.breeding-method.selection.required", new Object[] {});
+		}
+
+		final BreedingMethodDTO breedingMethodDTO = this.breedingMethodValidator.validateMethod(breedingMethodId);
+		if (MethodType.isGenerative(breedingMethodDTO.getType())) {
+			throw new ApiRequestValidationException("advance.breeding-method.selection.generative.invalid", new Object[] {});
+		}
+
+		if (breedingMethodDTO.getIsBulkingMethod()) {
+			throw new ApiRequestValidationException("advance.samples.breeding-method.selection.bulking.invalid", new Object[] {});
+		}
 	}
 
 	void validateLineSelection(final AdvanceStudyRequest request, final BreedingMethodDTO selectedBreedingMethod,
