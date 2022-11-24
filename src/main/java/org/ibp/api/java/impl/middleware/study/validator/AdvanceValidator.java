@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -42,7 +43,7 @@ public class AdvanceValidator {
 	@Resource
 	private DatasetValidator datasetValidator;
 
-	public void validate(final Integer studyId, final AdvanceStudyRequest request) {
+	public void validateAdvanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 		checkNotNull(request, "request.null");
 
 		this.studyValidator.validate(studyId, true);
@@ -68,6 +69,14 @@ public class AdvanceValidator {
 		this.validateBulkingSelection(request, selectedBreedingMethodDTO, plotDatasetVariables);
 		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
 		this.validateReplicationNumberSelection(request.getSelectedReplications(), plotDatasetVariables);
+	}
+
+	public void validateAdvanceSamples(final Integer studyId, final AdvanceSampledPlantsRequest request) {
+		// TODO: validate samples are created
+		// TODO: validate instances
+		// TODO: validate non-bulking DER and MAN methods are allowed
+		// TODO: validate replications
+		// TODO: validate harvest date
 	}
 
 	BreedingMethodDTO validateBreedingMethodSelection(

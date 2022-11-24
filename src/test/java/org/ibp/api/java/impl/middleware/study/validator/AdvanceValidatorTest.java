@@ -92,7 +92,7 @@ public class AdvanceValidatorTest {
 		final AdvanceStudyRequest request =
 			this.mockAdvanceStudyRequest(Arrays.asList(INSTANCE_ID), null, breedingMethodSelectionRequest, lineSelectionRequest, null,
 				null);
-		this.advanceValidator.validate(STUDY_ID, request);
+		this.advanceValidator.validateAdvanceStudy(STUDY_ID, request);
 
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
 		Mockito.verify(this.studyValidator).validateStudyHasPlotDataset(STUDY_ID);
@@ -128,7 +128,7 @@ public class AdvanceValidatorTest {
 			this.mockAdvanceStudyRequest(Arrays.asList(INSTANCE_ID), null, breedingMethodSelectionRequest, lineSelectionRequest,
 				bulkingRequest,
 				null);
-		this.advanceValidator.validate(STUDY_ID, request);
+		this.advanceValidator.validateAdvanceStudy(STUDY_ID, request);
 
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
 		Mockito.verify(this.studyValidator).validateStudyHasPlotDataset(STUDY_ID);
@@ -162,7 +162,7 @@ public class AdvanceValidatorTest {
 		final AdvanceStudyRequest request =
 			this.mockAdvanceStudyRequest(Arrays.asList(INSTANCE_ID), null, breedingMethodSelectionRequest, lineSelectionRequest, null,
 				null);
-		this.advanceValidator.validate(STUDY_ID, request);
+		this.advanceValidator.validateAdvanceStudy(STUDY_ID, request);
 
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
 		Mockito.verify(this.studyValidator).validateStudyHasPlotDataset(STUDY_ID);
@@ -202,7 +202,7 @@ public class AdvanceValidatorTest {
 			this.mockAdvanceStudyRequest(Arrays.asList(INSTANCE_ID), null, breedingMethodSelectionRequest, lineSelectionRequest,
 				bulkingRequest,
 				selectionTraitRequest);
-		this.advanceValidator.validate(STUDY_ID, request);
+		this.advanceValidator.validateAdvanceStudy(STUDY_ID, request);
 
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
 		Mockito.verify(this.studyValidator).validateStudyHasPlotDataset(STUDY_ID);
@@ -244,7 +244,7 @@ public class AdvanceValidatorTest {
 			this.mockAdvanceStudyRequest(Arrays.asList(INSTANCE_ID), null, breedingMethodSelectionRequest, lineSelectionRequest,
 				bulkingRequest,
 				selectionTraitRequest);
-		this.advanceValidator.validate(STUDY_ID, request);
+		this.advanceValidator.validateAdvanceStudy(STUDY_ID, request);
 
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
 		Mockito.verify(this.studyValidator).validateStudyHasPlotDataset(STUDY_ID);

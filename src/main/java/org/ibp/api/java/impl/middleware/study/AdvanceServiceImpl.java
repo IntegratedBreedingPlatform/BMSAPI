@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.ibp.api.java.impl.middleware.study.validator.AdvanceValidator;
 import org.ibp.api.java.study.AdvanceService;
@@ -22,8 +23,14 @@ public class AdvanceServiceImpl implements AdvanceService {
 
 	@Override
 	public List<Integer> advanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
-		this.advanceValidator.validate(studyId, request);
+		this.advanceValidator.validateAdvanceStudy(studyId, request);
 		return this.advanceService.advanceStudy(studyId, request);
+	}
+
+	@Override
+	public List<Integer> advanceSamples(final Integer studyId, final AdvanceSampledPlantsRequest request) {
+		this.advanceValidator.validateAdvanceSamples(studyId, request);
+		return this.advanceService.advanceSamples(studyId, request);
 	}
 
 }

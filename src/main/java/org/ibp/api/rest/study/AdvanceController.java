@@ -2,6 +2,7 @@ package org.ibp.api.rest.study;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.ibp.api.java.study.AdvanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,21 @@ public class AdvanceController {
 		@RequestBody final AdvanceStudyRequest request) {
 
 		final List<Integer> advancedGids = this.advanceService.advanceStudy(studyId, request);
+		return new ResponseEntity<>(advancedGids, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Advance sampled plants from plots")
+	// TODO: define granular permission for advance
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
+	@ResponseBody
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/advance/samples", method = RequestMethod.POST)
+	public ResponseEntity<List<Integer>> advanceSamples(
+		@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@RequestBody final AdvanceSampledPlantsRequest request) {
+
+		final List<Integer> advancedGids = this.advanceService.advanceSamples(studyId, request);
 		return new ResponseEntity<>(advancedGids, HttpStatus.OK);
 	}
 
