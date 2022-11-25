@@ -1,6 +1,7 @@
 package org.ibp.api.rest.labelprinting;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -30,7 +32,6 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
-import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -84,12 +85,10 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	public static final String GID = "GID";
 	public static final String GROUP_ID = "GROUP ID";
-
 	public static final String MALE_PARENT_GID = "MGID";
 	public static final String FEMALE_PARENT_GID = "FGID";
 	public static final String CROSS_MALE_PREFERRED_NAME = "CROSS-MALE PREFERRED NAME";
 	public static final String CROSS_FEMALE_PREFERRED_NAME = "CROSS-FEMALE PREFERRED NAME";
-
 	public static final String ORIG_FINAL_NAME = "germplasm-labels";
 
 	@Autowired
@@ -239,7 +238,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		nonNameAndAttributeIds.addAll(this.pedigreeFieldIds);
 		final Set<String> combinedKeys = this.getSelectedFieldIds(labelsGeneratorInput);
 		final boolean fieldsContainsNamesOrAttributes =
-			combinedKeys.stream().anyMatch(fieldId -> !nonNameAndAttributeIds.contains(fieldId));
+			combinedKeys.stream().anyMatch(fieldId -> !nonNameAndAttributeIds.contains(getFieldIdFromCombinedKey(fieldId)));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 		if (fieldsContainsNamesOrAttributes) {
@@ -248,10 +247,12 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			this.getNameValuesMap(nameValues, gids);
 		}
 
+		final boolean isPdf = FileType.PDF.equals(labelsGeneratorInput.getFileType());
+
 		// Data to be exported
 		final List<Map<String, String>> data = new ArrayList<>();
 		for (final GermplasmSearchResponse germplasmSearchResponse : responseList) {
-			data.add(this.getDataRow(labelsGeneratorInput, combinedKeys, germplasmSearchResponse, attributeValues, nameValues));
+			data.add(this.getDataRow(isPdf, combinedKeys, germplasmSearchResponse, attributeValues, nameValues));
 		}
 		return new LabelsData(FieldType.STATIC.getName() + UNDERSCORE + LabelPrintingStaticField.GUID.getFieldId(), data);
 	}
@@ -302,45 +303,133 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		germplasmSearchRequest.setAddedColumnsPropertyIds(new ArrayList<>(addedColumnsPropertyIds));
 	}
 
-	Map<String, String> getDataRow(final LabelsGeneratorInput labelsGeneratorInput,
+	Map<String, String> getDataRow(final boolean isPdf,
 		final Set<String> combinedKeys, final GermplasmSearchResponse germplasmSearchResponse,
 		final Map<Integer, Map<Integer, String>> attributeValues, final Map<Integer, Map<Integer, String>> nameValues) {
 
-		final boolean isPdf = FileType.PDF.equals(labelsGeneratorInput.getFileType());
 		final Map<String, String> columns = new HashMap<>();
 		for (final String combinedKey : combinedKeys) {
-			final String[] composedKey = combinedKey.split(UNDERSCORE);
-			final Integer id = Integer.valueOf(composedKey[1]);
-			if (this.germplasmFieldIds.contains(id)) {
-				this.getGermplasmFieldDataRowValue(isPdf, germplasmSearchResponse, columns, combinedKey, id);
-			} else if (this.pedigreeFieldIds.contains(id)) {
-				this.getPedigreeFieldDataRowValue(isPdf, germplasmSearchResponse, columns, combinedKey, id);
-			} else {
-				this.getAttributeOrNameDataRowValue(isPdf, germplasmSearchResponse, attributeValues, nameValues, columns, combinedKey, id);
+			final FieldType fieldType = FieldType.find(getFieldTypeNameFromCombinedKey(combinedKey));
+			if (FieldType.VARIABLE.equals(fieldType)) {
+				this.getVariableDataRowValue(columns, isPdf, combinedKey, germplasmSearchResponse, attributeValues);
+			} else if (FieldType.STATIC.equals(fieldType)) {
+				this.getStaticDataRowValue(columns,isPdf, combinedKey, germplasmSearchResponse);
+			} else if (FieldType.NAME.equals(fieldType)) {
+				this.getNameDataRowValue(columns, isPdf, combinedKey, germplasmSearchResponse, nameValues);
 			}
 		}
 		return columns;
 	}
+	void getVariableDataRowValue(final Map<String, String> columns, final boolean isPdf, final String combinedKey,
+		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues){
+		final TermId term = TermId.getById(this.getFieldIdFromCombinedKey(combinedKey));
 
-	void getAttributeOrNameDataRowValue(final boolean isPdf,
-		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues,
-		final Map<Integer, Map<Integer, String>> nameValues, final Map<String, String> columns, final String combinedKey, final int id) {
-		// Not part of the fixed columns
-		// Attributes
-		final Map<Integer, String> attributesByType = attributeValues.get(germplasmSearchResponse.getGid());
-		if (attributesByType != null) {
-			final String attributeValue = attributesByType.get(id);
-			if (attributeValue != null) {
-				// Truncate attribute values to 200 characters if export file type is PDF
-				columns.put(combinedKey, this.truncateValueIfPdf(isPdf, attributeValue, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH));
-			}
+		switch (term) {
+			case GID:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGid(), ""));
+				break;
+			case GROUP_ID:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGroupId(), ""));
+				break;
+			case GERMPLASM_LOCATION:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getLocationName(), ""));
+				break;
+			case LOCATION_ABBR:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getLocationAbbr(), ""));
+				break;
+			case BREEDING_METHOD:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getMethodName(), ""));
+				break;
+			case PREFERRED_ID:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGermplasmPreferredId(), ""));
+				break;
+			case PREFERRED_NAME:
+				columns.put(combinedKey, Objects.toString(
+					this.truncateValueIfPdf(isPdf, germplasmSearchResponse.getGermplasmPreferredName(), NAME_DISPLAY_MAX_LENGTH),
+					""));
+				break;
+			case GERMPLASM_DATE:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGermplasmDate(), ""));
+				break;
+			case AVAILABLE_INVENTORY:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getAvailableBalance(), ""));
+				break;
+			case UNITS_INVENTORY:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getUnit(), ""));
+				break;
+			case CROSS_FEMALE_GID:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getFemaleParentGID(), ""));
+				break;
+			case CROSS_MALE_GID:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getMaleParentGID(), ""));
+				break;
+			case CROSS_MALE_PREFERRED_NAME:
+				columns.put(combinedKey, Objects.toString(
+					this.truncateValueIfPdf(isPdf, germplasmSearchResponse.getMaleParentPreferredName(), NAME_DISPLAY_MAX_LENGTH), ""));
+				break;
+			case CROSS_FEMALE_PREFERRED_NAME:
+				columns.put(combinedKey, Objects.toString(
+					this.truncateValueIfPdf(isPdf, germplasmSearchResponse.getFemaleParentPreferredName(), NAME_DISPLAY_MAX_LENGTH), ""));
+				break;
+			default:
+				final Map<Integer, String> attributesByType = attributeValues.get(germplasmSearchResponse.getGid());
+				if (attributesByType != null) {
+					final String attributeValue = attributesByType.get(this.getFieldIdFromCombinedKey(combinedKey));
+					if (attributeValue != null) {
+						// Truncate attribute values to 200 characters if export file type is PDF
+						columns.put(combinedKey, this.truncateValueIfPdf(isPdf, attributeValue, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH));
+					}
+				}
 		}
+	}
 
-		// Not part of the fixed columns
-		// Name
+	void getStaticDataRowValue(final Map<String, String> columns, final boolean isPdf, final String combinedKey,
+		final GermplasmSearchResponse germplasmSearchResponse){
+		final Optional<LabelPrintingStaticField> staticField = LabelPrintingStaticField.getByFieldId(this.getFieldIdFromCombinedKey(combinedKey));
+		switch (staticField.get()) {
+			case GUID:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGermplasmUUID(), ""));
+				break;
+			case REFERENCE:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getReference(), ""));
+				break;
+			case METHOD_CODE:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getMethodCode(), ""));
+				break;
+			case METHOD_NUMBER:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getMethodNumber(), ""));
+				break;
+			case METHOD_GROUP:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getMethodGroup(), ""));
+				break;
+			case GROUP_SOURCE_GID:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGroupSourceGID(), ""));
+				break;
+			case GROUP_SOURCE_PREFERRED_NAME:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGroupSourcePreferredName(), ""));
+				break;
+			case LOTS:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getLotCount(), ""));
+				break;
+			case CROSS:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getPedigreeString(), ""));
+				break;
+			case IMMEDIATE_SOURCE_GID:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getImmediateSourceGID(), ""));
+				break;
+			case IMMEDIATE_SOURCE_NAME:
+				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getImmediateSourceName(), ""));
+				break;
+			default:
+				//do nothing
+		}
+	}
+
+	void getNameDataRowValue(final Map<String, String> columns, final boolean isPdf, final String combinedKey,
+		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> nameValues){
 		final Map<Integer, String> namesByType = nameValues.get(germplasmSearchResponse.getGid());
 		if (namesByType != null) {
-			final String nameValue = namesByType.get(id);
+			final String nameValue = namesByType.get(this.getFieldIdFromCombinedKey(combinedKey));
 			if (nameValue != null) {
 				columns.put(combinedKey, this.truncateValueIfPdf(isPdf, nameValue, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
 			}
@@ -350,118 +439,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	private String truncateValueIfPdf(final boolean isPdf, final String value, final int maxLength) {
 		return isPdf && StringUtils.length(value) > maxLength ?
 			value.substring(0, maxLength) + "..." : value;
-	}
-
-	void getPedigreeFieldDataRowValue(final boolean isPdf,
-		final GermplasmSearchResponse germplasmSearchResponse, final Map<String, String> columns, final String combinedKey, final int id) {
-		final TermId term = TermId.getById(id);
-		switch (term) {
-			case CROSS_FEMALE_GID:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getFemaleParentGID(), ""));
-				return;
-			case CROSS_MALE_GID:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getMaleParentGID(), ""));
-				return;
-			case CROSS_MALE_PREFERRED_NAME:
-				columns.put(combinedKey, Objects.toString(
-					this.truncateValueIfPdf(isPdf, germplasmSearchResponse.getMaleParentPreferredName(), NAME_DISPLAY_MAX_LENGTH), ""));
-				return;
-			case CROSS_FEMALE_PREFERRED_NAME:
-				columns.put(combinedKey, Objects.toString(
-					this.truncateValueIfPdf(isPdf, germplasmSearchResponse.getFemaleParentPreferredName(), NAME_DISPLAY_MAX_LENGTH), ""));
-				return;
-			default:
-				//do nothing
-		}
-
-		final Optional<LabelPrintingStaticField> staticField = LabelPrintingStaticField.getByFieldId(id);
-		if (!staticField.isPresent())
-			return;
-		switch (staticField.get()) {
-			case CROSS:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getPedigreeString(), ""));
-				return;
-			case IMMEDIATE_SOURCE_GID:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getImmediateSourceGID(), ""));
-				return;
-			case IMMEDIATE_SOURCE_NAME:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getImmediateSourceName(), ""));
-				return;
-			default:
-				//do nothing
-		}
-	}
-
-	void getGermplasmFieldDataRowValue(final boolean isPdf,
-		final GermplasmSearchResponse germplasmSearchResponse, final Map<String, String> columns, final String combinedKey, final int id) {
-		final TermId term = TermId.getById(id);
-		switch (term) {
-			case GID:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGid(), ""));
-				return;
-			case GROUP_ID:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGroupId(), ""));
-				return;
-			case GERMPLASM_LOCATION:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getLocationName(), ""));
-				return;
-			case LOCATION_ABBR:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getLocationAbbr(), ""));
-				return;
-			case BREEDING_METHOD:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getMethodName(), ""));
-				return;
-			case PREFERRED_ID:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGermplasmPreferredId(), ""));
-				return;
-			case PREFERRED_NAME:
-				columns.put(combinedKey, Objects.toString(
-					this.truncateValueIfPdf(isPdf, germplasmSearchResponse.getGermplasmPreferredName(), NAME_DISPLAY_MAX_LENGTH), ""));
-				return;
-			case GERMPLASM_DATE:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGermplasmDate(), ""));
-				return;
-			case AVAILABLE_INVENTORY:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getAvailableBalance(), ""));
-				return;
-			case UNITS_INVENTORY:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getUnit(), ""));
-				return;
-			default:
-				//do nothing
-		}
-
-		final Optional<LabelPrintingStaticField> staticField = LabelPrintingStaticField.getByFieldId(id);
-		if (!staticField.isPresent())
-			return;
-		switch (staticField.get()) {
-			case GUID:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGermplasmUUID(), ""));
-				return;
-			case REFERENCE:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getReference(), ""));
-				return;
-			case METHOD_CODE:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getMethodCode(), ""));
-				return;
-			case METHOD_NUMBER:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getMethodNumber(), ""));
-				return;
-			case METHOD_GROUP:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getMethodGroup(), ""));
-				return;
-			case GROUP_SOURCE_GID:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGroupSourceGID(), ""));
-				return;
-			case GROUP_SOURCE_PREFERRED_NAME:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGroupSourcePreferredName(), ""));
-				return;
-			case LOTS:
-				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getLotCount(), ""));
-				return;
-			default:
-				//do nothing
-		}
 	}
 
 	void addingColumnToGermplasmSearchRequest(

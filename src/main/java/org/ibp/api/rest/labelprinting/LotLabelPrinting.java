@@ -1,5 +1,6 @@
 package org.ibp.api.rest.labelprinting;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
@@ -8,6 +9,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.inventory.LotAttributeService;
@@ -25,7 +27,6 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
-import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -251,25 +252,26 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final List<Map<String, String>> data = new ArrayList<>();
 
 		final Map<String, String> pedigreeByGID = new HashMap<>();
-		final Set<String> keys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toSet());
+		final Set<String> combinedKeys = labelsGeneratorInput.getFields().stream().flatMap(Collection::stream).collect(Collectors.toSet());
 
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				keys.add(FieldType.STATIC.getName() + LabelPrintingStrategy.UNDERSCORE + LOT_FIELD.LOT_UID.getId());
+				combinedKeys.add(FieldType.STATIC.getName() + LabelPrintingStrategy.UNDERSCORE + LOT_FIELD.LOT_UID.getId());
 			} else {
-				keys.addAll(labelsGeneratorInput.getBarcodeFields());
+				combinedKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
 		}
 
+		final boolean isPdf = FileType.PDF.equals(labelsGeneratorInput.getFileType());
+
 		for (final ExtendedLotDto extendedLotDto : extendedLotDtos) {
 			data.add(
-				this.getDataRow(labelsGeneratorInput, keys, extendedLotDto, germplasmAttributeValues, lotAttributeValues, pedigreeByGID));
+				this.getDataRow(isPdf, combinedKeys, extendedLotDto, germplasmAttributeValues, lotAttributeValues, pedigreeByGID));
 		}
-
 		return new LabelsData(FieldType.STATIC.getName() + LabelPrintingStrategy.UNDERSCORE + LOT_FIELD.LOT_UID.getId(), data);
 	}
 
-	Map<String, String> getDataRow(final LabelsGeneratorInput labelsGeneratorInput,
+	Map<String, String> getDataRow(final boolean isPdf,
 		final Set<String> combinedKeys,
 		final ExtendedLotDto extendedLotDto,
 		final Map<Integer, Map<Integer, String>> germplasmAttributeValues,
@@ -280,108 +282,122 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 		// Select columns
 		for (final String combinedKey : combinedKeys) {
-			final String[] composedKey = combinedKey.split(UNDERSCORE);
-			final String fieldTypeName = composedKey[0];
-			final Integer fieldId = Integer.valueOf(composedKey[1]);
+			final FieldType fieldType = FieldType.find(getFieldTypeNameFromCombinedKey(combinedKey));
 
-			if (LOT_FIELD.getById(fieldId) != null) {
-				switch (LOT_FIELD.getById(fieldId)) {
-					case LOT_UID:
-						columns.put(combinedKey, extendedLotDto.getLotUUID());
-						break;
-					case LOT_ID:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getLotId(), ""));
-						break;
-					case STOCK_ID:
-						columns.put(combinedKey, extendedLotDto.getStockId());
-						break;
-					case STATUS:
-						columns.put(combinedKey, extendedLotDto.getStatus());
-						break;
-					case STORAGE_LOCATION:
-						columns.put(combinedKey, extendedLotDto.getLocationName());
-						break;
-					case UNITS:
-						columns.put(combinedKey, extendedLotDto.getUnitName());
-						break;
-					case ACTUAL_BALANCE:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getActualBalance(), ""));
-						break;
-					case AVAILABLE:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getAvailableBalance(), ""));
-						break;
-					case RESERVED:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getReservedTotal(), ""));
-						break;
-					case TOTAL_WITHDRAWALS:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getWithdrawalTotal(), ""));
-						break;
-					case PENDING_DEPOSITS:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getPendingDepositsTotal(), ""));
-						break;
-					case NOTES:
-						columns.put(combinedKey, extendedLotDto.getNotes());
-						break;
-					case USERNAME:
-						columns.put(combinedKey, extendedLotDto.getCreatedByUsername());
-						break;
-					case CREATION_DATE:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getCreatedDate(), ""));
-						break;
-					case LAST_DEPOSIT_DATE:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getLastDepositDate(), ""));
-						break;
-					case LAST_WITHDRAWAL_DATE:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getLastWithdrawalDate(), ""));
-						break;
-					default:
-						break;
-				}
-			} else if (GERMPLASM_FIELD.getById(fieldId) != null) {
-				switch (GERMPLASM_FIELD.getById(fieldId)) {
-					case GID:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getGid(), ""));
-						break;
-					case GROUP_ID:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getMgid(), ""));
-						break;
-					case DESIGNATION:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getDesignation(), ""));
-						break;
-					case BREEDING_METHOD:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getGermplasmMethodName(), ""));
-						break;
-					case LOCATION:
-						columns.put(combinedKey, Objects.toString(extendedLotDto.getGermplasmLocation(), ""));
-						break;
-					case CROSS:
-						columns.put(combinedKey, this.getPedigree(Objects.toString(extendedLotDto.getGid(), null), pedigreeByGID));
-						break;
-					default:
-						break;
-				}
-			} else if (CollectionUtils.isNotEmpty(this.lotAttributeKeys) && this.lotAttributeKeys.contains(combinedKey)) {
-				this.addAttributeColumns(labelsGeneratorInput, columns, combinedKey, fieldId,
-					lotAttributeValues.get(extendedLotDto.getLotId()));
-			} else {
-				// Not part of the fixed columns or lot attributes
-				// Attributes
-				this.addAttributeColumns(labelsGeneratorInput, columns, combinedKey, fieldId,
-					germplasmAttributeValues.get(extendedLotDto.getGid()));
+			if (FieldType.VARIABLE.equals(fieldType)) {
+				this.getVariableDataRowValue(columns, isPdf, combinedKey, extendedLotDto, germplasmAttributeValues, lotAttributeValues);
+			} else if (FieldType.STATIC.equals(fieldType)) {
+				this.getStaticDataRowValue(columns, combinedKey, extendedLotDto, pedigreeByGID);
 			}
 		}
 
 		return columns;
 	}
 
-	private void addAttributeColumns(final LabelsGeneratorInput labelsGeneratorInput, final Map<String, String> columns,
+	private void getStaticDataRowValue(final Map<String, String> columns, final String combinedKey, final ExtendedLotDto extendedLotDto,
+		final Map<String, String> pedigreeByGID) {
+		final Integer fieldId = this.getFieldIdFromCombinedKey(combinedKey);
+		if (LOT_FIELD.getById(fieldId) != null) {
+			switch (LOT_FIELD.getById(fieldId)) {
+				case LOT_UID:
+					columns.put(combinedKey, extendedLotDto.getLotUUID());
+					break;
+				case LOT_ID:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getLotId(), ""));
+					break;
+				case STOCK_ID:
+					columns.put(combinedKey, extendedLotDto.getStockId());
+					break;
+				case STATUS:
+					columns.put(combinedKey, extendedLotDto.getStatus());
+					break;
+				case STORAGE_LOCATION:
+					columns.put(combinedKey, extendedLotDto.getLocationName());
+					break;
+				case UNITS:
+					columns.put(combinedKey, extendedLotDto.getUnitName());
+					break;
+				case ACTUAL_BALANCE:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getActualBalance(), ""));
+					break;
+				case AVAILABLE:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getAvailableBalance(), ""));
+					break;
+				case RESERVED:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getReservedTotal(), ""));
+					break;
+				case TOTAL_WITHDRAWALS:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getWithdrawalTotal(), ""));
+					break;
+				case PENDING_DEPOSITS:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getPendingDepositsTotal(), ""));
+					break;
+				case NOTES:
+					columns.put(combinedKey, extendedLotDto.getNotes());
+					break;
+				case USERNAME:
+					columns.put(combinedKey, extendedLotDto.getCreatedByUsername());
+					break;
+				case CREATION_DATE:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getCreatedDate(), ""));
+					break;
+				case LAST_DEPOSIT_DATE:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getLastDepositDate(), ""));
+					break;
+				case LAST_WITHDRAWAL_DATE:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getLastWithdrawalDate(), ""));
+					break;
+				default:
+			}
+		} else if (GERMPLASM_FIELD.getById(fieldId) != null) {
+			switch (GERMPLASM_FIELD.getById(fieldId)) {
+				case GID:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getGid(), ""));
+					break;
+				case GROUP_ID:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getMgid(), ""));
+					break;
+				case DESIGNATION:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getDesignation(), ""));
+					break;
+				case BREEDING_METHOD:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getGermplasmMethodName(), ""));
+					break;
+				case LOCATION:
+					columns.put(combinedKey, Objects.toString(extendedLotDto.getGermplasmLocation(), ""));
+					break;
+				case CROSS:
+					columns.put(combinedKey, this.getPedigree(Objects.toString(extendedLotDto.getGid(), null), pedigreeByGID));
+					break;
+				default:
+			}
+		}
+	}
+
+	void getVariableDataRowValue(final Map<String, String> columns, final boolean isPdf,
+		final String combinedKey, final ExtendedLotDto extendedLotDto,
+		final Map<Integer, Map<Integer, String>> germplasmAttributeValues,
+		final Map<Integer, Map<Integer, String>> lotAttributeValues) {
+		final Integer fieldId = this.getFieldIdFromCombinedKey(combinedKey);
+
+		if (CollectionUtils.isNotEmpty(this.lotAttributeKeys) && this.lotAttributeKeys.contains(combinedKey)) {
+			this.addAttributeColumns(isPdf, columns, combinedKey, fieldId,
+				lotAttributeValues.get(extendedLotDto.getLotId()));
+		} else {
+			// Not part of the fixed columns or lot attributes
+			// Attributes
+			this.addAttributeColumns(isPdf, columns, combinedKey, fieldId,
+				germplasmAttributeValues.get(extendedLotDto.getGid()));
+		}
+	}
+
+	private void addAttributeColumns(final boolean isPdf, final Map<String, String> columns,
 		final String key, final int id, final Map<Integer, String> attributesByType) {
 		if (attributesByType != null) {
 			final String attributeValue = attributesByType.get(id);
 			if (attributeValue != null) {
 				// Truncate attribute values to 200 characters if export file type is PDF
-				columns.put(key, FileType.PDF.equals(labelsGeneratorInput.getFileType())
-					&& StringUtils.length(attributeValue) > GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH ?
+				columns.put(key, isPdf && StringUtils.length(attributeValue) > GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH ?
 					attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "..." : attributeValue);
 			}
 		}

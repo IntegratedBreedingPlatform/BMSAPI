@@ -1,5 +1,6 @@
 package org.ibp.api.rest.labelprinting;
 
+import com.google.common.collect.Maps;
 import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
@@ -176,12 +177,13 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final Map<Integer, GermplasmSearchResponse> germplasmSearchResponseMap = responseList.stream()
 			.collect(Collectors.toMap(GermplasmSearchResponse::getGid, Function.identity()));
 
+		final boolean isPdf = FileType.PDF.equals(labelsGeneratorInput.getFileType());
+
 		// Data to be exported
 		final List<Map<String, String>> data = new ArrayList<>();
 		for (final GermplasmListDataSearchResponse listData : listDataSearchResponseList) {
 			final Integer gid = (Integer) listData.getData().get(GermplasmListStaticColumns.GID.getName());
-			data.add(this.getDataRow(labelsGeneratorInput, combinedKeys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues,
-				entryDetailValues));
+			data.add(this.getDataRow(isPdf, combinedKeys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues, entryDetailValues));
 		}
 
 		return new LabelsData(FieldType.STATIC.getName() + UNDERSCORE + LabelPrintingStaticField.GUID.getFieldId(), data);
@@ -207,51 +209,50 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		return entryDetailFields;
 	}
 
-	Map<String, String> getDataRow(final LabelsGeneratorInput labelsGeneratorInput,
+	Map<String, String> getDataRow(final boolean isPdf,
 		final Set<String> combinedKeys, final GermplasmListDataSearchResponse listData,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues,
 		final Map<Integer, Map<Integer, String>> nameValues, final Map<Integer, Map<Integer, String>> entryDetailValues) {
 
-		final boolean isPdf = FileType.PDF.equals(labelsGeneratorInput.getFileType());
 		final Map<String, String> columns = new HashMap<>();
 		for (final String combinedKey : combinedKeys) {
-			final String[] composedKey = combinedKey.split(UNDERSCORE);
-			final Integer id = Integer.valueOf(composedKey[1]);
-			if (this.germplasmFieldIds.contains(id)) {
-				this.getGermplasmFieldDataRowValue(isPdf, germplasmSearchResponse, columns, combinedKey, id);
-			} else if (this.pedigreeFieldIds.contains(id)) {
-				this.getPedigreeFieldDataRowValue(isPdf, germplasmSearchResponse, columns, combinedKey, id);
+			final FieldType fieldType = FieldType.find(getFieldTypeNameFromCombinedKey(combinedKey));
+			final Integer fieldId = this.getFieldIdFromCombinedKey(combinedKey);
+			if (FieldType.VARIABLE.equals(fieldType)) {
+				this.getVariableDataRowValue(columns, isPdf, combinedKey, germplasmSearchResponse, attributeValues);
+				this.getEntryDetailDataRowValue(columns, combinedKey, listData, entryDetailValues);
 
+			} else if (FieldType.STATIC.equals(fieldType)) {
+				this.getStaticDataRowValue(columns, isPdf, combinedKey, germplasmSearchResponse);
 				/*
 				 * Germplasm list data stores precalculated pedigree strings with a certain cross expansion level
 				 * in grpname
 				 */
-				if (LabelPrintingStaticField.CROSS.getFieldId().equals(id)) {
+				if (LabelPrintingStaticField.CROSS.getFieldId().equals(fieldId)) {
 					columns.put(combinedKey, Objects.toString(listData.getData().get(GermplasmListStaticColumns.CROSS.name()), ""));
 				}
-			} else {
-				this.getAttributeOrNameDataRowValue(isPdf, germplasmSearchResponse, attributeValues, nameValues, columns, combinedKey, id);
-				this.getEntryDetailDataRowValue(listData, entryDetailValues, columns, combinedKey, id);
+			} else if (FieldType.NAME.equals(fieldType)) {
+				this.getNameDataRowValue(columns, isPdf, combinedKey, germplasmSearchResponse, nameValues);
 			}
 		}
 		return columns;
 	}
 
-	public void getEntryDetailDataRowValue(
+	public void getEntryDetailDataRowValue(final Map<String, String> columns, final String combinedKey,
 		final GermplasmListDataSearchResponse listData,
-		final Map<Integer, Map<Integer, String>> entryDetailValues, final Map<String, String> columns, final String key, final int id) {
+		final Map<Integer, Map<Integer, String>> entryDetailValues) {
 		// Especial case for ENTRY NO.
-		final TermId term = TermId.getById(id);
+		final TermId term = TermId.getById(this.getFieldIdFromCombinedKey(combinedKey));
 		if (TermId.ENTRY_NO.equals(term)) {
-			columns.put(key, Objects.toString(listData.getData().get(GermplasmListLabelPrinting.SORT_BY_ENTRY_NO), ""));
+			columns.put(combinedKey, Objects.toString(listData.getData().get(GermplasmListLabelPrinting.SORT_BY_ENTRY_NO), ""));
 		} else {
 			// Not part of the fixed columns
 			// Entry Details
 			final Map<Integer, String> entryDetails = entryDetailValues.get(listData.getListDataId());
 			if (entryDetails != null) {
-				final String entryDetailValue = entryDetails.get(id);
+				final String entryDetailValue = entryDetails.get(this.getFieldIdFromCombinedKey(combinedKey));
 				if (entryDetailValue != null) {
-					columns.put(key, entryDetailValue);
+					columns.put(combinedKey, entryDetailValue);
 				}
 			}
 		}
