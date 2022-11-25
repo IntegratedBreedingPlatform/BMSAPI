@@ -80,10 +80,10 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 		return values.toArray(new String[] {});
 	}
 
-	protected List<String> getHeaderNames(final LabelsGeneratorInput labelsGeneratorInput, final Map<String, Field> termIdFieldMap) {
+	protected List<String> getHeaderNames(final LabelsGeneratorInput labelsGeneratorInput, final Map<String, Field> combinedKeyFieldMap) {
 		final List<String> headerNames = new LinkedList<>();
 		for (final List<String> headers : labelsGeneratorInput.getFields()) {
-			headers.forEach(header -> headerNames.add(termIdFieldMap.get(header).getName()));
+			headers.forEach(header -> headerNames.add(combinedKeyFieldMap.get(header).getName()));
 		}
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			headerNames.add(BARCODE);
