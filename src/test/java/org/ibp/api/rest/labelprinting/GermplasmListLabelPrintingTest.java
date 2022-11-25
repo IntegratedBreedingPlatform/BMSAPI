@@ -252,15 +252,15 @@ public class GermplasmListLabelPrintingTest {
 	@Test
 	public void testGetDataRow_For_GermplasmFields_WhenCSVFileType() {
 		this.labelPrinting.initStaticFields();
-		final Set<String> keys =
+		final Set<String> combinedKeys =
 			new HashSet<>(Arrays.asList(GermplasmListLabelPrintingTest.GID_KEY, GermplasmListLabelPrintingTest.GUID_KEY,
 				GermplasmListLabelPrintingTest.PREFERRED_NAME_KEY));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		response.setGermplasmPreferredName(RandomStringUtils.randomAlphanumeric(4000));
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.CSV);
+		final GermplasmListDataSearchResponse listData = new GermplasmListDataSearchResponse();
+		final boolean isPdf = false;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, null, response, new HashMap<>(), new HashMap<>(), new HashMap<>());
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, new HashMap<>(), new HashMap<>(), new HashMap<>());
 		Assert.assertEquals(3, dataRow.keySet().size());
 		Assert.assertEquals(String.valueOf(response.getGid()), dataRow.get(GermplasmListLabelPrintingTest.GID_KEY));
 		Assert.assertEquals(response.getGermplasmUUID(), dataRow.get(GermplasmListLabelPrintingTest.GUID_KEY));
@@ -272,15 +272,15 @@ public class GermplasmListLabelPrintingTest {
 	@Test
 	public void testGetDataRow_For_GermplasmFields_WhenXLSFileType() {
 		this.labelPrinting.initStaticFields();
-		final Set<String> keys =
+		final Set<String> combinedKeys =
 			new HashSet<>(Arrays.asList(GermplasmListLabelPrintingTest.GID_KEY, GermplasmListLabelPrintingTest.GUID_KEY,
 				GermplasmListLabelPrintingTest.PREFERRED_NAME_KEY));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		response.setGermplasmPreferredName(RandomStringUtils.randomAlphanumeric(4000));
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.XLS);
+		final GermplasmListDataSearchResponse listData = new GermplasmListDataSearchResponse();
+		final boolean isPdf = false;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, null, response, new HashMap<>(), new HashMap<>(), new HashMap<>());
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, new HashMap<>(), new HashMap<>(), new HashMap<>());
 		Assert.assertEquals(3, dataRow.keySet().size());
 		Assert.assertEquals(String.valueOf(response.getGid()), dataRow.get(GermplasmListLabelPrintingTest.GID_KEY));
 		Assert.assertEquals(response.getGermplasmUUID(), dataRow.get(GermplasmListLabelPrintingTest.GUID_KEY));
@@ -293,15 +293,15 @@ public class GermplasmListLabelPrintingTest {
 	@Test
 	public void testGetDataRow_For_GermplasmFields_WhenPDFFileType() {
 		this.labelPrinting.initStaticFields();
-		final Set<String> keys =
+		final Set<String> combinedKeys =
 			new HashSet<>(Arrays.asList(GermplasmListLabelPrintingTest.GID_KEY, GermplasmListLabelPrintingTest.GUID_KEY,
 				GermplasmListLabelPrintingTest.PREFERRED_NAME_KEY));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		response.setGermplasmPreferredName(RandomStringUtils.randomAlphanumeric(4000));
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.PDF);
+		final GermplasmListDataSearchResponse listData = new GermplasmListDataSearchResponse();
+		final boolean isPdf = true;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, null, response, new HashMap<>(), new HashMap<>(), new HashMap<>());
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, new HashMap<>(), new HashMap<>(), new HashMap<>());
 		Assert.assertEquals(3, dataRow.keySet().size());
 		Assert.assertEquals(String.valueOf(response.getGid()), dataRow.get(GermplasmListLabelPrintingTest.GID_KEY));
 		Assert.assertEquals(response.getGermplasmUUID(), dataRow.get(GermplasmListLabelPrintingTest.GUID_KEY));
@@ -314,7 +314,7 @@ public class GermplasmListLabelPrintingTest {
 	@Test
 	public void testGetDataRow_For_PedigreeFields_WhenCSVFileType() {
 		this.labelPrinting.initStaticFields();
-		final Set<String> keys =
+		final Set<String> combinedKeys =
 			new HashSet<>(Arrays.asList(GermplasmListLabelPrintingTest.CROSS_FEMALE_GID_KEY,
 				GermplasmListLabelPrintingTest.CROSS_KEY,
 				GermplasmListLabelPrintingTest.CROSS_FEMALE_PREFERRED_NAME_KEY,
@@ -323,10 +323,9 @@ public class GermplasmListLabelPrintingTest {
 		response.setFemaleParentPreferredName(RandomStringUtils.randomAlphanumeric(4000));
 		response.setMaleParentPreferredName(RandomStringUtils.randomAlphanumeric(4000));
 		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.CSV);
+		final boolean isPdf = false;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, new HashMap<>(), new HashMap<>(),
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, new HashMap<>(), new HashMap<>(),
 				new HashMap<>());
 		Assert.assertEquals(4, dataRow.keySet().size());
 		Assert.assertEquals(response.getFemaleParentGID(), dataRow.get(GermplasmListLabelPrintingTest.CROSS_FEMALE_GID_KEY));
@@ -343,7 +342,7 @@ public class GermplasmListLabelPrintingTest {
 	@Test
 	public void testGetDataRow_For_PedigreeFields_WhenXLSFileType() {
 		this.labelPrinting.initStaticFields();
-		final Set<String> keys =
+		final Set<String> combinedKeys =
 			new HashSet<>(Arrays.asList(GermplasmListLabelPrintingTest.CROSS_FEMALE_GID_KEY,
 				GermplasmListLabelPrintingTest.CROSS_KEY,
 				GermplasmListLabelPrintingTest.CROSS_FEMALE_PREFERRED_NAME_KEY,
@@ -352,10 +351,9 @@ public class GermplasmListLabelPrintingTest {
 		response.setFemaleParentPreferredName(RandomStringUtils.randomAlphanumeric(4000));
 		response.setMaleParentPreferredName(RandomStringUtils.randomAlphanumeric(4000));
 		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.XLS);
+		final boolean isPdf = false;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, new HashMap<>(), new HashMap<>(),
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, new HashMap<>(), new HashMap<>(),
 				new HashMap<>());
 		Assert.assertEquals(4, dataRow.keySet().size());
 		Assert.assertEquals(response.getFemaleParentGID(), dataRow.get(GermplasmListLabelPrintingTest.CROSS_FEMALE_GID_KEY));
@@ -372,7 +370,7 @@ public class GermplasmListLabelPrintingTest {
 	@Test
 	public void testGetDataRow_For_PedigreeFields_WhenPDFFileType() {
 		this.labelPrinting.initStaticFields();
-		final Set<String> keys =
+		final Set<String> combinedKeys =
 			new HashSet<>(Arrays.asList(GermplasmListLabelPrintingTest.CROSS_FEMALE_GID_KEY,
 				GermplasmListLabelPrintingTest.CROSS_KEY,
 				GermplasmListLabelPrintingTest.CROSS_FEMALE_PREFERRED_NAME_KEY,
@@ -381,10 +379,9 @@ public class GermplasmListLabelPrintingTest {
 		response.setFemaleParentPreferredName(RandomStringUtils.randomAlphanumeric(4000));
 		response.setMaleParentPreferredName(RandomStringUtils.randomAlphanumeric(4000));
 		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.PDF);
+		final boolean isPdf = true;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, new HashMap<>(), new HashMap<>(),
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, new HashMap<>(), new HashMap<>(),
 				new HashMap<>());
 		Assert.assertEquals(4, dataRow.keySet().size());
 		Assert.assertEquals(response.getFemaleParentGID(), dataRow.get(GermplasmListLabelPrintingTest.CROSS_FEMALE_GID_KEY));
@@ -403,17 +400,16 @@ public class GermplasmListLabelPrintingTest {
 		this.labelPrinting.initStaticFields();
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final String AttributeKey = FieldType.VARIABLE.getName() + LabelPrintingStrategy.UNDERSCORE + attributeId;
-		final Set<String> keys = new HashSet<>(Collections.singletonList(AttributeKey));
+		final Set<String> combinedKeys = new HashSet<>(Collections.singletonList(AttributeKey));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
 		attributeValues.get(GID).put(attributeId, attributeValue);
 		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.CSV);
+		final boolean isPdf = false;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, attributeValues, new HashMap<>(),
+			this.labelPrinting.getDataRow(false, combinedKeys, listData, response, attributeValues, new HashMap<>(),
 				new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values are not truncated for CSV file type
@@ -424,7 +420,7 @@ public class GermplasmListLabelPrintingTest {
 	public void testGetDataRow_For_AttributeFields_WhenXLSFileType() {
 		this.labelPrinting.initStaticFields();
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<String> keys =
+		final Set<String> combinedKeys =
 			new HashSet<>(Collections.singletonList(FieldType.VARIABLE.getName() + LabelPrintingStrategy.UNDERSCORE + attributeId));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
@@ -432,10 +428,9 @@ public class GermplasmListLabelPrintingTest {
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
 		attributeValues.get(GID).put(attributeId, attributeValue);
 		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.XLS);
+		final boolean isPdf = false;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, attributeValues, new HashMap<>(),
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, attributeValues, new HashMap<>(),
 				new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values are not truncated for XLS file type
@@ -446,7 +441,7 @@ public class GermplasmListLabelPrintingTest {
 	public void testGetDataRow_For_TruncateLongAttributeValues_WhenPDFFileType() {
 		this.labelPrinting.initStaticFields();
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<String> keys =
+		final Set<String> combinedKeys =
 			new HashSet<>(Collections.singletonList(FieldType.VARIABLE.getName() + LabelPrintingStrategy.UNDERSCORE + attributeId));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
@@ -454,10 +449,9 @@ public class GermplasmListLabelPrintingTest {
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
 		attributeValues.get(GID).put(attributeId, attributeValue);
 		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.PDF);
+		final boolean isPdf = true;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, attributeValues, new HashMap<>(),
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, attributeValues, new HashMap<>(),
 				new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values are truncated for PDF file type
@@ -469,7 +463,7 @@ public class GermplasmListLabelPrintingTest {
 	public void testGetDataRow_For_NameFields_WhenCSVFileType() {
 		this.labelPrinting.initStaticFields();
 		final Integer nameTypeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<String> keys =
+		final Set<String> combinedKeys =
 			new HashSet<>(Collections.singletonList(FieldType.NAME.getName() + LabelPrintingStrategy.UNDERSCORE + nameTypeId));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
@@ -477,10 +471,9 @@ public class GermplasmListLabelPrintingTest {
 		final String nameValue = RandomStringUtils.randomAlphanumeric(4000);
 		nameValues.get(GID).put(nameTypeId, nameValue);
 		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.CSV);
+		final boolean isPdf = false;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, new HashMap<>(), nameValues, new HashMap<>());
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, new HashMap<>(), nameValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 
 		// Verify that name values are truncated for this file type
@@ -491,7 +484,7 @@ public class GermplasmListLabelPrintingTest {
 	public void testGetDataRow_For_NameFields_WhenXLSFileType() {
 		this.labelPrinting.initStaticFields();
 		final Integer nameTypeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<String> keys =
+		final Set<String> combinedKeys =
 			new HashSet<>(Collections.singletonList(FieldType.NAME.getName() + LabelPrintingStrategy.UNDERSCORE + nameTypeId));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
@@ -499,10 +492,9 @@ public class GermplasmListLabelPrintingTest {
 		final String nameValue = RandomStringUtils.randomAlphanumeric(4000);
 		nameValues.get(GID).put(nameTypeId, nameValue);
 		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.XLS);
+		final boolean isPdf = false;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, new HashMap<>(), nameValues, new HashMap<>());
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, new HashMap<>(), nameValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 
 		// Verify that name values are not truncated for this file type
@@ -513,7 +505,7 @@ public class GermplasmListLabelPrintingTest {
 	public void testGetDataRow_For_NameFields_WhenPDFFileType() {
 		this.labelPrinting.initStaticFields();
 		final Integer nameTypeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<String> keys =
+		final Set<String> combinedKeys =
 			new HashSet<>(Collections.singletonList(FieldType.NAME.getName() + LabelPrintingStrategy.UNDERSCORE + nameTypeId));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
@@ -521,10 +513,9 @@ public class GermplasmListLabelPrintingTest {
 		final String nameValue = RandomStringUtils.randomAlphanumeric(4000);
 		nameValues.get(GID).put(nameTypeId, nameValue);
 		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.PDF);
+		final boolean isPdf = true;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, new HashMap<>(), nameValues, new HashMap<>());
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, new HashMap<>(), nameValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 
 		// Verify that name values are truncated for this file type
@@ -536,7 +527,7 @@ public class GermplasmListLabelPrintingTest {
 	public void testGetDataRow_For_EntryDetailFields() {
 		this.labelPrinting.initStaticFields();
 		final Integer entryDetailVariableId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<String> keys = new HashSet<>(
+		final Set<String> combinedKeys = new HashSet<>(
 			Collections.singletonList(FieldType.VARIABLE.getName() + LabelPrintingStrategy.UNDERSCORE + entryDetailVariableId));
 		final GermplasmListDataSearchResponse listData = this.createGermplasmListDataSearchResponse();
 		final Map<Integer, Map<Integer, String>> entryDetailValues = new HashMap<>();
@@ -544,9 +535,9 @@ public class GermplasmListLabelPrintingTest {
 		final String entryDetailValue = RandomStringUtils.randomAlphanumeric(10);
 		entryDetailValues.get(listData.getListDataId()).put(entryDetailVariableId, entryDetailValue);
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
+		final boolean isPdf = false;
 		final Map<String, String> dataRow =
-			this.labelPrinting.getDataRow(labelsGeneratorInput, keys, listData, response, new HashMap<>(), new HashMap<>(),
+			this.labelPrinting.getDataRow(isPdf, combinedKeys, listData, response, new HashMap<>(), new HashMap<>(),
 				entryDetailValues);
 		Assert.assertEquals(1, dataRow.keySet().size());
 		Assert.assertEquals(entryDetailValue,
