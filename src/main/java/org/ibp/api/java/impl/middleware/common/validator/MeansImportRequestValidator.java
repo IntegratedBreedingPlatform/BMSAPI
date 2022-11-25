@@ -90,6 +90,7 @@ public class MeansImportRequestValidator {
 
 			final VariableFilter variableFilter = new VariableFilter();
 			analysisVariableNames.forEach(variableFilter::addName);
+			variableFilter.setShowObsoletes(false);
 			final Map<String, Variable> variablesMapByName =
 				new CaseInsensitiveMap(this.ontologyVariableDataManager.getWithFilter(variableFilter).stream()
 					.collect(Collectors.toMap(Variable::getName, Function.identity())));
