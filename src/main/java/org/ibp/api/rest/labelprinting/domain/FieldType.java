@@ -15,4 +15,13 @@ public enum FieldType {
 	public String getName() {
 		return this.name;
 	}
+
+	public static FieldType find(final String name) {
+		for (FieldType fieldType : FieldType.values()) {
+			if (fieldType.getName().equalsIgnoreCase(name)) {
+				return fieldType;
+			}
+		}
+		return null;
+	}
 }
