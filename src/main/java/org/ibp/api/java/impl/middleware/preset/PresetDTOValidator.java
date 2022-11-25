@@ -16,6 +16,7 @@ import org.ibp.api.rest.common.FileType;
 import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.generationcp.middleware.domain.labelprinting.PresetDTO;
 import org.generationcp.middleware.domain.labelprinting.PresetType;
+import org.ibp.api.rest.labelprinting.LabelPrintingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -211,8 +212,7 @@ public class PresetDTOValidator {
 	}
 
 	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final String combinedKey) {
-		final String[] composedKey = combinedKey.split(UNDERSCORE);
-		final String fieldId = composedKey[1];
+		final String fieldId = LabelPrintingStrategy.getFieldIdFromCombinedKey(combinedKey).toString();
 		return this.isValidateFieldId(labelPrintingPresetDTO) && //
 			!LabelPrintingStaticField.getAvailableStaticFields().contains(Integer.valueOf(fieldId)) && //
 			!this.germplasmNameTypeService.getNameTypeById(Integer.valueOf(fieldId)).isPresent() && //
