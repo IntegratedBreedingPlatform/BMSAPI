@@ -58,7 +58,7 @@ import java.util.Set;
 
 @Component
 @Transactional
-public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
+public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelPrinting {
 
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
@@ -332,8 +332,13 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 				if (FieldType.VARIABLE.equals(field.getFieldType())) {
 					this.getVariableDataRowValue(row, field, combinedKey, observationUnitRow);
-				} else if (FieldType.STATIC.equals(field.getFieldType()))  {
-					this.getStaticDataRowValue(row, field, combinedKey, observationUnitRow, study, observationUnitDtoTransactionDtoMap, gidPedigreeMap);
+				} else if (FieldType.STATIC.equals(field.getFieldType())) {
+					if (LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId().equals(field.getId())) {
+						row.put(combinedKey, observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue());
+						continue;
+					}
+					this.getStaticDataRowValue(row, field, combinedKey, observationUnitRow, study, observationUnitDtoTransactionDtoMap,
+						gidPedigreeMap);
 				} else if (FieldType.NAME.equals(field.getFieldType())) {
 					this.getNameDataRowValue(row, field, combinedKey, observationUnitRow);
 				}
@@ -342,113 +347,6 @@ public class SubObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		}
 
 		return new LabelsData(FieldType.STATIC.getName() + UNDERSCORE + LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId(), results);
-	}
-
-	private void getNameDataRowValue(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow) {
-		final Optional<ObservationUnitData> observationVariables =
-			ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(), field);
-		if (observationVariables.isPresent()) {
-			row.put(combinedKey, observationVariables.get().getValue());
-		}
-	}
-
-	private void getStaticDataRowValue(final Map<String, String> row, final Field field, final String combinedKey,
-		final ObservationUnitRow observationUnitRow, final StudyDetails study,
-		final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap, final Map<String, String> gidPedigreeMap) {
-
-		// If it is not a number it is a hardcoded field
-		// Year, Study Name, Parentage, subObsDatasetObsUnitId
-		final Optional<LabelPrintingStaticField> staticField =
-			LabelPrintingStaticField.getByFieldId(this.getFieldIdFromCombinedKey(combinedKey));
-		switch (staticField.get()) {
-			case YEAR:
-				row.put(combinedKey, StringUtils.isNotEmpty(study.getStartDate()) ? study.getStartDate().substring(0, 4) : StringUtils.EMPTY);
-				break;
-			case STUDY_NAME:
-				row.put(combinedKey, study.getStudyName());
-				break;
-			case PARENTAGE:
-				final String gid = observationUnitRow.getVariables().get(GID).getValue();
-				row.put(combinedKey, this.getPedigree(gid, gidPedigreeMap));
-				break;
-			case SUB_OBSERVATION_DATASET_OBS_UNIT_ID:
-				row.put(combinedKey, observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue());
-				break;
-			default:
-				final String ObsUnitId = observationUnitRow.getVariables().get(PARENT_OBS_UNIT_ID).getValue();
-				final StudyTransactionsDto studyTransactionsDto = observationUnitDtoTransactionDtoMap.get(ObsUnitId);
-
-				// If it does not exist studyTransactionsDto, it isn't necessary to continue
-				// filling in the Lots and Transaction data.
-				if (studyTransactionsDto != null) {
-					if (LabelPrintingStaticField.LOT_UID.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, studyTransactionsDto.getLot().getLotUUID());
-					} else if (LabelPrintingStaticField.LOT_ID.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, Objects.toString(studyTransactionsDto.getLot().getLotId(), ""));
-					} else if (LabelPrintingStaticField.STOCK_ID.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, studyTransactionsDto.getLot().getStockId());
-					} else if (LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, studyTransactionsDto.getLot().getLocationAbbr());
-					} else if (LabelPrintingStaticField.STORAGE_LOCATION.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, studyTransactionsDto.getLot().getLocationName());
-					} else if (LabelPrintingStaticField.UNITS.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, studyTransactionsDto.getLot().getUnitName());
-					} else if (LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, Objects.toString(studyTransactionsDto.getLot().getAvailableBalance(), ""));
-					} else if (LabelPrintingStaticField.LOT_NOTES.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, studyTransactionsDto.getLot().getNotes());
-					} else if (LabelPrintingStaticField.TRN_ID.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, studyTransactionsDto.getTransactionId().toString());
-					} else if (LabelPrintingStaticField.STATUS.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, Objects.toString(studyTransactionsDto.getTransactionStatus(), ""));
-					} else if (LabelPrintingStaticField.TYPE.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, Objects.toString(studyTransactionsDto.getTransactionType(), ""));
-					} else if (LabelPrintingStaticField.CREATED.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, Objects.toString(studyTransactionsDto.getCreatedDate(), ""));
-					} else if (LabelPrintingStaticField.TRN_NOTES.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, studyTransactionsDto.getNotes());
-					} else if (LabelPrintingStaticField.USERNAME.getFieldId().equals(field.getId())) {
-						row.put(combinedKey, studyTransactionsDto.getCreatedByUsername());
-					}
-				}
-		}
-
-	}
-
-	private void getVariableDataRowValue(final Map<String, String> row, final Field field, final String combinedKey,
-		final ObservationUnitRow observationUnitRow) {
-		final TermId term = TermId.getById(field.getId());
-
-		// Special cases: LOCATION_NAME, PLOT OBS_UNIT_ID, CROP_SEASON_CODE
-		switch (term) {
-			case LOCATION_ID:
-				row.put(combinedKey, observationUnitRow.getVariables().get(LOCATION_ID).getValue());
-				break;
-			case OBS_UNIT_ID:
-				row.put(combinedKey, observationUnitRow.getVariables().get(PARENT_OBS_UNIT_ID).getValue());
-				break;
-			case SEASON_VAR:
-				final ObservationUnitData observationUnitData =
-					observationUnitRow.getEnvironmentVariables().get("Crop_season_Code");
-				row.put(combinedKey,
-					ObservationLabelPrintingHelper.getSeason(observationUnitData != null ? observationUnitData.getValue() : null));
-				break;
-			default:
-				final Optional<ObservationUnitData>
-					observationVariables =
-					ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(), field);
-				if (observationVariables.isPresent()) {
-					row.put(combinedKey, observationVariables.get().getValue());
-					break;
-				}
-
-				final Optional<ObservationUnitData>
-					environmentVariables =
-					ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getEnvironmentVariables(), field);
-				if (environmentVariables.isPresent()) {
-					row.put(combinedKey, environmentVariables.get().getValue());
-				}
-		}
 	}
 
 	@Override
