@@ -58,7 +58,6 @@ public class VariableResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchObservationVariables(
 		@PathVariable final String crop,
 		@RequestBody final VariableSearchRequestDTO variableSearchRequestDTO) {
-		variableSearchRequestDTO.setFilterObsoletes(true);
 		final BrapiSearchDto searchDto =
 			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(variableSearchRequestDTO, VariableSearchRequestDTO.class)
 				.toString());
@@ -129,7 +128,6 @@ public class VariableResourceBrapi {
 		if (!StringUtils.isEmpty(externalReferenceSource)) {
 			requestDTO.setExternalReferenceSources(Collections.singletonList(externalReferenceSource));
 		}
-		requestDTO.setFilterObsoletes(true);
 		return this.getSearchResults(crop, requestDTO, currentPage, pageSize);
 	}
 
@@ -153,6 +151,9 @@ public class VariableResourceBrapi {
 		final Integer currentPage, final Integer pageSize) {
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+
+		// brapi calls should filter obsoletes by default
+		requestDTO.setFilterObsoletes(true);
 
 		final PageRequest pageRequest = new PageRequest(finalPageNumber, finalPageSize);
 
