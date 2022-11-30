@@ -25,6 +25,7 @@ import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -186,7 +187,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 			data.add(this.getDataRow(isPdf, combinedKeys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues, entryDetailValues));
 		}
 
-		return new LabelsData(FieldType.STATIC.getName() + UNDERSCORE + LabelPrintingStaticField.GUID.getFieldId(), data);
+		return new LabelsData(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE + LabelPrintingStaticField.GUID.getFieldId(), data);
 	}
 
 	void getEntryDetailValues(final Map<Integer, Map<Integer, String>> entryDetailValues, final Integer listId) {
@@ -203,7 +204,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 			.getGermplasmListVariables(programUUID, listId, VariableType.ENTRY_DETAIL.getId());
 
 		final List<Field> entryDetailFields = germplasmEntryDetailVariables.stream()
-			.map(variable -> new Field(variable.getId(), variable.getName(), FieldType.VARIABLE))
+			.map(variable -> new Field(FieldType.VARIABLE, variable.getId(), variable.getName()))
 			.collect(Collectors.toList());
 
 		return entryDetailFields;
@@ -216,8 +217,8 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 		final Map<String, String> columns = new HashMap<>();
 		for (final String combinedKey : combinedKeys) {
-			final FieldType fieldType = FieldType.find(getFieldTypeNameFromCombinedKey(combinedKey));
-			final Integer fieldId = this.getFieldIdFromCombinedKey(combinedKey);
+			final FieldType fieldType = FieldType.find(LabelPrintingFieldUtils.getFieldTypeNameFromCombinedKey(combinedKey));
+			final Integer fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
 			if (FieldType.VARIABLE.equals(fieldType)) {
 				this.getVariableDataRowValue(columns, isPdf, combinedKey, germplasmSearchResponse, attributeValues);
 				this.getEntryDetailDataRowValue(columns, combinedKey, listData, entryDetailValues);
@@ -242,7 +243,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final GermplasmListDataSearchResponse listData,
 		final Map<Integer, Map<Integer, String>> entryDetailValues) {
 		// Especial case for ENTRY NO.
-		final TermId term = TermId.getById(this.getFieldIdFromCombinedKey(combinedKey));
+		final TermId term = TermId.getById(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 		if (TermId.ENTRY_NO.equals(term)) {
 			columns.put(combinedKey, Objects.toString(listData.getData().get(GermplasmListLabelPrinting.SORT_BY_ENTRY_NO), ""));
 		} else {
@@ -250,7 +251,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 			// Entry Details
 			final Map<Integer, String> entryDetails = entryDetailValues.get(listData.getListDataId());
 			if (entryDetails != null) {
-				final String entryDetailValue = entryDetails.get(this.getFieldIdFromCombinedKey(combinedKey));
+				final String entryDetailValue = entryDetails.get(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 				if (entryDetailValue != null) {
 					columns.put(combinedKey, entryDetailValue);
 				}
@@ -289,67 +290,67 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 			switch (termId) {
 				case GID_ACTIVE_LOTS_COUNT:
-					fields.add(FieldType.STATIC.getName() + UNDERSCORE + LabelPrintingStaticField.LOTS.getFieldId());
+					fields.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE + LabelPrintingStaticField.LOTS.getFieldId());
 					break;
 				case GID_AVAILABLE_BALANCE:
-					fields.add(FieldType.VARIABLE.getName() + UNDERSCORE +  TermId.AVAILABLE_INVENTORY.getId());
+					fields.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE +  TermId.AVAILABLE_INVENTORY.getId());
 					break;
 				case GID_UNIT:
-					fields.add(FieldType.VARIABLE.getName() + UNDERSCORE +  TermId.UNITS_INVENTORY.getId());
+					fields.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE +  TermId.UNITS_INVENTORY.getId());
 					break;
 				case IMMEDIATE_SOURCE_GID:
-					fields.add(FieldType.STATIC.getName() + UNDERSCORE + LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId());
+					fields.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE + LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId());
 					break;
 				case IMMEDIATE_SOURCE_NAME:
-					fields.add(FieldType.STATIC.getName() + UNDERSCORE +  LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId());
+					fields.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE +  LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId());
 					break;
 				case GROUP_SOURCE_GID:
-					fields.add(FieldType.STATIC.getName() + UNDERSCORE +  LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId());
+					fields.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE +  LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId());
 					break;
 				case GROUP_SOURCE_NAME:
-					fields.add(FieldType.STATIC.getName() + UNDERSCORE +  LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId());
+					fields.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE +  LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId());
 					break;
 				case GUID:
-					fields.add(FieldType.STATIC.getName() + UNDERSCORE +  LabelPrintingStaticField.GUID.getFieldId());
+					fields.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE +  LabelPrintingStaticField.GUID.getFieldId());
 					break;
 				case GERMPLASM_REFERENCE:
-					fields.add(FieldType.STATIC.getName() + UNDERSCORE +  LabelPrintingStaticField.REFERENCE.getFieldId());
+					fields.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE +  LabelPrintingStaticField.REFERENCE.getFieldId());
 					break;
 				case CROSS:
-					fields.add(FieldType.STATIC.getName() + UNDERSCORE +  LabelPrintingStaticField.CROSS.getFieldId());
+					fields.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE +  LabelPrintingStaticField.CROSS.getFieldId());
 					break;
 				case BREEDING_METHOD_NAME:
-					fields.add(FieldType.VARIABLE.getName() + UNDERSCORE +  TermId.BREEDING_METHOD.getId());
+					fields.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE +  TermId.BREEDING_METHOD.getId());
 					break;
 				case BREEDING_METHOD_ABBREVIATION:
-					fields.add(FieldType.STATIC.getName() + UNDERSCORE +  LabelPrintingStaticField.METHOD_CODE.getFieldId());
+					fields.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE +  LabelPrintingStaticField.METHOD_CODE.getFieldId());
 					break;
 				case BREEDING_METHOD_GROUP:
-					fields.add(FieldType.STATIC.getName() + UNDERSCORE +  LabelPrintingStaticField.METHOD_GROUP.getFieldId());
+					fields.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE +  LabelPrintingStaticField.METHOD_GROUP.getFieldId());
 					break;
 				case DESIG:
-					fields.add(FieldType.VARIABLE.getName() + UNDERSCORE +  TermId.PREFERRED_NAME.getId());
+					fields.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE +  TermId.PREFERRED_NAME.getId());
 					break;
 				case FGID:
-					fields.add(FieldType.VARIABLE.getName() + UNDERSCORE +  TermId.CROSS_FEMALE_GID.getId());
+					fields.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE +  TermId.CROSS_FEMALE_GID.getId());
 					break;
 				case MGID:
-					fields.add(FieldType.VARIABLE.getName() + UNDERSCORE +  TermId.CROSS_MALE_GID.getId());
+					fields.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE +  TermId.CROSS_MALE_GID.getId());
 					break;
 				case MALE_PARENT:
-					fields.add(FieldType.VARIABLE.getName() + UNDERSCORE +  TermId.CROSS_MALE_PREFERRED_NAME.getId());
+					fields.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE +  TermId.CROSS_MALE_PREFERRED_NAME.getId());
 					break;
 				case FEMALE_PARENT:
-					fields.add(FieldType.VARIABLE.getName() + UNDERSCORE +  TermId.CROSS_FEMALE_PREFERRED_NAME.getId());
+					fields.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE +  TermId.CROSS_FEMALE_PREFERRED_NAME.getId());
 					break;
 				case ENTRY_CODE:
-					fields.add(FieldType.VARIABLE.getName() + UNDERSCORE +  TermId.ENTRY_CODE.getId());
+					fields.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE +  TermId.ENTRY_CODE.getId());
 					break;
 				case ENTRY_NO:
-					fields.add(FieldType.VARIABLE.getName() + UNDERSCORE +  TermId.ENTRY_NO.getId());
+					fields.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE +  TermId.ENTRY_NO.getId());
 					break;
 				default:
-					fields.add(dto.getColumnCategory().name() + UNDERSCORE + dto.getTermId());
+					fields.add(dto.getColumnCategory().name() + LabelPrintingFieldUtils.UNDERSCORE + dto.getTermId());
 					break;
 			}
 

@@ -13,7 +13,7 @@ public class Field {
 
 	private String name;
 
-	public Field(final Integer id, final String name, final FieldType fieldType) {
+	public Field(final FieldType fieldType, final Integer id, final String name) {
 		this.id = id;
 		this.name = name;
 		this.fieldType = fieldType;

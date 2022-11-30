@@ -27,6 +27,7 @@ import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -60,8 +61,6 @@ import java.util.Set;
 @Transactional
 public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
-	private static final String UNDERSCORE = "_";
-
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
 
@@ -89,7 +88,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 	private Field seasonField;
 	private List<Field> defaultStudyDetailsFields;
 	private List<Field> defaultLotDetailsFields;
-	private List<Field> defaultTransactioNDetailsFields;
+	private List<Field> defaultTransactionDetailsFields;
 
 	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	private static final String LOCATION_ID = "LOCATION_ID";
@@ -107,14 +106,13 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final String parentagePropValue = this.getMessage("label.printing.field.parentage");
 		final String seasonPropValue = this.getMessage("label.printing.field.season");
 
-		this.studyNameField = new Field(LabelPrintingStaticField.STUDY_NAME.getFieldId(), studyNamePropValue, FieldType.STATIC);
-		this.yearField = new Field(LabelPrintingStaticField.YEAR.getFieldId(), yearPropValue, FieldType.STATIC);
-		this.parentageField = new Field(LabelPrintingStaticField.PARENTAGE.getFieldId(), parentagePropValue, FieldType.STATIC);
-		this.seasonField = new Field(TermId.SEASON_VAR.getId(), seasonPropValue, FieldType.VARIABLE);
-
+		this.studyNameField = new Field(FieldType.STATIC, LabelPrintingStaticField.STUDY_NAME.getFieldId(), studyNamePropValue);
+		this.yearField = new Field(FieldType.STATIC, LabelPrintingStaticField.YEAR.getFieldId(), yearPropValue);
+		this.parentageField = new Field(FieldType.STATIC, LabelPrintingStaticField.PARENTAGE.getFieldId(), parentagePropValue);
+		this.seasonField = new Field(FieldType.VARIABLE, TermId.SEASON_VAR.getId(), seasonPropValue);
 		this.defaultStudyDetailsFields = Arrays.asList(this.studyNameField, this.yearField);
 
-		this.defaultTransactioNDetailsFields = ObservationLabelPrintingHelper.buildTransactionDetailsFields(this.messageSource);
+		this.defaultTransactionDetailsFields = ObservationLabelPrintingHelper.buildTransactionDetailsFields(this.messageSource);
 
 		this.defaultLotDetailsFields = ObservationLabelPrintingHelper.buildLotDetailsFields(this.messageSource);
 
@@ -189,12 +187,10 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final Map<String, String> resultsMap = new LinkedHashMap<>();
 		resultsMap.put(this.getMessage("label.printing.name"), study.getStudyName());
 		resultsMap.put(this.getMessage("label.printing.title"), study.getDescription());
-		resultsMap.put(
-			this.getMessage("label.printing.objective"), //
+		resultsMap.put(this.getMessage("label.printing.objective"), //
 			(study.getObjective() == null) ? StringUtils.EMPTY : study.getObjective());
 		resultsMap.put(this.getMessage("label.printing.selected.dataset"), datasetDTO.getName());
-		resultsMap.put(
-			this.getMessage("label.printing.number.of.environments.in.dataset"), //
+		resultsMap.put(this.getMessage("label.printing.number.of.environments.in.dataset"), //
 			String.valueOf(datasetDTO.getInstances().size()));
 
 		return new OriginResourceMetadata(defaultFileName, resultsMap);
@@ -212,7 +208,6 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final String namesPropValue = this.getMessage("label.printing.names.details");
 
 		final DatasetDTO dataSetDTO = this.middlewareDatasetService.getDataset(labelsInfoInput.getDatasetId());
-
 		final int environmentDatasetId =
 			this.studyDataManager.getDataSetsByType(labelsInfoInput.getStudyId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
 
@@ -250,7 +245,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		namesType.setFields(nameFields);
 
 		lotDetailsLabelType.setFields(this.defaultLotDetailsFields);
-		transactionDetailsLabelType.setFields(this.defaultTransactioNDetailsFields);
+		transactionDetailsLabelType.setFields(this.defaultTransactionDetailsFields);
 
 		final List<Field> studyDetailsFields = new LinkedList<>();
 		//Requirement to add Study Name as an available label when in fact it is not a variable.
@@ -270,6 +265,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		if (!studyDetailsFields.contains(this.seasonField)) {
 			studyDetailsFields.add(this.seasonField);
 		}
+
 		datasetDetailsLabelType.setFields(datasetDetailsFields);
 
 		labelTypes.add(studyDetailsLabelType);
@@ -298,12 +294,13 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		studyTransactionsDtos.forEach(studyTransactionsDto -> studyTransactionsDto.getObservationUnits().forEach(
 			observationUnitDto -> observationUnitDtoTransactionDtoMap.put(observationUnitDto.getObsUnitId(), studyTransactionsDto)));
 
-		final Map<String, Field> combinedKeyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> LabelPrintingStrategy.transformToCombinedKey(field));
+		final Map<String, Field> combinedKeyFieldMap = //
+			Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> LabelPrintingFieldUtils.transformToCombinedKey(field));
 
 		final Set<String> combinedKeys = new HashSet<>();
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				combinedKeys.add(TermId.OBS_UNIT_ID.getId() + UNDERSCORE + FieldType.VARIABLE.getName());
+				combinedKeys.add(FieldType.VARIABLE.getName() + TermId.OBS_UNIT_ID.getId() + LabelPrintingFieldUtils.UNDERSCORE  );
 			} else {
 				combinedKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
@@ -340,7 +337,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			results.add(row);
 		}
 
-		return new LabelsData(FieldType.VARIABLE.getName() + UNDERSCORE + TermId.OBS_UNIT_ID.getId(), results);
+		return new LabelsData(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE + TermId.OBS_UNIT_ID.getId(), results);
 	}
 
 	protected void getVariableDataRowValue(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow) {
@@ -381,7 +378,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final Map<String, String> gidPedigreeMap) {
 
 		final Optional<LabelPrintingStaticField> staticField =
-			LabelPrintingStaticField.getByFieldId(this.getFieldIdFromCombinedKey(combinedKey));
+			LabelPrintingStaticField.getByFieldId(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 		switch (staticField.get()) {
 			case YEAR:
 				row.put(combinedKey, StringUtils.isNotEmpty(study.getStartDate()) ? study.getStartDate().substring(0, 4) : StringUtils.EMPTY);

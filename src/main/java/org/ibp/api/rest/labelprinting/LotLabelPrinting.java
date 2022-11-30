@@ -19,6 +19,7 @@ import org.ibp.api.java.inventory.manager.LotService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -120,7 +121,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	// Lot fields
 	private static final LabelType LOT_FIXED_LABEL_TYPES = new LabelType("Lot", "Lot")
 		.withFields(Arrays.stream(LOT_FIELD.values())
-			.map(field -> new Field(field.getId(), field.getName(), FieldType.STATIC))
+			.map(field -> new Field(FieldType.STATIC, field.getId(), field.getName()))
 			.collect(Collectors.toList()));
 
 
@@ -164,7 +165,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 	// Germplasm fields
 	private static final LabelType GERMPLASM_FIXED_LABEL_TYPES = new LabelType("Germplasm", "Germplasm")
 		.withFields(Arrays.stream(GERMPLASM_FIELD.values())
-			.map(field -> new Field(field.getId(), field.getName(), FieldType.STATIC))
+			.map(field -> new Field(FieldType.STATIC, field.getId(), field.getName()))
 			.collect(Collectors.toList()));
 
 	@Override
@@ -224,8 +225,8 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			final List<Variable> germplasmAttributeVariables =
 				this.germplasmAttributeService.getGermplasmAttributeVariables(gids.stream().collect(Collectors.toList()), programUUID);
 			germplasmLabelTypes.getFields().addAll(germplasmAttributeVariables.stream()
-				.map(attributeVariable -> new Field(attributeVariable.getId(),
-					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName(), FieldType.VARIABLE))
+				.map(attributeVariable -> new Field(FieldType.VARIABLE, attributeVariable.getId(),
+					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
 				.collect(Collectors.toList()));
 			labelTypes.add(germplasmLabelTypes);
 			this.populateLotAttributesLabelType(programUUID, labelTypes, extendedLotDtos);
@@ -256,7 +257,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				combinedKeys.add(FieldType.STATIC.getName() + LabelPrintingStrategy.UNDERSCORE + LOT_FIELD.LOT_UID.getId());
+				combinedKeys.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE + LOT_FIELD.LOT_UID.getId());
 			} else {
 				combinedKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
@@ -268,7 +269,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			data.add(
 				this.getDataRow(isPdf, combinedKeys, extendedLotDto, germplasmAttributeValues, lotAttributeValues, pedigreeByGID));
 		}
-		return new LabelsData(FieldType.STATIC.getName() + LabelPrintingStrategy.UNDERSCORE + LOT_FIELD.LOT_UID.getId(), data);
+		return new LabelsData(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE + LOT_FIELD.LOT_UID.getId(), data);
 	}
 
 	Map<String, String> getDataRow(final boolean isPdf,
@@ -282,7 +283,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 		// Select columns
 		for (final String combinedKey : combinedKeys) {
-			final FieldType fieldType = FieldType.find(getFieldTypeNameFromCombinedKey(combinedKey));
+			final FieldType fieldType = FieldType.find(LabelPrintingFieldUtils.getFieldTypeNameFromCombinedKey(combinedKey));
 
 			if (FieldType.VARIABLE.equals(fieldType)) {
 				this.getVariableDataRowValue(columns, isPdf, combinedKey, extendedLotDto, germplasmAttributeValues, lotAttributeValues);
@@ -296,7 +297,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 	private void getStaticDataRowValue(final Map<String, String> columns, final String combinedKey, final ExtendedLotDto extendedLotDto,
 		final Map<String, String> pedigreeByGID) {
-		final Integer fieldId = this.getFieldIdFromCombinedKey(combinedKey);
+		final Integer fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
 		if (LOT_FIELD.getById(fieldId) != null) {
 			switch (LOT_FIELD.getById(fieldId)) {
 				case LOT_UID:
@@ -378,7 +379,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final String combinedKey, final ExtendedLotDto extendedLotDto,
 		final Map<Integer, Map<Integer, String>> germplasmAttributeValues,
 		final Map<Integer, Map<Integer, String>> lotAttributeValues) {
-		final Integer fieldId = this.getFieldIdFromCombinedKey(combinedKey);
+		final Integer fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
 
 		if (CollectionUtils.isNotEmpty(this.lotAttributeKeys) && this.lotAttributeKeys.contains(combinedKey)) {
 			this.addAttributeColumns(isPdf, columns, combinedKey, fieldId,

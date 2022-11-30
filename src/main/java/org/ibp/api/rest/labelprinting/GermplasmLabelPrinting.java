@@ -24,6 +24,7 @@ import org.ibp.api.java.germplasm.GermplasmService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -210,7 +211,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			this.populateAttributesLabelType(programUUID, labelTypes, gids, attributeVariables);
 
 			namesType.getFields().addAll(nameTypes.stream()
-				.map(nameType -> new Field(nameType.getId(), nameType.getCode(), FieldType.NAME))
+				.map(nameType -> new Field(FieldType.NAME, nameType.getId(), nameType.getCode()))
 				.collect(Collectors.toList()));
 		} else {
 			this.populateAttributesLabelType(programUUID, labelTypes, Collections.emptyList(), Collections.emptyList());
@@ -238,7 +239,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		nonNameAndAttributeIds.addAll(this.pedigreeFieldIds);
 		final Set<String> combinedKeys = this.getSelectedFieldIds(labelsGeneratorInput);
 		final boolean fieldsContainsNamesOrAttributes =
-			combinedKeys.stream().anyMatch(fieldId -> !nonNameAndAttributeIds.contains(getFieldIdFromCombinedKey(fieldId)));
+			combinedKeys.stream().anyMatch(fieldId -> !nonNameAndAttributeIds.contains(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(fieldId)));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 		if (fieldsContainsNamesOrAttributes) {
@@ -254,7 +255,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		for (final GermplasmSearchResponse germplasmSearchResponse : responseList) {
 			data.add(this.getDataRow(isPdf, combinedKeys, germplasmSearchResponse, attributeValues, nameValues));
 		}
-		return new LabelsData(FieldType.STATIC.getName() + UNDERSCORE + LabelPrintingStaticField.GUID.getFieldId(), data);
+		return new LabelsData(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE + LabelPrintingStaticField.GUID.getFieldId(), data);
 	}
 
 	void getNameValuesMap(final Map<Integer, Map<Integer, String>> nameValues, final List<Integer> gids) {
@@ -279,7 +280,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				combinedKeys.add(FieldType.STATIC.getName() + UNDERSCORE + LabelPrintingStaticField.GUID.getFieldId());
+				combinedKeys.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE + LabelPrintingStaticField.GUID.getFieldId());
 			} else {
 				combinedKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
@@ -309,7 +310,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		final Map<String, String> columns = new HashMap<>();
 		for (final String combinedKey : combinedKeys) {
-			final FieldType fieldType = FieldType.find(getFieldTypeNameFromCombinedKey(combinedKey));
+			final FieldType fieldType = FieldType.find(LabelPrintingFieldUtils.getFieldTypeNameFromCombinedKey(combinedKey));
 			if (FieldType.VARIABLE.equals(fieldType)) {
 				this.getVariableDataRowValue(columns, isPdf, combinedKey, germplasmSearchResponse, attributeValues);
 			} else if (FieldType.STATIC.equals(fieldType)) {
@@ -322,7 +323,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	}
 	void getVariableDataRowValue(final Map<String, String> columns, final boolean isPdf, final String combinedKey,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues){
-		final TermId term = TermId.getById(this.getFieldIdFromCombinedKey(combinedKey));
+		final TermId term = TermId.getById(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 
 		switch (term) {
 			case GID:
@@ -374,7 +375,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			default:
 				final Map<Integer, String> attributesByType = attributeValues.get(germplasmSearchResponse.getGid());
 				if (attributesByType != null) {
-					final String attributeValue = attributesByType.get(this.getFieldIdFromCombinedKey(combinedKey));
+					final String attributeValue = attributesByType.get(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 					if (attributeValue != null) {
 						// Truncate attribute values to 200 characters if export file type is PDF
 						columns.put(combinedKey, this.truncateValueIfPdf(isPdf, attributeValue, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH));
@@ -385,7 +386,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 	void getStaticDataRowValue(final Map<String, String> columns, final boolean isPdf, final String combinedKey,
 		final GermplasmSearchResponse germplasmSearchResponse){
-		final Optional<LabelPrintingStaticField> staticField = LabelPrintingStaticField.getByFieldId(this.getFieldIdFromCombinedKey(combinedKey));
+		final Optional<LabelPrintingStaticField> staticField = LabelPrintingStaticField.getByFieldId(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 		switch (staticField.get()) {
 			case GUID:
 				columns.put(combinedKey, Objects.toString(germplasmSearchResponse.getGermplasmUUID(), ""));
@@ -429,7 +430,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> nameValues){
 		final Map<Integer, String> namesByType = nameValues.get(germplasmSearchResponse.getGid());
 		if (namesByType != null) {
-			final String nameValue = namesByType.get(this.getFieldIdFromCombinedKey(combinedKey));
+			final String nameValue = namesByType.get(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 			if (nameValue != null) {
 				columns.put(combinedKey, this.truncateValueIfPdf(isPdf, nameValue, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
 			}
@@ -511,13 +512,13 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final String immediateSourceNamePropValue = this.getMessage("label.printing.field.pedigree.immediate.source.name");
 
 		return ImmutableList.<Field>builder()
-			.add(new Field(LabelPrintingStaticField.CROSS.getFieldId(), crossPropValue, FieldType.STATIC))
-			.add(new Field(TermId.CROSS_FEMALE_GID.getId(), femaleParentGIDPropValue, FieldType.VARIABLE))
-			.add(new Field(TermId.CROSS_MALE_GID.getId(), maleParentGIDPropValue, FieldType.VARIABLE))
-			.add(new Field(TermId.CROSS_MALE_PREFERRED_NAME.getId(), maleParentPreferredNamePropValue, FieldType.VARIABLE))
-			.add(new Field(TermId.CROSS_FEMALE_PREFERRED_NAME.getId(), femaleParentPreferredNamePropValue, FieldType.VARIABLE))
-			.add(new Field(LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId(), immediateSourceGIDPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId(), immediateSourceNamePropValue, FieldType.STATIC))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.CROSS.getFieldId(), crossPropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.CROSS_FEMALE_GID.getId(), femaleParentGIDPropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.CROSS_MALE_GID.getId(), maleParentGIDPropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.CROSS_MALE_PREFERRED_NAME.getId(), maleParentPreferredNamePropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.CROSS_FEMALE_PREFERRED_NAME.getId(), femaleParentPreferredNamePropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId(), immediateSourceGIDPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId(), immediateSourceNamePropValue))
 			.build();
 	}
 
@@ -543,24 +544,24 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final String lotsPropValue = this.getMessage("label.printing.field.germplasm.lots");
 
 		return ImmutableList.<Field>builder()
-			.add(new Field(TermId.GID.getId(), gidPropValue, FieldType.VARIABLE))
-			.add(new Field(LabelPrintingStaticField.GUID.getFieldId(), guidPropValue, FieldType.STATIC))
-			.add(new Field(TermId.GROUP_ID.getId(), groupIdPropValue, FieldType.VARIABLE))
-			.add(new Field(TermId.GERMPLASM_LOCATION.getId(), locationPropValue, FieldType.VARIABLE))
-			.add(new Field(TermId.LOCATION_ABBR.getId(), locationAbbrPropValue, FieldType.VARIABLE))
-			.add(new Field(TermId.BREEDING_METHOD.getId(), breedingMethodNamePropValue, FieldType.VARIABLE))
-			.add(new Field(TermId.PREFERRED_ID.getId(), preferredIdPropValue, FieldType.VARIABLE))
-			.add(new Field(TermId.PREFERRED_NAME.getId(), preferredNamePropValue, FieldType.VARIABLE))
-			.add(new Field(LabelPrintingStaticField.REFERENCE.getFieldId(), referencePropValue, FieldType.STATIC))
-			.add(new Field(TermId.GERMPLASM_DATE.getId(), creationDatePropValue, FieldType.VARIABLE))
-			.add(new Field(LabelPrintingStaticField.METHOD_CODE.getFieldId(), methodCodePropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.METHOD_NUMBER.getFieldId(), methodNumberPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.METHOD_GROUP.getFieldId(), methodGroupPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId(), groupSourceGidPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId(), groupSourcePreferredNamePropValue, FieldType.STATIC))
-			.add(new Field(TermId.AVAILABLE_INVENTORY.getId(), availablePropValue, FieldType.VARIABLE))
-			.add(new Field(TermId.UNITS_INVENTORY.getId(), unitsPropValue, FieldType.VARIABLE))
-			.add(new Field(LabelPrintingStaticField.LOTS.getFieldId(), lotsPropValue, FieldType.STATIC))
+			.add(new Field(FieldType.VARIABLE, TermId.GID.getId(), gidPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.GUID.getFieldId(), guidPropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.GROUP_ID.getId(), groupIdPropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.GERMPLASM_LOCATION.getId(), locationPropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.LOCATION_ABBR.getId(), locationAbbrPropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.BREEDING_METHOD.getId(), breedingMethodNamePropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.PREFERRED_ID.getId(), preferredIdPropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.PREFERRED_NAME.getId(), preferredNamePropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.REFERENCE.getFieldId(), referencePropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.GERMPLASM_DATE.getId(), creationDatePropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.METHOD_CODE.getFieldId(), methodCodePropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.METHOD_NUMBER.getFieldId(), methodNumberPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.METHOD_GROUP.getFieldId(), methodGroupPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId(), groupSourceGidPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId(), groupSourcePreferredNamePropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.AVAILABLE_INVENTORY.getId(), availablePropValue))
+			.add(new Field(FieldType.VARIABLE, TermId.UNITS_INVENTORY.getId(), unitsPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.LOTS.getFieldId(), lotsPropValue))
 			.build();
 	}
 

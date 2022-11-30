@@ -53,7 +53,7 @@ public abstract class ObservationLabelPrintingHelper {
 	public static List<Field> transformNameTypesToFields(final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs) {
 		final List<Field> fields = new LinkedList<>();
 		for (final GermplasmNameTypeDTO germplasmNameTypeDTO : germplasmNameTypeDTOs) {
-			final Field field = new Field(germplasmNameTypeDTO.getId(), germplasmNameTypeDTO.getCode(), FieldType.NAME);
+			final Field field = new Field(FieldType.NAME, germplasmNameTypeDTO.getId(), germplasmNameTypeDTO.getCode());
 			fields.add(field);
 		}
 		return fields;
@@ -71,12 +71,12 @@ public abstract class ObservationLabelPrintingHelper {
 		final String transactionUsernamePropValue = messageSource.getMessage("label.printing.field.transaction.username", null, locale);
 
 		return ImmutableList.<Field>builder()
-			.add(new Field(LabelPrintingStaticField.TRN_ID.getFieldId(), transactionIdPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.STATUS.getFieldId(), transactionStatusPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.TYPE.getFieldId(), transactionTypePropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.CREATED.getFieldId(), transactionCreationDatePropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.TRN_NOTES.getFieldId(), transactionNotesPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.USERNAME.getFieldId(), transactionUsernamePropValue, FieldType.STATIC)).build();
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.TRN_ID.getFieldId(), transactionIdPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.STATUS.getFieldId(), transactionStatusPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.TYPE.getFieldId(), transactionTypePropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.CREATED.getFieldId(), transactionCreationDatePropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.TRN_NOTES.getFieldId(), transactionNotesPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.USERNAME.getFieldId(), transactionUsernamePropValue)).build();
 	}
 
 	public static List<Field> buildLotDetailsFields(final ResourceBundleMessageSource messageSource){
@@ -93,14 +93,14 @@ public abstract class ObservationLabelPrintingHelper {
 		final String lotNotesPropValue = messageSource.getMessage("label.printing.field.lot.notes", null, locale);
 
 		return ImmutableList.<Field>builder()
-			.add(new Field(LabelPrintingStaticField.LOT_ID.getFieldId(), lotIDPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.LOT_UID.getFieldId(), lotUIDPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.STOCK_ID.getFieldId(), lotStockIdPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId(), lotAvailableBalancePropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.UNITS.getFieldId(), lotUnitsPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId(), lotStorageLocationAbbrPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.STORAGE_LOCATION.getFieldId(), lotStorageLocationPropValue, FieldType.STATIC))
-			.add(new Field(LabelPrintingStaticField.LOT_NOTES.getFieldId(), lotNotesPropValue, FieldType.STATIC)).build();
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.LOT_ID.getFieldId(), lotIDPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.LOT_UID.getFieldId(), lotUIDPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.STOCK_ID.getFieldId(), lotStockIdPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.AVAILABLE_BALANCE.getFieldId(), lotAvailableBalancePropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.UNITS.getFieldId(), lotUnitsPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.STORAGE_LOCATION_ABBR.getFieldId(), lotStorageLocationAbbrPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.STORAGE_LOCATION.getFieldId(), lotStorageLocationPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.LOT_NOTES.getFieldId(), lotNotesPropValue)).build();
 	}
 
 	public static String getSeason(final String seasonStr) {

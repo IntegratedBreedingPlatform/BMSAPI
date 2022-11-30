@@ -123,9 +123,9 @@ public class PDFLabelsFileGeneratorTest {
 
 	private Set<Field> mockAvailableFields() {
 		final Set<Field> availableFields = new HashSet<>();
-		availableFields.add(new Field(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.name(), FieldType.VARIABLE));
-		availableFields.add(new Field(TermId.GID.getId(), TermId.GID.name(), FieldType.VARIABLE));
-		availableFields.add(new Field(TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name(), FieldType.VARIABLE));
+		availableFields.add(new Field(FieldType.VARIABLE, TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.name()));
+		availableFields.add(new Field(FieldType.VARIABLE, TermId.GID.getId(), TermId.GID.name()));
+		availableFields.add(new Field(FieldType.VARIABLE, TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name()));
 		return availableFields;
 	}
 
@@ -147,9 +147,9 @@ public class PDFLabelsFileGeneratorTest {
 
 	private Map<String, Field> mockKeyFieldMap() {
 		final Map<String, Field> keyFieldMap = new HashMap<>();
-		keyFieldMap.put( FieldType.VARIABLE.getName() + "_" + TermId.ENTRY_CODE.getId(), new Field(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.name(), FieldType.VARIABLE));
-		keyFieldMap.put( FieldType.VARIABLE.getName() + "_" + TermId.GID.getId(), new Field(TermId.GID.getId(), TermId.GID.name(), FieldType.VARIABLE));
-		keyFieldMap.put( FieldType.VARIABLE.getName() + "_" + TermId.OBS_UNIT_ID.getId(), new Field(TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name(), FieldType.VARIABLE));
+		keyFieldMap.put( FieldType.VARIABLE.getName() + "_" + TermId.ENTRY_CODE.getId(), new Field(FieldType.VARIABLE, TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.name()));
+		keyFieldMap.put( FieldType.VARIABLE.getName() + "_" + TermId.GID.getId(), new Field(FieldType.VARIABLE, TermId.GID.getId(), TermId.GID.name()));
+		keyFieldMap.put( FieldType.VARIABLE.getName() + "_" + TermId.OBS_UNIT_ID.getId(), new Field(FieldType.VARIABLE, TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name()));
 		return keyFieldMap;
 	}
 }

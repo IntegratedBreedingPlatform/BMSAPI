@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.springframework.stereotype.Component;
@@ -29,8 +30,6 @@ import java.util.stream.Collectors;
 @Component
 public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 
-	public static final String UNDERSCORE = "_";
-
 	@Override
 	public File generate(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) throws IOException {
 		final File temporaryFolder = Files.createTempDir();
@@ -38,7 +37,7 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 		final String fullFileName = fileName + "." + FileType.XLS.getExtension();
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + fullFileName;
 
-		final Map<String, Field> fieldsByKey = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + CSVLabelsFileGenerator.UNDERSCORE + field.getId());
+		final Map<String, Field> fieldsByKey = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + LabelPrintingFieldUtils.UNDERSCORE + field.getId());
 
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 		final HSSFSheet sheet = xlsBook.createSheet(fileName);
@@ -70,7 +69,7 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 			int colIndex = 0;
 			for (final Field header : headers) {
 				final HSSFCell cell = row.createCell(colIndex);
-				cell.setCellValue(dataRow.get(header.getFieldType().getName() + CSVLabelsFileGenerator.UNDERSCORE + header.getId()));
+				cell.setCellValue(dataRow.get(header.getFieldType().getName() + LabelPrintingFieldUtils.UNDERSCORE + header.getId()));
 				colIndex++;
 			}
 			rowIndex++;

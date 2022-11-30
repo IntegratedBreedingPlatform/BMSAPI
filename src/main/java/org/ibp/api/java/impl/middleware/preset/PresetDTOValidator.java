@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.generationcp.middleware.domain.labelprinting.PresetDTO;
 import org.generationcp.middleware.domain.labelprinting.PresetType;
 import org.ibp.api.rest.labelprinting.LabelPrintingStrategy;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -33,7 +34,6 @@ public class PresetDTOValidator {
 
 	private static final Integer FIELDBOOK_TOOL_ID = 23;
 	private static final int NAME_MAX_LENGTH = 50;
-	private static final String UNDERSCORE = "_";
 
 	@Autowired
 	private PresetService presetService;
@@ -212,7 +212,7 @@ public class PresetDTOValidator {
 	}
 
 	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final String combinedKey) {
-		final String fieldId = LabelPrintingStrategy.getFieldIdFromCombinedKey(combinedKey).toString();
+		final String fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey).toString();
 		return this.isValidFieldId(labelPrintingPresetDTO) && //
 			!LabelPrintingStaticField.getAvailableStaticFields().contains(Integer.valueOf(fieldId)) && //
 			!this.germplasmNameTypeService.getNameTypeById(Integer.valueOf(fieldId)).isPresent() && //

@@ -17,6 +17,7 @@ import org.ibp.api.java.study.StudyEntryService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -45,8 +46,6 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
-
-	private static final String UNDERSCORE = "_";
 
 	private static final int NAME_DISPLAY_MAX_LENGTH = 200;
 
@@ -86,7 +85,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsInfoInput.getStudyId());
-		final String tempFileName = study.getStudyName().concat(StudyEntriesLabelPrinting.UNDERSCORE).concat(StudyEntriesLabelPrinting.ORIG_FINAL_NAME);
+		final String tempFileName = study.getStudyName().concat(LabelPrintingFieldUtils.UNDERSCORE).concat(StudyEntriesLabelPrinting.ORIG_FINAL_NAME);
 		final String fileName = FileNameGenerator.generateFileName(tempFileName);
 		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
 	}
@@ -158,7 +157,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 		studyEntryDtos.forEach((studyEntry) -> {
 			final Map<String, String> row = new HashMap<>();
 			combinedKeys.forEach((combinedKey) -> {
-				final String[] composedKey = combinedKey.split(StudyEntriesLabelPrinting.UNDERSCORE);
+				final String[] composedKey = combinedKey.split(LabelPrintingFieldUtils.UNDERSCORE);
 				final Integer key = Integer.valueOf(composedKey[1]);
 				if (TermId.CROSS.getId() == key) {
 					row.put(combinedKey,
@@ -172,7 +171,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 			});
 			results.add(row);
 		});
-		return new LabelsData(FieldType.VARIABLE.getName() + UNDERSCORE + TermId.GID.getId(), results);
+		return new LabelsData(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE + TermId.GID.getId(), results);
 	}
 
 	private String truncateValueIfPdf(final boolean isPdf, final String value, final int maxLength) {
@@ -185,7 +184,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				keys.add(FieldType.VARIABLE.getName() + UNDERSCORE + TermId.GID.getId());
+				keys.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE + TermId.GID.getId());
 			} else {
 				keys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}

@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.ibp.api.rest.labelprinting.template.LabelPaper;
@@ -55,7 +56,6 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 	public static final String FIELDNAME_VALUE_SEPARATOR = " : ";
 	public static final String BARCODE_SEPARATOR = " | ";
 	public static final int BARCODE_LABEL_LIMIT = 79;
-	public static final String UNDERSCORE = "_";
 
 	@Autowired
 	private LabelPaperFactory labelPaperFactory;
@@ -66,7 +66,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s." + FileType.PDF.getExtension(), labelsGeneratorInput.getFileName()));
 
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
-		final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + CSVLabelsFileGenerator.UNDERSCORE + field.getId());
+		final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + LabelPrintingFieldUtils.UNDERSCORE + field.getId());
 
 		final int pageSizeId = Integer.parseInt(labelsGeneratorInput.getSizeOfLabelSheet());
 		final int numberOfLabelPerRow = LabelsGeneratorInput.LABEL_PER_ROW;

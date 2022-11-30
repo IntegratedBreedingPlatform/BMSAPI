@@ -6,6 +6,7 @@ import com.google.common.io.Files;
 import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.springframework.stereotype.Component;
@@ -26,8 +27,6 @@ import java.util.Map;
 @Component
 public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 
-	public static final String UNDERSCORE = "_";
-
 	private static String BARCODE = "Barcode";
 
 	@Override
@@ -40,7 +39,7 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8),
 				',')) {
 
-			final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + CSVLabelsFileGenerator.UNDERSCORE + field.getId());
+			final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + LabelPrintingFieldUtils.UNDERSCORE + field.getId());
 
 			final File newFile = new File(fileNameFullPath);
 			// feed in your array (or convert your data to an array)

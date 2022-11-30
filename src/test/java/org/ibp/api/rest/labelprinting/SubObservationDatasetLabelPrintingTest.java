@@ -102,9 +102,9 @@ public class SubObservationDatasetLabelPrintingTest {
 		final String studyDetailsPropValue = this.subObservationDatasetLabelPrinting.getMessage("label.printing.study.details");
 		final LabelType labelType = new LabelType(studyDetailsPropValue, studyDetailsPropValue);
 		final List<Field> fields = new ArrayList<>();
-		fields.add(new Field(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), FieldType.VARIABLE));
-		fields.add(new Field(SubObservationDatasetLabelPrinting.PAIR_ID_VARIABLES.get(0), "PI_NAME_ID", FieldType.VARIABLE));
-		fields.add(new Field(SubObservationDatasetLabelPrinting.PAIR_ID_VARIABLES.get(1), "COOPERATOR_ID", FieldType.VARIABLE));
+		fields.add(new Field(FieldType.VARIABLE, TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name()));
+		fields.add(new Field(FieldType.VARIABLE, SubObservationDatasetLabelPrinting.PAIR_ID_VARIABLES.get(0), "PI_NAME_ID"));
+		fields.add(new Field(FieldType.VARIABLE, SubObservationDatasetLabelPrinting.PAIR_ID_VARIABLES.get(1), "COOPERATOR_ID"));
 		labelType.setFields(fields);
 		Assert.assertEquals(3, labelType.getFields().size());
 		ObservationLabelPrintingHelper.removePairIdVariables(Arrays.asList(labelType));

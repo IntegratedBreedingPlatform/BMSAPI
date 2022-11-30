@@ -9,6 +9,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
 import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -33,8 +34,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public abstract class LabelPrintingStrategy {
-
-	public static final String UNDERSCORE = "_";
 
 	private static final int FILENAME_MAX_LENGTH = 100;
 
@@ -130,7 +129,7 @@ public abstract class LabelPrintingStrategy {
 
 		final Set<String> availableKeys = this.getAvailableLabelTypes(labelsGeneratorInput, programUUID)
 			.stream().flatMap(labelType -> labelType.getFields().stream())
-			.map(field -> transformToCombinedKey(field))
+			.map(field -> LabelPrintingFieldUtils.transformToCombinedKey(field))
 			.collect(Collectors.toSet());
 
 		final Set<String> requestedFields = new HashSet<>();
@@ -212,8 +211,9 @@ public abstract class LabelPrintingStrategy {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		if (!labelsGeneratorInput.isAutomaticBarcode()) {
 			for (final Map<String, String> data : labelsData.getData()) {
-				final List<String> barcodeIds = labelsGeneratorInput.getBarcodeFields().stream().filter(labelId -> StringUtils.isEmpty(data.get(labelId))).collect(
-					Collectors.toList());
+				final List<String> barcodeIds =
+					labelsGeneratorInput.getBarcodeFields().stream().filter(labelId -> StringUtils.isEmpty(data.get(labelId))).collect(
+						Collectors.toList());
 				if (!barcodeIds.isEmpty()) {
 					errors.reject("label.fields.barcodes.selected.empty.value", "");
 					throw new ApiRequestValidationException(errors.getAllErrors());
@@ -233,9 +233,9 @@ public abstract class LabelPrintingStrategy {
 
 		if (!recordIds.isEmpty()) {
 			attributesType.getFields().addAll(attributeVariables.stream()
-				.map(attributeVariable -> new Field(
+				.map(attributeVariable -> new Field(FieldType.VARIABLE,
 					attributeVariable.getId(),
-					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName(), FieldType.VARIABLE))
+					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
 				.collect(Collectors.toList()));
 		}
 	}
@@ -248,36 +248,4 @@ public abstract class LabelPrintingStrategy {
 	 * @return LabelPrintingPresetDTO
 	 */
 	abstract LabelPrintingPresetDTO getDefaultSetting(final LabelsInfoInput labelsInfoInput, final String programUUID);
-
-	/**
-	 * Given field, it will get a String combing FieldType.name + '_' + field.Id
-	 *
-	 * @param field
-	 * @return String
-	 */
-	static String transformToCombinedKey(final Field field){
-		return field.getFieldType().getName() + UNDERSCORE + field.getId();
-	}
-
-	/**
-	 * Given combinedKey( FieldType.name + '_' + field.Id ), it will get the Id of a Field
-	 *
-	 * @param Integer
-	 * @return String
-	 */
-	public static Integer getFieldIdFromCombinedKey(final String combinedKey) {
-		final String[] keys = combinedKey.split(LabelPrintingStrategy.UNDERSCORE);
-		return Integer.valueOf(keys[1]);
-	}
-
-	/**
-	 * Given combinedKey( FieldType.name + '_' + field.Id ), it will get the FieldType (VARIABLE/STATIC/NAME)
-	 *
-	 * @param String
-	 * @return String
-	 */
-	public static String getFieldTypeNameFromCombinedKey(final String combinedKey) {
-		final String[] keys = combinedKey.split(LabelPrintingStrategy.UNDERSCORE);
-		return keys[0];
-	}
 }

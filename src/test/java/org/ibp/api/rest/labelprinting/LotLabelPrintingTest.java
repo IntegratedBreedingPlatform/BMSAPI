@@ -53,7 +53,7 @@ public class LotLabelPrintingTest {
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
 		attributeValues.get(GID).put(attributeId, attributeValue);
 		final Map<String, Field> combinedKeyFieldMap = new HashMap<>();
-		combinedKeyFieldMap.put("VARIABLE_" + attributeId, new Field(attributeId, RandomStringUtils.randomNumeric(5), FieldType.VARIABLE));
+		combinedKeyFieldMap.put("VARIABLE_" + attributeId, new Field(FieldType.VARIABLE, attributeId, RandomStringUtils.randomNumeric(5)));
 		final boolean isPdf = false;
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
@@ -74,7 +74,7 @@ public class LotLabelPrintingTest {
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
 		attributeValues.get(GID).put(attributeId, attributeValue);
 		final Map<String, Field> combinedKeyFieldMap = new HashMap<>();
-		combinedKeyFieldMap.put("VARIABLE_" + attributeId, new Field(attributeId, RandomStringUtils.randomNumeric(5), FieldType.VARIABLE));
+		combinedKeyFieldMap.put("VARIABLE_" + attributeId, new Field(FieldType.VARIABLE, attributeId, RandomStringUtils.randomNumeric(5)));
 		final boolean isPdf = false;
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
@@ -95,7 +95,7 @@ public class LotLabelPrintingTest {
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
 		attributeValues.get(GID).put(attributeId, attributeValue);
 		final Map<String, Field> combinedKeyFieldMap = new HashMap<>();
-		combinedKeyFieldMap.put("VARIABLE_" + attributeId, new Field(attributeId, RandomStringUtils.randomNumeric(5), FieldType.VARIABLE));
+		combinedKeyFieldMap.put("VARIABLE_" + attributeId, new Field(FieldType.VARIABLE, attributeId, RandomStringUtils.randomNumeric(5)));
 		final boolean isPdf = true;
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
