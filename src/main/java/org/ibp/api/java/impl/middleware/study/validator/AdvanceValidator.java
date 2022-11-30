@@ -220,6 +220,7 @@ public class AdvanceValidator {
 	void validateSelectionTrait(final Integer studyId, final AdvanceStudyRequest request,
 		final BreedingMethodDTO selectedBreedingMethod) {
 
+		// TODO: if there is at least a selection trait variable at any level then validate that must be one variable selected?
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			request.getBreedingMethodSelectionRequest();
 		if (breedingMethodSelectionRequest.getMethodVariateId() != null || (breedingMethodSelectionRequest.getBreedingMethodId() != null
