@@ -2,13 +2,14 @@ package org.ibp.api.java.impl.middleware.preset;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetDTO;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
+import org.generationcp.middleware.preset.PresetMapper;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.preset.PresetService;
 import org.ibp.api.java.program.ProgramService;
-import org.generationcp.middleware.domain.labelprinting.PresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -28,9 +29,6 @@ public class PresetServiceImpl implements PresetService {
 	private PresetDTOValidator presetDTOValidator;
 
 	@Autowired
-	private PresetMapper presetMapper;
-
-	@Autowired
 	private SecurityService securityService;
 
 	@Autowired
@@ -42,7 +40,8 @@ public class PresetServiceImpl implements PresetService {
 	public PresetDTO savePreset(final String crop, final PresetDTO presetDTO) {
 		this.presetDTOValidator.validate(crop, null, presetDTO);
 		this.validateUserIsAProgramMember(crop, this.securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
-		ProgramPreset programPreset = this.presetMapper.map(presetDTO);
+		final PresetMapper presetMapper = new PresetMapper();
+		ProgramPreset programPreset = presetMapper.map(presetDTO);
 		programPreset = this.presetService.saveProgramPreset(programPreset);
 		presetDTO.setId(programPreset.getProgramPresetId());
 		return presetDTO;
@@ -65,7 +64,8 @@ public class PresetServiceImpl implements PresetService {
 		}
 		final List<ProgramPreset> programPresets = this.presetService.getProgramPresetFromProgramAndTool(programUUID, toolId, toolSection);
 		final List<PresetDTO> presetDTOs = new ArrayList<>();
-		programPresets.forEach(programPreset -> presetDTOs.add(this.presetMapper.map(programPreset)));
+		final PresetMapper presetMapper = new PresetMapper();
+		programPresets.forEach(programPreset -> presetDTOs.add(presetMapper.map(programPreset)));
 		return presetDTOs;
 	}
 
@@ -82,7 +82,8 @@ public class PresetServiceImpl implements PresetService {
 		this.presetDTOValidator.validate(crop, presetId, presetDTO);
 		this.validateUserIsAProgramMember(crop, this.securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
 		final ProgramPreset updateProgramPreset = this.presetService.getProgramPresetById(presetId);
-		final ProgramPreset programPreset = this.presetMapper.map(presetDTO, updateProgramPreset);
+		final PresetMapper presetMapper = new PresetMapper();
+		final ProgramPreset programPreset = presetMapper.map(presetDTO, updateProgramPreset);
 		this.presetService.updateProgramPreset(updateProgramPreset);
 	}
 
