@@ -56,6 +56,7 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 	public void init() {
 		this.programUUID = RandomStringUtils.randomAlphabetic(10);
 		this.presetId = RandomUtils.nextInt();
+		//this.presetMapper = new PresetMapper();
 
 		this.workbenchUser = new WorkbenchUser();
 		this.workbenchUser.setName("username");
@@ -82,9 +83,7 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 		final ProgramDTO programSummary = new ProgramDTO();
 		programSummary.setMembers(Sets.newHashSet(this.workbenchUser.getName()));
 		Mockito.doReturn(programSummary).when(this.programService).getByUUIDAndCrop(this.CROP_NAME, this.programUUID);
-		final ProgramPreset programPreset = new ProgramPreset();
-		Mockito.doReturn(programPreset).when(this.presetMapper).map(presetDTO);
-		Mockito.doThrow(MiddlewareQueryException.class).when(this.middlewarePresetService).saveProgramPreset(programPreset);
+		Mockito.doThrow(MiddlewareQueryException.class).when(this.middlewarePresetService).saveProgramPreset(Mockito.any());
 		this.presetService.savePreset(this.CROP_NAME, presetDTO);
 	}
 
@@ -99,7 +98,7 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 		Mockito.doReturn(programSummary).when(this.programService).getByUUIDAndCrop(this.CROP_NAME, this.programUUID);
 		final ProgramPreset programPreset = new ProgramPreset();
 		Mockito.doReturn(programPreset).when(this.presetMapper).map(presetDTO);
-		Mockito.doReturn(programPreset).when(this.middlewarePresetService).saveProgramPreset(programPreset);
+		Mockito.doReturn(programPreset).when(this.middlewarePresetService).saveProgramPreset(Mockito.any());
 		this.presetService.savePreset(this.CROP_NAME, presetDTO);
 	}
 
