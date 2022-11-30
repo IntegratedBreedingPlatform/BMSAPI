@@ -327,11 +327,11 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 				final Field field = combinedKeyFieldMap.get(combinedKey);
 
 				if (FieldType.VARIABLE.equals(field.getFieldType())) {
-					this.getVariableDataRowValue(row, field, combinedKey, observationUnitRow);
+					this.getDataRowFromVariableFieldType(row, field, combinedKey, observationUnitRow);
 				} else if (FieldType.STATIC.equals(field.getFieldType())) {
-					this.getStaticDataRowValue(row, field, combinedKey, observationUnitRow, study, observationUnitDtoTransactionDtoMap, gidPedigreeMap);
+					this.getDataRowFromStaticFieldType(row, field, combinedKey, observationUnitRow, study, observationUnitDtoTransactionDtoMap, gidPedigreeMap);
 				} else if (FieldType.NAME.equals(field.getFieldType())) {
-					this.getNameDataRowValue(row, field, combinedKey, observationUnitRow);
+					this.getDataRowFromNameFieldType(row, field, combinedKey, observationUnitRow);
 				}
 			}
 			results.add(row);
@@ -340,7 +340,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		return new LabelsData(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE + TermId.OBS_UNIT_ID.getId(), results);
 	}
 
-	protected void getVariableDataRowValue(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow) {
+	protected void getDataRowFromVariableFieldType(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow) {
 		// Special cases: LOCATION_NAME, PLOT OBS_UNIT_ID, CROP_SEASON_CODE
 		final TermId term = TermId.getById(field.getId());
 		switch (term) {
@@ -374,7 +374,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	}
 
-	protected void getStaticDataRowValue(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow, final StudyDetails study, final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap,
+	protected void getDataRowFromStaticFieldType(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow, final StudyDetails study, final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap,
 		final Map<String, String> gidPedigreeMap) {
 
 		final Optional<LabelPrintingStaticField> staticField =
@@ -432,7 +432,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	}
 
-	protected void getNameDataRowValue(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow) {
+	protected void getDataRowFromNameFieldType(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow) {
 		final Optional<ObservationUnitData> observationVariables =
 			ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(), field);
 		if (observationVariables.isPresent()) {

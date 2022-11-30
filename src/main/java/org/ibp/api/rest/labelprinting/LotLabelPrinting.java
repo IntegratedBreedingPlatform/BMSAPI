@@ -1,6 +1,5 @@
 package org.ibp.api.rest.labelprinting;
 
-import com.google.common.collect.Maps;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
@@ -286,16 +285,16 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			final FieldType fieldType = FieldType.find(LabelPrintingFieldUtils.getFieldTypeNameFromCombinedKey(combinedKey));
 
 			if (FieldType.VARIABLE.equals(fieldType)) {
-				this.getVariableDataRowValue(columns, isPdf, combinedKey, extendedLotDto, germplasmAttributeValues, lotAttributeValues);
+				this.getDataRowFromVariableFieldType(columns, isPdf, combinedKey, extendedLotDto, germplasmAttributeValues, lotAttributeValues);
 			} else if (FieldType.STATIC.equals(fieldType)) {
-				this.getStaticDataRowValue(columns, combinedKey, extendedLotDto, pedigreeByGID);
+				this.getDataRowFromStaticFieldType(columns, combinedKey, extendedLotDto, pedigreeByGID);
 			}
 		}
 
 		return columns;
 	}
 
-	private void getStaticDataRowValue(final Map<String, String> columns, final String combinedKey, final ExtendedLotDto extendedLotDto,
+	private void getDataRowFromStaticFieldType(final Map<String, String> columns, final String combinedKey, final ExtendedLotDto extendedLotDto,
 		final Map<String, String> pedigreeByGID) {
 		final Integer fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
 		if (LOT_FIELD.getById(fieldId) != null) {
@@ -375,7 +374,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		}
 	}
 
-	void getVariableDataRowValue(final Map<String, String> columns, final boolean isPdf,
+	void getDataRowFromVariableFieldType(final Map<String, String> columns, final boolean isPdf,
 		final String combinedKey, final ExtendedLotDto extendedLotDto,
 		final Map<Integer, Map<Integer, String>> germplasmAttributeValues,
 		final Map<Integer, Map<Integer, String>> lotAttributeValues) {

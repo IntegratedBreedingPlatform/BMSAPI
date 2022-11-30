@@ -18,7 +18,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
-import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
@@ -53,8 +52,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -329,16 +326,16 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 				final Field field = combinedKeyFieldMap.get(combinedKey);
 
 				if (FieldType.VARIABLE.equals(field.getFieldType())) {
-					this.getVariableDataRowValue(row, field, combinedKey, observationUnitRow);
+					this.getDataRowFromVariableFieldType(row, field, combinedKey, observationUnitRow);
 				} else if (FieldType.STATIC.equals(field.getFieldType())) {
 					if (LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId().equals(field.getId())) {
 						row.put(combinedKey, observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue());
 						continue;
 					}
-					this.getStaticDataRowValue(row, field, combinedKey, observationUnitRow, study, observationUnitDtoTransactionDtoMap,
+					this.getDataRowFromStaticFieldType(row, field, combinedKey, observationUnitRow, study, observationUnitDtoTransactionDtoMap,
 						gidPedigreeMap);
 				} else if (FieldType.NAME.equals(field.getFieldType())) {
-					this.getNameDataRowValue(row, field, combinedKey, observationUnitRow);
+					this.getDataRowFromNameFieldType(row, field, combinedKey, observationUnitRow);
 				}
 			}
 			results.add(row);
