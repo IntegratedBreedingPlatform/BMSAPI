@@ -213,13 +213,13 @@ public class PresetDTOValidator {
 
 	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final String combinedKey) {
 		final String fieldId = LabelPrintingStrategy.getFieldIdFromCombinedKey(combinedKey).toString();
-		return this.isValidateFieldId(labelPrintingPresetDTO) && //
+		return this.isValidFieldId(labelPrintingPresetDTO) && //
 			!LabelPrintingStaticField.getAvailableStaticFields().contains(Integer.valueOf(fieldId)) && //
 			!this.germplasmNameTypeService.getNameTypeById(Integer.valueOf(fieldId)).isPresent() && //
 			this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), fieldId) == null;
 	}
 
-	private boolean isValidateFieldId(final LabelPrintingPresetDTO labelPrintingPresetDTO) {
+	private boolean isValidFieldId(final LabelPrintingPresetDTO labelPrintingPresetDTO) {
 		return !ToolSection.LOT_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection())
 			&& !ToolSection.GERMPLASM_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection())
 			&& !ToolSection.GERMPLASM_LIST_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection());
