@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
@@ -7,6 +8,7 @@ import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.ruleengine.naming.expression.SelectionTraitExpression;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -120,7 +122,7 @@ public class AdvanceValidatorTest {
 		this.mockValidateStudyHasPlotDataset();
 		this.mockGetDataset(true);
 
-		final MeasurementVariable plotVariate = this.mockMeasurementVariable(PLOT_VARIATE_ID);
+		final MeasurementVariable plotVariate = this.mockMeasurementVariable(PLOT_VARIATE_ID, AdvanceValidator.SELECTED_LINE_VARIABLE_PROPERTY, VariableType.SELECTION_METHOD);
 		Mockito.when(this.datasetService.getObservationSetVariables(PLOT_DATASET_ID)).thenReturn(Arrays.asList(plotVariate));
 
 		this.mockValidateMethod(MethodType.DERIVATIVE, true);
@@ -156,7 +158,8 @@ public class AdvanceValidatorTest {
 		this.mockValidateStudyHasPlotDataset();
 		this.mockGetDataset(true);
 
-		final MeasurementVariable plotDatasetVariables = this.mockMeasurementVariable(LINE_VARIATE_ID);
+		final MeasurementVariable plotDatasetVariables =
+			this.mockMeasurementVariable(LINE_VARIATE_ID, AdvanceValidator.SELECTED_LINE_VARIABLE_PROPERTY, VariableType.SELECTION_METHOD);
 		Mockito.when(this.datasetService.getObservationSetVariables(PLOT_DATASET_ID)).thenReturn(Arrays.asList(plotDatasetVariables));
 
 		this.mockValidateMethod(MethodType.DERIVATIVE, false);
@@ -190,7 +193,9 @@ public class AdvanceValidatorTest {
 		this.mockValidateStudyHasPlotDataset();
 		this.mockGetDataset(true);
 
-		final MeasurementVariable plotDatasetVariables = this.mockMeasurementVariable(METHOD_VARIATE_ID);
+		final MeasurementVariable plotDatasetVariables =
+			this.mockMeasurementVariable(METHOD_VARIATE_ID, AdvanceValidator.BREEDING_METHOD_VARIABLE_PROPERTY,
+				VariableType.SELECTION_METHOD);
 		Mockito.when(this.datasetService.getObservationSetVariables(PLOT_DATASET_ID)).thenReturn(Arrays.asList(plotDatasetVariables));
 
 		final MeasurementVariable selectionTraitDatasetVariables = this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID);
@@ -231,8 +236,10 @@ public class AdvanceValidatorTest {
 		this.mockValidateStudyHasPlotDataset();
 		this.mockGetDataset(true);
 
-		final MeasurementVariable methodVariate = this.mockMeasurementVariable(METHOD_VARIATE_ID);
-		final MeasurementVariable plotVariate = this.mockMeasurementVariable(PLOT_VARIATE_ID);
+		final MeasurementVariable methodVariate =
+			this.mockMeasurementVariable(METHOD_VARIATE_ID, AdvanceValidator.BREEDING_METHOD_VARIABLE_PROPERTY,
+				VariableType.SELECTION_METHOD);
+		final MeasurementVariable plotVariate = this.mockMeasurementVariable(PLOT_VARIATE_ID, AdvanceValidator.SELECTED_LINE_VARIABLE_PROPERTY, VariableType.SELECTION_METHOD);
 		Mockito.when(this.datasetService.getObservationSetVariables(PLOT_DATASET_ID)).thenReturn(Arrays.asList(methodVariate, plotVariate));
 
 		final MeasurementVariable selectionTraitDatasetVariables = this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID);
@@ -348,6 +355,48 @@ public class AdvanceValidatorTest {
 	}
 
 	@Test
+	public void validateAdvanceStudyBreedingMethodSelection_FAIL_invalidMethodVariableType() {
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
+			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
+
+		final MeasurementVariable plotDatasetVariables =
+			this.mockMeasurementVariable(METHOD_VARIATE_ID, AdvanceValidator.BREEDING_METHOD_VARIABLE_PROPERTY, VariableType.ENTRY_DETAIL);
+
+		try {
+			this.advanceValidator
+				.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, Arrays.asList(plotDatasetVariables));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.breeding-method.selection.variate.type.invalid"));
+			assertThat(exception.getErrors().get(0).getArguments()[0], is(VariableType.SELECTION_METHOD.getName()));
+		}
+
+		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+	}
+
+	@Test
+	public void validateAdvanceStudyBreedingMethodSelection_FAIL_invalidMethodProperty() {
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
+			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
+
+		final MeasurementVariable plotDatasetVariables =
+			this.mockMeasurementVariable(METHOD_VARIATE_ID, RandomStringUtils.randomAlphabetic(10), VariableType.SELECTION_METHOD);
+
+		try {
+			this.advanceValidator
+				.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, Arrays.asList(plotDatasetVariables));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.breeding-method.selection.variate.property.invalid"));
+			assertThat(exception.getErrors().get(0).getArguments()[0], is(AdvanceValidator.BREEDING_METHOD_VARIABLE_PROPERTY));
+		}
+
+		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+	}
+
+	@Test
 	public void validateLineSelection_FAIL_requestRequiredUsingSameNotBulkingMethod() {
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(BREEDING_METHOD_ID, null);
@@ -436,6 +485,53 @@ public class AdvanceValidatorTest {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.lines.selection.variate.not-present"));
 			assertThat(exception.getErrors().get(0).getArguments()[0], is(LINE_VARIATE_ID.toString()));
+		}
+	}
+
+	@Test
+	public void validateLineSelection_FAIL_invalidVariableType() {
+
+		final MeasurementVariable plotDatasetVariables =
+			this.mockMeasurementVariable(LINE_VARIATE_ID, AdvanceValidator.SELECTED_LINE_VARIABLE_PROPERTY, VariableType.ENTRY_DETAIL);
+
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
+			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
+		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest = this.mockLineSelectionRequest(null, LINE_VARIATE_ID);
+		final AdvanceStudyRequest request =
+			this.mockAdvanceStudyRequest(new ArrayList<>(), new ArrayList<>(), breedingMethodSelectionRequest, lineSelectionRequest, null,
+				null);
+		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, false);
+
+		try {
+			this.advanceValidator.validateLineSelection(request, breedingMethodDTO, Arrays.asList(plotDatasetVariables));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.lines.selection.variate.type.invalid"));
+			assertThat(exception.getErrors().get(0).getArguments()[0], is(VariableType.SELECTION_METHOD));
+		}
+	}
+
+	@Test
+	public void validateLineSelection_FAIL_invalidVariableProperty() {
+		final MeasurementVariable plotDatasetVariables =
+			this.mockMeasurementVariable(LINE_VARIATE_ID, RandomStringUtils.randomAlphabetic(10), VariableType.SELECTION_METHOD);
+
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
+			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
+		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest = this.mockLineSelectionRequest(null, LINE_VARIATE_ID);
+		final AdvanceStudyRequest request =
+			this.mockAdvanceStudyRequest(new ArrayList<>(), new ArrayList<>(), breedingMethodSelectionRequest, lineSelectionRequest, null,
+				null);
+		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, false);
+
+		try {
+			this.advanceValidator.validateLineSelection(request, breedingMethodDTO, Arrays.asList(plotDatasetVariables));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.lines.selection.variate.property.invalid"));
+			assertThat(exception.getErrors().get(0).getArguments()[0], is(AdvanceValidator.SELECTED_LINE_VARIABLE_PROPERTY));
 		}
 	}
 
@@ -529,6 +625,53 @@ public class AdvanceValidatorTest {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.bulking.selection.variate.not-present"));
 			assertThat(exception.getErrors().get(0).getArguments()[0], is(PLOT_VARIATE_ID.toString()));
+		}
+	}
+
+	@Test
+	public void validateBulkingSelection_FAIL_invalidVariableType() {
+
+		final MeasurementVariable plotDatasetVariables =
+			this.mockMeasurementVariable(PLOT_VARIATE_ID, AdvanceValidator.SELECTED_LINE_VARIABLE_PROPERTY, VariableType.ENTRY_DETAIL);
+
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
+			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
+		final AdvanceStudyRequest.BulkingRequest bulkingRequest = this.mockBulkingRequest(null, PLOT_VARIATE_ID);
+		final AdvanceStudyRequest request =
+			this.mockAdvanceStudyRequest(new ArrayList<>(), new ArrayList<>(), breedingMethodSelectionRequest, null, bulkingRequest,
+				null);
+		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, false);
+
+		try {
+			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, Arrays.asList(plotDatasetVariables));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.bulking.selection.variate.type.invalid"));
+			assertThat(exception.getErrors().get(0).getArguments()[0], is(VariableType.SELECTION_METHOD));
+		}
+	}
+
+	@Test
+	public void validateBulkingSelection_FAIL_invalidVariableProperty() {
+		final MeasurementVariable plotDatasetVariables =
+			this.mockMeasurementVariable(PLOT_VARIATE_ID, RandomStringUtils.randomAlphabetic(10), VariableType.SELECTION_METHOD);
+
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
+			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
+		final AdvanceStudyRequest.BulkingRequest bulkingRequest = this.mockBulkingRequest(null, PLOT_VARIATE_ID);
+		final AdvanceStudyRequest request =
+			this.mockAdvanceStudyRequest(new ArrayList<>(), new ArrayList<>(), breedingMethodSelectionRequest, null, bulkingRequest,
+				null);
+		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, false);
+
+		try {
+			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, Arrays.asList(plotDatasetVariables));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.bulking.selection.variate.property.invalid"));
+			assertThat(exception.getErrors().get(0).getArguments()[0], is(AdvanceValidator.SELECTED_LINE_VARIABLE_PROPERTY));
 		}
 	}
 
@@ -872,8 +1015,14 @@ public class AdvanceValidatorTest {
 	}
 
 	private MeasurementVariable mockMeasurementVariable(final Integer variableId) {
+		return this.mockMeasurementVariable(variableId, RandomStringUtils.randomAlphabetic(10), VariableType.ENTRY_DETAIL);
+	}
+
+	private MeasurementVariable mockMeasurementVariable(final Integer variableId, final String property, final VariableType variableType) {
 		final MeasurementVariable measurementVariable = Mockito.mock(MeasurementVariable.class);
 		Mockito.when(measurementVariable.getTermId()).thenReturn(variableId);
+		Mockito.when(measurementVariable.getProperty()).thenReturn(property);
+		Mockito.when(measurementVariable.getVariableType()).thenReturn(variableType);
 		return measurementVariable;
 	}
 
