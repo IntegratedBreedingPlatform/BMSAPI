@@ -16,6 +16,16 @@ public abstract class LabelPrintingFieldUtils {
 	}
 
 	/**
+	 * Given fieldType and fieldId, it will get a String combing FieldType.name + '_' + field.Id
+	 *
+	 * @param fieldType
+	 * @param fieldId
+	 * @return String
+	 */
+	public static String transformToCombinedKey(final FieldType fieldType, final Integer fieldId) {
+		return fieldType.getName() + LabelPrintingFieldUtils.UNDERSCORE + fieldId;
+	}
+	/**
 	 * Given combinedKey( FieldType.name + '_' + field.Id ), it will get the Id of a Field
 	 *
 	 * @param Integer

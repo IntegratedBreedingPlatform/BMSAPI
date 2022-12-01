@@ -256,7 +256,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				combinedKeys.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE + LOT_FIELD.LOT_UID.getId());
+				combinedKeys.add(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LOT_FIELD.LOT_UID.getId()));
 			} else {
 				combinedKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
@@ -268,7 +268,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			data.add(
 				this.getDataRow(isPdf, combinedKeys, extendedLotDto, germplasmAttributeValues, lotAttributeValues, pedigreeByGID));
 		}
-		return new LabelsData(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE + LOT_FIELD.LOT_UID.getId(), data);
+		return new LabelsData(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LOT_FIELD.LOT_UID.getId()), data);
 	}
 
 	Map<String, String> getDataRow(final boolean isPdf,

@@ -254,7 +254,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		for (final GermplasmSearchResponse germplasmSearchResponse : responseList) {
 			data.add(this.getDataRow(isPdf, combinedKeys, germplasmSearchResponse, attributeValues, nameValues));
 		}
-		return new LabelsData(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE + LabelPrintingStaticField.GUID.getFieldId(), data);
+		return new LabelsData(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LabelPrintingStaticField.GUID.getFieldId()), data);
 	}
 
 	void getNameValuesMap(final Map<Integer, Map<Integer, String>> nameValues, final List<Integer> gids) {
@@ -279,7 +279,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				combinedKeys.add(FieldType.STATIC.getName() + LabelPrintingFieldUtils.UNDERSCORE + LabelPrintingStaticField.GUID.getFieldId());
+				combinedKeys.add(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC,LabelPrintingStaticField.GUID.getFieldId()));
 			} else {
 				combinedKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}

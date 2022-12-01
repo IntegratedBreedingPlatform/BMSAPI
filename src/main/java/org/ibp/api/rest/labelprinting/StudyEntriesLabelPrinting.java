@@ -157,8 +157,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 		studyEntryDtos.forEach((studyEntry) -> {
 			final Map<String, String> row = new HashMap<>();
 			combinedKeys.forEach((combinedKey) -> {
-				final String[] composedKey = combinedKey.split(LabelPrintingFieldUtils.UNDERSCORE);
-				final Integer key = Integer.valueOf(composedKey[1]);
+				final Integer key = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
 				if (TermId.CROSS.getId() == key) {
 					row.put(combinedKey,
 						truncateValueIfPdf(isPdf, studyEntry.getCross(), StudyEntriesLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
@@ -171,7 +170,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 			});
 			results.add(row);
 		});
-		return new LabelsData(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE + TermId.GID.getId(), results);
+		return new LabelsData(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.GID.getId()), results);
 	}
 
 	private String truncateValueIfPdf(final boolean isPdf, final String value, final int maxLength) {
@@ -184,7 +183,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				keys.add(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE + TermId.GID.getId());
+				keys.add(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.GID.getId()));
 			} else {
 				keys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}

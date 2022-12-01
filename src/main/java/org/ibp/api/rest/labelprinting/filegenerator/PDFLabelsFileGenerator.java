@@ -66,7 +66,8 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 		final String sanitizedFileName = FileUtils.sanitizeFileName(String.format("%s." + FileType.PDF.getExtension(), labelsGeneratorInput.getFileName()));
 
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
-		final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + LabelPrintingFieldUtils.UNDERSCORE + field.getId());
+		final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(),
+			field -> LabelPrintingFieldUtils.transformToCombinedKey(field.getFieldType(), field.getId()));
 
 		final int pageSizeId = Integer.parseInt(labelsGeneratorInput.getSizeOfLabelSheet());
 		final int numberOfLabelPerRow = LabelsGeneratorInput.LABEL_PER_ROW;

@@ -37,7 +37,7 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 		final String fullFileName = fileName + "." + FileType.XLS.getExtension();
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + fullFileName;
 
-		final Map<String, Field> fieldsByKey = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + LabelPrintingFieldUtils.UNDERSCORE + field.getId());
+		final Map<String, Field> fieldsByKey = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> LabelPrintingFieldUtils.transformToCombinedKey(field.getFieldType(), field.getId()));
 
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 		final HSSFSheet sheet = xlsBook.createSheet(fileName);
@@ -69,7 +69,7 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 			int colIndex = 0;
 			for (final Field header : headers) {
 				final HSSFCell cell = row.createCell(colIndex);
-				cell.setCellValue(dataRow.get(header.getFieldType().getName() + LabelPrintingFieldUtils.UNDERSCORE + header.getId()));
+				cell.setCellValue(dataRow.get(LabelPrintingFieldUtils.transformToCombinedKey(header.getFieldType(), header.getId())));
 				colIndex++;
 			}
 			rowIndex++;

@@ -300,7 +300,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		final Set<String> combinedKeys = new HashSet<>();
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				combinedKeys.add(FieldType.VARIABLE.getName() + TermId.OBS_UNIT_ID.getId() + LabelPrintingFieldUtils.UNDERSCORE  );
+				combinedKeys.add(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.OBS_UNIT_ID.getId()));
 			} else {
 				combinedKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
@@ -337,7 +337,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			results.add(row);
 		}
 
-		return new LabelsData(FieldType.VARIABLE.getName() + LabelPrintingFieldUtils.UNDERSCORE + TermId.OBS_UNIT_ID.getId(), results);
+		return new LabelsData(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.OBS_UNIT_ID.getId()), results);
 	}
 
 	protected void getDataRowFromVariableFieldType(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow) {

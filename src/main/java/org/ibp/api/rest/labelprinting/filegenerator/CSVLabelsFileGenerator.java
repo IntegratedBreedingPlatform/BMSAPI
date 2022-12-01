@@ -39,7 +39,8 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8),
 				',')) {
 
-			final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> field.getFieldType().getName() + LabelPrintingFieldUtils.UNDERSCORE + field.getId());
+			final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(),
+				field -> LabelPrintingFieldUtils.transformToCombinedKey(field.getFieldType(), field.getId()));
 
 			final File newFile = new File(fileNameFullPath);
 			// feed in your array (or convert your data to an array)
