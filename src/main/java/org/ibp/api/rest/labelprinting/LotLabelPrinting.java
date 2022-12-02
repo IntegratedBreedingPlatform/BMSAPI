@@ -381,23 +381,22 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final Integer fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
 
 		if (CollectionUtils.isNotEmpty(this.lotAttributeKeys) && this.lotAttributeKeys.contains(fieldId)) {
-			this.addAttributeColumns(isPdf, columns, combinedKey, fieldId,
-				lotAttributeValues.get(extendedLotDto.getLotId()));
+			this.addAttributeColumns(isPdf, columns, combinedKey, lotAttributeValues.get(extendedLotDto.getLotId()));
 		} else {
 			// Not part of the fixed columns or lot attributes
 			// Attributes
-			this.addAttributeColumns(isPdf, columns, combinedKey, fieldId,
-				germplasmAttributeValues.get(extendedLotDto.getGid()));
+			this.addAttributeColumns(isPdf, columns, combinedKey, germplasmAttributeValues.get(extendedLotDto.getGid()));
 		}
 	}
 
 	private void addAttributeColumns(final boolean isPdf, final Map<String, String> columns,
-		final String key, final int id, final Map<Integer, String> attributesByType) {
+		final String combinedKey, final Map<Integer, String> attributesByType) {
 		if (attributesByType != null) {
-			final String attributeValue = attributesByType.get(id);
+			final Integer fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
+			final String attributeValue = attributesByType.get(fieldId);
 			if (attributeValue != null) {
 				// Truncate attribute values to 200 characters if export file type is PDF
-				columns.put(key, isPdf && StringUtils.length(attributeValue) > GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH ?
+				columns.put(combinedKey, isPdf && StringUtils.length(attributeValue) > GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH ?
 					attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "..." : attributeValue);
 			}
 		}
