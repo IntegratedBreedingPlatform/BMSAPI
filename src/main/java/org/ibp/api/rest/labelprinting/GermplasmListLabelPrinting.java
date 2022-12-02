@@ -288,6 +288,10 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 			final TermId termId = TermId.getById(dto.getTermId());
 
 			switch (termId) {
+				case GID:
+					fields.add(
+						LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.GID.getId()));
+					break;
 				case GID_ACTIVE_LOTS_COUNT:
 					fields.add(
 						LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LabelPrintingStaticField.LOTS.getFieldId()));
@@ -353,12 +357,6 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 				case FEMALE_PARENT:
 					fields.add(
 						LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.CROSS_FEMALE_PREFERRED_NAME.getId()));
-					break;
-				case ENTRY_CODE:
-					fields.add(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.ENTRY_CODE.getId()));
-					break;
-				case ENTRY_NO:
-					fields.add(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.ENTRY_NO.getId()));
 					break;
 				default:
 					final FieldType fieldType = dto.getColumnCategory().NAMES.equals(dto.getColumnCategory()) ?
