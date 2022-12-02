@@ -444,59 +444,59 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	void addingColumnToGermplasmSearchRequest(
 		final List<String> listOfSelectedFields,
 		final Set<String> addedColumnsPropertyIds) {
-		if (listOfSelectedFields.contains(TermId.GERMPLASM_DATE.getId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.GERMPLASM_DATE.getId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.GERMPLASM_DATE);
 		}
 
-		if (listOfSelectedFields.contains(LabelPrintingStaticField.METHOD_CODE.getFieldId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LabelPrintingStaticField.METHOD_CODE.getFieldId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.METHOD_ABBREV);
 		}
 
-		if (listOfSelectedFields.contains(LabelPrintingStaticField.METHOD_NUMBER.getFieldId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LabelPrintingStaticField.METHOD_NUMBER.getFieldId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.METHOD_NUMBER);
 		}
 
-		if (listOfSelectedFields.contains(LabelPrintingStaticField.METHOD_GROUP.getFieldId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LabelPrintingStaticField.METHOD_GROUP.getFieldId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.METHOD_GROUP);
 		}
 
-		if (listOfSelectedFields.contains(TermId.PREFERRED_NAME.getId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.PREFERRED_NAME.getId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.PREFERRED_NAME);
 		}
 
-		if (listOfSelectedFields.contains(TermId.PREFERRED_ID.getId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.PREFERRED_ID.getId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.PREFERRED_ID);
 		}
 
-		if (listOfSelectedFields.contains(LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.GROUP_SOURCE_GID);
 		}
 
-		if (listOfSelectedFields.contains(LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.GROUP_SOURCE);
 		}
 
-		if (listOfSelectedFields.contains(TermId.CROSS_MALE_GID.getId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.CROSS_MALE_GID.getId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.MALE_PARENT_GID);
 		}
 
-		if (listOfSelectedFields.contains(TermId.CROSS_FEMALE_GID.getId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.CROSS_FEMALE_GID.getId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.FEMALE_PARENT_GID);
 		}
 
-		if (listOfSelectedFields.contains(TermId.CROSS_MALE_PREFERRED_NAME.getId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.CROSS_MALE_PREFERRED_NAME.getId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.CROSS_MALE_PREFERRED_NAME);
 		}
 
-		if (listOfSelectedFields.contains(TermId.CROSS_FEMALE_PREFERRED_NAME.getId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.CROSS_FEMALE_PREFERRED_NAME.getId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.CROSS_FEMALE_PREFERRED_NAME);
 		}
 
-		if (listOfSelectedFields.contains(LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.IMMEDIATE_SOURCE_GID);
 		}
 
-		if (listOfSelectedFields.contains(LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId())) {
+		if (listOfSelectedFields.contains(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId()))) {
 			addedColumnsPropertyIds.add(GermplasmLabelPrinting.IMMEDIATE_SOURCE);
 		}
 	}
