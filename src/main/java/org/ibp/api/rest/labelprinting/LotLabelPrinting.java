@@ -380,7 +380,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		final Map<Integer, Map<Integer, String>> lotAttributeValues) {
 		final Integer fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
 
-		if (CollectionUtils.isNotEmpty(this.lotAttributeKeys) && this.lotAttributeKeys.contains(combinedKey)) {
+		if (CollectionUtils.isNotEmpty(this.lotAttributeKeys) && this.lotAttributeKeys.contains(fieldId)) {
 			this.addAttributeColumns(isPdf, columns, combinedKey, fieldId,
 				lotAttributeValues.get(extendedLotDto.getLotId()));
 		} else {
