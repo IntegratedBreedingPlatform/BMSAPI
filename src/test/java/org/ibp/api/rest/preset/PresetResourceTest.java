@@ -9,6 +9,8 @@ import org.generationcp.middleware.domain.labelprinting.FilePresetConfigurationD
 import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.generationcp.middleware.domain.labelprinting.PresetDTO;
 import org.generationcp.middleware.domain.labelprinting.PresetType;
+import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -71,8 +73,10 @@ public class PresetResourceTest extends ApiUnitTestBase {
 		this.toolId = 23;
 
 		this.type = PresetType.LABEL_PRINTING_PRESET.getName();
-		this.selectedField = Arrays.asList(Arrays.asList("STATIC_4", "STATIC_13"));
-		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList("STATIC_2"));
+		this.selectedField = Arrays.asList(Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, 4),
+			LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, 13)));
+		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE,
+			Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, 2)));
 		this.filePresetConfigurationDTO = new FilePresetConfigurationDTO();
 		this.filePresetConfigurationDTO.setOutputType("csv");
 	}
