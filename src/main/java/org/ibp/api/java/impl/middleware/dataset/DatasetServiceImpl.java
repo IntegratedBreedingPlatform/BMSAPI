@@ -1038,12 +1038,12 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<MeasurementVariable> getVariablesByVariableType(final Integer studyId, final Integer datasetId,
 		final List<Integer> variableTypes) {
 		this.studyValidator.validate(studyId, false);
-		if (!studyId.equals(datasetId)) {
+		if (datasetId != null) {
 			this.datasetValidator.validateDataset(datasetId);
 		}
 
 		variableTypes.forEach(this.datasetValidator::validateVariableType);
-		return this.middlewareDatasetService.getDatasetMeasurementVariablesByVariableType(datasetId, variableTypes);
+		return this.middlewareDatasetService.getDatasetMeasurementVariablesByVariableType(studyId != null ? studyId : datasetId, variableTypes);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
