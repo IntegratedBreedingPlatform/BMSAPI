@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 public class PDFLabelsFileGenerator implements LabelsFileGenerator {
@@ -67,7 +66,7 @@ public class PDFLabelsFileGenerator implements LabelsFileGenerator {
 
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 		final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(),
-			field -> LabelPrintingFieldUtils.transformToCombinedKey(field.getFieldType(), field.getId()));
+			field -> LabelPrintingFieldUtils.buildCombinedKey(field.getFieldType(), field.getId()));
 
 		final int pageSizeId = Integer.parseInt(labelsGeneratorInput.getSizeOfLabelSheet());
 		final int numberOfLabelPerRow = LabelsGeneratorInput.LABEL_PER_ROW;

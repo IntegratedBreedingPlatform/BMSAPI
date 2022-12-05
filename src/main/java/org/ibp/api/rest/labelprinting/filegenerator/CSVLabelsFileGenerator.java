@@ -40,7 +40,7 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 				',')) {
 
 			final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(),
-				field -> LabelPrintingFieldUtils.transformToCombinedKey(field.getFieldType(), field.getId()));
+				field -> LabelPrintingFieldUtils.buildCombinedKey(field.getFieldType(), field.getId()));
 
 			final File newFile = new File(fileNameFullPath);
 			// feed in your array (or convert your data to an array)

@@ -1,7 +1,5 @@
 package org.ibp.api.rest.labelprinting.domain;
 
-import org.ibp.api.rest.labelprinting.LabelPrintingStrategy;
-
 public abstract class LabelPrintingFieldUtils {
 
 	public static final String UNDERSCORE = "_";
@@ -11,7 +9,7 @@ public abstract class LabelPrintingFieldUtils {
 	 * @param field
 	 * @return String
 	 */
-	public static String transformToCombinedKey(final Field field) {
+	public static String buildCombinedKey(final Field field) {
 		return field.getFieldType().getName() + LabelPrintingFieldUtils.UNDERSCORE + field.getId();
 	}
 
@@ -22,7 +20,7 @@ public abstract class LabelPrintingFieldUtils {
 	 * @param fieldId
 	 * @return String
 	 */
-	public static String transformToCombinedKey(final FieldType fieldType, final Integer fieldId) {
+	public static String buildCombinedKey(final FieldType fieldType, final Integer fieldId) {
 		return fieldType.getName() + LabelPrintingFieldUtils.UNDERSCORE + fieldId;
 	}
 	/**

@@ -129,7 +129,7 @@ public abstract class LabelPrintingStrategy {
 
 		final Set<String> availableKeys = this.getAvailableLabelTypes(labelsGeneratorInput, programUUID)
 			.stream().flatMap(labelType -> labelType.getFields().stream())
-			.map(field -> LabelPrintingFieldUtils.transformToCombinedKey(field))
+			.map(field -> LabelPrintingFieldUtils.buildCombinedKey(field))
 			.collect(Collectors.toSet());
 
 		final Set<String> requestedFields = new HashSet<>();

@@ -60,24 +60,24 @@ public class GermplasmLabelPrintingTest {
 	final static String ATTRIBUTES = "Attributes";
 	final static Integer GID = 1;
 
-	final static String GID_KEY = LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.GID.getId());
+	final static String GID_KEY = LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.GID.getId());
 
-	final static String GUID_KEY = LabelPrintingFieldUtils.transformToCombinedKey(
+	final static String GUID_KEY = LabelPrintingFieldUtils.buildCombinedKey(
 		FieldType.STATIC, LabelPrintingStaticField.GUID.getFieldId());
 
-	final static String CROSS_FEMALE_GID_KEY = LabelPrintingFieldUtils.transformToCombinedKey(
+	final static String CROSS_FEMALE_GID_KEY = LabelPrintingFieldUtils.buildCombinedKey(
 		FieldType.VARIABLE, TermId.CROSS_FEMALE_GID.getId());
 
-	final static String PREFERRED_NAME_KEY = LabelPrintingFieldUtils.transformToCombinedKey(
+	final static String PREFERRED_NAME_KEY = LabelPrintingFieldUtils.buildCombinedKey(
 		FieldType.VARIABLE, TermId.PREFERRED_NAME.getId());
 
-	final static String CROSS_KEY = LabelPrintingFieldUtils.transformToCombinedKey(
+	final static String CROSS_KEY = LabelPrintingFieldUtils.buildCombinedKey(
 		FieldType.STATIC, LabelPrintingStaticField.CROSS.getFieldId());
 
-	final static String CROSS_MALE_PREFERRED_NAME_KEY = LabelPrintingFieldUtils.transformToCombinedKey(
+	final static String CROSS_MALE_PREFERRED_NAME_KEY = LabelPrintingFieldUtils.buildCombinedKey(
 		FieldType.VARIABLE, TermId.CROSS_MALE_PREFERRED_NAME.getId());
 
-	final static String CROSS_FEMALE_PREFERRED_NAME_KEY = LabelPrintingFieldUtils.transformToCombinedKey(
+	final static String CROSS_FEMALE_PREFERRED_NAME_KEY = LabelPrintingFieldUtils.buildCombinedKey(
 		FieldType.VARIABLE, TermId.CROSS_FEMALE_PREFERRED_NAME.getId());
 
 	@Mock
@@ -402,7 +402,7 @@ public class GermplasmLabelPrintingTest {
 		this.germplasmLabelPrinting.initStaticFields();
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final Set<String> combinedKeys =
-			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, attributeId)));
+			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
@@ -412,7 +412,7 @@ public class GermplasmLabelPrintingTest {
 		final Map<String, String> dataRow =
 			this.germplasmLabelPrinting.getDataRow(isPdf, combinedKeys, response, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
-		Assert.assertEquals(attributeValue, dataRow.get(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, attributeId)));
+		Assert.assertEquals(attributeValue, dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 	}
 
 	@Test
@@ -420,7 +420,7 @@ public class GermplasmLabelPrintingTest {
 		this.germplasmLabelPrinting.initStaticFields();
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final Set<String> combinedKeys =
-			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, attributeId)));
+			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
@@ -431,7 +431,7 @@ public class GermplasmLabelPrintingTest {
 			this.germplasmLabelPrinting.getDataRow(isPdf, combinedKeys, response, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is not truncated for CSV file type
-		Assert.assertEquals(attributeValue, dataRow.get(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, attributeId)));
+		Assert.assertEquals(attributeValue, dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 	}
 
 	@Test
@@ -439,7 +439,7 @@ public class GermplasmLabelPrintingTest {
 		this.germplasmLabelPrinting.initStaticFields();
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final Set<String> combinedKeys =
-			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, attributeId)));
+			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
@@ -450,7 +450,7 @@ public class GermplasmLabelPrintingTest {
 			this.germplasmLabelPrinting.getDataRow(isPdf, combinedKeys, response, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is not truncated for XLS file type
-		Assert.assertEquals(attributeValue, dataRow.get(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, attributeId)));
+		Assert.assertEquals(attributeValue, dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 	}
 
 	@Test
@@ -458,7 +458,7 @@ public class GermplasmLabelPrintingTest {
 		this.germplasmLabelPrinting.initStaticFields();
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final Set<String> combinedKeys =
-			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, attributeId)));
+			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
@@ -469,7 +469,7 @@ public class GermplasmLabelPrintingTest {
 			this.germplasmLabelPrinting.getDataRow(isPdf, combinedKeys, response, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		Assert.assertEquals(attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "...",
-			dataRow.get(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, attributeId)));
+			dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 	}
 
 	@Test
@@ -477,7 +477,7 @@ public class GermplasmLabelPrintingTest {
 		this.germplasmLabelPrinting.initStaticFields();
 		final Integer nameTypeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final Set<String> combinedKeys =
-			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.NAME, nameTypeId)));
+			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.NAME, nameTypeId)));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 		nameValues.put(GID, new HashMap<>());
@@ -487,7 +487,7 @@ public class GermplasmLabelPrintingTest {
 		final Map<String, String> dataRow =
 			this.germplasmLabelPrinting.getDataRow(isPdf, combinedKeys, response, new HashMap<>(), nameValues);
 		Assert.assertEquals(1, dataRow.keySet().size());
-		Assert.assertEquals(nameValue, dataRow.get(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.NAME, nameTypeId)));
+		Assert.assertEquals(nameValue, dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.NAME, nameTypeId)));
 	}
 
 	@Test
@@ -495,7 +495,7 @@ public class GermplasmLabelPrintingTest {
 		this.germplasmLabelPrinting.initStaticFields();
 		final Integer nameTypeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final Set<String> combinedKeys =
-			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.NAME, nameTypeId)));
+			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.NAME, nameTypeId)));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 		nameValues.put(GID, new HashMap<>());
@@ -505,7 +505,7 @@ public class GermplasmLabelPrintingTest {
 		final Map<String, String> dataRow =
 			this.germplasmLabelPrinting.getDataRow(isPdf, combinedKeys, response, new HashMap<>(), nameValues);
 		Assert.assertEquals(1, dataRow.keySet().size());
-		Assert.assertEquals(nameValue, dataRow.get(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.NAME, nameTypeId)));
+		Assert.assertEquals(nameValue, dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.NAME, nameTypeId)));
 	}
 
 	@Test
@@ -513,7 +513,7 @@ public class GermplasmLabelPrintingTest {
 		this.germplasmLabelPrinting.initStaticFields();
 		final Integer nameTypeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final Set<String> combinedKeys =
-			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.NAME, nameTypeId)));
+			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.NAME, nameTypeId)));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 		nameValues.put(GID, new HashMap<>());
@@ -523,7 +523,7 @@ public class GermplasmLabelPrintingTest {
 		final Map<String, String> dataRow =
 			this.germplasmLabelPrinting.getDataRow(isPdf, combinedKeys, response, new HashMap<>(), nameValues);
 		Assert.assertEquals(1, dataRow.keySet().size());
-		Assert.assertEquals(nameValue, dataRow.get(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.NAME, nameTypeId)));
+		Assert.assertEquals(nameValue, dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.NAME, nameTypeId)));
 	}
 
 	@Test
@@ -531,7 +531,7 @@ public class GermplasmLabelPrintingTest {
 		this.germplasmLabelPrinting.initStaticFields();
 		final Integer nameTypeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final Set<String> combinedKeys =
-			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.NAME, nameTypeId)));
+			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.NAME, nameTypeId)));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 		nameValues.put(GID, new HashMap<>());
@@ -541,7 +541,7 @@ public class GermplasmLabelPrintingTest {
 		final Map<String, String> dataRow =
 			this.germplasmLabelPrinting.getDataRow(isPdf, combinedKeys, response, new HashMap<>(), nameValues);
 		Assert.assertEquals(1, dataRow.keySet().size());
-		Assert.assertEquals(nameValue, dataRow.get(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.NAME, nameTypeId)));
+		Assert.assertEquals(nameValue, dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.NAME, nameTypeId)));
 	}
 
 	@Test
@@ -549,7 +549,7 @@ public class GermplasmLabelPrintingTest {
 		this.germplasmLabelPrinting.initStaticFields();
 		final Integer nameTypeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
 		final Set<String> combinedKeys =
-			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.NAME, nameTypeId)));
+			new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.NAME, nameTypeId)));
 		final GermplasmSearchResponse response = this.createGermplasmSearchResponse();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 		nameValues.put(GID, new HashMap<>());
@@ -560,7 +560,7 @@ public class GermplasmLabelPrintingTest {
 			this.germplasmLabelPrinting.getDataRow(isPdf, combinedKeys, response, new HashMap<>(), nameValues);
 		Assert.assertEquals(1, dataRow.keySet().size());
 		Assert.assertEquals(nameValue.substring(0, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH) + "...",
-			dataRow.get(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.NAME, nameTypeId)));
+			dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.NAME, nameTypeId)));
 	}
 
 	private GermplasmSearchResponse createGermplasmSearchResponse() {

@@ -295,12 +295,12 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 			observationUnitDto -> observationUnitDtoTransactionDtoMap.put(observationUnitDto.getObsUnitId(), studyTransactionsDto)));
 
 		final Map<String, Field> combinedKeyFieldMap = //
-			Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> LabelPrintingFieldUtils.transformToCombinedKey(field));
+			Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> LabelPrintingFieldUtils.buildCombinedKey(field));
 
 		final Set<String> combinedKeys = new HashSet<>();
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				combinedKeys.add(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId()));
+				combinedKeys.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId()));
 			} else {
 				combinedKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
@@ -341,7 +341,7 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 			results.add(row);
 		}
 
-		return new LabelsData(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.STATIC, LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId()), results);
+		return new LabelsData(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId()), results);
 	}
 
 	@Override

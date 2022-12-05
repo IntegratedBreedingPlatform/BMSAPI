@@ -295,12 +295,12 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			observationUnitDto -> observationUnitDtoTransactionDtoMap.put(observationUnitDto.getObsUnitId(), studyTransactionsDto)));
 
 		final Map<String, Field> combinedKeyFieldMap = //
-			Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> LabelPrintingFieldUtils.transformToCombinedKey(field));
+			Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> LabelPrintingFieldUtils.buildCombinedKey(field));
 
 		final Set<String> combinedKeys = new HashSet<>();
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				combinedKeys.add(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.OBS_UNIT_ID.getId()));
+				combinedKeys.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.OBS_UNIT_ID.getId()));
 			} else {
 				combinedKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
@@ -337,7 +337,7 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 			results.add(row);
 		}
 
-		return new LabelsData(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.OBS_UNIT_ID.getId()), results);
+		return new LabelsData(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.OBS_UNIT_ID.getId()), results);
 	}
 
 	protected void getDataRowFromVariableFieldType(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow) {

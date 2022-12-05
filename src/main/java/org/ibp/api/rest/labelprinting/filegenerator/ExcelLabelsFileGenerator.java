@@ -6,8 +6,6 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
 import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
@@ -37,7 +35,7 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 		final String fullFileName = fileName + "." + FileType.XLS.getExtension();
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + fullFileName;
 
-		final Map<String, Field> fieldsByKey = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> LabelPrintingFieldUtils.transformToCombinedKey(field.getFieldType(), field.getId()));
+		final Map<String, Field> fieldsByKey = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> LabelPrintingFieldUtils.buildCombinedKey(field.getFieldType(), field.getId()));
 
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 		final HSSFSheet sheet = xlsBook.createSheet(fileName);
@@ -69,7 +67,7 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 			int colIndex = 0;
 			for (final Field header : headers) {
 				final HSSFCell cell = row.createCell(colIndex);
-				cell.setCellValue(dataRow.get(LabelPrintingFieldUtils.transformToCombinedKey(header.getFieldType(), header.getId())));
+				cell.setCellValue(dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(header.getFieldType(), header.getId())));
 				colIndex++;
 			}
 			rowIndex++;

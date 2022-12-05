@@ -170,7 +170,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 			});
 			results.add(row);
 		});
-		return new LabelsData(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.GID.getId()), results);
+		return new LabelsData(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.GID.getId()), results);
 	}
 
 	private String truncateValueIfPdf(final boolean isPdf, final String value, final int maxLength) {
@@ -183,7 +183,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				keys.add(LabelPrintingFieldUtils.transformToCombinedKey(FieldType.VARIABLE, TermId.GID.getId()));
+				keys.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.GID.getId()));
 			} else {
 				keys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
