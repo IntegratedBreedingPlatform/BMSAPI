@@ -1034,6 +1034,18 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.middlewareDatasetService.getDatasetNameTypes(plotDatasetId);
 	}
 
+	@Override
+	public List<MeasurementVariable> getVariablesByVariableType(final Integer studyId, final Integer datasetId,
+		final List<Integer> variableTypes) {
+		this.studyValidator.validate(studyId, false);
+		if (!studyId.equals(datasetId)) {
+			this.datasetValidator.validateDataset(datasetId);
+		}
+
+		variableTypes.forEach(this.datasetValidator::validateVariableType);
+		return this.middlewareDatasetService.getDatasetMeasurementVariablesByVariableType(datasetId, variableTypes);
+	}
+
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
 		if (searchDTO.getItemIds() != null && !searchDTO.getItemIds().isEmpty()) {
 			final ObservationUnitsSearchDTO searchRequest = new ObservationUnitsSearchDTO();

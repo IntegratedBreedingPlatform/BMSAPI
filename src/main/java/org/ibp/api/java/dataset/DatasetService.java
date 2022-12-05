@@ -47,8 +47,7 @@ public interface DatasetService {
 	 * @param datasetId Id of the Dataset
 	 * @return List of Measurement Variables.
 	 */
-	List<MeasurementVariable> getSubObservationSetVariables(
-		Integer studyId, Integer datasetId);
+	List<MeasurementVariable> getSubObservationSetVariables(Integer studyId, Integer datasetId);
 
 	/**
 	 * Given a dataset and a list of variables, it will count how many observations it has associated.
@@ -351,5 +350,8 @@ public interface DatasetService {
 	void updatePlotDatasetProperties(Integer studyId, PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, String programUUID);
 
 	List<GermplasmNameTypeDTO> getAllPlotDatasetNameTypes(Integer datasetId);
+
+	List<MeasurementVariable> getVariablesByVariableType(final Integer studyId, final Integer datasetId,
+		final List<Integer> variableTypes);
 
 }
