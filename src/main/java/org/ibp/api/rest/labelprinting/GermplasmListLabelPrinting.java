@@ -219,11 +219,11 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 			final FieldType fieldType = FieldType.find(LabelPrintingFieldUtils.getFieldTypeNameFromCombinedKey(combinedKey));
 			final Integer fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
 			if (FieldType.VARIABLE.equals(fieldType)) {
-				this.getDataRowFromVariableFieldType(columns, isPdf, combinedKey, germplasmSearchResponse, attributeValues);
+				this.putVariableValueInColumns(columns, isPdf, combinedKey, germplasmSearchResponse, attributeValues);
 				this.getEntryDetailDataRowValue(columns, combinedKey, listData, entryDetailValues);
 
 			} else if (FieldType.STATIC.equals(fieldType)) {
-				this.getDataRowFromStaticFieldType(columns, isPdf, combinedKey, germplasmSearchResponse);
+				this.putStaticValueInColumns(columns, isPdf, combinedKey, germplasmSearchResponse);
 				/*
 				 * Germplasm list data stores precalculated pedigree strings with a certain cross expansion level
 				 * in grpname
@@ -232,7 +232,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 					columns.put(combinedKey, Objects.toString(listData.getData().get(GermplasmListStaticColumns.CROSS.name()), ""));
 				}
 			} else if (FieldType.NAME.equals(fieldType)) {
-				this.getDataRowFromNameFieldType(columns, isPdf, combinedKey, germplasmSearchResponse, nameValues);
+				this.putNameValueInColumns(columns, isPdf, combinedKey, germplasmSearchResponse, nameValues);
 			}
 		}
 		return columns;

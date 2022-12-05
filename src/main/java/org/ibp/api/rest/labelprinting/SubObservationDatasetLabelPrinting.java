@@ -326,16 +326,16 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 				final Field field = combinedKeyFieldMap.get(combinedKey);
 
 				if (FieldType.VARIABLE.equals(field.getFieldType())) {
-					this.getDataRowFromVariableFieldType(row, field, combinedKey, observationUnitRow);
+					this.putVariableValueInColumns(row, field, combinedKey, observationUnitRow);
 				} else if (FieldType.STATIC.equals(field.getFieldType())) {
 					if (LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId().equals(field.getId())) {
 						row.put(combinedKey, observationUnitRow.getVariables().get(OBS_UNIT_ID).getValue());
 						continue;
 					}
-					this.getDataRowFromStaticFieldType(row, field, combinedKey, observationUnitRow, study, observationUnitDtoTransactionDtoMap,
+					this.putStaticValueInColumns(row, field, combinedKey, observationUnitRow, study, observationUnitDtoTransactionDtoMap,
 						gidPedigreeMap);
 				} else if (FieldType.NAME.equals(field.getFieldType())) {
-					this.getDataRowFromNameFieldType(row, field, combinedKey, observationUnitRow);
+					this.putNameValueInColumns(row, field, combinedKey, observationUnitRow);
 				}
 			}
 			results.add(row);

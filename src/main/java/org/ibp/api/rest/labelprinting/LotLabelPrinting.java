@@ -285,16 +285,16 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 			final FieldType fieldType = FieldType.find(LabelPrintingFieldUtils.getFieldTypeNameFromCombinedKey(combinedKey));
 
 			if (FieldType.VARIABLE.equals(fieldType)) {
-				this.getDataRowFromVariableFieldType(columns, isPdf, combinedKey, extendedLotDto, germplasmAttributeValues, lotAttributeValues);
+				this.putVariableValueInColumns(columns, isPdf, combinedKey, extendedLotDto, germplasmAttributeValues, lotAttributeValues);
 			} else if (FieldType.STATIC.equals(fieldType)) {
-				this.getDataRowFromStaticFieldType(columns, combinedKey, extendedLotDto, pedigreeByGID);
+				this.putStaticValueInColumns(columns, combinedKey, extendedLotDto, pedigreeByGID);
 			}
 		}
 
 		return columns;
 	}
 
-	private void getDataRowFromStaticFieldType(final Map<String, String> columns, final String combinedKey, final ExtendedLotDto extendedLotDto,
+	private void putStaticValueInColumns(final Map<String, String> columns, final String combinedKey, final ExtendedLotDto extendedLotDto,
 		final Map<String, String> pedigreeByGID) {
 		final Integer fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
 		if (LOT_FIELD.getById(fieldId) != null) {
@@ -374,7 +374,7 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 		}
 	}
 
-	void getDataRowFromVariableFieldType(final Map<String, String> columns, final boolean isPdf,
+	void putVariableValueInColumns(final Map<String, String> columns, final boolean isPdf,
 		final String combinedKey, final ExtendedLotDto extendedLotDto,
 		final Map<Integer, Map<Integer, String>> germplasmAttributeValues,
 		final Map<Integer, Map<Integer, String>> lotAttributeValues) {

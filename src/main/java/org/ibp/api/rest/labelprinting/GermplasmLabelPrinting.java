@@ -311,16 +311,16 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		for (final String combinedKey : combinedKeys) {
 			final FieldType fieldType = FieldType.find(LabelPrintingFieldUtils.getFieldTypeNameFromCombinedKey(combinedKey));
 			if (FieldType.VARIABLE.equals(fieldType)) {
-				this.getDataRowFromVariableFieldType(columns, isPdf, combinedKey, germplasmSearchResponse, attributeValues);
+				this.putVariableValueInColumns(columns, isPdf, combinedKey, germplasmSearchResponse, attributeValues);
 			} else if (FieldType.STATIC.equals(fieldType)) {
-				this.getDataRowFromStaticFieldType(columns,isPdf, combinedKey, germplasmSearchResponse);
+				this.putStaticValueInColumns(columns,isPdf, combinedKey, germplasmSearchResponse);
 			} else if (FieldType.NAME.equals(fieldType)) {
-				this.getDataRowFromNameFieldType(columns, isPdf, combinedKey, germplasmSearchResponse, nameValues);
+				this.putNameValueInColumns(columns, isPdf, combinedKey, germplasmSearchResponse, nameValues);
 			}
 		}
 		return columns;
 	}
-	void getDataRowFromVariableFieldType(final Map<String, String> columns, final boolean isPdf, final String combinedKey,
+	void putVariableValueInColumns(final Map<String, String> columns, final boolean isPdf, final String combinedKey,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues){
 		final TermId term = TermId.getById(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 
@@ -383,7 +383,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		}
 	}
 
-	void getDataRowFromStaticFieldType(final Map<String, String> columns, final boolean isPdf, final String combinedKey,
+	void putStaticValueInColumns(final Map<String, String> columns, final boolean isPdf, final String combinedKey,
 		final GermplasmSearchResponse germplasmSearchResponse){
 		final Optional<LabelPrintingStaticField> staticField = LabelPrintingStaticField.getByFieldId(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 		switch (staticField.get()) {
@@ -425,7 +425,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		}
 	}
 
-	void getDataRowFromNameFieldType(final Map<String, String> columns, final boolean isPdf, final String combinedKey,
+	void putNameValueInColumns(final Map<String, String> columns, final boolean isPdf, final String combinedKey,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> nameValues){
 		final Map<Integer, String> namesByType = nameValues.get(germplasmSearchResponse.getGid());
 		if (namesByType != null) {
