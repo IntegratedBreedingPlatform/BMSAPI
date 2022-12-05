@@ -546,12 +546,12 @@ public class DatasetResource {
 
 	@ApiOperation( value = "Returns the variables associated to the given study/dataset filtered by a given variable types")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables/types/{variableTypeIds}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/variables/types/{variableTypeIds}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<MeasurementVariable>> getVariablesByVariableType(@PathVariable final String crop,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId,
+		@RequestParam(required = false) final Integer datasetId,
 		@PathVariable final List<Integer> variableTypeIds) {
 		final List<MeasurementVariable> variables = this.studyDatasetService.getVariablesByVariableType(studyId, datasetId, variableTypeIds);
 		return new ResponseEntity<>(variables, HttpStatus.OK);
