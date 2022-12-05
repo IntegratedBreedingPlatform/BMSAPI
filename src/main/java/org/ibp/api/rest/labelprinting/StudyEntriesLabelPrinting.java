@@ -85,7 +85,7 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	OriginResourceMetadata getOriginResourceMetadata(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final StudyDetails study = this.studyDataManager.getStudyDetails(labelsInfoInput.getStudyId());
-		final String tempFileName = study.getStudyName().concat(LabelPrintingFieldUtils.UNDERSCORE).concat(StudyEntriesLabelPrinting.ORIG_FINAL_NAME);
+		final String tempFileName = study.getStudyName().concat("_").concat(StudyEntriesLabelPrinting.ORIG_FINAL_NAME);
 		final String fileName = FileNameGenerator.generateFileName(tempFileName);
 		return new OriginResourceMetadata(FileUtils.cleanFileName(fileName), new HashMap<>());
 	}
