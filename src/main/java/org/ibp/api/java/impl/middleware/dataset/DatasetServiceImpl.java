@@ -288,7 +288,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		final List<org.generationcp.middleware.domain.dms.DatasetDTO> datasetDTOS =
-			this.middlewareDatasetService.getDatasets(studyId, datasetTypeIdList);
+			this.middlewareDatasetService.getDatasetsWithVariables(studyId, datasetTypeIdList);
 
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
@@ -298,6 +298,9 @@ public class DatasetServiceImpl implements DatasetService {
 			if (datasetDto.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 				datasetDto.setName(PLOT_DATASET_NAME);
 			}
+			final List<org.generationcp.middleware.service.impl.study.StudyInstance> datasetInstances =
+				this.middlewareDatasetService.getDatasetInstances(datasetDTO.getDatasetId());
+			datasetDto.setInstances(this.convertToStudyInstances(mapper, datasetInstances));
 			datasetDTOs.add(datasetDto);
 		}
 		return datasetDTOs;
