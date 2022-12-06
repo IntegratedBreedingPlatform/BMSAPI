@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.study.AbstractAdvanceRequest;
 import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -9,9 +10,11 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.ruleengine.naming.expression.SelectionTraitExpression;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.impl.study.advance.resolver.level.SelectionTraitDataResolver;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BreedingMethodValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
@@ -21,9 +24,13 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkNotNull;
@@ -226,28 +233,33 @@ public class AdvanceValidator {
 		if (breedingMethodSelectionRequest.getMethodVariateId() != null || (breedingMethodSelectionRequest.getBreedingMethodId() != null
 			&& (SelectionTraitExpression.KEY.equals(selectedBreedingMethod.getPrefix()) || SelectionTraitExpression.KEY
 			.equals(selectedBreedingMethod.getSuffix())))) {
-			final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest = request.getSelectionTraitRequest();
-			checkNotNull(selectionTraitRequest, "request.null");
-			checkArgument(selectionTraitRequest.getDatasetId() != null, "field.is.required",
-				new String[] {"selectionTraitRequest.datasetId"});
-			checkArgument(selectionTraitRequest.getVariableId() != null, "field.is.required",
-				new String[] {"selectionTraitRequest.variableId"});
 
-			final List<MeasurementVariable> datasetVariables;
-			if (studyId.equals(selectionTraitRequest.getDatasetId())) {
-				datasetVariables = this.datasetService
-					.getDatasetMeasurementVariablesByVariableType(studyId, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
-			} else {
-				this.datasetValidator.validateDatasetBelongsToStudy(studyId, selectionTraitRequest.getDatasetId());
-				datasetVariables = this.datasetService.getDataset(selectionTraitRequest.getDatasetId()).getVariables();
-			}
+			// Check if there is at least a selection trait variables at any level
+			final Map<Integer, List<MeasurementVariable>> selectionTraitVariablesByDatasetIds =
+				this.getSelectionTraitVariablesByDatasetIds(studyId);
+			final boolean selectionTraitVariablesPresent =
+				selectionTraitVariablesByDatasetIds.values().stream().anyMatch(CollectionUtils::isNotEmpty);
 
-			final Optional<MeasurementVariable> selectionTraitVariable = datasetVariables.stream()
-				.filter(measurementVariable -> measurementVariable.getTermId() == selectionTraitRequest.getVariableId())
-				.findFirst();
-			if (!selectionTraitVariable.isPresent()) {
-				throw new ApiRequestValidationException("advance.selection-trait.not-present",
-					new Object[] {String.valueOf(selectionTraitRequest.getVariableId())});
+			if (selectionTraitVariablesPresent) {
+				final AbstractAdvanceRequest.SelectionTraitRequest selectionTraitRequest = request.getSelectionTraitRequest();
+				checkNotNull(selectionTraitRequest, "request.null");
+				checkArgument(selectionTraitRequest.getDatasetId() != null, "field.is.required",
+					new String[] {"selectionTraitRequest.datasetId"});
+				checkArgument(selectionTraitRequest.getVariableId() != null, "field.is.required",
+					new String[] {"selectionTraitRequest.variableId"});
+
+				if (!studyId.equals(selectionTraitRequest.getDatasetId())) {
+					this.datasetValidator.validateDatasetBelongsToStudy(studyId, selectionTraitRequest.getDatasetId());
+				}
+
+				final Optional<MeasurementVariable> selectionTraitVariable =
+					selectionTraitVariablesByDatasetIds.get(selectionTraitRequest.getDatasetId()).stream()
+						.filter(measurementVariable -> measurementVariable.getTermId() == selectionTraitRequest.getVariableId())
+						.findFirst();
+				if (!selectionTraitVariable.isPresent()) {
+					throw new ApiRequestValidationException("advance.selection-trait.not-present",
+						new Object[] {String.valueOf(selectionTraitRequest.getVariableId())});
+				}
 			}
 		}
 	}
@@ -272,6 +284,32 @@ public class AdvanceValidator {
 			throw new ApiRequestValidationException(errorCode, new Object[] {String.valueOf(variableId)});
 		}
 		return methodVariate.get();
+	}
+
+	private Map<Integer, List<MeasurementVariable>> getSelectionTraitVariablesByDatasetIds(final Integer studyId) {
+		final List<MeasurementVariable> studyVariables = this.datasetService
+			.getDatasetMeasurementVariablesByVariableType(studyId, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
+		final List<MeasurementVariable> studySelectionTraitVariables = this.filterSelectionTraitVariables(studyVariables);
+
+		final Set<Integer> datasetTypeIds = new HashSet<>();
+		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
+		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
+		final Map<Integer, List<MeasurementVariable>> envAndPlotDatasetSelectionTraitVariables =
+			this.datasetService.getDatasetsWithVariables(studyId, datasetTypeIds).stream()
+				.collect(Collectors
+					.toMap(DatasetDTO::getDatasetId, datasetDTO -> this.filterSelectionTraitVariables(datasetDTO.getVariables())));
+
+		final Map<Integer, List<MeasurementVariable>> selectionTraitVariablesByDatasetIds = new HashMap<>();
+		selectionTraitVariablesByDatasetIds.put(studyId, studySelectionTraitVariables);
+		selectionTraitVariablesByDatasetIds.putAll(envAndPlotDatasetSelectionTraitVariables);
+		return selectionTraitVariablesByDatasetIds;
+	}
+
+	private List<MeasurementVariable> filterSelectionTraitVariables(final List<MeasurementVariable> variables) {
+		return variables.stream()
+			.filter(measurementVariable -> SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY.equals(measurementVariable.getProperty()))
+			.collect(
+				Collectors.toList());
 	}
 
 }
