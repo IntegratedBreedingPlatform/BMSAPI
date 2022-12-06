@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
 public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 	static final String LABELS_FOR = "Labels-for-";
-	private static final String SORT_BY_ENTRY_NO = "VARIABLE_" + TermId.ENTRY_NO.getId();
+	private static final String SORT_BY_ENTRY_NO = LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.ENTRY_NO.getId());
 
 	@Autowired
 	private GermplasmListService germplasmListService;
