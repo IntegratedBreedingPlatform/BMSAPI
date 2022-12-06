@@ -431,7 +431,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		if (namesByType != null) {
 			final String nameValue = namesByType.get(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 			if (nameValue != null) {
-				columns.put(combinedKey, this.truncateValueIfPdf(isPdf, nameValue, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
+				columns.putIfAbsent(combinedKey, this.truncateValueIfPdf(isPdf, nameValue, GermplasmLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
 			}
 		}
 	}
