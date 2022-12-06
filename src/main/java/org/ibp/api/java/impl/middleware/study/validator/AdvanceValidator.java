@@ -20,6 +20,7 @@ import org.ibp.api.java.study.StudyService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -220,7 +221,6 @@ public class AdvanceValidator {
 	void validateSelectionTrait(final Integer studyId, final AdvanceStudyRequest request,
 		final BreedingMethodDTO selectedBreedingMethod) {
 
-		// TODO: if there is at least a selection trait variable at any level then validate that must be one variable selected?
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			request.getBreedingMethodSelectionRequest();
 		if (breedingMethodSelectionRequest.getMethodVariateId() != null || (breedingMethodSelectionRequest.getBreedingMethodId() != null
@@ -233,10 +233,15 @@ public class AdvanceValidator {
 			checkArgument(selectionTraitRequest.getVariableId() != null, "field.is.required",
 				new String[] {"selectionTraitRequest.variableId"});
 
-			this.datasetValidator.validateDatasetBelongsToStudy(studyId, selectionTraitRequest.getDatasetId());
+			final List<MeasurementVariable> datasetVariables;
+			if (studyId.equals(selectionTraitRequest.getDatasetId())) {
+				datasetVariables = this.datasetService
+					.getDatasetMeasurementVariablesByVariableType(studyId, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
+			} else {
+				this.datasetValidator.validateDatasetBelongsToStudy(studyId, selectionTraitRequest.getDatasetId());
+				datasetVariables = this.datasetService.getDataset(selectionTraitRequest.getDatasetId()).getVariables();
+			}
 
-			final List<MeasurementVariable> datasetVariables =
-				this.datasetService.getObservationSetVariables(selectionTraitRequest.getDatasetId());
 			final Optional<MeasurementVariable> selectionTraitVariable = datasetVariables.stream()
 				.filter(measurementVariable -> measurementVariable.getTermId() == selectionTraitRequest.getVariableId())
 				.findFirst();
