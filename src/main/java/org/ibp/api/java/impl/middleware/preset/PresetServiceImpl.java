@@ -37,13 +37,13 @@ public class PresetServiceImpl implements PresetService {
 
 	private BindingResult errors;
 
+	@Autowired
 	private PresetMapper presetMapper;
 
 	@Override
 	public PresetDTO savePreset(final String crop, final PresetDTO presetDTO) {
 		this.presetDTOValidator.validate(crop, null, presetDTO);
 		this.validateUserIsAProgramMember(crop, this.securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
-		this.presetMapper = new PresetMapper();
 		ProgramPreset programPreset = presetMapper.map(presetDTO);
 		programPreset = this.presetService.saveProgramPreset(programPreset);
 		presetDTO.setId(programPreset.getProgramPresetId());
@@ -67,7 +67,6 @@ public class PresetServiceImpl implements PresetService {
 		}
 		final List<ProgramPreset> programPresets = this.presetService.getProgramPresetFromProgramAndTool(programUUID, toolId, toolSection);
 		final List<PresetDTO> presetDTOs = new ArrayList<>();
-		this.presetMapper = new PresetMapper();
 		programPresets.forEach(programPreset -> presetDTOs.add(presetMapper.map(programPreset)));
 		return presetDTOs;
 	}
@@ -85,7 +84,6 @@ public class PresetServiceImpl implements PresetService {
 		this.presetDTOValidator.validate(crop, presetId, presetDTO);
 		this.validateUserIsAProgramMember(crop, this.securityService.getCurrentlyLoggedInUser().getName(), presetDTO.getProgramUUID());
 		final ProgramPreset updateProgramPreset = this.presetService.getProgramPresetById(presetId);
-		this.presetMapper = new PresetMapper();
 		final ProgramPreset programPreset = presetMapper.map(presetDTO, updateProgramPreset);
 		this.presetService.updateProgramPreset(updateProgramPreset);
 	}

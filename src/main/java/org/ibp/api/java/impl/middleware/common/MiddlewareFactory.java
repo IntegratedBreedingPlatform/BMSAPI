@@ -115,6 +115,7 @@ import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
+import org.generationcp.middleware.preset.PresetMapper;
 import org.generationcp.middleware.ruleengine.impl.RulesServiceImpl;
 import org.generationcp.middleware.ruleengine.naming.impl.GermplasmNamingServiceImpl;
 import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
@@ -902,6 +903,10 @@ public class MiddlewareFactory {
 		return new RestTemplate();
 	}
 
+	@Bean
+	public PresetMapper getPresetMapper(){
+		return new PresetMapper();
+	}
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyEntryObservationService getStudyEntryObservationService() {
