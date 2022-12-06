@@ -56,7 +56,6 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 	public void init() {
 		this.programUUID = RandomStringUtils.randomAlphabetic(10);
 		this.presetId = RandomUtils.nextInt();
-		//this.presetMapper = new PresetMapper();
 
 		this.workbenchUser = new WorkbenchUser();
 		this.workbenchUser.setName("username");
