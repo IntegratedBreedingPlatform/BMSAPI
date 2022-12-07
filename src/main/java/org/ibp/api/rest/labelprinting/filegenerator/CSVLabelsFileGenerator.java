@@ -27,7 +27,7 @@ import java.util.Map;
 @Component
 public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 
-	private static String BARCODE = "Barcode";
+	private static final String BARCODE = "Barcode";
 
 	@Override
 	public File generate(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) throws IOException {
@@ -36,7 +36,7 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
-		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8),
+		try (final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8),
 				',')) {
 
 			final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(),
@@ -65,8 +65,8 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 				if (labelsGeneratorInput.isAutomaticBarcode()) {
 					values.add(labels.get(defaultBarcodeKey));
 				} else {
-					StringBuffer barcode = new StringBuffer();
-					for (String barcodeField : labelsGeneratorInput.getBarcodeFields()) {
+					final StringBuffer barcode = new StringBuffer();
+					for (final String barcodeField : labelsGeneratorInput.getBarcodeFields()) {
 						if (StringUtils.isEmpty(barcode.toString())) {
 							barcode.append(labels.get(barcodeField));
 							continue;
