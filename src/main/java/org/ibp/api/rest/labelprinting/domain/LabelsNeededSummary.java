@@ -3,7 +3,6 @@ package org.ibp.api.rest.labelprinting.domain;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,18 +62,16 @@ public class LabelsNeededSummary {
 			return this.entries;
 		}
 
-		public Row setEntries(final Long entries) {
+		public void setEntries(final Long entries) {
 			this.entries = entries;
-			return this;
 		}
 
 		public Long getReps() {
-			return reps;
+			return this.reps;
 		}
 
-		public Row setReps(final Long reps) {
+		public void setReps(final Long reps) {
 			this.reps = reps;
-			return this;
 		}
 
 		@Override
