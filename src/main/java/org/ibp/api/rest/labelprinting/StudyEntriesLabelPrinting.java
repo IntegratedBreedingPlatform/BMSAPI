@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
@@ -26,7 +27,6 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
-import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -144,8 +144,8 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 	@Override
 	LabelsData getLabelsData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
 		final StudyEntrySearchDto.Filter filter = null;
-		Pageable pageable = null;
-		List<StudyEntryDto> studyEntryDtos = this.studyEntryService.getStudyEntries(labelsGeneratorInput.getStudyId(), filter, pageable);
+		final Pageable pageable = null;
+		final List<StudyEntryDto> studyEntryDtos = this.studyEntryService.getStudyEntries(labelsGeneratorInput.getStudyId(), filter, pageable);
 
 		// Data to be exported
 		final List<Map<String, String>> results = new LinkedList<>();
@@ -160,11 +160,11 @@ public class StudyEntriesLabelPrinting extends LabelPrintingStrategy {
 				final Integer key = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
 				if (TermId.CROSS.getId() == key) {
 					row.put(combinedKey,
-						truncateValueIfPdf(isPdf, studyEntry.getCross(), StudyEntriesLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
+						this.truncateValueIfPdf(isPdf, studyEntry.getCross(), StudyEntriesLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
 				}else if (studyEntry.getProperties().containsKey(key)) {
 					final StudyEntryPropertyData data = studyEntry.getProperties().get(key);
 					row.put(combinedKey,
-						truncateValueIfPdf(isPdf, data.getValue(), StudyEntriesLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
+						this.truncateValueIfPdf(isPdf, data.getValue(), StudyEntriesLabelPrinting.NAME_DISPLAY_MAX_LENGTH));
 				}
 
 			});
