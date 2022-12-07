@@ -19,7 +19,7 @@ public class LabelsData {
 	}
 
 	public String getDefaultBarcodeKey() {
-		return defaultBarcodeKey;
+		return this.defaultBarcodeKey;
 	}
 
 	public void setDefaultBarcodeKey(final String defaultBarcodeKey) {
@@ -27,7 +27,7 @@ public class LabelsData {
 	}
 
 	public List<Map<String, String>> getData() {
-		return data;
+		return this.data;
 	}
 
 	public void setData(final List<Map<String, String>> data) {
