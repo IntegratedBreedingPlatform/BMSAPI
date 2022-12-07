@@ -25,7 +25,7 @@ public class Field {
 	}
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(final Integer id) {
@@ -33,7 +33,7 @@ public class Field {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
