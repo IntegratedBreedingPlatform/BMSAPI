@@ -3,6 +3,9 @@ package org.ibp.api.rest.labelprinting;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.ibp.api.rest.common.FileType;
+import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,80 +30,83 @@ public class LotLabelPrintingTest {
 	@Test
 	public void testGetDataRow_For_ShortAttributeValues() {
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
+		final Set<String> combinedKey = new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(100);
-		attributeValues.get(GID).put(LotLabelPrinting.toId(attributeId), attributeValue);
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.PDF);
+		attributeValues.get(GID).put(attributeId, attributeValue);
+		final boolean isPdf = true;
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow =
-			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
+		final Map<String, String> dataRow =
+			this.lotLabelPrinting.getDataRow(isPdf, combinedKey, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
-		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue, dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 	}
 
 	@Test
 	public void testGetDataRow_For_LongAttributeValuesNotTruncated_WhenCSVFileType() {
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
+		final Set<String> combinedKey = new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
-		attributeValues.get(GID).put(LotLabelPrinting.toId(attributeId), attributeValue);
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.CSV);
+		attributeValues.get(GID).put(attributeId, attributeValue);
+		final Map<String, Field> combinedKeyFieldMap = new HashMap<>();
+		combinedKeyFieldMap.put(
+			LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId), new Field(FieldType.VARIABLE, attributeId, RandomStringUtils.randomNumeric(5)));
+		final boolean isPdf = false;
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow =
-			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
+		final Map<String, String> dataRow =
+			this.lotLabelPrinting.getDataRow(isPdf, combinedKey, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is not truncated for CSV file type
-		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue, dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 	}
 
 	@Test
 	public void testGetDataRow_For_LongAttributeValuesNotTruncated_WhenXLSFileType() {
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
+		final Set<String> combinedKey = new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
-		attributeValues.get(GID).put(LotLabelPrinting.toId(attributeId), attributeValue);
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.XLS);
+		attributeValues.get(GID).put(attributeId, attributeValue);
+		final Map<String, Field> combinedKeyFieldMap = new HashMap<>();
+		combinedKeyFieldMap.put(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId), new Field(FieldType.VARIABLE, attributeId, RandomStringUtils.randomNumeric(5)));
+		final boolean isPdf = false;
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow =
-			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
+		final Map<String, String> dataRow =
+			this.lotLabelPrinting.getDataRow(isPdf, combinedKey, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is not truncated for XLS file type
-		Assert.assertEquals(attributeValue, dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue, dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 	}
 
 	@Test
 	public void testGetDataRow_For_TruncateLongAttributeValues_WhenPDFExportType() {
 		final Integer attributeId = Integer.valueOf(RandomStringUtils.randomNumeric(5));
-		final Set<Integer> keys = new HashSet<>(Collections.singletonList(attributeId));
+		final Set<String> combinedKey = new HashSet<>(Collections.singletonList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		attributeValues.put(GID, new HashMap<>());
 		final String attributeValue = RandomStringUtils.randomAlphanumeric(4000);
-		attributeValues.get(GID).put(LotLabelPrinting.toId(attributeId), attributeValue);
-		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
-		labelsGeneratorInput.setFileType(FileType.PDF);
+		attributeValues.get(GID).put(attributeId, attributeValue);
+		final Map<String, Field> combinedKeyFieldMap = new HashMap<>();
+		combinedKeyFieldMap.put(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId), new Field(FieldType.VARIABLE, attributeId, RandomStringUtils.randomNumeric(5)));
+		final boolean isPdf = true;
 		final ExtendedLotDto lotDto = new ExtendedLotDto();
 		lotDto.setGid(GID);
 		lotDto.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(36));
-		final Map<Integer, String> dataRow =
-			this.lotLabelPrinting.getDataRow(labelsGeneratorInput, keys, lotDto, attributeValues, attributeValues, new HashMap<>());
+		final Map<String, String> dataRow =
+			this.lotLabelPrinting.getDataRow(isPdf, combinedKey, lotDto, attributeValues, attributeValues, new HashMap<>());
 		Assert.assertEquals(1, dataRow.keySet().size());
 		// Verify that attribute values is truncated for PDF file type
-		Assert.assertEquals(attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "...", dataRow.get(attributeId));
+		Assert.assertEquals(attributeValue.substring(0, GermplasmLabelPrinting.ATTRIBUTE_DISPLAY_MAX_LENGTH) + "...", dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, attributeId)));
 	}
 
 }

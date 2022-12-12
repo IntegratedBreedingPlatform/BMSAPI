@@ -19,7 +19,7 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 	@JsonIgnore
 	private FileType fileType;
 
-	private List<List<Integer>> fields;
+	private List<List<String>> fields;
 
 	private boolean barcodeRequired;
 
@@ -27,7 +27,7 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 
 	private boolean includeHeadings;
 
-	private List<Integer> barcodeFields;
+	private List<String> barcodeFields;
 
 	private String sizeOfLabelSheet;
 
@@ -35,11 +35,11 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 
 	private String fileName;
 
-	public List<List<Integer>> getFields() {
+	public List<List<String>> getFields() {
 		return this.fields;
 	}
 
-	public void setFields(final List<List<Integer>> fields) {
+	public void setFields(final List<List<String>> fields) {
 		this.fields = fields;
 	}
 
@@ -67,11 +67,11 @@ public class LabelsGeneratorInput extends LabelsInfoInput {
 		this.includeHeadings = includeHeadings;
 	}
 
-	public List<Integer> getBarcodeFields() {
+	public List<String> getBarcodeFields() {
 		return this.barcodeFields;
 	}
 
-	public void setBarcodeFields(final List<Integer> barcodeFields) {
+	public void setBarcodeFields(final List<String> barcodeFields) {
 		this.barcodeFields = barcodeFields;
 	}
 

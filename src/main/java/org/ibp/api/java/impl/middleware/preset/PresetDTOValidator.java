@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.preset;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
@@ -12,9 +13,11 @@ import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.FileType;
-import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
-import org.ibp.api.rest.preset.domain.PresetDTO;
-import org.ibp.api.rest.preset.domain.PresetType;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetType;
+import org.ibp.api.rest.labelprinting.LabelPrintingStrategy;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -37,6 +40,9 @@ public class PresetDTOValidator {
 
 	@Autowired
 	private VariableService variableService;
+
+	@Autowired
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	private BindingResult errors;
 
@@ -170,7 +176,7 @@ public class PresetDTOValidator {
 			});
 		});
 
-		final List<Integer> barcodeFields = barcodeSetting.getBarcodeFields();
+		final List<String> barcodeFields = barcodeSetting.getBarcodeFields();
 
 		if (barcodeSetting.isBarcodeNeeded()) {
 			if (barcodeSetting.isAutomaticBarcode()) {
@@ -205,14 +211,15 @@ public class PresetDTOValidator {
 		}
 	}
 
-	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final Integer fieldId) {
-		return this.isValidateFieldId(labelPrintingPresetDTO)
-			&& !LabelPrintingStaticField.getAvailableStaticFields().contains(fieldId)
-			&& this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), String.valueOf(fieldId))
-			== null;
+	private boolean isInvalidField(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO, final String combinedKey) {
+		final String fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey).toString();
+		return this.isValidFieldId(labelPrintingPresetDTO) && //
+			!LabelPrintingStaticField.getAvailableStaticFields().contains(Integer.valueOf(fieldId)) && //
+			!this.germplasmNameTypeService.getNameTypeById(Integer.valueOf(fieldId)).isPresent() && //
+			this.variableService.getVariableById(crop, labelPrintingPresetDTO.getProgramUUID(), fieldId) == null;
 	}
 
-	private boolean isValidateFieldId(final LabelPrintingPresetDTO labelPrintingPresetDTO) {
+	private boolean isValidFieldId(final LabelPrintingPresetDTO labelPrintingPresetDTO) {
 		return !ToolSection.LOT_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection())
 			&& !ToolSection.GERMPLASM_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection())
 			&& !ToolSection.GERMPLASM_LIST_LABEL_PRINTING_PRESET.name().equals(labelPrintingPresetDTO.getToolSection());

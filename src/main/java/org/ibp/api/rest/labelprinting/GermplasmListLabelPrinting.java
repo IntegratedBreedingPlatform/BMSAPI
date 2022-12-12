@@ -23,14 +23,16 @@ import org.ibp.api.java.germplasm.GermplasmListDataService;
 import org.ibp.api.java.germplasm.GermplasmListService;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.ibp.api.rest.labelprinting.domain.LabelsInfoInput;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
-import org.ibp.api.rest.preset.domain.FilePresetConfigurationDTO;
-import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
+import org.generationcp.middleware.domain.labelprinting.FilePresetConfigurationDTO;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -57,8 +59,7 @@ import java.util.stream.Collectors;
 public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 
 	static final String LABELS_FOR = "Labels-for-";
-	private static final String SORT_BY_ENTRY_NO = "VARIABLE_" + TermId.ENTRY_NO.getId();
-	protected static final int DRVNM_ID = 5;
+	private static final String SORT_BY_ENTRY_NO = LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.ENTRY_NO.getId());
 
 	@Autowired
 	private GermplasmListService germplasmListService;
@@ -155,9 +156,9 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final List<Integer> germplasmFieldIds = new ArrayList<>();
 		germplasmFieldIds.addAll(this.germplasmFieldIds);
 		germplasmFieldIds.addAll(this.pedigreeFieldIds);
-		final Set<Integer> keys = this.getSelectedFieldIds(labelsGeneratorInput);
+		final Set<String> combinedKeys = this.getSelectedFieldIds(labelsGeneratorInput);
 		final boolean fieldsContainsNonGermplasmFields =
-			keys.stream().anyMatch(fieldId -> !germplasmFieldIds.contains(fieldId));
+			combinedKeys.stream().anyMatch(fieldId -> !germplasmFieldIds.contains(fieldId));
 		final Map<Integer, Map<Integer, String>> attributeValues = new HashMap<>();
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 		final Map<Integer, Map<Integer, String>> entryDetailValues = new HashMap<>();
@@ -176,15 +177,16 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final Map<Integer, GermplasmSearchResponse> germplasmSearchResponseMap = responseList.stream()
 			.collect(Collectors.toMap(GermplasmSearchResponse::getGid, Function.identity()));
 
+		final boolean isPdf = FileType.PDF.equals(labelsGeneratorInput.getFileType());
+
 		// Data to be exported
-		final List<Map<Integer, String>> data = new ArrayList<>();
+		final List<Map<String, String>> data = new ArrayList<>();
 		for (final GermplasmListDataSearchResponse listData : listDataSearchResponseList) {
 			final Integer gid = (Integer) listData.getData().get(GermplasmListStaticColumns.GID.getName());
-			data.add(this.getDataRow(labelsGeneratorInput, keys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues,
-				entryDetailValues));
+			data.add(this.getDataRow(isPdf, combinedKeys, listData, germplasmSearchResponseMap.get(gid), attributeValues, nameValues, entryDetailValues));
 		}
 
-		return new LabelsData(LabelPrintingStaticField.GUID.getFieldId(), data);
+		return new LabelsData(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, LabelPrintingStaticField.GUID.getFieldId()), data);
 	}
 
 	void getEntryDetailValues(final Map<Integer, Map<Integer, String>> entryDetailValues, final Integer listId) {
@@ -201,56 +203,56 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 			.getGermplasmListVariables(programUUID, listId, VariableType.ENTRY_DETAIL.getId());
 
 		final List<Field> entryDetailFields = germplasmEntryDetailVariables.stream()
-			.map(variable -> new Field(toKey(variable.getId()), variable.getName()))
+			.map(variable -> new Field(FieldType.VARIABLE, variable.getId(), variable.getName()))
 			.collect(Collectors.toList());
 
 		return entryDetailFields;
 	}
 
-	Map<Integer, String> getDataRow(final LabelsGeneratorInput labelsGeneratorInput,
-		final Set<Integer> keys, final GermplasmListDataSearchResponse listData,
+	Map<String, String> getDataRow(final boolean isPdf,
+		final Set<String> combinedKeys, final GermplasmListDataSearchResponse listData,
 		final GermplasmSearchResponse germplasmSearchResponse, final Map<Integer, Map<Integer, String>> attributeValues,
 		final Map<Integer, Map<Integer, String>> nameValues, final Map<Integer, Map<Integer, String>> entryDetailValues) {
 
-		final boolean isPdf = FileType.PDF.equals(labelsGeneratorInput.getFileType());
-		final Map<Integer, String> columns = new HashMap<>();
-		for (final Integer key : keys) {
-			final int id = toId(key);
-			if (this.germplasmFieldIds.contains(id)) {
-				this.getGermplasmFieldDataRowValue(isPdf, germplasmSearchResponse, columns, key, id);
-			} else if (this.pedigreeFieldIds.contains(id)) {
-				this.getPedigreeFieldDataRowValue(isPdf, germplasmSearchResponse, columns, key, id);
+		final Map<String, String> columns = new HashMap<>();
+		for (final String combinedKey : combinedKeys) {
+			final FieldType fieldType = FieldType.find(LabelPrintingFieldUtils.getFieldTypeNameFromCombinedKey(combinedKey));
+			final Integer fieldId = LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey);
+			if (FieldType.VARIABLE.equals(fieldType)) {
+				this.putVariableValueInColumns(columns, isPdf, combinedKey, germplasmSearchResponse, attributeValues);
+				this.getEntryDetailDataRowValue(columns, combinedKey, listData, entryDetailValues);
 
+			} else if (FieldType.STATIC.equals(fieldType)) {
+				this.putStaticValueInColumns(columns, isPdf, combinedKey, germplasmSearchResponse);
 				/*
 				 * Germplasm list data stores precalculated pedigree strings with a certain cross expansion level
 				 * in grpname
 				 */
-				if (LabelPrintingStaticField.CROSS.getFieldId().equals(id)) {
-					columns.put(key, Objects.toString(listData.getData().get(GermplasmListStaticColumns.CROSS.name()), ""));
+				if (LabelPrintingStaticField.CROSS.getFieldId().equals(fieldId)) {
+					columns.put(combinedKey, Objects.toString(listData.getData().get(GermplasmListStaticColumns.CROSS.name()), ""));
 				}
-			} else {
-				this.getAttributeOrNameDataRowValue(isPdf, germplasmSearchResponse, attributeValues, nameValues, columns, key, id);
-				this.getEntryDetailDataRowValue(listData, entryDetailValues, columns, key, id);
+			} else if (FieldType.NAME.equals(fieldType)) {
+				this.putNameValueInColumns(columns, isPdf, combinedKey, germplasmSearchResponse, nameValues);
 			}
 		}
 		return columns;
 	}
 
-	public void getEntryDetailDataRowValue(
+	public void getEntryDetailDataRowValue(final Map<String, String> columns, final String combinedKey,
 		final GermplasmListDataSearchResponse listData,
-		final Map<Integer, Map<Integer, String>> entryDetailValues, final Map<Integer, String> columns, final Integer key, final int id) {
+		final Map<Integer, Map<Integer, String>> entryDetailValues) {
 		// Especial case for ENTRY NO.
-		final TermId term = TermId.getById(id);
+		final TermId term = TermId.getById(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 		if (TermId.ENTRY_NO.equals(term)) {
-			columns.put(key, Objects.toString(listData.getData().get(GermplasmListLabelPrinting.SORT_BY_ENTRY_NO), ""));
+			columns.put(combinedKey, Objects.toString(listData.getData().get(GermplasmListLabelPrinting.SORT_BY_ENTRY_NO), ""));
 		} else {
 			// Not part of the fixed columns
 			// Entry Details
 			final Map<Integer, String> entryDetails = entryDetailValues.get(listData.getListDataId());
 			if (entryDetails != null) {
-				final String entryDetailValue = entryDetails.get(id);
+				final String entryDetailValue = entryDetails.get(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 				if (entryDetailValue != null) {
-					columns.put(key, entryDetailValue);
+					columns.put(combinedKey, entryDetailValue);
 				}
 			}
 		}
@@ -281,78 +283,85 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 	public LabelPrintingPresetDTO getDefaultSetting(final LabelsInfoInput labelsInfoInput, final String programUUID) {
 		final List<GermplasmListMeasurementVariableDTO> germplasmListMeasurementVariableDTOs =
 			this.germplasmListDataService.getGermplasmListDataTableHeader(labelsInfoInput.getListId(), programUUID);
-		final ArrayList<Integer> fields = new ArrayList<>();
+		final ArrayList<String> fields = new ArrayList<>();
 		germplasmListMeasurementVariableDTOs.stream().forEach(dto -> {
 			final TermId termId = TermId.getById(dto.getTermId());
 
 			switch (termId) {
+				case GID:
+					fields.add(
+						LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.GID.getId()));
+					break;
 				case GID_ACTIVE_LOTS_COUNT:
-					fields.add(LabelPrintingStaticField.LOTS.getFieldId());
+					fields.add(
+						LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, LabelPrintingStaticField.LOTS.getFieldId()));
 					break;
 				case GID_AVAILABLE_BALANCE:
-					fields.add(TermId.AVAILABLE_INVENTORY.getId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.AVAILABLE_INVENTORY.getId()));
 					break;
 				case GID_UNIT:
-					fields.add(TermId.UNITS_INVENTORY.getId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.UNITS_INVENTORY.getId()));
 					break;
 				case IMMEDIATE_SOURCE_GID:
-					fields.add(LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,
+						LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId()));
 					break;
 				case IMMEDIATE_SOURCE_NAME:
-					fields.add(LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,
+						LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId()));
 					break;
 				case GROUP_SOURCE_GID:
-					fields.add(LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,
+						LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId()));
 					break;
 				case GROUP_SOURCE_NAME:
-					fields.add(LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,
+						LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId()));
 					break;
 				case GUID:
-					fields.add(LabelPrintingStaticField.GUID.getFieldId());
+					fields.add(
+						LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, LabelPrintingStaticField.GUID.getFieldId()));
 					break;
 				case GERMPLASM_REFERENCE:
-					fields.add(LabelPrintingStaticField.REFERENCE.getFieldId());
+					fields.add(
+						LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, LabelPrintingStaticField.REFERENCE.getFieldId()));
 					break;
 				case CROSS:
-					fields.add(LabelPrintingStaticField.CROSS.getFieldId());
+					fields.add(
+						LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, LabelPrintingStaticField.CROSS.getFieldId()));
 					break;
 				case BREEDING_METHOD_NAME:
-					fields.add(TermId.BREEDING_METHOD.getId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.BREEDING_METHOD.getId()));
 					break;
 				case BREEDING_METHOD_ABBREVIATION:
-					fields.add(LabelPrintingStaticField.METHOD_CODE.getFieldId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,
+						LabelPrintingStaticField.METHOD_CODE.getFieldId()));
 					break;
 				case BREEDING_METHOD_GROUP:
-					fields.add(LabelPrintingStaticField.METHOD_GROUP.getFieldId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,
+						LabelPrintingStaticField.METHOD_GROUP.getFieldId()));
 					break;
 				case DESIG:
-					fields.add(TermId.PREFERRED_NAME.getId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.PREFERRED_NAME.getId()));
 					break;
 				case FGID:
-					fields.add(TermId.CROSS_FEMALE_GID.getId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.CROSS_FEMALE_GID.getId()));
 					break;
 				case MGID:
-					fields.add(TermId.CROSS_MALE_GID.getId());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.CROSS_MALE_GID.getId()));
 					break;
 				case MALE_PARENT:
-					fields.add(TermId.CROSS_MALE_PREFERRED_NAME.getId());
+					fields.add(
+						LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.CROSS_MALE_PREFERRED_NAME.getId()));
 					break;
 				case FEMALE_PARENT:
-					fields.add(TermId.CROSS_FEMALE_PREFERRED_NAME.getId());
-					break;
-				case ENTRY_CODE:
-					fields.add(toKey(TermId.ENTRY_CODE.getId()));
-					break;
-				case ENTRY_NO:
-					fields.add(toKey(TermId.ENTRY_NO.getId()));
+					fields.add(
+						LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.CROSS_FEMALE_PREFERRED_NAME.getId()));
 					break;
 				default:
-					if (dto.getTermId() == GermplasmListLabelPrinting.DRVNM_ID
-						|| dto.getTermId() > GermplasmLabelPrinting.MAX_FIXED_TYPE_INDEX) {
-						fields.add(dto.getTermId() + GermplasmLabelPrinting.MAX_FIXED_TYPE_INDEX);
-					} else {
-						fields.add(dto.getTermId());
-					}
+					final FieldType fieldType = dto.getColumnCategory().NAMES.equals(dto.getColumnCategory()) ?
+						FieldType.NAME : FieldType.find(dto.getColumnCategory().name());
+					fields.add(LabelPrintingFieldUtils.buildCombinedKey(fieldType, dto.getTermId()));
 					break;
 			}
 

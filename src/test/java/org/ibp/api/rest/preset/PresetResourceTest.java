@@ -3,12 +3,15 @@ package org.ibp.api.rest.preset;
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
 import org.apache.commons.lang3.SerializationUtils;
 import org.generationcp.commons.constant.ToolSection;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.preset.PresetService;
-import org.ibp.api.rest.preset.domain.FilePresetConfigurationDTO;
-import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
-import org.ibp.api.rest.preset.domain.PresetDTO;
-import org.ibp.api.rest.preset.domain.PresetType;
+import org.generationcp.middleware.domain.labelprinting.FilePresetConfigurationDTO;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetType;
+import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -43,7 +46,7 @@ public class PresetResourceTest extends ApiUnitTestBase {
 
 	private String type;
 
-	private List<List<Integer>> selectedField;
+	private List<List<String>> selectedField;
 
 	private LabelPrintingPresetDTO.BarcodeSetting barcodeSetting;
 
@@ -71,8 +74,13 @@ public class PresetResourceTest extends ApiUnitTestBase {
 		this.toolId = 23;
 
 		this.type = PresetType.LABEL_PRINTING_PRESET.getName();
-		this.selectedField = Arrays.asList(Arrays.asList(4, 13));
-		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList(2));
+		this.selectedField = Arrays.asList(Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, 4),
+			LabelPrintingFieldUtils.buildCombinedKey(FieldType.NAME, 5),
+			LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.ENTRY_NO.getId()),
+			LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, 13)));
+		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE,
+			Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.GID.getId()),
+				LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, 2)));
 		this.filePresetConfigurationDTO = new FilePresetConfigurationDTO();
 		this.filePresetConfigurationDTO.setOutputType("csv");
 	}
