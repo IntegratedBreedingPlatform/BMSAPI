@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.ibp.api.java.preset.PresetService;
-import org.ibp.api.rest.preset.domain.PresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

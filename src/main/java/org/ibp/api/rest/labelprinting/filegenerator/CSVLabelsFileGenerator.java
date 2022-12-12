@@ -6,6 +6,7 @@ import com.google.common.io.Files;
 import liquibase.util.StringUtils;
 import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.springframework.stereotype.Component;
@@ -26,7 +27,7 @@ import java.util.Map;
 @Component
 public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 
-	private static String BARCODE = "Barcode";
+	private static final String BARCODE = "Barcode";
 
 	@Override
 	public File generate(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) throws IOException {
@@ -35,10 +36,11 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
-		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8),
+		try (final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8),
 				',')) {
 
-			final Map<Integer, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
+			final Map<String, Field> keyFieldMap = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(),
+				field -> LabelPrintingFieldUtils.buildCombinedKey(field.getFieldType(), field.getId()));
 
 			final File newFile = new File(fileNameFullPath);
 			// feed in your array (or convert your data to an array)
@@ -55,16 +57,16 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 		}
 	}
 
-	private String[] getColumnValues(final Map<Integer, String> labels, final LabelsGeneratorInput labelsGeneratorInput, final Integer defaultBarcodeKey) {
+	private String[] getColumnValues(final Map<String, String> labels, final LabelsGeneratorInput labelsGeneratorInput, final String defaultBarcodeKey) {
 		final List<String> values = new LinkedList<>();
-		for (final List<Integer> fieldsList : labelsGeneratorInput.getFields()) {
+		for (final List<String> fieldsList : labelsGeneratorInput.getFields()) {
 			fieldsList.forEach(field -> values.add(labels.get(field)));
 			if (labelsGeneratorInput.isBarcodeRequired()) {
 				if (labelsGeneratorInput.isAutomaticBarcode()) {
 					values.add(labels.get(defaultBarcodeKey));
 				} else {
-					StringBuffer barcode = new StringBuffer();
-					for (Integer barcodeField : labelsGeneratorInput.getBarcodeFields()) {
+					final StringBuffer barcode = new StringBuffer();
+					for (final String barcodeField : labelsGeneratorInput.getBarcodeFields()) {
 						if (StringUtils.isEmpty(barcode.toString())) {
 							barcode.append(labels.get(barcodeField));
 							continue;
@@ -78,10 +80,10 @@ public class CSVLabelsFileGenerator implements LabelsFileGenerator {
 		return values.toArray(new String[] {});
 	}
 
-	protected List<String> getHeaderNames(final LabelsGeneratorInput labelsGeneratorInput, final Map<Integer, Field> termIdFieldMap) {
+	protected List<String> getHeaderNames(final LabelsGeneratorInput labelsGeneratorInput, final Map<String, Field> combinedKeyFieldMap) {
 		final List<String> headerNames = new LinkedList<>();
-		for (final List<Integer> headers : labelsGeneratorInput.getFields()) {
-			headers.forEach(header -> headerNames.add(termIdFieldMap.get(header).getName()));
+		for (final List<String> headers : labelsGeneratorInput.getFields()) {
+			headers.forEach(header -> headerNames.add(combinedKeyFieldMap.get(header).getName()));
 		}
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			headerNames.add(BARCODE);

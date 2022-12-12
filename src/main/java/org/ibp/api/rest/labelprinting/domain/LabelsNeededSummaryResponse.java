@@ -23,7 +23,7 @@ public class LabelsNeededSummaryResponse {
 	}
 
 	public List<String> getHeaders() {
-		return headers;
+		return this.headers;
 	}
 
 	public void setHeaders(final List<String> headers) {
@@ -31,7 +31,7 @@ public class LabelsNeededSummaryResponse {
 	}
 
 	public List<Map<String, String>> getValues() {
-		return values;
+		return this.values;
 	}
 
 	public void setValues(final List<Map<String, String>> values) {
@@ -39,7 +39,7 @@ public class LabelsNeededSummaryResponse {
 	}
 
 	public Long getTotalNumberOfLabelsNeeded() {
-		return totalNumberOfLabelsNeeded;
+		return this.totalNumberOfLabelsNeeded;
 	}
 
 	public void setTotalNumberOfLabelsNeeded(final Long totalNumberOfLabelsNeeded) {

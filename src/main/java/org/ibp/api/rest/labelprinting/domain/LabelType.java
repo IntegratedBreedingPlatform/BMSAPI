@@ -20,7 +20,7 @@ public class LabelType {
 	}
 
 	public String getTitle() {
-		return title;
+		return this.title;
 	}
 
 	public void setTitle(final String title) {
@@ -28,7 +28,7 @@ public class LabelType {
 	}
 
 	public String getKey() {
-		return key;
+		return this.key;
 	}
 
 	public void setKey(final String key) {
@@ -36,7 +36,7 @@ public class LabelType {
 	}
 
 	public List<Field> getFields() {
-		return fields;
+		return this.fields;
 	}
 
 	public void setFields(final List<Field> fields) {
