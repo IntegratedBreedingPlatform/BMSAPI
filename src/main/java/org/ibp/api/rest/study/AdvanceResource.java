@@ -2,7 +2,7 @@ package org.ibp.api.rest.study;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
+import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.ibp.api.java.study.AdvanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @Api(value = "Advance Services")
 @Controller
-public class AdvanceController {
+public class AdvanceResource {
 
 	@Autowired
 	private AdvanceService advanceService;
@@ -49,7 +49,7 @@ public class AdvanceController {
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@RequestBody final AdvanceSampledPlantsRequest request) {
+		@RequestBody final AdvanceSamplesRequest request) {
 
 		final List<Integer> advancedGids = this.advanceService.advanceSamples(studyId, request);
 		return new ResponseEntity<>(advancedGids, HttpStatus.OK);

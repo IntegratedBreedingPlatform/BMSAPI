@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.study.validator;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.study.AbstractAdvanceRequest;
-import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
+import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -989,7 +989,7 @@ public class AdvanceValidatorTest {
 
 		this.mockValidateMethod(MethodType.DERIVATIVE, false);
 
-		final AdvanceSampledPlantsRequest request =
+		final AdvanceSamplesRequest request =
 			this.mockAdvanceSampledPlantsRequest(Arrays.asList(INSTANCE_ID), BREEDING_METHOD_ID);
 		this.advanceValidator.validateAdvanceSamples(STUDY_ID, request);
 
@@ -1015,7 +1015,7 @@ public class AdvanceValidatorTest {
 
 		this.mockValidateMethod(MethodType.DERIVATIVE, false);
 
-		final AdvanceSampledPlantsRequest request =
+		final AdvanceSamplesRequest request =
 			this.mockAdvanceSampledPlantsRequest(Arrays.asList(INSTANCE_ID), BREEDING_METHOD_ID);
 
 		try {
@@ -1178,8 +1178,8 @@ public class AdvanceValidatorTest {
 		return measurementVariable;
 	}
 
-	private AdvanceSampledPlantsRequest mockAdvanceSampledPlantsRequest(final List<Integer> instanceIds, final Integer breedingMethodId) {
-		final AdvanceSampledPlantsRequest request = Mockito.mock(AdvanceSampledPlantsRequest.class);
+	private AdvanceSamplesRequest mockAdvanceSampledPlantsRequest(final List<Integer> instanceIds, final Integer breedingMethodId) {
+		final AdvanceSamplesRequest request = Mockito.mock(AdvanceSamplesRequest.class);
 		Mockito.when(request.getInstanceIds()).thenReturn(instanceIds);
 		Mockito.when(request.getSelectedReplications()).thenReturn(new ArrayList<>());
 		Mockito.when(request.getBreedingMethodId()).thenReturn(breedingMethodId);

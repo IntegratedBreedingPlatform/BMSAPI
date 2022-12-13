@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.study.validator;
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.study.AbstractAdvanceRequest;
-import org.generationcp.middleware.api.study.AdvanceSampledPlantsRequest;
+import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -73,7 +73,7 @@ public class AdvanceValidator {
 		this.validateReplicationNumberSelection(request.getSelectedReplications(), plotDatasetVariables);
 	}
 
-	public void validateAdvanceSamples(final Integer studyId, final AdvanceSampledPlantsRequest request) {
+	public void validateAdvanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
 		checkNotNull(request, "request.null");
 
 		final Integer plotDatasetId = this.commonValidations(studyId, request.getInstanceIds());
