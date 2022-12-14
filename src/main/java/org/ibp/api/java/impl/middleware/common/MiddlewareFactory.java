@@ -187,7 +187,6 @@ import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SessionFactory;
 import org.ibp.api.java.germplasm.GermplasmCodeGenerationService;
-import org.ibp.api.java.impl.middleware.dataset.DatasetLock;
 import org.ibp.api.java.impl.middleware.germplasm.GermplasmCodeGenerationServiceImpl;
 import org.ibp.api.java.impl.middleware.germplasm.cop.CopServiceAsync;
 import org.ibp.api.java.impl.middleware.germplasm.cop.CopServiceAsyncImpl;
@@ -909,10 +908,6 @@ public class MiddlewareFactory {
 		return new PresetMapper();
 	}
 
-	@Bean
-	public DatasetLock getDatasetLock(){
-		return new DatasetLock();
-	}
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyEntryObservationService getStudyEntryObservationService() {
