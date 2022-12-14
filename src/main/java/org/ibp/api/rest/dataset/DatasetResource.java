@@ -128,6 +128,7 @@ public class DatasetResource {
 		@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetVariable) {
 		MeasurementVariable variable = null;
 		try {
+			// TODO: We need to find a better way to lock the specific dataset where the variable is added instead of the resource.
 			this.datasetLock.lockWrite();
 			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
 		} finally {
