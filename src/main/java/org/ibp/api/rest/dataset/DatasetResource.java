@@ -27,6 +27,7 @@ import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.dataset.DatasetLock;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -87,6 +88,9 @@ public class DatasetResource {
 	@Autowired
 	protected ResourceBundleMessageSource messageSource;
 
+	@Autowired
+	private DatasetLock datasetLock;
+
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
@@ -121,9 +125,14 @@ public class DatasetResource {
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.PUT)
 	public ResponseEntity<MeasurementVariable> addVariable(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetTrait) {
-
-		final MeasurementVariable variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetTrait);
+		@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetVariable) {
+		MeasurementVariable variable = null;
+		try {
+			this.datasetLock.lockWrite();
+			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
+		} finally {
+			this.datasetLock.unlockWrite();
+		}
 		return new ResponseEntity<>(variable, HttpStatus.OK);
 	}
 
