@@ -131,22 +131,24 @@ public class OntologyMapper {
 				this.map().setFavourite(this.source.getIsFavorite());
 				this.map().setObsolete(this.source.isObsolete());
 				this.map().setAlias(this.source.getAlias());
-				this.map().setObservations(this.source.getObservations());
 				this.map().setStudies(this.source.getStudies());
 				this.map().setExpectedMin(this.source.getMinValue());
 				this.map().setExpectedMax(this.source.getMaxValue());
-				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
-				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
 				this.map().getMetadata().setDeletable(false);
 				this.map().setFormula(this.source.getFormula());
 				this.map().setAllowsFormula(this.source.isAllowsFormula());
 				// Mapping datasets this through metadata instead of creating a new set as it is in studies and observations
 				// since it was failing in some environments
-				this.map().getMetadata().setDatasets(this.source.getDatasets());
-				this.map().getMetadata().setGermplasm(this.source.getGermplasm());
-				this.map().getMetadata().setBreedingMethods(this.source.getBreedingMethods());
-				this.map().getMetadata().setLists(this.source.getLists());
+				this.map().getMetadata().getUsage().setDatasets(this.source.getDatasets());
+				this.map().getMetadata().getUsage().setObservations(this.source.getObservations());
+				this.map().getMetadata().getUsage().setGermplasm(this.source.getGermplasm());
+				this.map().getMetadata().getUsage().setBreedingMethods(this.source.getBreedingMethods());
+				this.map().getMetadata().getUsage().setLists(this.source.getLists());
 				this.map().getMetadata().getUsage().setSystemTerm(this.source.getIsSystem());
+
+				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
+				this.map().getMetadata().setDateLastModified(this.source.getDateLastModified());
+
 			}
 		});
 	}
