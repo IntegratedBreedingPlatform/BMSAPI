@@ -829,7 +829,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public TrialServiceBrapi getTrialServiceBrapi() {
-		return new TrialServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+		return new TrialServiceBrapiImpl(this.getCropDatabaseSessionProvider(), this.getWorkbenchSessionProvider());
 	}
 
 	@Bean
