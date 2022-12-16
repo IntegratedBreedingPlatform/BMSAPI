@@ -3,9 +3,9 @@ package org.ibp.api.java.study;
 
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
+import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -33,9 +33,16 @@ public interface StudyService {
 
 	void deleteStudy(Integer studyId);
 
+	@Deprecated
 	List<StudyDTO> getFilteredStudies(String programUUID, StudySearchRequest studySearchRequest, Pageable pageable);
 
+	@Deprecated
 	long countFilteredStudies(String programUUID, StudySearchRequest studySearchRequest);
 
 	void deleteNameTypeFromStudies(Integer nameTypeId);
+
+	List<StudySearchResponse> searchStudies(String programUUID, StudySearchRequest studySearchRequest, Pageable pageable);
+
+	long countSearchStudies(String programUUID, StudySearchRequest studySearchRequest);
+
 }

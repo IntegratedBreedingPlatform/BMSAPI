@@ -7,9 +7,9 @@ import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
+import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
@@ -134,8 +134,6 @@ public class StudyServiceImpl implements StudyService {
 		return this.middlewareStudyService.getGermplasmStudies(gid);
 	}
 
-
-
 	@Override
 	public void deleteStudy(final Integer studyId) {
 		this.studyValidator.validateDeleteStudy(studyId);
@@ -157,6 +155,17 @@ public class StudyServiceImpl implements StudyService {
 	public void deleteNameTypeFromStudies(final Integer nameTypeId) {
 		this.germplasmNameTypeValidator.validate(nameTypeId);
 		this.middlewareStudyService.deleteNameTypeFromStudies(nameTypeId);
+	}
+
+	@Override
+	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest studySearchRequest,
+		final Pageable pageable) {
+		return this.middlewareStudyService.searchStudies(programUUID, studySearchRequest, pageable);
+	}
+
+	@Override
+	public long countSearchStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
+		return this.middlewareStudyService.countSearchStudies(programUUID, studySearchRequest);
 	}
 
 }

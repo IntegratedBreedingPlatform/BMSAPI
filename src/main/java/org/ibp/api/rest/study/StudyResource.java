@@ -11,7 +11,9 @@ import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.api.study.MyStudiesService;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
+import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
@@ -132,6 +134,7 @@ public class StudyResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
+	@Deprecated
 	@ApiOperation("Return a paginated list of studies.")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies", method = RequestMethod.GET)
 	@ApiImplicitParams({
@@ -151,7 +154,7 @@ public class StudyResource {
 	) {
 
 		final StudySearchRequest studySearchRequest = new StudySearchRequest();
-		studySearchRequest.setStudyName(studyNameContainsString);
+		studySearchRequest.setStudyNameFilter(new SqlTextFilter(studyNameContainsString, SqlTextFilter.Type.CONTAINS));
 
 		return new PaginatedSearch().getPagedResult(
 			() -> this.studyService.countFilteredStudies(programUUID, studySearchRequest),
@@ -167,6 +170,30 @@ public class StudyResource {
 		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId) {
 		this.studyService.deleteNameTypeFromStudies(nameTypeId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@ApiOperation("Search studies")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/search", method = RequestMethod.POST)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property,asc|desc. ")
+	})
+	@ResponseBody
+	public ResponseEntity<List<StudySearchResponse>> searchStudies(
+		@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@RequestBody final StudySearchRequest studySearchRequest,
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
+	) {
+		return new PaginatedSearch().getPagedResult(
+			() -> this.studyService.countSearchStudies(programUUID, studySearchRequest),
+			() -> this.studyService.searchStudies(programUUID, studySearchRequest, pageable),
+			pageable);
 	}
 
 }
