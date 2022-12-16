@@ -907,6 +907,7 @@ public class MiddlewareFactory {
 	public PresetMapper getPresetMapper(){
 		return new PresetMapper();
 	}
+
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyEntryObservationService getStudyEntryObservationService() {
