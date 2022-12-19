@@ -30,11 +30,12 @@ public class StudyTreeValidator {
 		}
 	}
 
-	public void validateFolderId(final Integer folderId) {
+	public Study validateFolderId(final Integer folderId) {
 		final Study folder = this.studyDataManager.getStudy(folderId);
 		if (folder == null || !folder.isFolder()) {
 			throw new ApiRequestValidationException("study.folder.id.not.exist", new Object[] {folderId});
 		}
+		return folder;
 	}
 
 	public void validateNotSameFolderNameInParent(final String folderName, final Integer parentId, final String programUUID) {
