@@ -6,4 +6,6 @@ public interface StudyTreeService {
 
 	Integer updateStudyTreeFolder(final String cropName, String programUUID, int parentId, String newFolderName);
 
+	void deleteStudyFolder(final String cropName, final String programUUID, Integer folderId);
+
 }

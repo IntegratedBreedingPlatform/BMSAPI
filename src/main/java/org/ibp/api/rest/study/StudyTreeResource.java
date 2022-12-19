@@ -39,7 +39,7 @@ public class StudyTreeResource {
 	@ApiOperation(value = "Update the given study folder")
 	@ResponseBody
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/study-folders/{folderId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/study-folders/{folderId}", method = RequestMethod.PUT)
 	public ResponseEntity<Integer> updateStudyFolder(
 		@PathVariable final String crop,
 		@PathVariable final String programUUID,
@@ -48,6 +48,19 @@ public class StudyTreeResource {
 
 		return new ResponseEntity<>(this.studyTreeService.updateStudyTreeFolder(crop, programUUID, parentId, newfolderName),
 			HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Delete the given study folder")
+	@ResponseBody
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/study-folders/{folderId}", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> deleteStudyFolder(
+		@PathVariable final String crop,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer parentId) {
+
+		this.studyTreeService.deleteStudyFolder(crop, programUUID, parentId);
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 }

@@ -61,9 +61,6 @@ public class StudyTreeServiceImplTest {
 
 	@Test
 	public void updateStudyTreeFolder_OK() {
-//		final Study study = Mockito.mock(Study.class);
-//		Mockito.when(study.getName()).thenRe
-
 		Mockito.when(this.studyTreeValidator.validateFolderId(FOLDER_ID)).thenReturn(Mockito.mock(Study.class));
 
 		this.studyTreeService.updateStudyTreeFolder(CROP_NAME, PROGRAM_UUID, FOLDER_ID, FOLDER_NAME);
@@ -96,6 +93,22 @@ public class StudyTreeServiceImplTest {
 		Mockito.verifyNoMoreInteractions(this.studyTreeValidator);
 		Mockito.verifyNoInteractions(this.programValidator);
 		Mockito.verifyNoInteractions(this.studyTreeServiceMW);
+	}
+
+	@Test
+	public void deleteStudyTreeFolder_OK() {
+		this.studyTreeService.deleteStudyFolder(CROP_NAME, PROGRAM_UUID, FOLDER_ID);
+
+		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID);
+		Mockito.verify(this.programValidator)
+			.validate(ArgumentMatchers.any(ProgramDTO.class), ArgumentMatchers.any(MapBindingResult.class));
+		Mockito.verify(this.studyTreeValidator).validateFolderHasNoChildren(FOLDER_ID, "study.delete.folder.has.child", PROGRAM_UUID);
+
+		Mockito.verify(this.studyTreeServiceMW).deleteStudyFolder(FOLDER_ID);
+
+		Mockito.verifyNoMoreInteractions(this.studyTreeValidator);
+		Mockito.verifyNoMoreInteractions(this.programValidator);
+		Mockito.verifyNoMoreInteractions(this.studyTreeServiceMW);
 	}
 
 }

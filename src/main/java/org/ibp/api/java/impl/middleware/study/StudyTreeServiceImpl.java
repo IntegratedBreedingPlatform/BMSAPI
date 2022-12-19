@@ -6,7 +6,6 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyTreeValidator;
 import org.ibp.api.java.study.StudyTreeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.MapBindingResult;
@@ -51,6 +50,17 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 		this.studyTreeValidator.validateNotSameFolderNameInParent(newFolderName, parentId, programUUID);
 
 		return this.studyTreeService.updateStudyTreeFolder(parentId, newFolderName);
+	}
+
+	@Override
+	public void deleteStudyFolder(final String cropName, final String programUUID, final Integer folderId) {
+		this.studyTreeValidator.validateFolderId(folderId);
+		this.validateProgram(cropName, programUUID);
+		this.studyTreeValidator.validateFolderHasNoChildren(folderId, "study.delete.folder.has.child", programUUID);
+
+		// TODO: should only the owner be able to delete the folder?
+
+		this.studyTreeService.deleteStudyFolder(folderId);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {

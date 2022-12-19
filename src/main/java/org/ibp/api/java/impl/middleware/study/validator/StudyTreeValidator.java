@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -8,6 +10,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Component
 public class StudyTreeValidator {
@@ -43,6 +46,13 @@ public class StudyTreeValidator {
 			.ifPresent(germplasmList -> {
 				throw new ApiRequestValidationException("study.folder.name.exists", new Object[] {folderName});
 			});
+	}
+
+	public void validateFolderHasNoChildren(final Integer folderId, final String message, final String programUUID) {
+		final List<Reference> children = this.studyDataManager.getChildrenOfFolder(folderId, programUUID);
+		if (!CollectionUtils.isEmpty(children)) {
+			throw new ApiRequestValidationException(message, new Object[] {});
+		}
 	}
 
 }
