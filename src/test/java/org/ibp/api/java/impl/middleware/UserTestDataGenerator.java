@@ -100,7 +100,7 @@ public abstract class UserTestDataGenerator {
 		final String lastName = RandomStringUtils.randomAlphanumeric(50);
 		user.setLastName(lastName);
 
-		user.setStatus("true");
+		user.setActive(Boolean.TRUE);
 		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
 		final UserRoleDto userRoleDto = new UserRoleDto();
 		userRoleDto.setId(1);
@@ -172,7 +172,7 @@ public abstract class UserTestDataGenerator {
 
 		final String email = RandomStringUtils.randomAlphanumeric(24);
 		user.setEmail("test" + email + "@leafnode.io");
-		user.setStatus("true");
+		user.setActive(Boolean.TRUE);
 		user.setId(userId);
 		return user;
 	}

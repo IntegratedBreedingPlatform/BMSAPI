@@ -99,12 +99,12 @@ public class UserValidator {
 		this.validateFieldLength(user.getLastName(), LAST_NAME, LAST_NAME_MAX_LENGTH);
 		final boolean usernameIsValid = this.validateFieldLength(user.getUsername(), USERNAME, USERNAME_MAX_LENGTH);
 		final boolean emailIsValid = this.validateFieldLength(user.getEmail(), EMAIL, EMAIL_MAX_LENGTH);
-		final boolean statusIsValid = this.validateFieldLength(user.getStatus(), STATUS, STATUS_MAX_LENGTH);
+//		final boolean statusIsValid = this.validateFieldLength(user.getStatus(), STATUS, STATUS_MAX_LENGTH);
 
 		this.validateUserRoles(user);
 
 		if (emailIsValid) this.validateEmailFormat(user.getEmail());
-		if (statusIsValid) this.validateUserStatus(user.getStatus());
+//		if (statusIsValid) this.validateUserStatus(user.getStatus());
 
 		if (createUser) {
 			if (usernameIsValid) this.validateUsernameIfExists(user.getUsername());
@@ -151,12 +151,11 @@ public class UserValidator {
 			this.errors.reject(CANNOT_UPDATE_PERSON_MULTIPLE_USERS);
 		}
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-		// TODO change frontend status type to integer
-		if (loggedInUser.equals(userUpdate) && "false".equals(user.getStatus())) {
+		if (loggedInUser.equals(userUpdate) && !user.getActive()) {
 			this.errors.reject(USER_AUTO_DEACTIVATION);
 		}
 
-		if (userUpdate.getStatus() == 1 && "true".equals(user.getStatus())) {
+		if (userUpdate.getStatus() == 1 && user.getActive()) {
 			this.validateNumberOfActiveUsers(this.errors);
 		}
 
@@ -351,12 +350,12 @@ public class UserValidator {
 
 	}
 
-	protected void validateUserStatus(final String fieldValue) {
-		if (!Objects.isNull(fieldValue) && !"true".equalsIgnoreCase(fieldValue)
-			&& !"false".equalsIgnoreCase(fieldValue)) {
-			this.errors.reject(SIGNUP_FIELD_INVALID_STATUS);
-		}
-	}
+//	protected void validateUserStatus(final String fieldValue) {
+//		if (!Objects.isNull(fieldValue) && !"true".equalsIgnoreCase(fieldValue)
+//			&& !"false".equalsIgnoreCase(fieldValue)) {
+//			this.errors.reject(SIGNUP_FIELD_INVALID_STATUS);
+//		}
+//	}
 
 	public void validateFieldLength(final BindingResult errors, final String fieldValue, final String fieldName,
 		final Integer maxLength) {

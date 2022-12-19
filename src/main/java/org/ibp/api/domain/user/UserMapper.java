@@ -21,10 +21,10 @@ public class UserMapper {
 
 	private static final ModelMapper applicationWideModelMapper = ApiMapper.getInstance();
 
-	private static final Converter<Integer, String> toStatusConvert = new AbstractConverter<Integer, String>() {
+	private static final Converter<Integer, Boolean> toStatusConvert = new AbstractConverter<Integer, Boolean>() {
 
-		protected String convert(final Integer statusId) {
-			return statusId.equals(0) ? "true" : "false";
+		protected Boolean convert(final Integer statusId) {
+			return statusId.equals(0) ? Boolean.TRUE : Boolean.FALSE;
 
 		}
 	};
@@ -79,7 +79,8 @@ public class UserMapper {
 				this.map().setUsername(this.source.getName());
 				this.map().setFirstName(this.source.getPerson().getFirstName());
 				this.map().setLastName(this.source.getPerson().getLastName());
-				this.using(toStatusConvert).map().setStatus(this.source.getStatus().toString());
+				this.using(toStatusConvert).map(this.source.getStatus()).setActive(null);
+//				this.using(toStatusConvert).map(UserDto::getActive, WorkbenchUser::getStatus);
 				this.map().setEmail(this.source.getPerson().getEmail());
 				this.using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
 				this.using(authoritiesConverter).map(this.source.getPermissions()).setAuthorities(null);

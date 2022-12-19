@@ -51,7 +51,7 @@ public class UserValidatorTest {
 	public static final String FIRST_NAME_VALID = "firstName";
 	public static final String LAST_NAME_VALID = "lastName";
 	public static final String EMAIL_VALID = "user@test.com";
-	public static final String STATUS_VALID = "true";
+	public static final Boolean STATUS_VALID = Boolean.TRUE;
 
 	@InjectMocks
 	private UserValidator uservalidator;
@@ -198,17 +198,6 @@ public class UserValidatorTest {
 		this.assertValidateException(userDetailDto, false, "signup.field.invalid.userId", null);
 
 		Mockito.verify(this.userService).getUserById(userId);
-	}
-
-	/**
-	 * Should validate the status allow.* *
-	 */
-	@Test
-	public void testValidateStatus() {
-		final UserDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
-			LAST_NAME_VALID, EMAIL_VALID, "truee");
-
-		this.assertValidateException(userDto, true, "signup.field.invalid.status", null);
 	}
 
 	/**
@@ -366,7 +355,7 @@ public class UserValidatorTest {
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
 		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(new RoleDto(user.getRoles().get(0).getRole())));
 
-		userDto.setStatus("false");
+		userDto.setActive(Boolean.FALSE);
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
@@ -497,14 +486,14 @@ public class UserValidatorTest {
 	}
 
 	private UserDto createDummyUserDetailDto(final String userName, final String firstName, final String lastName, final String email,
-		final String status) {
+		final Boolean status) {
 		final UserDto userDto = new UserDto();
 		userDto.setId(null);
 		userDto.setUsername(userName);
 		userDto.setFirstName(firstName);
 		userDto.setLastName(lastName);
 		userDto.setEmail(email);
-		userDto.setStatus(status);
+		userDto.setActive(status);
 
 		userDto.setUserRoles(new ArrayList<>());
 
