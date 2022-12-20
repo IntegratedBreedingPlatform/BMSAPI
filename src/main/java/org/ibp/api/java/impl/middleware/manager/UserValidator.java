@@ -42,7 +42,6 @@ public class UserValidator {
 	public static final String SIGNUP_FIELD_EMAIL_EXISTS = "signup.field.email.exists";
 	public static final String SIGNUP_FIELD_USERNAME_EXISTS = "signup.field.username.exists";
 
-	public static final String SIGNUP_FIELD_INVALID_STATUS = "signup.field.invalid.status";
 	public static final String SIGNUP_FIELD_INVALID_USER_ID = "signup.field.invalid.userId";
 
 	public static final String USER_AUTO_DEACTIVATION = "users.user.can.not.be.deactivated";
@@ -66,7 +65,6 @@ public class UserValidator {
 	public static final int LAST_NAME_MAX_LENGTH = 50;
 	public static final int USERNAME_MAX_LENGTH = 30;
 	public static final int EMAIL_MAX_LENGTH = 255;
-	public static final int STATUS_MAX_LENGTH = 11;
 
 	@Value("${active.users.max.number}")
 	public int maximumActiveUsers;
@@ -99,12 +97,9 @@ public class UserValidator {
 		this.validateFieldLength(user.getLastName(), LAST_NAME, LAST_NAME_MAX_LENGTH);
 		final boolean usernameIsValid = this.validateFieldLength(user.getUsername(), USERNAME, USERNAME_MAX_LENGTH);
 		final boolean emailIsValid = this.validateFieldLength(user.getEmail(), EMAIL, EMAIL_MAX_LENGTH);
-//		final boolean statusIsValid = this.validateFieldLength(user.getStatus(), STATUS, STATUS_MAX_LENGTH);
-
 		this.validateUserRoles(user);
 
 		if (emailIsValid) this.validateEmailFormat(user.getEmail());
-//		if (statusIsValid) this.validateUserStatus(user.getStatus());
 
 		if (createUser) {
 			if (usernameIsValid) this.validateUsernameIfExists(user.getUsername());
@@ -349,13 +344,6 @@ public class UserValidator {
 		}
 
 	}
-
-//	protected void validateUserStatus(final String fieldValue) {
-//		if (!Objects.isNull(fieldValue) && !"true".equalsIgnoreCase(fieldValue)
-//			&& !"false".equalsIgnoreCase(fieldValue)) {
-//			this.errors.reject(SIGNUP_FIELD_INVALID_STATUS);
-//		}
-//	}
 
 	public void validateFieldLength(final BindingResult errors, final String fieldValue, final String fieldName,
 		final Integer maxLength) {
