@@ -80,7 +80,6 @@ public class UserMapper {
 				this.map().setFirstName(this.source.getPerson().getFirstName());
 				this.map().setLastName(this.source.getPerson().getLastName());
 				this.using(toStatusConvert).map(this.source.getStatus()).setActive(null);
-//				this.using(toStatusConvert).map(UserDto::getActive, WorkbenchUser::getStatus);
 				this.map().setEmail(this.source.getPerson().getEmail());
 				this.using(userRolesConverter).map(this.source.getRoles()).setUserRoles(null);
 				this.using(authoritiesConverter).map(this.source.getPermissions()).setAuthorities(null);
