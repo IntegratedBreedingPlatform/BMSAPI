@@ -2,6 +2,7 @@ package org.ibp.api.rest.study;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.ibp.api.java.study.StudyTreeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +62,20 @@ public class StudyTreeResource {
 
 		this.studyTreeService.deleteStudyFolder(crop, programUUID, parentId);
 		return new ResponseEntity<>(HttpStatus.CREATED);
+	}
+
+	@ApiOperation(value = "Move study folder")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/study-folders/{folderId}/move", method = RequestMethod.PUT)
+	@ResponseBody
+	public ResponseEntity<TreeNode> moveGermplasmList(
+		@PathVariable final String crop,
+		@PathVariable final Integer folderId,
+		@PathVariable final String programUUID,
+		@RequestParam final Integer newParentId) {
+
+		final TreeNode movedNode = this.studyTreeService.moveStudyFolder(crop, programUUID, folderId, newParentId);
+		return new ResponseEntity<>(movedNode, HttpStatus.OK);
 	}
 
 }

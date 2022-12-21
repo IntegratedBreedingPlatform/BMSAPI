@@ -1,7 +1,12 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.commons.pojo.treeview.TreeNode;
+import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyTreeValidator;
@@ -12,6 +17,7 @@ import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 @Transactional
@@ -22,6 +28,9 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 
 	@Resource
 	public ProgramValidator programValidator;
+
+	@Resource
+	private StudyDataManager studyDataManager;
 
 	@Resource
 	private org.generationcp.middleware.service.api.study.StudyTreeService studyTreeService;
@@ -56,11 +65,45 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 	public void deleteStudyFolder(final String cropName, final String programUUID, final Integer folderId) {
 		this.studyTreeValidator.validateFolderId(folderId);
 		this.validateProgram(cropName, programUUID);
-		this.studyTreeValidator.validateFolderHasNoChildren(folderId, "study.delete.folder.has.child", programUUID);
+		this.studyTreeValidator.validateFolderHasNoChildren(folderId, "study.folder.delete.has.child", programUUID);
 
 		// TODO: should only the owner be able to delete the folder?
 
 		this.studyTreeService.deleteStudyFolder(folderId);
+	}
+
+	@Override
+	public TreeNode moveStudyFolder(final String cropName, final String programUUID, final Integer folderId,
+		final Integer newParentFolderId) {
+		if (folderId == null) {
+			throw new ApiRequestValidationException("study.folder.id.invalid", new Object[] {});
+		}
+
+		if (newParentFolderId == null) {
+			throw new ApiRequestValidationException("study.parent.folder.id.invalid", new Object[] {});
+		}
+
+		if (folderId.equals(newParentFolderId)) {
+			throw new ApiRequestValidationException("study.folder.move.id.same.values", new Object[] {});
+		}
+
+		this.validateProgram(cropName, programUUID);
+		final Study folderToMove = this.studyTreeValidator.validateFolderId(folderId);
+		final Study newParentFolder = this.studyTreeValidator.validateFolderId(newParentFolderId);
+		if (!folderToMove.getProgramUUID().equals(programUUID)) {
+			throw new ApiRequestValidationException("study.folder.id.not.exist", new Object[] {folderId.toString()});
+		}
+		if (!newParentFolder.getProgramUUID().equals(programUUID)) {
+			throw new ApiRequestValidationException("study.folder.id.not.exist", new Object[] {newParentFolderId.toString()});
+		}
+
+		this.studyTreeValidator.validateFolderHasNoChildren(folderId, "study.folder.move.has.child", programUUID);
+		//Validate if there is a folder with same name in parent folder
+		this.studyTreeValidator.validateNotSameFolderNameInParent(folderToMove.getName(), newParentFolderId, programUUID);
+
+		final Integer movedFolderId = this.studyTreeService.moveStudyFolder(folderId, newParentFolderId);
+		final List<Reference> folders = this.studyDataManager.getChildrenOfFolder(movedFolderId, programUUID);
+		return TreeViewUtil.convertStudyFolderReferencesToTreeView(folders, true).get(0);
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {

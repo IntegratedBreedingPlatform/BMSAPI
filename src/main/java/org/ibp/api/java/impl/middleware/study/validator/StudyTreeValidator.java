@@ -51,7 +51,7 @@ public class StudyTreeValidator {
 	public void validateFolderHasNoChildren(final Integer folderId, final String message, final String programUUID) {
 		final List<Reference> children = this.studyDataManager.getChildrenOfFolder(folderId, programUUID);
 		if (!CollectionUtils.isEmpty(children)) {
-			throw new ApiRequestValidationException(message, new Object[] {});
+			throw new ApiRequestValidationException(message, new Object[] {folderId.toString()});
 		}
 	}
 

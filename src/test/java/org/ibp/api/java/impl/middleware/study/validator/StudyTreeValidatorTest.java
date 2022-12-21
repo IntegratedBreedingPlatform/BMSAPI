@@ -5,7 +5,6 @@ import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.hamcrest.MatcherAssert;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -209,9 +208,15 @@ public class StudyTreeValidatorTest {
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+
+			final ObjectError objectError = ((ApiRequestValidationException) e).getErrors().get(0);
 			MatcherAssert.assertThat(
-				Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
+				Arrays.asList(objectError.getCodes()),
 				hasItem("some.message"));
+
+			final Object[] arguments = objectError.getArguments();
+			MatcherAssert.assertThat(arguments.length, is(1));
+			MatcherAssert.assertThat(arguments[0], is(FOLDER_ID.toString()));
 		}
 
 		Mockito.verify(this.studyDataManager).getChildrenOfFolder(FOLDER_ID, PROGRAM_UUID);
