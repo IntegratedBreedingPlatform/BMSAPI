@@ -2,6 +2,7 @@ package org.ibp.api.rest.study;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.ibp.api.java.study.StudyTreeService;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Api(value = "Study Tree Services")
 @Controller
@@ -33,8 +35,8 @@ public class StudyTreeResource {
 		@RequestParam final String folderName,
 		@RequestParam final Integer parentId) {
 
-		return new ResponseEntity<>(this.studyTreeService.createStudyTreeFolder(crop, programUUID, parentId, folderName),
-			HttpStatus.CREATED);
+		final Integer folderId = this.studyTreeService.createStudyTreeFolder(crop, programUUID, parentId, folderName);
+		return new ResponseEntity<>(folderId, HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Update the given study folder")
@@ -47,8 +49,8 @@ public class StudyTreeResource {
 		@PathVariable final Integer parentId,
 		@RequestParam final String newfolderName) {
 
-		return new ResponseEntity<>(this.studyTreeService.updateStudyTreeFolder(crop, programUUID, parentId, newfolderName),
-			HttpStatus.CREATED);
+		final Integer folderId = this.studyTreeService.updateStudyTreeFolder(crop, programUUID, parentId, newfolderName);
+		return new ResponseEntity<>(folderId, HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Delete the given study folder")
@@ -76,6 +78,17 @@ public class StudyTreeResource {
 
 		final TreeNode movedNode = this.studyTreeService.moveStudyFolder(crop, programUUID, folderId, newParentId);
 		return new ResponseEntity<>(movedNode, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get the study tree")
+	@RequestMapping(value = "/{cropName}/studies/tree", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<TreeNode>> getStudyTree(final @PathVariable String cropName,
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
+		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId) {
+
+		final List<TreeNode> studyTree = this.studyTreeService.getStudyTree(parentFolderId, programUUID);
+		return new ResponseEntity<>(studyTree, HttpStatus.OK);
 	}
 
 }

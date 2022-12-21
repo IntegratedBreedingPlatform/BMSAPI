@@ -75,17 +75,6 @@ public class StudyResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get the study tree")
-	@RequestMapping(value = "/{cropName}/studies/tree", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<TreeNode>> getStudyTree(final @PathVariable String cropName,
-		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
-		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId) {
-
-		final List<TreeNode> studyTree = this.studyService.getStudyTree(parentFolderId, programUUID);
-		return new ResponseEntity<>(studyTree, HttpStatus.OK);
-	}
-
 	@ApiOperation("Get my studies along with statistical information")
 	@RequestMapping(value = "/{cropName}/my-studies", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")

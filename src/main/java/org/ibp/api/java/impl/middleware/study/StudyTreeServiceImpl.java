@@ -1,5 +1,8 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.commons.constant.AppConstants;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.middleware.api.program.ProgramDTO;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -98,6 +102,22 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 		final Integer movedFolderId = this.studyTreeService.moveStudyFolder(folderId, newParentFolderId);
 		final List<Reference> folders = this.studyDataManager.getChildrenOfFolder(movedFolderId, programUUID);
 		return TreeViewUtil.convertStudyFolderReferencesToTreeView(folders, true).get(0);
+	}
+
+	@Override
+	public List<TreeNode> getStudyTree(final String parentKey, final String programUUID) {
+		List<TreeNode> nodes = new ArrayList<>();
+		if (StringUtils.isBlank(parentKey)) {
+			final TreeNode rootNode = new TreeNode(AppConstants.STUDIES.name(), AppConstants.STUDIES.getString(), true, null);
+			nodes.add(rootNode);
+		} else if (parentKey.equals(AppConstants.STUDIES.name())) {
+			final List<Reference> children = this.studyDataManager.getRootFolders(programUUID);
+			nodes = TreeViewUtil.convertStudyFolderReferencesToTreeView(children, true);
+		} else if (NumberUtils.isNumber(parentKey)) {
+			final List<Reference> folders = this.studyDataManager.getChildrenOfFolder(Integer.valueOf(parentKey), programUUID);
+			nodes = TreeViewUtil.convertStudyFolderReferencesToTreeView(folders, true);
+		}
+		return nodes;
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {

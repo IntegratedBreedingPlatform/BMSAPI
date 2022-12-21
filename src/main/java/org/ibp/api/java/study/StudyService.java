@@ -1,7 +1,6 @@
 
 package org.ibp.api.java.study;
 
-import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
@@ -24,8 +23,6 @@ public interface StudyService {
 	StudyReference getStudyReference(Integer studyId);
 
 	void updateStudy(Study study);
-
-	List<TreeNode> getStudyTree(String parentKey, String programUUID);
 
 	Integer getEnvironmentDatasetId(Integer studyId);
 
