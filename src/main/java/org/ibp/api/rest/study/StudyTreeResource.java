@@ -47,9 +47,9 @@ public class StudyTreeResource {
 		@PathVariable final String crop,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer parentId,
-		@RequestParam final String newfolderName) {
+		@RequestParam final String newFolderName) {
 
-		final Integer folderId = this.studyTreeService.updateStudyTreeFolder(crop, programUUID, parentId, newfolderName);
+		final Integer folderId = this.studyTreeService.updateStudyTreeFolder(crop, programUUID, parentId, newFolderName);
 		return new ResponseEntity<>(folderId, HttpStatus.CREATED);
 	}
 
