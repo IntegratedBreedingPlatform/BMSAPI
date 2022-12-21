@@ -6,7 +6,6 @@ import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
@@ -19,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.validation.MapBindingResult;
-import org.springframework.validation.ObjectError;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -69,7 +67,7 @@ public class StudyTreeServiceImplTest {
 		assertThat(createdFolderId, is(FOLDER_ID));
 
 		Mockito.verify(this.studyTreeValidator).validateFolderName(FOLDER_NAME);
-		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID);
+		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID, PROGRAM_UUID);
 		Mockito.verify(this.programValidator)
 			.validate(ArgumentMatchers.any(ProgramDTO.class), ArgumentMatchers.any(MapBindingResult.class));
 		Mockito.verify(this.studyTreeValidator).validateNotSameFolderNameInParent(FOLDER_NAME, FOLDER_ID, PROGRAM_UUID);
@@ -83,7 +81,7 @@ public class StudyTreeServiceImplTest {
 
 	@Test
 	public void updateStudyTreeFolder_OK() {
-		Mockito.when(this.studyTreeValidator.validateFolderId(FOLDER_ID)).thenReturn(Mockito.mock(Study.class));
+		Mockito.when(this.studyTreeValidator.validateFolderId(FOLDER_ID, PROGRAM_UUID)).thenReturn(Mockito.mock(Study.class));
 
 		Mockito.when(this.studyTreeServiceMW.updateStudyTreeFolder(FOLDER_ID, FOLDER_NAME)).thenReturn(FOLDER_ID);
 
@@ -91,7 +89,7 @@ public class StudyTreeServiceImplTest {
 		assertThat(updatedFolderId, is(FOLDER_ID));
 
 		Mockito.verify(this.studyTreeValidator).validateFolderName(FOLDER_NAME);
-		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID);
+		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID, PROGRAM_UUID);
 		Mockito.verify(this.programValidator)
 			.validate(ArgumentMatchers.any(ProgramDTO.class), ArgumentMatchers.any(MapBindingResult.class));
 		Mockito.verify(this.studyTreeValidator).validateNotSameFolderNameInParent(FOLDER_NAME, FOLDER_ID, PROGRAM_UUID);
@@ -109,13 +107,13 @@ public class StudyTreeServiceImplTest {
 		Mockito.when(study.getId()).thenReturn(FOLDER_ID);
 		Mockito.when(study.getName()).thenReturn(FOLDER_NAME);
 
-		Mockito.when(this.studyTreeValidator.validateFolderId(FOLDER_ID)).thenReturn(study);
+		Mockito.when(this.studyTreeValidator.validateFolderId(FOLDER_ID, PROGRAM_UUID)).thenReturn(study);
 
 		final Integer folderId = this.studyTreeService.updateStudyTreeFolder(CROP_NAME, PROGRAM_UUID, FOLDER_ID, FOLDER_NAME);
 		assertThat(folderId, is(FOLDER_ID));
 
 		Mockito.verify(this.studyTreeValidator).validateFolderName(FOLDER_NAME);
-		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID);
+		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID, PROGRAM_UUID);
 
 		Mockito.verifyNoMoreInteractions(this.studyTreeValidator);
 		Mockito.verifyNoInteractions(this.programValidator);
@@ -126,7 +124,7 @@ public class StudyTreeServiceImplTest {
 	public void deleteStudyTreeFolder_OK() {
 		this.studyTreeService.deleteStudyFolder(CROP_NAME, PROGRAM_UUID, FOLDER_ID);
 
-		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID);
+		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID, PROGRAM_UUID);
 		Mockito.verify(this.programValidator)
 			.validate(ArgumentMatchers.any(ProgramDTO.class), ArgumentMatchers.any(MapBindingResult.class));
 		Mockito.verify(this.studyTreeValidator).validateFolderHasNoChildren(FOLDER_ID, "study.folder.delete.has.child", PROGRAM_UUID);
@@ -141,10 +139,10 @@ public class StudyTreeServiceImplTest {
 	@Test
 	public void moveStudyFolder_OK() {
 		final Study folderToMove = mockStudy(PROGRAM_UUID);
-		Mockito.when(this.studyTreeValidator.validateFolderId(FOLDER_ID)).thenReturn(folderToMove);
+		Mockito.when(this.studyTreeValidator.validateFolderId(FOLDER_ID, PROGRAM_UUID)).thenReturn(folderToMove);
 
 		final Study newParentFolder = mockStudy(PROGRAM_UUID);
-		Mockito.when(this.studyTreeValidator.validateFolderId(NEW_PARENT_FOLDER_ID)).thenReturn(newParentFolder);
+		Mockito.when(this.studyTreeValidator.validateFolderId(NEW_PARENT_FOLDER_ID, PROGRAM_UUID)).thenReturn(newParentFolder);
 
 		Mockito.when(this.studyTreeServiceMW.moveStudyFolder(FOLDER_ID, NEW_PARENT_FOLDER_ID)).thenReturn(FOLDER_ID);
 
@@ -165,8 +163,8 @@ public class StudyTreeServiceImplTest {
 		Mockito.verify(this.programValidator)
 			.validate(ArgumentMatchers.any(ProgramDTO.class), ArgumentMatchers.any(MapBindingResult.class));
 
-		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID);
-		Mockito.verify(this.studyTreeValidator).validateFolderId(NEW_PARENT_FOLDER_ID);
+		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID, PROGRAM_UUID);
+		Mockito.verify(this.studyTreeValidator).validateFolderId(NEW_PARENT_FOLDER_ID, PROGRAM_UUID);
 		Mockito.verify(this.studyTreeValidator).validateFolderHasNoChildren(FOLDER_ID, "study.folder.move.has.child", PROGRAM_UUID);
 		Mockito.verify(this.studyTreeValidator).validateNotSameFolderNameInParent(FOLDER_NAME, NEW_PARENT_FOLDER_ID, PROGRAM_UUID);
 
@@ -222,69 +220,6 @@ public class StudyTreeServiceImplTest {
 
 		Mockito.verifyNoInteractions(this.programValidator);
 		Mockito.verifyNoInteractions(this.studyTreeValidator);
-		Mockito.verifyNoInteractions(this.studyDataManager);
-	}
-
-	@Test
-	public void moveStudyFolder_FAIL_folderNotBelongsToGivenProgramUUID() {
-		final Study folderToMove = mockStudy(RandomStringUtils.randomAlphabetic(10));
-		Mockito.when(this.studyTreeValidator.validateFolderId(FOLDER_ID)).thenReturn(folderToMove);
-
-		try {
-			this.studyTreeService.moveStudyFolder(CROP_NAME, PROGRAM_UUID, FOLDER_ID, NEW_PARENT_FOLDER_ID);
-			fail("Should have failed");
-		} catch (final Exception e) {
-			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
-
-			final ObjectError objectError = ((ApiRequestValidationException) e).getErrors().get(0);
-			MatcherAssert.assertThat(Arrays.asList(objectError.getCodes()),
-				hasItem("study.folder.id.not.exist"));
-
-			final Object[] arguments = objectError.getArguments();
-			MatcherAssert.assertThat(arguments.length, CoreMatchers.is(1));
-			MatcherAssert.assertThat(arguments[0], CoreMatchers.is(FOLDER_ID.toString()));
-		}
-
-		Mockito.verify(this.programValidator)
-			.validate(ArgumentMatchers.any(ProgramDTO.class), ArgumentMatchers.any(MapBindingResult.class));
-
-		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID);
-		Mockito.verify(this.studyTreeValidator).validateFolderId(NEW_PARENT_FOLDER_ID);
-
-		Mockito.verifyNoMoreInteractions(this.programValidator);
-		Mockito.verifyNoMoreInteractions(this.studyTreeValidator);
-		Mockito.verifyNoInteractions(this.studyDataManager);
-	}
-
-	@Test
-	public void moveStudyFolder_FAIL_parentFolderNotBelongsToGivenProgramUUID() {
-		final Study folderToMove = mockStudy(PROGRAM_UUID);
-		Mockito.when(this.studyTreeValidator.validateFolderId(FOLDER_ID)).thenReturn(folderToMove);
-
-		final Study parentFolderToMove = mockStudy(RandomStringUtils.randomAlphabetic(10));
-		Mockito.when(this.studyTreeValidator.validateFolderId(NEW_PARENT_FOLDER_ID)).thenReturn(parentFolderToMove);
-
-		try {
-			this.studyTreeService.moveStudyFolder(CROP_NAME, PROGRAM_UUID, FOLDER_ID, NEW_PARENT_FOLDER_ID);
-			fail("Should have failed");
-		} catch (final Exception e) {
-			final ObjectError objectError = ((ApiRequestValidationException) e).getErrors().get(0);
-			MatcherAssert.assertThat(Arrays.asList(objectError.getCodes()),
-				hasItem("study.folder.id.not.exist"));
-
-			final Object[] arguments = objectError.getArguments();
-			MatcherAssert.assertThat(arguments.length, CoreMatchers.is(1));
-			MatcherAssert.assertThat(arguments[0], CoreMatchers.is(NEW_PARENT_FOLDER_ID.toString()));
-		}
-
-		Mockito.verify(this.programValidator)
-			.validate(ArgumentMatchers.any(ProgramDTO.class), ArgumentMatchers.any(MapBindingResult.class));
-
-		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID);
-		Mockito.verify(this.studyTreeValidator).validateFolderId(NEW_PARENT_FOLDER_ID);
-
-		Mockito.verifyNoMoreInteractions(this.programValidator);
-		Mockito.verifyNoMoreInteractions(this.studyTreeValidator);
 		Mockito.verifyNoInteractions(this.studyDataManager);
 	}
 

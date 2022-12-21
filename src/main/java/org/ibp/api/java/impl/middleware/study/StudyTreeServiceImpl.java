@@ -38,7 +38,7 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 	@Override
 	public Integer createStudyTreeFolder(final String cropName, final String programUUID, final Integer parentId, final String folderName) {
 		this.studyTreeValidator.validateFolderName(folderName);
-		this.studyTreeValidator.validateFolderId(parentId);
+		this.studyTreeValidator.validateFolderId(parentId, programUUID);
 		this.validateProgram(cropName, programUUID);
 		this.studyTreeValidator.validateNotSameFolderNameInParent(folderName, parentId, programUUID);
 
@@ -48,7 +48,7 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 	@Override
 	public Integer updateStudyTreeFolder(final String cropName, final String programUUID, final int parentId, final String newFolderName) {
 		this.studyTreeValidator.validateFolderName(newFolderName);
-		final Study folder = this.studyTreeValidator.validateFolderId(parentId);
+		final Study folder = this.studyTreeValidator.validateFolderId(parentId, programUUID);
 
 		//Preventing edition using the same folder name
 		if (newFolderName.equalsIgnoreCase(folder.getName())) {
@@ -63,7 +63,7 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 
 	@Override
 	public void deleteStudyFolder(final String cropName, final String programUUID, final Integer folderId) {
-		this.studyTreeValidator.validateFolderId(folderId);
+		this.studyTreeValidator.validateFolderId(folderId, programUUID);
 		this.validateProgram(cropName, programUUID);
 		this.studyTreeValidator.validateFolderHasNoChildren(folderId, "study.folder.delete.has.child", programUUID);
 
@@ -88,14 +88,8 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 		}
 
 		this.validateProgram(cropName, programUUID);
-		final Study folderToMove = this.studyTreeValidator.validateFolderId(folderId);
-		final Study newParentFolder = this.studyTreeValidator.validateFolderId(newParentFolderId);
-		if (!folderToMove.getProgramUUID().equals(programUUID)) {
-			throw new ApiRequestValidationException("study.folder.id.not.exist", new Object[] {folderId.toString()});
-		}
-		if (!newParentFolder.getProgramUUID().equals(programUUID)) {
-			throw new ApiRequestValidationException("study.folder.id.not.exist", new Object[] {newParentFolderId.toString()});
-		}
+		final Study folderToMove = this.studyTreeValidator.validateFolderId(folderId, programUUID);
+		this.studyTreeValidator.validateFolderId(newParentFolderId, programUUID);
 
 		this.studyTreeValidator.validateFolderHasNoChildren(folderId, "study.folder.move.has.child", programUUID);
 		//Validate if there is a folder with same name in parent folder

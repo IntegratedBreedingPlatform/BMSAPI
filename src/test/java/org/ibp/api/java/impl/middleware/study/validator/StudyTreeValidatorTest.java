@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
@@ -53,7 +54,7 @@ public class StudyTreeValidatorTest {
 	}
 
 	@Test
-	public void validateFolderName_invalidTooLongFolderName() {
+	public void validateFolderName_FAIL_invalidTooLongFolderName() {
 		final String folderName = StringUtils.repeat("a", StudyTreeValidator.NAME_MAX_LENGTH + 1);
 
 		try {
@@ -72,7 +73,7 @@ public class StudyTreeValidatorTest {
 	}
 
 	@Test
-	public void validateFolderName_invalidNullFolderName() {
+	public void validateFolderName_FAIL_invalidNullFolderName() {
 		try {
 			this.studyTreeValidator.validateFolderName(null);
 			fail("Should have failed");
@@ -86,9 +87,9 @@ public class StudyTreeValidatorTest {
 
 	@Test
 	public void validateFolderId_OK() {
-		this.mockGetStudy(true);
+		this.mockGetStudy(true, PROGRAM_UUID);
 
-		this.studyTreeValidator.validateFolderId(FOLDER_ID);
+		this.studyTreeValidator.validateFolderId(FOLDER_ID, PROGRAM_UUID);
 
 		Mockito.verify(this.studyDataManager).getStudy(FOLDER_ID);
 
@@ -96,11 +97,11 @@ public class StudyTreeValidatorTest {
 	}
 
 	@Test
-	public void validateFolderId_nullFolder() {
+	public void validateFolderId_FAIL_nullFolder() {
 		Mockito.when(this.studyDataManager.getStudy(FOLDER_ID)).thenReturn(null);
 
 		try {
-			this.studyTreeValidator.validateFolderId(FOLDER_ID);
+			this.studyTreeValidator.validateFolderId(FOLDER_ID, PROGRAM_UUID);
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
@@ -121,11 +122,35 @@ public class StudyTreeValidatorTest {
 	}
 
 	@Test
-	public void validateFolderId_notAFolder() {
-		this.mockGetStudy(false);
+	public void validateFolderId_FAIL_notFolder() {
+		this.mockGetStudy(false, PROGRAM_UUID);
 
 		try {
-			this.studyTreeValidator.validateFolderId(FOLDER_ID);
+			this.studyTreeValidator.validateFolderId(FOLDER_ID, PROGRAM_UUID);
+			fail("Should have failed");
+		} catch (final Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+
+			final ObjectError objectError = ((ApiRequestValidationException) e).getErrors().get(0);
+			MatcherAssert
+				.assertThat(Arrays.asList(objectError.getCodes()), hasItem("study.folder.id.not.exist"));
+
+			final Object[] arguments = objectError.getArguments();
+			MatcherAssert.assertThat(arguments.length, is(1));
+			MatcherAssert.assertThat(arguments[0], is(FOLDER_ID));
+		}
+
+		Mockito.verify(this.studyDataManager).getStudy(FOLDER_ID);
+
+		Mockito.verifyNoMoreInteractions(this.studyDataManager);
+	}
+
+	@Test
+	public void validateFolderId_FAIL_folderNotBelongToProgram() {
+		this.mockGetStudy(false, RandomStringUtils.randomAlphabetic(10));
+
+		try {
+			this.studyTreeValidator.validateFolderId(FOLDER_ID, PROGRAM_UUID);
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
@@ -159,7 +184,7 @@ public class StudyTreeValidatorTest {
 	}
 
 	@Test
-	public void validateNotSameFolderNameInParent_InvalidSameFolderNameInParent() {
+	public void validateNotSameFolderNameInParent_FAIL_InvalidSameFolderNameInParent() {
 
 		final String folderName = "newFolderName";
 		final Integer parentId = new Random().nextInt(Integer.MAX_VALUE);
@@ -198,7 +223,7 @@ public class StudyTreeValidatorTest {
 	}
 
 	@Test
-	public void validateFolderHasNoChildren_listHasChildren() {
+	public void validateFolderHasNoChildren_FAIL_listHasChildren() {
 
 		Mockito.when(this.studyDataManager.getChildrenOfFolder(FOLDER_ID, PROGRAM_UUID))
 			.thenReturn(Collections.singletonList(Mockito.mock(Reference.class)));
@@ -224,9 +249,10 @@ public class StudyTreeValidatorTest {
 		Mockito.verifyNoMoreInteractions(this.studyDataManager);
 	}
 
-	private void mockGetStudy(final boolean isFolder) {
+	private void mockGetStudy(final boolean isFolder, final String programUUID) {
 		final Study study = Mockito.mock(Study.class);
 		Mockito.when(study.isFolder()).thenReturn(isFolder);
+		Mockito.when(study.getProgramUUID()).thenReturn(programUUID);
 		Mockito.when(this.studyDataManager.getStudy(FOLDER_ID)).thenReturn(study);
 	}
 

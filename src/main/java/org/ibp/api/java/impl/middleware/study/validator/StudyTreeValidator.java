@@ -33,9 +33,9 @@ public class StudyTreeValidator {
 		}
 	}
 
-	public Study validateFolderId(final Integer folderId) {
+	public Study validateFolderId(final Integer folderId, final String programUUID) {
 		final Study folder = this.studyDataManager.getStudy(folderId);
-		if (folder == null || !folder.isFolder()) {
+		if (folder == null || !folder.isFolder() || !folder.getProgramUUID().equals(programUUID)) {
 			throw new ApiRequestValidationException("study.folder.id.not.exist", new Object[] {folderId});
 		}
 		return folder;
