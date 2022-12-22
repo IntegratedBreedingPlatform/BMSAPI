@@ -12,7 +12,7 @@ public interface StudyTreeService {
 
 	void deleteStudyFolder(String cropName, String programUUID, Integer folderId);
 
-	TreeNode moveStudyFolder(String cropName, String programUUID, Integer folderId, Integer newParentFolderId);
+	TreeNode moveStudyNode(String cropName, String programUUID, Integer nodeId, Integer newParentFolderId);
 
 	List<TreeNode> getStudyTree(String parentKey, String programUUID);
 

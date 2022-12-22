@@ -139,14 +139,14 @@ public class StudyTreeServiceImplTest {
 	}
 
 	@Test
-	public void moveStudyFolder_OK() {
+	public void moveStudyNode_OK() {
 		final DmsProject folderToMove = mockDmsProject(FOLDER_ID);
-		Mockito.when(this.studyTreeValidator.validateFolderId(FOLDER_ID, PROGRAM_UUID)).thenReturn(folderToMove);
+		Mockito.when(this.studyTreeValidator.validateNodeId(FOLDER_ID, PROGRAM_UUID)).thenReturn(folderToMove);
 
 		final DmsProject newParentFolder = mockDmsProject(FOLDER_ID);
 		Mockito.when(this.studyTreeValidator.validateFolderId(PARENT_FOLDER_ID, PROGRAM_UUID)).thenReturn(newParentFolder);
 
-		Mockito.when(this.studyTreeServiceMW.moveStudyFolder(FOLDER_ID, PARENT_FOLDER_ID)).thenReturn(FOLDER_ID);
+		Mockito.when(this.studyTreeServiceMW.moveStudyNode(FOLDER_ID, PARENT_FOLDER_ID)).thenReturn(FOLDER_ID);
 
 		final Reference reference = Mockito.mock(Reference.class);
 		Mockito.when(reference.getId()).thenReturn(FOLDER_ID);
@@ -155,7 +155,7 @@ public class StudyTreeServiceImplTest {
 		Mockito.when(reference.isFolder()).thenReturn(true);
 		Mockito.when(this.studyDataManager.getChildrenOfFolder(FOLDER_ID, PROGRAM_UUID)).thenReturn(Arrays.asList(reference));
 
-		final TreeNode treeNode = this.studyTreeService.moveStudyFolder(CROP_NAME, PROGRAM_UUID, FOLDER_ID, PARENT_FOLDER_ID);
+		final TreeNode treeNode = this.studyTreeService.moveStudyNode(CROP_NAME, PROGRAM_UUID, FOLDER_ID, PARENT_FOLDER_ID);
 		assertNotNull(treeNode);
 		assertThat(treeNode.getKey(), is(FOLDER_ID.toString()));
 		assertThat(treeNode.getTitle(), is(FOLDER_NAME));
@@ -165,7 +165,7 @@ public class StudyTreeServiceImplTest {
 		Mockito.verify(this.programValidator)
 			.validate(ArgumentMatchers.any(ProgramDTO.class), ArgumentMatchers.any(MapBindingResult.class));
 
-		Mockito.verify(this.studyTreeValidator).validateFolderId(FOLDER_ID, PROGRAM_UUID);
+		Mockito.verify(this.studyTreeValidator).validateNodeId(FOLDER_ID, PROGRAM_UUID);
 		Mockito.verify(this.studyTreeValidator).validateFolderId(PARENT_FOLDER_ID, PROGRAM_UUID);
 		Mockito.verify(this.studyTreeValidator).validateFolderHasNoChildren(FOLDER_ID, "study.folder.move.has.child", PROGRAM_UUID);
 		Mockito.verify(this.studyTreeValidator).validateNotSameFolderNameInParent(FOLDER_NAME, PARENT_FOLDER_ID, PROGRAM_UUID);
@@ -178,9 +178,9 @@ public class StudyTreeServiceImplTest {
 	}
 
 	@Test
-	public void moveStudyFolder_FAIL_invalidFolderId() {
+	public void moveStudyNode_FAIL_invalidNodeId() {
 		try {
-			this.studyTreeService.moveStudyFolder(CROP_NAME, PROGRAM_UUID, null, PARENT_FOLDER_ID);
+			this.studyTreeService.moveStudyNode(CROP_NAME, PROGRAM_UUID, null, PARENT_FOLDER_ID);
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
@@ -194,9 +194,9 @@ public class StudyTreeServiceImplTest {
 	}
 
 	@Test
-	public void moveStudyFolder_FAIL_invalidNewParentFolderId() {
+	public void moveStudyNode_FAIL_invalidNewParentNodeId() {
 		try {
-			this.studyTreeService.moveStudyFolder(CROP_NAME, PROGRAM_UUID, FOLDER_ID, null);
+			this.studyTreeService.moveStudyNode(CROP_NAME, PROGRAM_UUID, FOLDER_ID, null);
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
@@ -210,9 +210,9 @@ public class StudyTreeServiceImplTest {
 	}
 
 	@Test
-	public void moveStudyFolder_FAIL_folderAndParentAreTheSame() {
+	public void moveStudyNode_FAIL_folderAndParentAreTheSame() {
 		try {
-			this.studyTreeService.moveStudyFolder(CROP_NAME, PROGRAM_UUID, FOLDER_ID, FOLDER_ID);
+			this.studyTreeService.moveStudyNode(CROP_NAME, PROGRAM_UUID, FOLDER_ID, FOLDER_ID);
 			fail("Should have failed");
 		} catch (final Exception e) {
 			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));

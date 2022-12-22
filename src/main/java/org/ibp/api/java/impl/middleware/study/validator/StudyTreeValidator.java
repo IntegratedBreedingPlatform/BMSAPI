@@ -33,6 +33,14 @@ public class StudyTreeValidator {
 		}
 	}
 
+	public DmsProject validateNodeId(final Integer nodeId, final String programUUID) {
+		final DmsProject project = this.studyDataManager.getProject(nodeId);
+		if (project == null || (project.getProgramUUID() != null && !project.getProgramUUID().equals(programUUID))) {
+			throw new ApiRequestValidationException("study.node.id.not.exist", new Object[] {nodeId});
+		}
+		return project;
+	}
+
 	public DmsProject validateFolderId(final Integer folderId, final String programUUID) {
 		final DmsProject project = this.studyDataManager.getProject(folderId);
 		if (project == null || !project.isFolder() || (project.getProgramUUID() != null && !project.getProgramUUID().equals(programUUID))) {

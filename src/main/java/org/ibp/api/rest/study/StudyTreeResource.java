@@ -66,17 +66,17 @@ public class StudyTreeResource {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
-	@ApiOperation(value = "Move study folder")
+	@ApiOperation(value = "Move study node")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/study-folders/{folderId}/move", method = RequestMethod.PUT)
+	@RequestMapping(value = "/crops/{crop}/programs/{programUUID}/study-folders/{nodeId}/move", method = RequestMethod.PUT)
 	@ResponseBody
-	public ResponseEntity<TreeNode> moveGermplasmList(
+	public ResponseEntity<TreeNode> moveStudyNode(
 		@PathVariable final String crop,
-		@PathVariable final Integer folderId,
+		@PathVariable final Integer nodeId,
 		@PathVariable final String programUUID,
 		@RequestParam final Integer newParentId) {
 
-		final TreeNode movedNode = this.studyTreeService.moveStudyFolder(crop, programUUID, folderId, newParentId);
+		final TreeNode movedNode = this.studyTreeService.moveStudyNode(crop, programUUID, nodeId, newParentId);
 		return new ResponseEntity<>(movedNode, HttpStatus.OK);
 	}
 

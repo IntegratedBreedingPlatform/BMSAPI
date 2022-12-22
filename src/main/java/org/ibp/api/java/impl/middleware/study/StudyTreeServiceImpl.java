@@ -77,9 +77,9 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 	}
 
 	@Override
-	public TreeNode moveStudyFolder(final String cropName, final String programUUID, final Integer folderId,
+	public TreeNode moveStudyNode(final String cropName, final String programUUID, final Integer nodeId,
 		final Integer newParentFolderId) {
-		if (folderId == null) {
+		if (nodeId == null) {
 			throw new ApiRequestValidationException("study.folder.id.invalid", new Object[] {});
 		}
 
@@ -87,19 +87,19 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 			throw new ApiRequestValidationException("study.parent.folder.id.invalid", new Object[] {});
 		}
 
-		if (folderId.equals(newParentFolderId)) {
+		if (nodeId.equals(newParentFolderId)) {
 			throw new ApiRequestValidationException("study.folder.move.id.same.values", new Object[] {});
 		}
 
 		this.validateProgram(cropName, programUUID);
-		final DmsProject folderToMove = this.studyTreeValidator.validateFolderId(folderId, programUUID);
+		final DmsProject folderToMove = this.studyTreeValidator.validateNodeId(nodeId, programUUID);
 		this.studyTreeValidator.validateFolderId(newParentFolderId, programUUID);
 
-		this.studyTreeValidator.validateFolderHasNoChildren(folderId, "study.folder.move.has.child", programUUID);
+		this.studyTreeValidator.validateFolderHasNoChildren(nodeId, "study.folder.move.has.child", programUUID);
 		//Validate if there is a folder with same name in parent folder
 		this.studyTreeValidator.validateNotSameFolderNameInParent(folderToMove.getName(), newParentFolderId, programUUID);
 
-		final Integer movedFolderId = this.studyTreeService.moveStudyFolder(folderId, newParentFolderId);
+		final Integer movedFolderId = this.studyTreeService.moveStudyNode(nodeId, newParentFolderId);
 		final List<Reference> folders = this.studyDataManager.getChildrenOfFolder(movedFolderId, programUUID);
 		return TreeViewUtil.convertStudyFolderReferencesToTreeView(folders, true).get(0);
 	}

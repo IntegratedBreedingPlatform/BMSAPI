@@ -4,7 +4,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -84,6 +83,66 @@ public class StudyTreeValidatorTest {
 				.assertThat(Arrays.asList(((ApiRequestValidationException) e).getErrors().get(0).getCodes()),
 					hasItem("study.folder.empty"));
 		}
+	}
+
+	@Test
+	public void validateNodeId_OK() {
+		this.mockGetStudy(true, PROGRAM_UUID);
+
+		this.studyTreeValidator.validateNodeId(FOLDER_ID, PROGRAM_UUID);
+
+		Mockito.verify(this.studyDataManager).getProject(FOLDER_ID);
+
+		Mockito.verifyNoMoreInteractions(this.studyDataManager);
+	}
+
+	@Test
+	public void validateNodeId_FAIL_nullItem() {
+		Mockito.when(this.studyDataManager.getStudy(FOLDER_ID)).thenReturn(null);
+
+		try {
+			this.studyTreeValidator.validateNodeId(FOLDER_ID, PROGRAM_UUID);
+			fail("Should have failed");
+		} catch (final Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+
+			final ObjectError objectError = ((ApiRequestValidationException) e).getErrors().get(0);
+
+			MatcherAssert
+				.assertThat(Arrays.asList(objectError.getCodes()), hasItem("study.node.id.not.exist"));
+
+			final Object[] arguments = objectError.getArguments();
+			MatcherAssert.assertThat(arguments.length, is(1));
+			MatcherAssert.assertThat(arguments[0], is(FOLDER_ID));
+		}
+
+		Mockito.verify(this.studyDataManager).getProject(FOLDER_ID);
+
+		Mockito.verifyNoMoreInteractions(this.studyDataManager);
+	}
+
+	@Test
+	public void validateNodeId_FAIL_itemNotBelongToProgram() {
+		this.mockGetStudy(false, RandomStringUtils.randomAlphabetic(10));
+
+		try {
+			this.studyTreeValidator.validateNodeId(FOLDER_ID, PROGRAM_UUID);
+			fail("Should have failed");
+		} catch (final Exception e) {
+			MatcherAssert.assertThat(e, instanceOf(ApiRequestValidationException.class));
+
+			final ObjectError objectError = ((ApiRequestValidationException) e).getErrors().get(0);
+			MatcherAssert
+				.assertThat(Arrays.asList(objectError.getCodes()), hasItem("study.node.id.not.exist"));
+
+			final Object[] arguments = objectError.getArguments();
+			MatcherAssert.assertThat(arguments.length, is(1));
+			MatcherAssert.assertThat(arguments[0], is(FOLDER_ID));
+		}
+
+		Mockito.verify(this.studyDataManager).getProject(FOLDER_ID);
+
+		Mockito.verifyNoMoreInteractions(this.studyDataManager);
 	}
 
 	@Test
