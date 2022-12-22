@@ -99,8 +99,8 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 		//Validate if there is a folder with same name in parent folder
 		this.studyTreeValidator.validateNotSameFolderNameInParent(folderToMove.getName(), newParentFolderId, programUUID);
 
-		final Integer movedFolderId = this.studyTreeService.moveStudyNode(nodeId, newParentFolderId);
-		final List<Reference> folders = this.studyDataManager.getChildrenOfFolder(movedFolderId, programUUID);
+		this.studyTreeService.moveStudyNode(nodeId, newParentFolderId);
+		final List<Reference> folders = this.studyDataManager.getChildrenOfFolder(newParentFolderId, programUUID);
 		return TreeViewUtil.convertStudyFolderReferencesToTreeView(folders, true).get(0);
 	}
 

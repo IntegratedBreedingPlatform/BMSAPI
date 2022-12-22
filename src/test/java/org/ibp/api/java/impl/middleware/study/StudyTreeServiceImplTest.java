@@ -153,7 +153,7 @@ public class StudyTreeServiceImplTest {
 		Mockito.when(reference.getName()).thenReturn(FOLDER_NAME);
 		Mockito.when(reference.getProgramUUID()).thenReturn(PROGRAM_UUID);
 		Mockito.when(reference.isFolder()).thenReturn(true);
-		Mockito.when(this.studyDataManager.getChildrenOfFolder(FOLDER_ID, PROGRAM_UUID)).thenReturn(Arrays.asList(reference));
+		Mockito.when(this.studyDataManager.getChildrenOfFolder(PARENT_FOLDER_ID, PROGRAM_UUID)).thenReturn(Arrays.asList(reference));
 
 		final TreeNode treeNode = this.studyTreeService.moveStudyNode(CROP_NAME, PROGRAM_UUID, FOLDER_ID, PARENT_FOLDER_ID);
 		assertNotNull(treeNode);
@@ -170,7 +170,7 @@ public class StudyTreeServiceImplTest {
 		Mockito.verify(this.studyTreeValidator).validateFolderHasNoChildren(FOLDER_ID, "study.folder.move.has.child", PROGRAM_UUID);
 		Mockito.verify(this.studyTreeValidator).validateNotSameFolderNameInParent(FOLDER_NAME, PARENT_FOLDER_ID, PROGRAM_UUID);
 
-		Mockito.verify(this.studyDataManager).getChildrenOfFolder(FOLDER_ID, PROGRAM_UUID);
+		Mockito.verify(this.studyDataManager).getChildrenOfFolder(PARENT_FOLDER_ID, PROGRAM_UUID);
 
 		Mockito.verifyNoMoreInteractions(this.programValidator);
 		Mockito.verifyNoMoreInteractions(this.studyTreeValidator);
