@@ -81,7 +81,7 @@ public class StudyTreeResource {
 	}
 
 	@ApiOperation(value = "Get the study tree")
-	@RequestMapping(value = "/{cropName}/studies/tree", method = RequestMethod.GET)
+	@RequestMapping(value = "/crops/{cropName}/studies/tree", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getStudyTree(final @PathVariable String cropName,
 		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,

@@ -8,11 +8,11 @@ public interface StudyTreeService {
 
 	Integer createStudyTreeFolder(String cropName, String programUUID, Integer parentId, String folderName);
 
-	Integer updateStudyTreeFolder(final String cropName, String programUUID, int parentId, String newFolderName);
+	Integer updateStudyTreeFolder(String cropName, String programUUID, int parentId, String newFolderName);
 
-	void deleteStudyFolder(final String cropName, final String programUUID, Integer folderId);
+	void deleteStudyFolder(String cropName, String programUUID, Integer folderId);
 
-	TreeNode moveStudyFolder(final String cropName, final String programUUID, Integer folderId, Integer newParentFolderId);
+	TreeNode moveStudyFolder(String cropName, String programUUID, Integer folderId, Integer newParentFolderId);
 
 	List<TreeNode> getStudyTree(String parentKey, String programUUID);
 
