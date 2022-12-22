@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.hamcrest.MatcherAssert;
 import org.ibp.api.exception.ApiRequestValidationException;
@@ -91,7 +92,7 @@ public class StudyTreeValidatorTest {
 
 		this.studyTreeValidator.validateFolderId(FOLDER_ID, PROGRAM_UUID);
 
-		Mockito.verify(this.studyDataManager).getStudy(FOLDER_ID);
+		Mockito.verify(this.studyDataManager).getProject(FOLDER_ID);
 
 		Mockito.verifyNoMoreInteractions(this.studyDataManager);
 	}
@@ -116,7 +117,7 @@ public class StudyTreeValidatorTest {
 			MatcherAssert.assertThat(arguments[0], is(FOLDER_ID));
 		}
 
-		Mockito.verify(this.studyDataManager).getStudy(FOLDER_ID);
+		Mockito.verify(this.studyDataManager).getProject(FOLDER_ID);
 
 		Mockito.verifyNoMoreInteractions(this.studyDataManager);
 	}
@@ -140,7 +141,7 @@ public class StudyTreeValidatorTest {
 			MatcherAssert.assertThat(arguments[0], is(FOLDER_ID));
 		}
 
-		Mockito.verify(this.studyDataManager).getStudy(FOLDER_ID);
+		Mockito.verify(this.studyDataManager).getProject(FOLDER_ID);
 
 		Mockito.verifyNoMoreInteractions(this.studyDataManager);
 	}
@@ -164,7 +165,7 @@ public class StudyTreeValidatorTest {
 			MatcherAssert.assertThat(arguments[0], is(FOLDER_ID));
 		}
 
-		Mockito.verify(this.studyDataManager).getStudy(FOLDER_ID);
+		Mockito.verify(this.studyDataManager).getProject(FOLDER_ID);
 
 		Mockito.verifyNoMoreInteractions(this.studyDataManager);
 	}
@@ -250,10 +251,10 @@ public class StudyTreeValidatorTest {
 	}
 
 	private void mockGetStudy(final boolean isFolder, final String programUUID) {
-		final Study study = Mockito.mock(Study.class);
+		final DmsProject study = Mockito.mock(DmsProject.class);
 		Mockito.when(study.isFolder()).thenReturn(isFolder);
 		Mockito.when(study.getProgramUUID()).thenReturn(programUUID);
-		Mockito.when(this.studyDataManager.getStudy(FOLDER_ID)).thenReturn(study);
+		Mockito.when(this.studyDataManager.getProject(FOLDER_ID)).thenReturn(study);
 	}
 
 }

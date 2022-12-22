@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.study.validator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -36,7 +35,7 @@ public class StudyTreeValidator {
 
 	public DmsProject validateFolderId(final Integer folderId, final String programUUID) {
 		final DmsProject project = this.studyDataManager.getProject(folderId);
-		if (project == null || !project.isFolder() || !project.getProgramUUID().equals(programUUID)) {
+		if (project == null || !project.isFolder() || (project.getProgramUUID() != null && !project.getProgramUUID().equals(programUUID))) {
 			throw new ApiRequestValidationException("study.folder.id.not.exist", new Object[] {folderId});
 		}
 		return project;
