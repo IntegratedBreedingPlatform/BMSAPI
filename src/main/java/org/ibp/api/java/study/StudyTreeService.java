@@ -8,7 +8,7 @@ public interface StudyTreeService {
 
 	Integer createStudyTreeFolder(String cropName, String programUUID, Integer parentId, String folderName);
 
-	Integer updateStudyTreeFolder(String cropName, String programUUID, int parentId, String newFolderName);
+	Integer updateStudyTreeFolder(String cropName, String programUUID, Integer parentId, String newFolderName);
 
 	void deleteStudyFolder(String cropName, String programUUID, Integer folderId);
 

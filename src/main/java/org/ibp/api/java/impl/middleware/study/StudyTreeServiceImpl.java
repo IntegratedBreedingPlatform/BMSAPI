@@ -7,8 +7,8 @@ import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.dms.Reference;
-import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
@@ -50,17 +50,17 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 	}
 
 	@Override
-	public Integer updateStudyTreeFolder(final String cropName, final String programUUID, final int parentId, final String newFolderName) {
+	public Integer updateStudyTreeFolder(final String cropName, final String programUUID, final Integer parentId, final String newFolderName) {
 		this.studyTreeValidator.validateFolderName(newFolderName);
-		final Study folder = this.studyTreeValidator.validateFolderId(parentId, programUUID);
+		final DmsProject folder = this.studyTreeValidator.validateFolderId(parentId, programUUID);
 
 		//Preventing edition using the same folder name
 		if (newFolderName.equalsIgnoreCase(folder.getName())) {
-			return folder.getId();
+			return folder.getProjectId();
 		}
 
 		this.validateProgram(cropName, programUUID);
-		this.studyTreeValidator.validateNotSameFolderNameInParent(newFolderName, parentId, programUUID);
+		this.studyTreeValidator.validateNotSameFolderNameInParent(newFolderName, folder.getParent().getProjectId(), programUUID);
 
 		return this.studyTreeService.updateStudyTreeFolder(parentId, newFolderName);
 	}
@@ -92,7 +92,7 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 		}
 
 		this.validateProgram(cropName, programUUID);
-		final Study folderToMove = this.studyTreeValidator.validateFolderId(folderId, programUUID);
+		final DmsProject folderToMove = this.studyTreeValidator.validateFolderId(folderId, programUUID);
 		this.studyTreeValidator.validateFolderId(newParentFolderId, programUUID);
 
 		this.studyTreeValidator.validateFolderHasNoChildren(folderId, "study.folder.move.has.child", programUUID);

@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.stereotype.Component;
@@ -33,12 +34,12 @@ public class StudyTreeValidator {
 		}
 	}
 
-	public Study validateFolderId(final Integer folderId, final String programUUID) {
-		final Study folder = this.studyDataManager.getStudy(folderId);
-		if (folder == null || !folder.isFolder() || !folder.getProgramUUID().equals(programUUID)) {
+	public DmsProject validateFolderId(final Integer folderId, final String programUUID) {
+		final DmsProject project = this.studyDataManager.getProject(folderId);
+		if (project == null || !project.isFolder() || !project.getProgramUUID().equals(programUUID)) {
 			throw new ApiRequestValidationException("study.folder.id.not.exist", new Object[] {folderId});
 		}
-		return folder;
+		return project;
 	}
 
 	public void validateNotSameFolderNameInParent(final String folderName, final Integer parentId, final String programUUID) {

@@ -35,8 +35,8 @@ public class StudyTreeResource {
 		@RequestParam final String folderName,
 		@RequestParam final Integer parentId) {
 
-		final Integer folderId = this.studyTreeService.createStudyTreeFolder(crop, programUUID, parentId, folderName);
-		return new ResponseEntity<>(folderId, HttpStatus.CREATED);
+		final Integer createdFolderId = this.studyTreeService.createStudyTreeFolder(crop, programUUID, parentId, folderName);
+		return new ResponseEntity<>(createdFolderId, HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Update the given study folder")
@@ -46,11 +46,11 @@ public class StudyTreeResource {
 	public ResponseEntity<Integer> updateStudyFolder(
 		@PathVariable final String crop,
 		@PathVariable final String programUUID,
-		@PathVariable final Integer parentId,
+		@PathVariable final Integer folderId,
 		@RequestParam final String newFolderName) {
 
-		final Integer folderId = this.studyTreeService.updateStudyTreeFolder(crop, programUUID, parentId, newFolderName);
-		return new ResponseEntity<>(folderId, HttpStatus.CREATED);
+		final Integer updatedFolderId = this.studyTreeService.updateStudyTreeFolder(crop, programUUID, folderId, newFolderName);
+		return new ResponseEntity<>(updatedFolderId, HttpStatus.CREATED);
 	}
 
 	@ApiOperation(value = "Delete the given study folder")
