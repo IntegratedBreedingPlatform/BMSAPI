@@ -108,11 +108,8 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 	public List<TreeNode> getStudyTree(final String parentKey, final String programUUID) {
 		List<TreeNode> nodes = new ArrayList<>();
 		if (StringUtils.isBlank(parentKey)) {
-			final TreeNode rootNode = new TreeNode(AppConstants.STUDIES.name(), AppConstants.STUDIES.getString(), true, null);
+			final TreeNode rootNode = new TreeNode(DmsProject.SYSTEM_FOLDER_ID.toString(), AppConstants.STUDIES.getString(), true, null);
 			nodes.add(rootNode);
-		} else if (parentKey.equals(AppConstants.STUDIES.name())) {
-			final List<Reference> children = this.studyDataManager.getRootFolders(programUUID);
-			nodes = TreeViewUtil.convertStudyFolderReferencesToTreeView(children, true);
 		} else if (NumberUtils.isNumber(parentKey)) {
 			final List<Reference> folders = this.studyDataManager.getChildrenOfFolder(Integer.valueOf(parentKey), programUUID);
 			nodes = TreeViewUtil.convertStudyFolderReferencesToTreeView(folders, true);
