@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -41,7 +42,7 @@ public class StudyServiceImpl implements StudyService {
 	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
 
 	@Autowired
-	org.generationcp.middleware.service.api.SampleService sampleService;
+	private org.generationcp.middleware.service.api.SampleService sampleService;
 
 	@Autowired
 	private StudyDataManager studyDataManager;
@@ -143,6 +144,12 @@ public class StudyServiceImpl implements StudyService {
 	@Override
 	public long countSearchStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
 		return this.middlewareStudyService.countSearchStudies(programUUID, studySearchRequest);
+	}
+
+	@Override
+	public StudyDetailsDTO getStudyDetails(final String programUUID, final Integer studyId) {
+		this.studyValidator.validate(studyId, false);
+		return this.middlewareStudyService.getStudyDetails(programUUID, studyId);
 	}
 
 }

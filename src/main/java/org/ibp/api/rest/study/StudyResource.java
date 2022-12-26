@@ -6,10 +6,10 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.api.study.MyStudiesService;
 import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.dms.Study;
@@ -183,6 +183,17 @@ public class StudyResource {
 			() -> this.studyService.countSearchStudies(programUUID, studySearchRequest),
 			() -> this.studyService.searchStudies(programUUID, studySearchRequest, pageable),
 			pageable);
+	}
+
+	@ApiOperation(value = "Get the details for the given study",
+		notes = "Returns boolean indicating if there are samples associated to the study.")
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/details", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
+	@ResponseBody
+	public ResponseEntity<StudyDetailsDTO> getDetails(final @PathVariable String cropName, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId) {
+		final StudyDetailsDTO studyDetails = this.studyService.getStudyDetails(programUUID, studyId);
+		return new ResponseEntity<>(studyDetails, HttpStatus.OK);
 	}
 
 }

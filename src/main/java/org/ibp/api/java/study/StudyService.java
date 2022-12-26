@@ -3,6 +3,7 @@ package org.ibp.api.java.study;
 
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.dms.Study;
@@ -41,5 +42,7 @@ public interface StudyService {
 	List<StudySearchResponse> searchStudies(String programUUID, StudySearchRequest studySearchRequest, Pageable pageable);
 
 	long countSearchStudies(String programUUID, StudySearchRequest studySearchRequest);
+
+	StudyDetailsDTO getStudyDetails(final String programUUID, Integer studyId);
 
 }
