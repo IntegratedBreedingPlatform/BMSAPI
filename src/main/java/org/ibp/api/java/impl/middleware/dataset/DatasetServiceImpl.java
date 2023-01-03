@@ -295,6 +295,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<DatasetDTO> datasetDTOs = new ArrayList<>();
 		for (final org.generationcp.middleware.domain.dms.DatasetDTO datasetDTO : datasetDTOS) {
 			final DatasetDTO datasetDto = mapper.map(datasetDTO, DatasetDTO.class);
+			// TODO: should also rename environment dataset?
 			if (datasetDto.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 				datasetDto.setName(PLOT_DATASET_NAME);
 			}
