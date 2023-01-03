@@ -5,15 +5,11 @@ import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 import com.rits.cloning.Cloner;
 import org.generationcp.commons.derivedvariable.DerivedVariableProcessor;
-import org.generationcp.middleware.ruleengine.impl.RulesServiceImpl;
-import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.generationcp.commons.service.BreedingViewImportService;
 import org.generationcp.commons.service.CsvExportSampleListService;
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.service.impl.BreedingViewImportServiceImpl;
 import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
-import org.generationcp.middleware.ruleengine.naming.impl.GermplasmNamingServiceImpl;
 import org.generationcp.commons.service.impl.StockServiceImpl;
 import org.generationcp.commons.spring.util.ContextUtil;
 import org.generationcp.middleware.api.brapi.GermplasmListServiceBrapi;
@@ -40,8 +36,8 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
 import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.crop.CropServiceImpl;
-import org.generationcp.middleware.api.cropparameter.CropParameterServiceImpl;
 import org.generationcp.middleware.api.cropparameter.CropParameterService;
+import org.generationcp.middleware.api.cropparameter.CropParameterServiceImpl;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
@@ -119,6 +115,11 @@ import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
+import org.generationcp.middleware.preset.PresetMapper;
+import org.generationcp.middleware.ruleengine.impl.RulesServiceImpl;
+import org.generationcp.middleware.ruleengine.naming.impl.GermplasmNamingServiceImpl;
+import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.MethodServiceImpl;
@@ -135,7 +136,6 @@ import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 import org.generationcp.middleware.service.api.audit.GermplasmAuditService;
-import org.generationcp.middleware.service.api.crop.CropGenotypingParameterService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
@@ -162,7 +162,6 @@ import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.generationcp.middleware.service.impl.NamingConfigurationServiceImpl;
 import org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl;
 import org.generationcp.middleware.service.impl.audit.GermplasmAuditServiceImpl;
-import org.generationcp.middleware.service.impl.crop.CropGenotypingParameterServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
@@ -830,7 +829,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public TrialServiceBrapi getTrialServiceBrapi() {
-		return new TrialServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+		return new TrialServiceBrapiImpl(this.getCropDatabaseSessionProvider(), this.getWorkbenchSessionProvider());
 	}
 
 	@Bean
@@ -877,12 +876,6 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public CropGenotypingParameterService getCropGenotypingParameterService() {
-		return new CropGenotypingParameterServiceImpl(this.getWorkbenchSessionProvider());
-	}
-
-	@Bean
-	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public PedigreeServiceBrapi getPedigreeServiceBrapi() {
 		return new PedigreeServiceBrapiImpl(this.getCropDatabaseSessionProvider());
 	}
@@ -908,6 +901,11 @@ public class MiddlewareFactory {
 	@Bean
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();
+	}
+
+	@Bean
+	public PresetMapper getPresetMapper(){
+		return new PresetMapper();
 	}
 
 	@Bean

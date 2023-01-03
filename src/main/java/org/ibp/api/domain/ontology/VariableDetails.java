@@ -34,7 +34,7 @@ public class VariableDetails extends TermSummary {
 		return this.metadata;
 	}
 
-	public void setMetadata(MetadataDetails metadata) {
+	public void setMetadata(final MetadataDetails metadata) {
 		this.metadata = metadata;
 	}
 
@@ -43,10 +43,10 @@ public class VariableDetails extends TermSummary {
 	}
 
 	public String getProgramUuid() {
-		return programUuid;
+		return this.programUuid;
 	}
 
-	public void setProgramUuid(String programUuid) {
+	public void setProgramUuid(final String programUuid) {
 		this.programUuid = programUuid;
 	}
 
@@ -54,23 +54,23 @@ public class VariableDetails extends TermSummary {
 		return this.alias;
 	}
 
-	public void setAlias(String alias) {
+	public void setAlias(final String alias) {
 		this.alias = alias;
 	}
 
 	public MethodDetails getMethod() {
-		return method;
+		return this.method;
 	}
 
-	public void setMethod(MethodDetails method) {
+	public void setMethod(final MethodDetails method) {
 		this.method = method;
 	}
 
 	public PropertyDetails getProperty() {
-		return property;
+		return this.property;
 	}
 
-	public void setProperty(PropertyDetails property) {
+	public void setProperty(final PropertyDetails property) {
 		this.property = property;
 	}
 
@@ -78,7 +78,7 @@ public class VariableDetails extends TermSummary {
 		return this.scale;
 	}
 
-	public void setScale(ScaleDetails scale) {
+	public void setScale(final ScaleDetails scale) {
 		this.scale = scale;
 	}
 
@@ -86,15 +86,15 @@ public class VariableDetails extends TermSummary {
 		return this.favourite;
 	}
 
-	public void setFavourite(boolean favourite) {
+	public void setFavourite(final boolean favourite) {
 		this.favourite = favourite;
 	}
 
-	public void setExpectedMin(String min) {
+	public void setExpectedMin(final String min) {
 		this.expectedRange.setMin(min);
 	}
 
-	public void setExpectedMax(String max) {
+	public void setExpectedMax(final String max) {
 		this.expectedRange.setMax(max);
 	}
 
@@ -102,19 +102,19 @@ public class VariableDetails extends TermSummary {
 		return this.variableTypes;
 	}
 
-	public void setVariableTypes(Set<VariableType> variables) {
+	public void setVariableTypes(final Set<VariableType> variables) {
 		this.variableTypes.clear();
 
 		if (variables == null) {
 			return;
 		}
 
-		for (VariableType variableType : variables) {
+		for (final VariableType variableType : variables) {
 			this.variableTypes.add(variableType);
 		}
 	}
 
-	public void setObservations(Integer observations) {
+	public void setObservations(final Integer observations) {
 		if (observations == null) {
 			this.metadata.setObservations(0);
 		} else {
@@ -122,7 +122,7 @@ public class VariableDetails extends TermSummary {
 		}
 	}
 
-	public void setStudies(Integer studies) {
+	public void setStudies(final Integer studies) {
 		if (studies == null) {
 			this.metadata.setStudies(0);
 		} else {
@@ -131,7 +131,7 @@ public class VariableDetails extends TermSummary {
 	}
 
 	public FormulaDto getFormula() {
-		return formula;
+		return this.formula;
 	}
 
 	public void setFormula(final FormulaDto formula) {
@@ -139,7 +139,7 @@ public class VariableDetails extends TermSummary {
 	}
 
 	public boolean isAllowsFormula() {
-		return allowsFormula;
+		return this.allowsFormula;
 	}
 
 	public void setAllowsFormula(final boolean allowsFormula) {
@@ -154,7 +154,7 @@ public class VariableDetails extends TermSummary {
 		return this.obsolete;
 	}
 
-	public void setObsolete(boolean obsolete) {
+	public void setObsolete(final boolean obsolete) {
 		this.obsolete = obsolete;
 	}
 

@@ -20,7 +20,7 @@ import org.ibp.api.rest.labelprinting.filegenerator.CSVLabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.ExcelLabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.LabelsFileGenerator;
 import org.ibp.api.rest.labelprinting.filegenerator.PDFLabelsFileGenerator;
-import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;

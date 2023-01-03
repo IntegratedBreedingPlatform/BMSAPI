@@ -8,6 +8,8 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelType;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
@@ -16,7 +18,7 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
-import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -125,16 +127,16 @@ public abstract class LabelPrintingStrategy {
 	void validateLabelsGeneratorInputData(final LabelsGeneratorInput labelsGeneratorInput, final String programUUID) {
 		this.validateLabelsInfoInputData(labelsGeneratorInput, programUUID);
 
-		final Set<Integer> availableKeys = this.getAvailableLabelTypes(labelsGeneratorInput, programUUID)
+		final Set<String> availableKeys = this.getAvailableLabelTypes(labelsGeneratorInput, programUUID)
 			.stream().flatMap(labelType -> labelType.getFields().stream())
-			.map(Field::getId)
+			.map(field -> LabelPrintingFieldUtils.buildCombinedKey(field))
 			.collect(Collectors.toSet());
 
-		final Set<Integer> requestedFields = new HashSet<>();
+		final Set<String> requestedFields = new HashSet<>();
 		int totalRequestedFields = 0;
 
-		for (final List<Integer> list : labelsGeneratorInput.getFields()) {
-			for (final Integer key : list) {
+		for (final List<String> list : labelsGeneratorInput.getFields()) {
+			for (final String key : list) {
 				requestedFields.add(key);
 				totalRequestedFields++;
 			}
@@ -208,8 +210,8 @@ public abstract class LabelPrintingStrategy {
 	void validateBarcode(final LabelsGeneratorInput labelsGeneratorInput, final LabelsData labelsData) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 		if (!labelsGeneratorInput.isAutomaticBarcode()) {
-			for (final Map<Integer, String> data : labelsData.getData()) {
-				final List<Integer> barcodeIds =
+			for (final Map<String, String> data : labelsData.getData()) {
+				final List<String> barcodeIds =
 					labelsGeneratorInput.getBarcodeFields().stream().filter(labelId -> StringUtils.isEmpty(data.get(labelId))).collect(
 						Collectors.toList());
 				if (!barcodeIds.isEmpty()) {
@@ -231,29 +233,11 @@ public abstract class LabelPrintingStrategy {
 
 		if (!recordIds.isEmpty()) {
 			attributesType.getFields().addAll(attributeVariables.stream()
-				.map(attributeVariable -> new Field(
-					toKey(attributeVariable.getId()),
+				.map(attributeVariable -> new Field(FieldType.VARIABLE,
+					attributeVariable.getId(),
 					StringUtils.isNotBlank(attributeVariable.getAlias()) ? attributeVariable.getAlias() : attributeVariable.getName()))
 				.collect(Collectors.toList()));
 		}
-	}
-
-	/**
-	 * Identify non-fixed columns with id = MAX_FIXED_TYPE_INDEX + column-id
-	 * Requires no collision between non-fixed columns id
-	 * Allocates some space for future fixed-columns
-	 */
-	static final Integer MAX_FIXED_TYPE_INDEX = 10000;
-
-	static int toKey(final int id) {
-		return id + MAX_FIXED_TYPE_INDEX;
-	}
-
-	static int toId(final int key) {
-		if (key > MAX_FIXED_TYPE_INDEX) {
-			return key - MAX_FIXED_TYPE_INDEX;
-		}
-		return key;
 	}
 
 	/**
