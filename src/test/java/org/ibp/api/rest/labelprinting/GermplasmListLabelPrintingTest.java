@@ -218,7 +218,7 @@ public class GermplasmListLabelPrintingTest {
 		labelsGeneratorInput.setListId(LIST_ID);
 		labelsGeneratorInput.setFields(new ArrayList<>());
 		final LabelsData labelsData = this.labelPrinting.getLabelsData(labelsGeneratorInput, PROGRAM_UUID);
-		Mockito.verify(this.germplasmService).searchGermplasm(this.germplasmSearchRequest, null, PROGRAM_UUID);
+		Mockito.verify(this.germplasmSearchService).searchGermplasm(this.germplasmSearchRequest, null, PROGRAM_UUID);
 		Mockito.verify(this.germplasmAttributeService, Mockito.never())
 			.getGermplasmAttributeVariables(ArgumentMatchers.anyList(), ArgumentMatchers.anyString());
 		Mockito.verify(this.germplasmNameService, Mockito.never()).getGermplasmNamesByGids(ArgumentMatchers.anyList());
