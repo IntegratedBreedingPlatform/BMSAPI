@@ -150,7 +150,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		germplasmSearchRequest.setGermplasmListIds(Collections.singletonList(labelsGeneratorInput.getListId()));
 		this.setAddedColumnsToSearchRequest(labelsGeneratorInput, germplasmSearchRequest);
 		final List<GermplasmSearchResponse> responseList =
-			this.germplasmService.searchGermplasm(germplasmSearchRequest, null, programUUID);
+			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 
 		//Get Germplasm names, attributes, entry details data
 		final List<Integer> germplasmFieldIds = new ArrayList<>();
