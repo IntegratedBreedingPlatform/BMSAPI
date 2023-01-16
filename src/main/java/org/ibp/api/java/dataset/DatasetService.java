@@ -351,7 +351,6 @@ public interface DatasetService {
 
 	List<GermplasmNameTypeDTO> getAllPlotDatasetNameTypes(Integer datasetId);
 
-	List<MeasurementVariable> getVariablesByVariableTypes(final Integer studyId, final Integer datasetId,
-		final List<Integer> variableTypes);
+	List<MeasurementVariable> getVariablesByVariableTypes(Integer studyId, List<Integer> variableTypes);
 
 }

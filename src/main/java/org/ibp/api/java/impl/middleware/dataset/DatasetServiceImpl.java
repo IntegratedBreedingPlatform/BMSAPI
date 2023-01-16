@@ -1035,15 +1035,10 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getVariablesByVariableTypes(final Integer studyId, final Integer datasetId,
-		final List<Integer> variableTypes) {
+	public List<MeasurementVariable> getVariablesByVariableTypes(final Integer studyId, final List<Integer> variableTypes) {
 		this.studyValidator.validate(studyId, false);
-		if (datasetId != null) {
-			this.datasetValidator.validateDataset(datasetId);
-		}
-
 		variableTypes.forEach(this.datasetValidator::validateVariableType);
-		return this.middlewareDatasetService.getDatasetMeasurementVariablesByVariableType(studyId != null ? studyId : datasetId, variableTypes);
+		return this.middlewareDatasetService.getDatasetMeasurementVariablesByVariableType(studyId, variableTypes);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
