@@ -1035,7 +1035,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getVariablesByVariableType(final Integer studyId, final Integer datasetId,
+	public List<MeasurementVariable> getVariablesByVariableTypes(final Integer studyId, final Integer datasetId,
 		final List<Integer> variableTypes) {
 		this.studyValidator.validate(studyId, false);
 		if (datasetId != null) {
