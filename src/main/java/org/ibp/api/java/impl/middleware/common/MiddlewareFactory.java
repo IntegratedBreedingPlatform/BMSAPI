@@ -831,7 +831,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public TrialServiceBrapi getTrialServiceBrapi() {
-		return new TrialServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+		return new TrialServiceBrapiImpl(this.getCropDatabaseSessionProvider(), this.getWorkbenchSessionProvider());
 	}
 
 	@Bean
@@ -909,6 +909,7 @@ public class MiddlewareFactory {
 	public PresetMapper getPresetMapper(){
 		return new PresetMapper();
 	}
+
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyEntryObservationService getStudyEntryObservationService() {
