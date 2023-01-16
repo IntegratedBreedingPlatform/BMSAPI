@@ -200,7 +200,7 @@ public class GermplasmListLabelPrintingTest {
 
 		final List<LabelType> labelTypes = this.labelPrinting.getAvailableLabelTypes(this.labelsInfoInput, PROGRAM_UUID);
 		Mockito.verify(this.germplasmSearchService).searchGermplasm(ArgumentMatchers.any(GermplasmSearchRequest.class),
-			ArgumentMatchers.eq(null), ArgumentMatchers.eq(PROGRAM_UUID));
+			ArgumentMatchers.notNull(null), ArgumentMatchers.eq(PROGRAM_UUID));
 		Mockito.verify(this.germplasmAttributeService, Mockito.never())
 			.getGermplasmAttributeVariables(Collections.singletonList(GID), PROGRAM_UUID);
 		Mockito.verify(this.germplasmNameTypeService, Mockito.never()).getNameTypesByGIDList(Collections.singletonList(GID));
@@ -217,8 +217,9 @@ public class GermplasmListLabelPrintingTest {
 		final LabelsGeneratorInput labelsGeneratorInput = new LabelsGeneratorInput();
 		labelsGeneratorInput.setListId(LIST_ID);
 		labelsGeneratorInput.setFields(new ArrayList<>());
+		final PageRequest pageRequest = new PageRequest(0, 3000, null);
 		final LabelsData labelsData = this.labelPrinting.getLabelsData(labelsGeneratorInput, PROGRAM_UUID);
-		Mockito.verify(this.germplasmService).searchGermplasm(this.germplasmSearchRequest, null, PROGRAM_UUID);
+		Mockito.verify(this.germplasmSearchService).searchGermplasm(this.germplasmSearchRequest, pageRequest, PROGRAM_UUID);
 		Mockito.verify(this.germplasmAttributeService, Mockito.never())
 			.getGermplasmAttributeVariables(ArgumentMatchers.anyList(), ArgumentMatchers.anyString());
 		Mockito.verify(this.germplasmNameService, Mockito.never()).getGermplasmNamesByGids(ArgumentMatchers.anyList());
