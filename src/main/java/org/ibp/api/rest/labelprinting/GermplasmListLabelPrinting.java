@@ -121,8 +121,9 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final List<LabelType> labelTypes = new LinkedList<>();
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 		germplasmSearchRequest.setGermplasmListIds(Collections.singletonList(labelsInfoInput.getListId()));
-		final List<GermplasmSearchResponse> germplasmSearchResponses = this.germplasmSearchService
-			.searchGermplasm(germplasmSearchRequest, null, programUUID);
+		final PageRequest pageRequest = new PageRequest(0, this.maxTotalResults, null);
+		final List<GermplasmSearchResponse> germplasmSearchResponseList =
+			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageRequest, programUUID);
 
 		// Germplasm Details labels
 		final String germplasmPropValue = this.getMessage("label.printing.germplasm.details");
@@ -131,7 +132,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		germplasmType.getFields().addAll(new ArrayList<>(this.defaultPedigreeDetailsFields));
 		labelTypes.add(germplasmType);
 
-		this.populateNamesAndAttributesLabelType(programUUID, labelTypes, germplasmSearchResponses);
+		this.populateNamesAndAttributesLabelType(programUUID, labelTypes, germplasmSearchResponseList);
 
 		// Entry Details labels
 		final String entryDetailsPropValue = this.getMessage("label.printing.entry.details");
@@ -149,8 +150,9 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 		germplasmSearchRequest.setGermplasmListIds(Collections.singletonList(labelsGeneratorInput.getListId()));
 		this.setAddedColumnsToSearchRequest(labelsGeneratorInput, germplasmSearchRequest);
-		final List<GermplasmSearchResponse> responseList =
-			this.germplasmService.searchGermplasm(germplasmSearchRequest, null, programUUID);
+		final PageRequest pageRequest = new PageRequest(0, this.maxTotalResults, null);
+		final List<GermplasmSearchResponse> germplasmSearchResponseList =
+			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageRequest, programUUID);
 
 		//Get Germplasm names, attributes, entry details data
 		final List<Integer> germplasmFieldIds = new ArrayList<>();
@@ -163,7 +165,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final Map<Integer, Map<Integer, String>> nameValues = new HashMap<>();
 		final Map<Integer, Map<Integer, String>> entryDetailValues = new HashMap<>();
 		if (fieldsContainsNonGermplasmFields) {
-			final List<Integer> gids = responseList.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
+			final List<Integer> gids = germplasmSearchResponseList.stream().map(GermplasmSearchResponse::getGid).collect(Collectors.toList());
 			this.getAttributeValuesMap(attributeValues, gids);
 			this.getNameValuesMap(nameValues, gids);
 			this.getEntryDetailValues(entryDetailValues, labelsGeneratorInput.getListId());
@@ -174,7 +176,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 			new PageRequest(0, this.maxTotalResults, new Sort(Sort.Direction.ASC, GermplasmListLabelPrinting.SORT_BY_ENTRY_NO));
 		final List<GermplasmListDataSearchResponse> listDataSearchResponseList = this.germplasmListDataService
 			.searchGermplasmListData(labelsGeneratorInput.getListId(), new GermplasmListDataSearchRequest(), listDataPageRequest);
-		final Map<Integer, GermplasmSearchResponse> germplasmSearchResponseMap = responseList.stream()
+		final Map<Integer, GermplasmSearchResponse> germplasmSearchResponseMap = germplasmSearchResponseList.stream()
 			.collect(Collectors.toMap(GermplasmSearchResponse::getGid, Function.identity()));
 
 		final boolean isPdf = FileType.PDF.equals(labelsGeneratorInput.getFileType());
