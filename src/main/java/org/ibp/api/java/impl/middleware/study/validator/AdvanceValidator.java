@@ -62,7 +62,7 @@ public class AdvanceValidator {
 	public void validateAdvanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 		checkNotNull(request, "request.null");
 
-		final Integer plotDatasetId = this.commonValidations(studyId, request.getInstanceIds());
+		final Integer plotDatasetId = this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
 
 		final List<MeasurementVariable> plotDatasetVariables = this.datasetService.getObservationSetVariables(plotDatasetId);
 		final BreedingMethodDTO selectedBreedingMethodDTO =
@@ -76,7 +76,7 @@ public class AdvanceValidator {
 	public void validateAdvanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
 		checkNotNull(request, "request.null");
 
-		final Integer plotDatasetId = this.commonValidations(studyId, request.getInstanceIds());
+		final Integer plotDatasetId = this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
 
 		final List<MeasurementVariable> plotDatasetVariables = this.datasetService.getObservationSetVariables(plotDatasetId);
 
@@ -89,7 +89,13 @@ public class AdvanceValidator {
 		this.validateReplicationNumberSelection(request.getSelectedReplications(), plotDatasetVariables);
 	}
 
-	private Integer commonValidations(final Integer studyId, final List<Integer> instanceIds) {
+	/**
+	 * Perform basic information validation to the given study, dataset and instances 
+	 * @param studyId
+	 * @param instanceIds
+	 * @return an {@link Integer} representing the plotDatasetId
+	 */
+	private Integer validateBasicInfoAndGetPlotDatasetId(final Integer studyId, final List<Integer> instanceIds) {
 		this.studyValidator.validate(studyId, true);
 		final DataSet dataset = this.studyValidator.validateStudyHasPlotDataset(studyId);
 		final DatasetDTO plotDataset = this.datasetService.getDataset(dataset.getId());
