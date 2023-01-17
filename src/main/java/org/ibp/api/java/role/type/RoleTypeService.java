@@ -1,6 +1,6 @@
 package org.ibp.api.java.role.type;
 
-import org.ibp.api.domain.role.RoleTypeDto;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 
 import java.util.List;
 

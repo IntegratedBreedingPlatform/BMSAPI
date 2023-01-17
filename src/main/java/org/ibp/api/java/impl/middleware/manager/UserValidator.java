@@ -8,8 +8,8 @@ import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
@@ -42,7 +42,6 @@ public class UserValidator {
 	public static final String SIGNUP_FIELD_EMAIL_EXISTS = "signup.field.email.exists";
 	public static final String SIGNUP_FIELD_USERNAME_EXISTS = "signup.field.username.exists";
 
-	public static final String SIGNUP_FIELD_INVALID_STATUS = "signup.field.invalid.status";
 	public static final String SIGNUP_FIELD_INVALID_USER_ID = "signup.field.invalid.userId";
 
 	public static final String USER_AUTO_DEACTIVATION = "users.user.can.not.be.deactivated";
@@ -66,7 +65,6 @@ public class UserValidator {
 	public static final int LAST_NAME_MAX_LENGTH = 50;
 	public static final int USERNAME_MAX_LENGTH = 30;
 	public static final int EMAIL_MAX_LENGTH = 255;
-	public static final int STATUS_MAX_LENGTH = 11;
 
 	@Value("${active.users.max.number}")
 	public int maximumActiveUsers;
@@ -99,12 +97,9 @@ public class UserValidator {
 		this.validateFieldLength(user.getLastName(), LAST_NAME, LAST_NAME_MAX_LENGTH);
 		final boolean usernameIsValid = this.validateFieldLength(user.getUsername(), USERNAME, USERNAME_MAX_LENGTH);
 		final boolean emailIsValid = this.validateFieldLength(user.getEmail(), EMAIL, EMAIL_MAX_LENGTH);
-		final boolean statusIsValid = this.validateFieldLength(user.getStatus(), STATUS, STATUS_MAX_LENGTH);
-
 		this.validateUserRoles(user);
 
 		if (emailIsValid) this.validateEmailFormat(user.getEmail());
-		if (statusIsValid) this.validateUserStatus(user.getStatus());
 
 		if (createUser) {
 			if (usernameIsValid) this.validateUsernameIfExists(user.getUsername());
@@ -151,12 +146,11 @@ public class UserValidator {
 			this.errors.reject(CANNOT_UPDATE_PERSON_MULTIPLE_USERS);
 		}
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
-		// TODO change frontend status type to integer
-		if (loggedInUser.equals(userUpdate) && "false".equals(user.getStatus())) {
+		if (loggedInUser.equals(userUpdate) && !user.getActive()) {
 			this.errors.reject(USER_AUTO_DEACTIVATION);
 		}
 
-		if (userUpdate.getStatus() == 1 && "true".equals(user.getStatus())) {
+		if (userUpdate.getStatus() == 1 && user.getActive()) {
 			this.validateNumberOfActiveUsers(this.errors);
 		}
 
@@ -215,7 +209,7 @@ public class UserValidator {
 			// Roles in the list must exist
 			final Set<Integer> roleIds = userRoles.stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
 
-			final List<Role> savedRoles = this.roleService.getRoles(new RoleSearchDto(null, null, roleIds));
+			final List<RoleDto> savedRoles = this.roleService.getRoles(new RoleSearchDto(null, null, roleIds));
 
 			if (savedRoles.size() != roleIds.size()) {
 				this.errors.reject("user.invalid.roles", new String[] {
@@ -226,7 +220,7 @@ public class UserValidator {
 			}
 
 			// Roles in the list MUST be assignable
-			final Set<Role> notAssignableRoles = savedRoles.stream().filter(e -> !e.getAssignable()).collect(Collectors.toSet());
+			final Set<RoleDto> notAssignableRoles = savedRoles.stream().filter(e -> !e.getAssignable()).collect(Collectors.toSet());
 
 			if (!notAssignableRoles.isEmpty()) {
 				this.errors.reject("user.not.assignable.roles",
@@ -262,10 +256,10 @@ public class UserValidator {
 			// Instance ROLE can not have neither crop nor program
 			// Crop ROLE MUST have a crop and can not have a program
 			// Program ROLE MUST have crop and program and program MUST belong to the specified crop
-			final Map<Integer, Role> savedRolesMap = savedRoles.stream().collect(
-				Collectors.toMap(Role::getId, Function.identity()));
+			final Map<Integer, RoleDto> savedRolesMap = savedRoles.stream().collect(
+				Collectors.toMap(RoleDto::getId, Function.identity()));
 			for (final UserRoleDto userRoleDto : userRoles) {
-				final Role role = savedRolesMap.get(userRoleDto.getRole().getId());
+				final RoleDto role = savedRolesMap.get(userRoleDto.getRole().getId());
 				if (role.getRoleType().getId().equals(RoleType.INSTANCE.getId())) {
 					if (userRoleDto.getCrop() != null || userRoleDto.getProgram() != null) {
 						this.errors.reject("user.invalid.instance.role", new String[] {role.getId().toString()}, "");
@@ -349,13 +343,6 @@ public class UserValidator {
 			}
 		}
 
-	}
-
-	protected void validateUserStatus(final String fieldValue) {
-		if (!Objects.isNull(fieldValue) && !"true".equalsIgnoreCase(fieldValue)
-			&& !"false".equalsIgnoreCase(fieldValue)) {
-			this.errors.reject(SIGNUP_FIELD_INVALID_STATUS);
-		}
 	}
 
 	public void validateFieldLength(final BindingResult errors, final String fieldValue, final String fieldName,

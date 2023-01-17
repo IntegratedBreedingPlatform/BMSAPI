@@ -57,7 +57,7 @@ public class RemoveProgramMembersValidator {
 
 		final List<Integer> usersWithProgramAccess =
 			this.userService.getProgramMembers(programUUID, null, null).stream()
-				.filter(p -> p.getRole().getType().equals(
+				.filter(p -> p.getRole().getRoleType().getName().equals(
 					RoleType.PROGRAM.name())).map(ProgramMemberDto::getUserId).collect(Collectors.toList());
 		if (!usersWithProgramAccess.containsAll(userIds)) {
 			final List<Integer> notRemovableUserIds = new ArrayList<>(userIds);

@@ -1,8 +1,9 @@
 package org.ibp.api.rest.role;
 
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.service.api.user.RoleDto;
+import org.generationcp.middleware.service.api.user.RoleGeneratorInput;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
-import org.ibp.api.domain.role.RoleDto;
 import org.ibp.api.java.role.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
