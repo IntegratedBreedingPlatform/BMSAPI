@@ -42,7 +42,7 @@ public class GermplasmStudySourceResource {
 
 	@ApiOperation(value = "It will retrieve all generated germplasm in a study",
 		notes = "It will retrieve all generated germplasm in a study")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')"
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'VIEW_STUDIES')"
 		+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/germplasm-sources/table", method = RequestMethod.POST)
 	@ResponseBody
@@ -70,7 +70,7 @@ public class GermplasmStudySourceResource {
 
 	@ApiOperation(value = "Post generated germplasm in a study search", notes = "Post generated germplasm in a study search")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/germplasm-sources/search", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')"
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'VIEW_STUDIES')"
 		+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@ResponseBody
 	public ResponseEntity<SearchDto> postGermplasmStudySourceTable(final @PathVariable String cropname,

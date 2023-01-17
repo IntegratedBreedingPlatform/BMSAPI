@@ -54,7 +54,7 @@ public class StudyResource {
 	@ApiOperation(value = "Check if a study is sampled.",
 		notes = "Returns boolean indicating if there are samples associated to the study.")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/sampled", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'VIEW_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<Boolean> hasSamples(final @PathVariable String cropName, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {
@@ -98,12 +98,12 @@ public class StudyResource {
 
 				@Override
 				public long getCount() {
-					return myStudiesService.countMyStudies(programUUID, userId);
+					return StudyResource.this.myStudiesService.countMyStudies(programUUID, userId);
 				}
 
 				@Override
 				public List<MyStudiesDTO> getResults(final PagedResult<MyStudiesDTO> pagedResult) {
-					return myStudiesService.getMyStudies(programUUID, pageable, userId);
+					return StudyResource.this.myStudiesService.getMyStudies(programUUID, pageable, userId);
 				}
 			});
 		final List<MyStudiesDTO> pageResults = result.getPageResults();
@@ -162,7 +162,7 @@ public class StudyResource {
 	}
 
 	@ApiOperation("Search studies")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/search", method = RequestMethod.POST)
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
@@ -188,7 +188,7 @@ public class StudyResource {
 	@ApiOperation(value = "Get the details for the given study",
 		notes = "Returns boolean indicating if there are samples associated to the study.")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/details", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'VIEW_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<StudyDetailsDTO> getDetails(final @PathVariable String cropName, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {
