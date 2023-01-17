@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -67,6 +68,7 @@ public class GermplasmNameRequestValidatorTest {
 			Mockito.doThrow(new ApiRequestValidationException(errors.getAllErrors())).when(this.germplasmValidator)
 				.validateGermplasmId(Mockito.any(BindingResult.class), Mockito.anyInt());
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID, null);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.invalid"));
 		}
@@ -78,6 +80,7 @@ public class GermplasmNameRequestValidatorTest {
 			final GermplasmNameRequestDto germplasmNameRequestDto = this.createNewGermplasmNameRequestDto();
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.any())).thenReturn(null);
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID, null);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.invalid"));
 		}
@@ -90,6 +93,7 @@ public class GermplasmNameRequestValidatorTest {
 			germplasmNameRequestDto.setName(RandomStringUtils.randomAlphabetic(0));
 
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID, null);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.required"));
 		}
@@ -99,9 +103,10 @@ public class GermplasmNameRequestValidatorTest {
 	public void testValidateCreateName_ThrowsException_WhenNameExceedMaxLength() {
 		try {
 			final GermplasmNameRequestDto germplasmNameRequestDto = this.createNewGermplasmNameRequestDto();
-			germplasmNameRequestDto.setName(RandomStringUtils.randomAlphabetic(256));
+			germplasmNameRequestDto.setName(RandomStringUtils.randomAlphabetic(5001));
 
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID, null);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.length"));
 		}
@@ -114,6 +119,7 @@ public class GermplasmNameRequestValidatorTest {
 			germplasmNameRequestDto.setDate(null);
 
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID, null);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.date.required"));
 		}
@@ -126,6 +132,7 @@ public class GermplasmNameRequestValidatorTest {
 			germplasmNameRequestDto.setDate("20212201");
 
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID, null);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.date.invalid"));
 		}
@@ -138,6 +145,7 @@ public class GermplasmNameRequestValidatorTest {
 			germplasmNameRequestDto.setPreferredName(null);
 
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID, null);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.preferred.required"));
 		}
@@ -154,13 +162,14 @@ public class GermplasmNameRequestValidatorTest {
 				.thenReturn(Collections.singletonList(germplasmNameRequestDto.getName()));
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
 				null);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.pui.duplicate"));
 		}
 	}
 
 	@Test
-	public void testValidateCreateName_ThrowsException_WhenGermplasmHasExistingPUIName() {
+	public void testValidateCreateName_ThrowsException_WhenGermplasmHasExistingName() {
 		try {
 
 			final GermplasmNameRequestDto germplasmNameRequestDto = this.createNewGermplasmNameRequestDto();
@@ -174,24 +183,9 @@ public class GermplasmNameRequestValidatorTest {
 					.thenReturn(Collections.singletonList(exsitingPUIName));
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
 					null);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.has.pui"));
-		}
-	}
-
-	@Test
-	public void testValidateCreateName_Success_WhenUniquePUI() {
-		try {
-
-			final GermplasmNameRequestDto germplasmNameRequestDto = this.createNewGermplasmNameRequestDto();
-			germplasmNameRequestDto.setNameTypeCode(PUI_NAME);
-
-			Mockito.when(this.germplasmNameService.getExistingGermplasmPUIs(Collections.singletonList(germplasmNameRequestDto.getName())))
-				.thenReturn(Collections.emptyList());
-			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
-				null);
-		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.pui.duplicate"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.has.existing.name"));
 		}
 	}
 
@@ -205,6 +199,7 @@ public class GermplasmNameRequestValidatorTest {
 			Mockito.when(this.germplasmNameService.getNameById(Mockito.any())).thenReturn(null);
 			this.germplasmNameRequestValidator
 				.validateNameDeletable(GermplasmNameRequestValidatorTest.GERMPLASM_ID, GermplasmNameRequestValidatorTest.NAME_ID);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.invalid"));
 		}
@@ -219,6 +214,7 @@ public class GermplasmNameRequestValidatorTest {
 			name.setNstat(1);
 			Mockito.when(this.germplasmNameService.getNameById(Mockito.any())).thenReturn(name);
 			this.germplasmNameRequestValidator.validateNameDeletable(GermplasmNameRequestValidatorTest.GERMPLASM_ID, 1);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.preferred.invalid"));
 		}
@@ -237,6 +233,7 @@ public class GermplasmNameRequestValidatorTest {
 			Mockito.when(this.germplasmService.filterGermplasmNameTypes(Mockito.any())).thenReturn(null);
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
 				GermplasmNameRequestValidatorTest.NAME_ID);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.type.invalid"));
 		}
@@ -256,6 +253,7 @@ public class GermplasmNameRequestValidatorTest {
 
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
 				GermplasmNameRequestValidatorTest.NAME_ID);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.length"));
 		}
@@ -276,6 +274,7 @@ public class GermplasmNameRequestValidatorTest {
 
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
 				GermplasmNameRequestValidatorTest.NAME_ID);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.preferred.invalid"));
 		}
@@ -295,6 +294,7 @@ public class GermplasmNameRequestValidatorTest {
 			Mockito.when(this.germplasmNameService.getNameById(Mockito.any())).thenReturn(name);
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
 				GermplasmNameRequestValidatorTest.NAME_ID);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.date.invalid"));
 		}
@@ -320,6 +320,7 @@ public class GermplasmNameRequestValidatorTest {
 				.thenReturn(Collections.singletonList(newPUI));
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
 				GermplasmNameRequestValidatorTest.NAME_ID);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.pui.duplicate"));
 		}
@@ -360,13 +361,14 @@ public class GermplasmNameRequestValidatorTest {
 				.thenReturn(Collections.singletonList(name.getNval()));
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
 				GermplasmNameRequestValidatorTest.NAME_ID);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.pui.duplicate"));
 		}
 	}
 
 	@Test
-	public void testValidateUpdateName_ThrowsException_WhenUpdatingToPUINameTypeAndHasExistingPUIName() {
+	public void testValidateUpdateName_ThrowsException_WhenUpdatingToExistingNameType() {
 		try {
 
 			final GermplasmNameRequestDto germplasmNameRequestDto = new GermplasmNameRequestDto();
@@ -377,18 +379,21 @@ public class GermplasmNameRequestValidatorTest {
 			name.setNval(RandomStringUtils.randomAlphabetic(20));
 			name.setGermplasm(this.mockGermplasm());
 			name.setNstat(1);
+			name.setTypeId(18);
 
 			final GermplasmNameDto exsitingPUIName = new GermplasmNameDto();
 			exsitingPUIName.setName(RandomStringUtils.randomAlphabetic(20));
 			exsitingPUIName.setNameTypeCode(PUI_NAME);
+			exsitingPUIName.setNameTypeId(17);
 
 			Mockito.when(this.germplasmNameService.getNameById(Mockito.any())).thenReturn(name);
 			Mockito.when(this.germplasmNameService.getGermplasmNamesByGids(Lists.newArrayList(GERMPLASM_ID)))
 					.thenReturn(Collections.singletonList(exsitingPUIName));
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
 					GermplasmNameRequestValidatorTest.NAME_ID);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
-			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.has.pui"));
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.has.existing.name"));
 		}
 	}
 
@@ -433,6 +438,7 @@ public class GermplasmNameRequestValidatorTest {
 				.thenReturn(Collections.singletonList(newPUI));
 			this.germplasmNameRequestValidator.validate(germplasmNameRequestDto, GermplasmNameRequestValidatorTest.GERMPLASM_ID,
 				GermplasmNameRequestValidatorTest.NAME_ID);
+			Assert.fail("Should throw an exception");
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("germplasm.name.pui.duplicate"));
 		}

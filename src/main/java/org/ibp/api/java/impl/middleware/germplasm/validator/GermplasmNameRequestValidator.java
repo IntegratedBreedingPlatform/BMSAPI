@@ -28,7 +28,6 @@ public class GermplasmNameRequestValidator {
     private static final Integer NAME_MAX_LENGTH = 5000;
     public static final String PUI = "PUI";
     public static final String GERMPLASM_PUI_DUPLICATE = "germplasm.name.pui.duplicate";
-    private static final String HAS_EXISTING_PUI_NAME = "germplasm.has.pui";
 
     private BindingResult errors;
 
@@ -54,7 +53,7 @@ public class GermplasmNameRequestValidator {
             this.validateNameBelongsToGermplasm(gid, name);
 
             if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
-                this.validateNameTypeCode(germplasmNameRequestDto);
+                this.validateNameTypeCode(germplasmNameRequestDto, gid, name);
             }
             if (germplasmNameRequestDto.getName() != null) {
                 this.validateNameLength(germplasmNameRequestDto);
@@ -68,14 +67,12 @@ public class GermplasmNameRequestValidator {
                 this.validatePreferredNameUpdatable(germplasmNameRequestDto, name);
             }
             this.enforcePUIUniqueness(germplasmNameRequestDto, name);
-            this.enforceSinglePUINameForGermplasm(germplasmNameRequestDto, gid, name);
         } else {
-            this.validateNameTypeCode(germplasmNameRequestDto);
+            this.validateNameTypeCode(germplasmNameRequestDto, gid, null);
             this.validateNameLength(germplasmNameRequestDto);
             this.validateNameDate(germplasmNameRequestDto);
             this.validatePreferredName(germplasmNameRequestDto);
             this.enforcePUIUniqueness(germplasmNameRequestDto);
-            this.enforceSinglePUINameForGermplasm(germplasmNameRequestDto, gid);
 
         }
     }
@@ -199,36 +196,18 @@ public class GermplasmNameRequestValidator {
         return !this.germplasmNameService.getExistingGermplasmPUIs(Collections.singletonList(pui)).isEmpty();
     }
 
-    private void enforceSinglePUINameForGermplasm(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid) {
-        if (PUI.equalsIgnoreCase(germplasmNameRequestDto.getNameTypeCode())) {
-            final List<GermplasmNameDto> puiNames = this.germplasmNameService.getGermplasmNamesByGids(Lists.newArrayList(gid))
-                    .stream().filter(name -> name.getNameTypeCode().equalsIgnoreCase(PUI)).collect(Collectors.toList());
-            if(!CollectionUtils.isEmpty(puiNames)) {
-                this.errors.reject(HAS_EXISTING_PUI_NAME, "");
-                throw new ApiRequestValidationException(this.errors.getAllErrors());
-            }
-        }
-    }
-
-    private void enforceSinglePUINameForGermplasm(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid, final Name existingName) {
-        final List<GermplasmNameTypeDTO> puiNameType =
-                this.germplasmService.filterGermplasmNameTypes(Collections.singleton(PUI));
-        // Validate that there's no existing PUI name when changing a germplasm name type to PUI
-        if (!CollectionUtils.isEmpty(puiNameType) && !puiNameType.get(0).getId().equals(existingName.getTypeId())
-            && PUI.equalsIgnoreCase(germplasmNameRequestDto.getNameTypeCode())){
-            final List<GermplasmNameDto> puiNames = this.germplasmNameService.getGermplasmNamesByGids(Lists.newArrayList(gid))
-                    .stream().filter(name -> name.getNameTypeCode().equalsIgnoreCase(PUI)).collect(Collectors.toList());
-            if(!CollectionUtils.isEmpty(puiNames)) {
-                this.errors.reject(HAS_EXISTING_PUI_NAME, "");
-                throw new ApiRequestValidationException(this.errors.getAllErrors());
-            }
-        }
-    }
-
-    protected void validateNameTypeCode(final GermplasmNameRequestDto germplasmNameRequestDto) {
+    protected void validateNameTypeCode(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid, final Name name) {
         final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmService.filterGermplasmNameTypes(Collections.singleton(germplasmNameRequestDto.getNameTypeCode()));
         if (germplasmNameTypeDTOs == null || germplasmNameTypeDTOs.isEmpty()) {
             this.errors.reject("germplasm.name.type.invalid", "");
+            throw new ApiRequestValidationException(this.errors.getAllErrors());
+        }
+        final List<GermplasmNameDto> existingNamesWithSameNameType = this.germplasmNameService.getGermplasmNamesByGids(Lists.newArrayList(gid))
+                .stream().filter(existingName -> existingName.getNameTypeCode().equalsIgnoreCase(germplasmNameRequestDto.getNameTypeCode())).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(existingNamesWithSameNameType)  &&
+                (name == null || !name.getTypeId().equals(existingNamesWithSameNameType.get(0).getNameTypeId()))) {
+            this.errors.reject("germplasm.has.existing.name", new Object[]{
+                    germplasmNameRequestDto.getNameTypeCode()}, "");
             throw new ApiRequestValidationException(this.errors.getAllErrors());
         }
     }
