@@ -1,14 +1,11 @@
 package org.ibp.api.java.impl.middleware.role.type;
 
-import org.apache.commons.lang3.text.WordUtils;
-import org.generationcp.middleware.pojos.workbench.RoleType;
-import org.ibp.api.domain.role.RoleTypeDto;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.ibp.api.java.role.type.RoleTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RoleTypeServiceImpl implements RoleTypeService {
@@ -18,12 +15,7 @@ public class RoleTypeServiceImpl implements RoleTypeService {
 
 	@Override
 	public List<RoleTypeDto> getRoleTypes() {
-
-		final List<RoleType> roleTypes = this.roleTypeService.getRoleTypes();
-		final List<RoleTypeDto> roleTypeDtos = roleTypes.stream()
-			.map(roleType -> new RoleTypeDto(roleType.getId(), WordUtils.capitalizeFully(roleType.getName())))
-			.collect(Collectors.toList());
-		return roleTypeDtos;
+		return this.roleTypeService.getRoleTypes();
 	}
 
 }

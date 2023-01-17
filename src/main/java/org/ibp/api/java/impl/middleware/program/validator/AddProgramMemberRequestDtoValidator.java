@@ -3,8 +3,8 @@ package org.ibp.api.java.impl.middleware.program.validator;
 import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.domain.workbench.RoleType;
-import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.Util;
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -62,13 +63,13 @@ public class AddProgramMemberRequestDtoValidator {
 		}
 
 		//role is a program role
-		final Role role = this.roleService.getRoleById(addProgramMemberRequestDto.getRoleId());
-		if (role == null) {
+		final Optional<RoleDto> role = this.roleService.getRoleById(addProgramMemberRequestDto.getRoleId());
+		if (!role.isPresent()) {
 			errors.reject("program.member.role.do.not.exist", new String[] {String.valueOf(addProgramMemberRequestDto.getRoleId())}, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		if (!role.getRoleType().getId().equals(RoleType.PROGRAM.getId())) {
+		if (!role.get().getRoleType().getId().equals(RoleType.PROGRAM.getId())) {
 			errors.reject("program.member.invalid.user.role", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
