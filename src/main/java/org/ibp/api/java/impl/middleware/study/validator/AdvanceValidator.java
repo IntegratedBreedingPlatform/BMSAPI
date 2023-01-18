@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -277,22 +278,29 @@ public class AdvanceValidator {
 		}
 	}
 
-	void validateReplicationNumberSelection(final List<String> selectedReplications,
+	void validateReplicationNumberSelection(final List<Integer> selectedReplications,
 		final List<MeasurementVariable> plotDatasetVariables) {
-		final Optional<MeasurementVariable> replicationNumberVariable = plotDatasetVariables.stream()
-			.filter(measurementVariable -> measurementVariable.getTermId() == TermId.REP_NO.getId())
-			.findFirst();
-		if (replicationNumberVariable.isPresent() && CollectionUtils.isEmpty(selectedReplications)) {
-			throw new ApiRequestValidationException("advance.replication-number.selection.required", new Object[] {});
+		final Optional<MeasurementVariable> replicationNumberVariable = this.findVariableById(plotDatasetVariables, TermId.REP_NO.getId());
+		if (replicationNumberVariable.isPresent()) {
+			if (CollectionUtils.isEmpty(selectedReplications)) {
+				throw new ApiRequestValidationException("advance.replication-number.selection.required", new Object[] {});
+			}
+
+			this.findVariableById(plotDatasetVariables, TermId.NUMBER_OF_REPLICATES.getId()).ifPresent(measurementVariable -> {
+				Collections.sort(selectedReplications);
+
+				final Integer greaterReplicationNumberSelected = selectedReplications.get(selectedReplications.size() - 1);
+				if (selectedReplications.get(0) <= 0 || greaterReplicationNumberSelected > Integer.parseInt(measurementVariable.getValue())) {
+					throw new ApiRequestValidationException("advance.replication-number.invalid", new Object[] {});
+				}
+			});
 		}
 	}
 
 	private MeasurementVariable validatePlotdataSetHasVariable(final List<MeasurementVariable> plotDatasetVariables,
 		final Integer variableId,
 		final String errorCode) {
-		final Optional<MeasurementVariable> methodVariate = plotDatasetVariables.stream()
-			.filter(measurementVariable -> measurementVariable.getTermId() == variableId)
-			.findFirst();
+		final Optional<MeasurementVariable> methodVariate = this.findVariableById(plotDatasetVariables, variableId);
 		if (!methodVariate.isPresent()) {
 			throw new ApiRequestValidationException(errorCode, new Object[] {String.valueOf(variableId)});
 		}
@@ -323,6 +331,12 @@ public class AdvanceValidator {
 			.filter(measurementVariable -> SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY.equals(measurementVariable.getProperty()))
 			.collect(
 				Collectors.toList());
+	}
+
+	private Optional<MeasurementVariable> findVariableById(final List<MeasurementVariable> dataset, final Integer variableId) {
+		return dataset.stream()
+			.filter(measurementVariable -> measurementVariable.getTermId() == variableId)
+			.findFirst();
 	}
 
 }

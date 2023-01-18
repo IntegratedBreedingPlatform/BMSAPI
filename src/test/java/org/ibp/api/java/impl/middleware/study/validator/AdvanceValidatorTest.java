@@ -986,6 +986,14 @@ public class AdvanceValidatorTest {
 	}
 
 	@Test
+	public void validateReplicationNumberSelection_OK() {
+		final MeasurementVariable replicationVariable = this.mockMeasurementVariable(TermId.REP_NO.getId());
+		final MeasurementVariable replicationNumberVariable = this.mockMeasurementVariable(TermId.NUMBER_OF_REPLICATES.getId(), "5");
+
+		this.advanceValidator.validateReplicationNumberSelection(Arrays.asList(5,3,1,4), Arrays.asList(replicationVariable, replicationNumberVariable));
+	}
+
+	@Test
 	public void validateReplicationNumberSelection_FAIL_selectionRequired() {
 		final MeasurementVariable variable = this.mockMeasurementVariable(TermId.REP_NO.getId());
 
@@ -995,6 +1003,48 @@ public class AdvanceValidatorTest {
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.replication-number.selection.required"));
+		}
+	}
+
+	@Test
+	public void validateReplicationNumberSelection_FAIL_invalidReplicationNumberMinorToZero() {
+		final MeasurementVariable replicationVariable = this.mockMeasurementVariable(TermId.REP_NO.getId());
+		final MeasurementVariable replicationNumberVariable = this.mockMeasurementVariable(TermId.NUMBER_OF_REPLICATES.getId(), "2");
+
+		try {
+			this.advanceValidator.validateReplicationNumberSelection(Arrays.asList(-1), Arrays.asList(replicationVariable, replicationNumberVariable));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.replication-number.invalid"));
+		}
+	}
+
+	@Test
+	public void validateReplicationNumberSelection_FAIL_invalidReplicationNumberEqualsToZero() {
+		final MeasurementVariable replicationVariable = this.mockMeasurementVariable(TermId.REP_NO.getId());
+		final MeasurementVariable replicationNumberVariable = this.mockMeasurementVariable(TermId.NUMBER_OF_REPLICATES.getId(), "2");
+
+		try {
+			this.advanceValidator.validateReplicationNumberSelection(Arrays.asList(0), Arrays.asList(replicationVariable, replicationNumberVariable));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.replication-number.invalid"));
+		}
+	}
+
+	@Test
+	public void validateReplicationNumberSelection_FAIL_invalidReplicationGreaterThanReplicationNumbers() {
+		final MeasurementVariable replicationVariable = this.mockMeasurementVariable(TermId.REP_NO.getId());
+		final MeasurementVariable replicationNumberVariable = this.mockMeasurementVariable(TermId.NUMBER_OF_REPLICATES.getId(), "5");
+
+		try {
+			this.advanceValidator.validateReplicationNumberSelection(Arrays.asList(3,1,4,6), Arrays.asList(replicationVariable, replicationNumberVariable));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.replication-number.invalid"));
 		}
 	}
 
@@ -1172,7 +1222,7 @@ public class AdvanceValidatorTest {
 		return request;
 	}
 
-	private AdvanceStudyRequest mockAdvanceStudyRequest(final List<Integer> instanceIds, final List<String> selectedReplications,
+	private AdvanceStudyRequest mockAdvanceStudyRequest(final List<Integer> instanceIds, final List<Integer> selectedReplications,
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest,
 		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest, final AdvanceStudyRequest.BulkingRequest bulkingRequest,
 		final AdvanceStudyRequest.SelectionTraitRequest selectionTraitRequest) {
@@ -1187,14 +1237,23 @@ public class AdvanceValidatorTest {
 	}
 
 	private MeasurementVariable mockMeasurementVariable(final Integer variableId) {
-		return this.mockMeasurementVariable(variableId, RandomStringUtils.randomAlphabetic(10), VariableType.ENTRY_DETAIL);
+		return this.mockMeasurementVariable(variableId, RandomStringUtils.randomAlphabetic(10), VariableType.ENTRY_DETAIL, RandomStringUtils.randomAlphabetic(3));
+	}
+
+	private MeasurementVariable mockMeasurementVariable(final Integer variableId, final String value) {
+		return this.mockMeasurementVariable(variableId, RandomStringUtils.randomAlphabetic(10), VariableType.ENTRY_DETAIL, value);
 	}
 
 	private MeasurementVariable mockMeasurementVariable(final Integer variableId, final String property, final VariableType variableType) {
+		return this.mockMeasurementVariable(variableId, property, variableType, RandomStringUtils.randomAlphabetic(3));
+	}
+
+	private MeasurementVariable mockMeasurementVariable(final Integer variableId, final String property, final VariableType variableType, final String value) {
 		final MeasurementVariable measurementVariable = Mockito.mock(MeasurementVariable.class);
 		Mockito.when(measurementVariable.getTermId()).thenReturn(variableId);
 		Mockito.when(measurementVariable.getProperty()).thenReturn(property);
 		Mockito.when(measurementVariable.getVariableType()).thenReturn(variableType);
+		Mockito.when(measurementVariable.getValue()).thenReturn(value);
 		return measurementVariable;
 	}
 
