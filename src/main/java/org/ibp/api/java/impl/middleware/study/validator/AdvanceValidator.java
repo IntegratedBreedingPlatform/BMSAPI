@@ -184,6 +184,10 @@ public class AdvanceValidator {
 				throw new ApiRequestValidationException("advance.lines.selection.required", new Object[] {});
 			}
 
+			if (lineSelectionRequest.getLinesSelected() != null && lineSelectionRequest.getLinesSelected() <= 0) {
+				throw new ApiRequestValidationException("advance.lines.selection.number.invalid", new Object[] {});
+			}
+
 			if (lineSelectionRequest.getLineVariateId() != null) {
 				final MeasurementVariable variable =
 					this.validatePlotdataSetHasVariable(plotDatasetVariables, lineSelectionRequest.getLineVariateId(),
@@ -209,9 +213,12 @@ public class AdvanceValidator {
 			final AdvanceStudyRequest.BulkingRequest bulkingRequest = request.getBulkingRequest();
 			checkNotNull(bulkingRequest, "request.null");
 
-			if ((bulkingRequest.getAllPlotsSelected() == null && bulkingRequest.getPlotVariateId() == null) ||
-				(bulkingRequest.getAllPlotsSelected() != null && bulkingRequest.getPlotVariateId() != null)) {
+			if (bulkingRequest.getAllPlotsSelected() == null && bulkingRequest.getPlotVariateId() == null) {
 				throw new ApiRequestValidationException("advance.bulking.selection.required", new Object[] {});
+			}
+
+			if (bulkingRequest.getAllPlotsSelected() != null && bulkingRequest.getPlotVariateId() != null) {
+				throw new ApiRequestValidationException("advance.bulking.selection.both-selected", new Object[] {});
 			}
 
 			if (bulkingRequest.getPlotVariateId() != null) {

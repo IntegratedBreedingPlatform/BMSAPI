@@ -499,6 +499,26 @@ public class AdvanceValidatorTest {
 	}
 
 	@Test
+	public void validateLineSelection_FAIL_invalidLineNumber() {
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
+			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
+		final AdvanceStudyRequest.LineSelectionRequest lineSelectionRequest =
+			this.mockLineSelectionRequest(0, null);
+		final AdvanceStudyRequest request =
+			this.mockAdvanceStudyRequest(new ArrayList<>(), new ArrayList<>(), breedingMethodSelectionRequest, lineSelectionRequest, null,
+				null);
+		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, false);
+
+		try {
+			this.advanceValidator.validateLineSelection(request, breedingMethodDTO, new ArrayList<>());
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.lines.selection.number.invalid"));
+		}
+	}
+
+	@Test
 	public void validateLineSelection_FAIL_lineVariateNotPresent() {
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
@@ -623,7 +643,7 @@ public class AdvanceValidatorTest {
 	public void validateBulkingSelection_FAIL_bothSelectionPresent() {
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
-		final AdvanceStudyRequest.BulkingRequest bulkingRequest = this.mockBulkingRequest(null, null);
+		final AdvanceStudyRequest.BulkingRequest bulkingRequest = this.mockBulkingRequest(true, PLOT_VARIATE_ID);
 		final AdvanceStudyRequest request =
 			this.mockAdvanceStudyRequest(new ArrayList<>(), new ArrayList<>(), breedingMethodSelectionRequest, null, bulkingRequest,
 				null);
@@ -634,7 +654,7 @@ public class AdvanceValidatorTest {
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
-			assertThat(exception.getErrors().get(0).getCode(), is("advance.bulking.selection.required"));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.bulking.selection.both-selected"));
 		}
 	}
 
