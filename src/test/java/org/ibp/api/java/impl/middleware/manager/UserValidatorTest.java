@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -50,7 +51,7 @@ public class UserValidatorTest {
 	public static final String FIRST_NAME_VALID = "firstName";
 	public static final String LAST_NAME_VALID = "lastName";
 	public static final String EMAIL_VALID = "user@test.com";
-	public static final String STATUS_VALID = "true";
+	public static final Boolean STATUS_VALID = Boolean.TRUE;
 
 	@InjectMocks
 	private UserValidator uservalidator;
@@ -200,17 +201,6 @@ public class UserValidatorTest {
 	}
 
 	/**
-	 * Should validate the status allow.* *
-	 */
-	@Test
-	public void testValidateStatus() {
-		final UserDto userDto = this.createDummyUserDetailDto(USER_NAME_VALID, FIRST_NAME_VALID,
-			LAST_NAME_VALID, EMAIL_VALID, "truee");
-
-		this.assertValidateException(userDto, true, "signup.field.invalid.status", null);
-	}
-
-	/**
 	 * Should validate if username exists.* *
 	 */
 	@Test
@@ -253,7 +243,7 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
 
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
-		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(new RoleDto(user.getRoles().get(0).getRole())));
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(false);
@@ -280,7 +270,7 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
 
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
-		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(new RoleDto(user.getRoles().get(0).getRole())));
 
 		user.getPerson().setEmail("user@leafnode.io");
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
@@ -308,7 +298,7 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleAdmin());
 		user.setName("Nahuel");
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
-		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(new RoleDto(user.getRoles().get(0).getRole())));
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.userService.isUsernameExists(userDto.getUsername())).thenReturn(true);
@@ -353,7 +343,7 @@ public class UserValidatorTest {
 		final UserDto userDto = UserTestDataGenerator.initializeUserDetailDto(0, new CropType("wheat"), UserTestDataGenerator.initializeUserRoleDtoAdmin());
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(0,UserTestDataGenerator.initializeUserRoleAdmin());
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
-		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(new RoleDto(user.getRoles().get(0).getRole())));
 		this.uservalidator.validate(userDto, true);
 	}
 
@@ -363,9 +353,9 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(20, UserTestDataGenerator.initializeUserRoleAdmin());
 
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
-		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(new RoleDto(user.getRoles().get(0).getRole())));
 
-		userDto.setStatus("false");
+		userDto.setActive(Boolean.FALSE);
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(user);
 
@@ -378,7 +368,7 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleSuperAdmin());
 
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
-		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(new RoleDto(user.getRoles().get(0).getRole())));
 
 		this.assertValidateException(userDto, true, "user.not.assignable.roles", null);
 	}
@@ -400,7 +390,7 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleBreeder());
 
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
-		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(new RoleDto(user.getRoles().get(0).getRole())));
 
 		Mockito.when(this.cropService.getInstalledCrops()).thenReturn(Arrays.asList("maize", "wheat"));
 
@@ -417,7 +407,7 @@ public class UserValidatorTest {
 		final WorkbenchUser user = UserTestDataGenerator.initializeWorkbenchUser(10, UserTestDataGenerator.initializeUserRoleBreeder());
 
 		final Set<Integer> roleIds = userDto.getUserRoles().stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
-		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(user.getRoles().get(0).getRole()));
+		Mockito.when(this.roleService.getRoles(new RoleSearchDto(null, null, roleIds))).thenReturn(Arrays.asList(new RoleDto(user.getRoles().get(0).getRole())));
 
 
 		Mockito.when(this.userService.getUserById(userDto.getId())).thenReturn(user);
@@ -496,14 +486,14 @@ public class UserValidatorTest {
 	}
 
 	private UserDto createDummyUserDetailDto(final String userName, final String firstName, final String lastName, final String email,
-		final String status) {
+		final Boolean status) {
 		final UserDto userDto = new UserDto();
 		userDto.setId(null);
 		userDto.setUsername(userName);
 		userDto.setFirstName(firstName);
 		userDto.setLastName(lastName);
 		userDto.setEmail(email);
-		userDto.setStatus(status);
+		userDto.setActive(status);
 
 		userDto.setUserRoles(new ArrayList<>());
 

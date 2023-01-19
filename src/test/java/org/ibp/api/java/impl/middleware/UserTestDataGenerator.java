@@ -12,6 +12,7 @@ import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleDto;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 
@@ -99,7 +100,7 @@ public abstract class UserTestDataGenerator {
 		final String lastName = RandomStringUtils.randomAlphanumeric(50);
 		user.setLastName(lastName);
 
-		user.setStatus("true");
+		user.setActive(Boolean.TRUE);
 		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
 		final UserRoleDto userRoleDto = new UserRoleDto();
 		userRoleDto.setId(1);
@@ -171,7 +172,7 @@ public abstract class UserTestDataGenerator {
 
 		final String email = RandomStringUtils.randomAlphanumeric(24);
 		user.setEmail("test" + email + "@leafnode.io");
-		user.setStatus("true");
+		user.setActive(Boolean.TRUE);
 		user.setId(userId);
 		return user;
 	}
@@ -187,21 +188,21 @@ public abstract class UserTestDataGenerator {
 	}
 
 	public static UserRoleDto initializeUserRoleDtoSuperAdmin() {
-		final RoleDto role = new RoleDto(5,"SuperAdmin","","1",true,false,false);
+		final RoleDto role = new RoleDto(5,"SuperAdmin","",new RoleTypeDto(1, "instance") ,true,false,false);
 		final UserRoleDto userRoleDto = new UserRoleDto(RandomUtils.nextInt(), role, null, null, 1);
 		userRoleDto.setRole(role);
 		return userRoleDto;
 	}
 
 	public static UserRoleDto initializeUserRoleDtoAdmin() {
-		final RoleDto role = new RoleDto(1,"Admin","","1",true,true,true);
+		final RoleDto role = new RoleDto(1,"Admin","",new RoleTypeDto(1, "instance"),true,true,true);
 		final UserRoleDto userRoleDto = new UserRoleDto(RandomUtils.nextInt(), role, null, null, 1);
 		userRoleDto.setRole(role);
 		return userRoleDto;
 	}
 
 	public static UserRoleDto initializeUserRoleDtoBreeder(final CropDto cropDto) {
-		final RoleDto role = new RoleDto(2,"Breeder","","2",true,true,true);
+		final RoleDto role = new RoleDto(2,"Breeder","",new RoleTypeDto(1, "crop"),true,true,true);
 		final UserRoleDto userRoleDto = new UserRoleDto(RandomUtils.nextInt(), role, cropDto, null, 1);
 		userRoleDto.setRole(role);
 		return userRoleDto;
