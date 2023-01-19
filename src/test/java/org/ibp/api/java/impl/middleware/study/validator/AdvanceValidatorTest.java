@@ -146,6 +146,10 @@ public class AdvanceValidatorTest {
 			this.mockAdvanceStudyRequest(Arrays.asList(INSTANCE_ID), null, breedingMethodSelectionRequest, lineSelectionRequest,
 				bulkingRequest,
 				null);
+
+		Mockito.when(this.studyDataManager.countPlotsWithRecordedVariatesInDataset(PLOT_DATASET_ID, Arrays.asList(PLOT_VARIATE_ID)))
+			.thenReturn(1);
+
 		this.advanceValidator.validateAdvanceStudy(STUDY_ID, request);
 
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
@@ -158,6 +162,8 @@ public class AdvanceValidatorTest {
 
 		Mockito.verify(this.datasetValidator, Mockito.never())
 			.validateDatasetBelongsToStudy(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
+
+		Mockito.verify(this.studyDataManager).countPlotsWithRecordedVariatesInDataset(PLOT_DATASET_ID, Arrays.asList(PLOT_VARIATE_ID));
 
 		Mockito.verify(request).getBulkingRequest();
 		Mockito.verify(request, Mockito.never()).getSelectionTraitRequest();
@@ -292,6 +298,10 @@ public class AdvanceValidatorTest {
 			this.mockAdvanceStudyRequest(Arrays.asList(INSTANCE_ID), null, breedingMethodSelectionRequest, lineSelectionRequest,
 				bulkingRequest,
 				selectionTraitRequest);
+
+		Mockito.when(this.studyDataManager.countPlotsWithRecordedVariatesInDataset(PLOT_DATASET_ID, Arrays.asList(PLOT_VARIATE_ID)))
+			.thenReturn(1);
+
 		this.advanceValidator.validateAdvanceStudy(STUDY_ID, request);
 
 		Mockito.verify(this.studyValidator).validate(STUDY_ID, true);
@@ -308,6 +318,8 @@ public class AdvanceValidatorTest {
 
 		Mockito.verify(this.datasetValidator)
 			.validateDatasetBelongsToStudy(STUDY_ID, SELECTION_TRAIT_DATASET_ID);
+
+		Mockito.verify(this.studyDataManager).countPlotsWithRecordedVariatesInDataset(PLOT_DATASET_ID, Arrays.asList(PLOT_VARIATE_ID));
 
 		Mockito.verify(request).getBulkingRequest();
 		Mockito.verify(request).getSelectionTraitRequest();
@@ -450,6 +462,9 @@ public class AdvanceValidatorTest {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("request.null"));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -466,6 +481,9 @@ public class AdvanceValidatorTest {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("request.null"));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -485,6 +503,9 @@ public class AdvanceValidatorTest {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.lines.selection.required"));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -505,6 +526,9 @@ public class AdvanceValidatorTest {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.lines.selection.required"));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -525,6 +549,9 @@ public class AdvanceValidatorTest {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.lines.selection.number.invalid"));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -545,6 +572,9 @@ public class AdvanceValidatorTest {
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.lines.selection.variate.not-present"));
 			assertThat(exception.getErrors().get(0).getArguments()[0], is(LINE_VARIATE_ID.toString()));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -569,10 +599,13 @@ public class AdvanceValidatorTest {
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.lines.selection.variate.type.invalid"));
 			assertThat(exception.getErrors().get(0).getArguments()[0], is(VariableType.SELECTION_METHOD));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
-	public void validateLineSelection_FAIL_invalidVariableProperty() {
+	public void validateLineSelection_FAIL_noObservationsWithValueForGivenLineVariable() {
 		final MeasurementVariable plotDatasetVariables =
 			this.mockMeasurementVariable(LINE_VARIATE_ID, AdvanceValidator.SELECTED_LINE_VARIABLE_PROPERTY, VariableType.SELECTION_METHOD);
 
@@ -631,12 +664,15 @@ public class AdvanceValidatorTest {
 		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, true);
 
 		try {
-			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, new ArrayList<>());
+			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, PLOT_DATASET_ID, new ArrayList<>());
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("request.null"));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -647,7 +683,8 @@ public class AdvanceValidatorTest {
 			this.mockAdvanceStudyRequest(new ArrayList<>(), new ArrayList<>(), breedingMethodSelectionRequest, null, null, null);
 
 		try {
-			this.advanceValidator.validateBulkingSelection(request, Mockito.mock(BreedingMethodDTO.class), new ArrayList<>());
+			this.advanceValidator
+				.validateBulkingSelection(request, Mockito.mock(BreedingMethodDTO.class), PLOT_DATASET_ID, new ArrayList<>());
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
@@ -655,6 +692,8 @@ public class AdvanceValidatorTest {
 		}
 
 		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -668,12 +707,15 @@ public class AdvanceValidatorTest {
 		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, false);
 
 		try {
-			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, new ArrayList<>());
+			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, PLOT_DATASET_ID, new ArrayList<>());
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.bulking.selection.required"));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -687,12 +729,15 @@ public class AdvanceValidatorTest {
 		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, false);
 
 		try {
-			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, new ArrayList<>());
+			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, PLOT_DATASET_ID, new ArrayList<>());
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.bulking.selection.both-selected"));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -706,13 +751,16 @@ public class AdvanceValidatorTest {
 		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, false);
 
 		try {
-			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, new ArrayList<>());
+			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, PLOT_DATASET_ID, new ArrayList<>());
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.bulking.selection.variate.not-present"));
 			assertThat(exception.getErrors().get(0).getArguments()[0], is(PLOT_VARIATE_ID.toString()));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -730,13 +778,17 @@ public class AdvanceValidatorTest {
 		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, false);
 
 		try {
-			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, Arrays.asList(plotDatasetVariables));
+			this.advanceValidator
+				.validateBulkingSelection(request, breedingMethodDTO, PLOT_DATASET_ID, Arrays.asList(plotDatasetVariables));
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.bulking.selection.variate.type.invalid"));
 			assertThat(exception.getErrors().get(0).getArguments()[0], is(VariableType.SELECTION_METHOD));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
@@ -753,13 +805,46 @@ public class AdvanceValidatorTest {
 		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, false);
 
 		try {
-			this.advanceValidator.validateBulkingSelection(request, breedingMethodDTO, Arrays.asList(plotDatasetVariables));
+			this.advanceValidator
+				.validateBulkingSelection(request, breedingMethodDTO, PLOT_DATASET_ID, Arrays.asList(plotDatasetVariables));
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.bulking.selection.variate.property.invalid"));
 			assertThat(exception.getErrors().get(0).getArguments()[0], is(AdvanceValidator.SELECTED_LINE_VARIABLE_PROPERTY));
 		}
+
+		Mockito.verify(this.studyDataManager, Mockito.never())
+			.countPlotsWithRecordedVariatesInDataset(ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
+	}
+
+	@Test
+	public void validateBulkingSelection_FAIL_noObservationsWithValueForGivenLineVariable() {
+		final MeasurementVariable plotDatasetVariables =
+			this.mockMeasurementVariable(PLOT_VARIATE_ID, AdvanceValidator.SELECTED_LINE_VARIABLE_PROPERTY, VariableType.SELECTION_METHOD);
+
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
+			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
+		final AdvanceStudyRequest.BulkingRequest bulkingRequest = this.mockBulkingRequest(null, PLOT_VARIATE_ID);
+		final AdvanceStudyRequest request =
+			this.mockAdvanceStudyRequest(new ArrayList<>(), new ArrayList<>(), breedingMethodSelectionRequest, null, bulkingRequest,
+				null);
+		final BreedingMethodDTO breedingMethodDTO = this.mockBreedingMethodDTO(MethodType.DERIVATIVE, false);
+
+		Mockito.when(this.studyDataManager.countPlotsWithRecordedVariatesInDataset(PLOT_DATASET_ID, Arrays.asList(LINE_VARIATE_ID)))
+			.thenReturn(0);
+
+		try {
+			this.advanceValidator
+				.validateBulkingSelection(request, breedingMethodDTO, PLOT_DATASET_ID, Arrays.asList(plotDatasetVariables));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.bulking.selection.variate.empty.observations"));
+			assertThat(exception.getErrors().get(0).getArguments()[0], is(PLOT_VARIATE_ID.toString()));
+		}
+
+		Mockito.verify(this.studyDataManager).countPlotsWithRecordedVariatesInDataset(PLOT_DATASET_ID, Arrays.asList(PLOT_VARIATE_ID));
 	}
 
 	@Test

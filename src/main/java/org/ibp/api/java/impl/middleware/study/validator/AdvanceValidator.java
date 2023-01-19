@@ -75,7 +75,7 @@ public class AdvanceValidator {
 		final BreedingMethodDTO selectedBreedingMethodDTO =
 			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), plotDatasetVariables);
 		this.validateLineSelection(request, selectedBreedingMethodDTO, plotDatasetId, plotDatasetVariables);
-		this.validateBulkingSelection(request, selectedBreedingMethodDTO, plotDatasetVariables);
+		this.validateBulkingSelection(request, selectedBreedingMethodDTO, plotDatasetId, plotDatasetVariables);
 		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
 		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), plotDatasetVariables);
 	}
@@ -180,6 +180,7 @@ public class AdvanceValidator {
 
 	void validateLineSelection(final AdvanceStudyRequest request, final BreedingMethodDTO selectedBreedingMethod,
 		final Integer plotDatasetId, final List<MeasurementVariable> plotDatasetVariables) {
+
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			request.getBreedingMethodSelectionRequest();
 		if ((breedingMethodSelectionRequest.getBreedingMethodId() != null && (Boolean.FALSE
@@ -208,19 +209,15 @@ public class AdvanceValidator {
 					throw new ApiRequestValidationException("advance.lines.selection.variate.property.invalid",
 						new Object[] {SELECTED_LINE_VARIABLE_PROPERTY});
 				}
-
-				final int plots = this.studyDataManager
-					.countPlotsWithRecordedVariatesInDataset(plotDatasetId, Arrays.asList(lineSelectionRequest.getLineVariateId()));
-				if (plots == 0) {
-					throw new ApiRequestValidationException("advance.lines.selection.variate.empty.observations",
-						new Object[] {lineSelectionRequest.getLineVariateId().toString()});
-				}
+				this.validateCountPlotsWithRecordedVariatesInDataset(plotDatasetId, lineSelectionRequest.getLineVariateId(),
+					"advance.lines.selection.variate.empty.observations");
 			}
 		}
 	}
 
 	void validateBulkingSelection(final AdvanceStudyRequest request, final BreedingMethodDTO selectedBreedingMethod,
-		final List<MeasurementVariable> plotDatasetVariables) {
+		final Integer plotDatasetId, final List<MeasurementVariable> plotDatasetVariables) {
+
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			request.getBreedingMethodSelectionRequest();
 		if ((breedingMethodSelectionRequest.getBreedingMethodId() != null && selectedBreedingMethod.getIsBulkingMethod()) || (
@@ -248,6 +245,8 @@ public class AdvanceValidator {
 					throw new ApiRequestValidationException("advance.bulking.selection.variate.property.invalid",
 						new Object[] {SELECTED_LINE_VARIABLE_PROPERTY});
 				}
+				this.validateCountPlotsWithRecordedVariatesInDataset(plotDatasetId, bulkingRequest.getPlotVariateId(),
+					"advance.bulking.selection.variate.empty.observations");
 			}
 		}
 
@@ -363,6 +362,15 @@ public class AdvanceValidator {
 		return dataset.stream()
 			.filter(measurementVariable -> measurementVariable.getTermId() == variableId)
 			.findFirst();
+	}
+
+	private void validateCountPlotsWithRecordedVariatesInDataset(final Integer plotDatasetId, final Integer variableId,
+		final String message) {
+		final int plots = this.studyDataManager
+			.countPlotsWithRecordedVariatesInDataset(plotDatasetId, Arrays.asList(variableId));
+		if (plots == 0) {
+			throw new ApiRequestValidationException(message, new Object[] {variableId.toString()});
+		}
 	}
 
 }
