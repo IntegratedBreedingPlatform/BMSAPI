@@ -228,8 +228,6 @@ public class DatasetResource {
 		@RequestBody final ObservationUnitsSearchDTO searchDTO,
 		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
-		Preconditions
-			.checkArgument(Collections.isEmpty(searchDTO.getFilterColumns()), "filterColumns should be null or empty");
 
 		final Integer instanceId = searchDTO.getInstanceId();
 		final Boolean draftMode = searchDTO.getDraftMode();
@@ -271,7 +269,6 @@ public class DatasetResource {
 
 		final Locale locale = LocaleContextHolder.getLocale();
 		Preconditions.checkNotNull(observationUnitsSearchDTO, this.getMessageSource().getMessage("parameters.cannot.be.null", null, locale));
-		Preconditions.checkArgument(Collections.isEmpty(observationUnitsSearchDTO.getFilterColumns()), this.getMessageSource().getMessage("filter.columns.should.be.null.or.empty", null, locale));
 
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(observationUnitsSearchDTO, ObservationUnitsSearchDTO.class).toString();
@@ -291,8 +288,6 @@ public class DatasetResource {
 
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
 		Preconditions.checkNotNull(searchDTO.getFilter(), "filter inside params cannot be null");
-		Preconditions
-			.checkArgument(!Collections.isEmpty(searchDTO.getFilterColumns()), "filterColumns cannot be null or empty");
 
 		return new ResponseEntity<>(this.studyDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO), HttpStatus.OK);
 	}
