@@ -27,8 +27,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,7 +73,7 @@ public class AdvanceValidator {
 		this.validateLineSelection(request, selectedBreedingMethodDTO, plotDatasetVariables);
 		this.validateBulkingSelection(request, selectedBreedingMethodDTO, plotDatasetVariables);
 		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
-		this.validateReplicationNumberSelection(request.getSelectedReplications(), plotDatasetVariables);
+		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), plotDatasetVariables);
 	}
 
 	public void validateAdvanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
@@ -87,11 +89,12 @@ public class AdvanceValidator {
 		}
 
 		this.validateAdvanceSamplesBreedingMethodSelection(request.getBreedingMethodId());
-		this.validateReplicationNumberSelection(request.getSelectedReplications(), plotDatasetVariables);
+		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), plotDatasetVariables);
 	}
 
 	/**
-	 * Perform basic information validation to the given study, dataset and instances 
+	 * Perform basic information validation to the given study, dataset and instances
+	 *
 	 * @param studyId
 	 * @param instanceIds
 	 * @return an {@link Integer} representing the plotDatasetId
@@ -278,7 +281,7 @@ public class AdvanceValidator {
 		}
 	}
 
-	void validateReplicationNumberSelection(final List<Integer> selectedReplications,
+	void validateReplicationNumberSelection(final Integer studyId, final List<Integer> selectedReplications,
 		final List<MeasurementVariable> plotDatasetVariables) {
 		final Optional<MeasurementVariable> replicationNumberVariable = this.findVariableById(plotDatasetVariables, TermId.REP_NO.getId());
 		if (replicationNumberVariable.isPresent()) {
@@ -286,14 +289,26 @@ public class AdvanceValidator {
 				throw new ApiRequestValidationException("advance.replication-number.selection.required", new Object[] {});
 			}
 
-			this.findVariableById(plotDatasetVariables, TermId.NUMBER_OF_REPLICATES.getId()).ifPresent(measurementVariable -> {
-				Collections.sort(selectedReplications);
+			final List<DatasetDTO> datasetsWithVariables =
+				this.datasetService.getDatasetsWithVariables(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
+			if (!CollectionUtils.isEmpty(datasetsWithVariables)) {
+				this.findVariableById(datasetsWithVariables.get(0).getVariables(), TermId.NUMBER_OF_REPLICATES.getId())
+					.ifPresent(measurementVariable -> {
+						Collections.sort(selectedReplications);
 
-				final Integer greaterReplicationNumberSelected = selectedReplications.get(selectedReplications.size() - 1);
-				if (selectedReplications.get(0) <= 0 || greaterReplicationNumberSelected > Integer.parseInt(measurementVariable.getValue())) {
-					throw new ApiRequestValidationException("advance.replication-number.invalid", new Object[] {});
-				}
-			});
+						final Integer greaterReplicationNumberSelected = selectedReplications.get(selectedReplications.size() - 1);
+						final int replicationsNumber = Integer.parseInt(measurementVariable.getValue());
+						if (selectedReplications.get(0) <= 0 || greaterReplicationNumberSelected > replicationsNumber) {
+							final Set<String> invalidReplicationNumbers = selectedReplications.stream()
+								.filter(integer -> integer <= 0 || integer > replicationsNumber)
+								.sorted()
+								.map(Objects::toString)
+								.collect(Collectors.toCollection(LinkedHashSet::new));
+							throw new ApiRequestValidationException("advance.replication-number.invalid",
+								new Object[] {String.join(", ", invalidReplicationNumbers)});
+						}
+					});
+			}
 		}
 	}
 

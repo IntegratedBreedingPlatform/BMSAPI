@@ -31,6 +31,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -215,7 +216,6 @@ public class AdvanceValidatorTest {
 		Mockito.when(datasetDTO.getVariables()).thenReturn(Arrays.asList(selectionTraitDatasetVariables));
 		Mockito.when(
 			this.datasetService.getDatasetsWithVariables(STUDY_ID, datasetTypeIds)).thenReturn(Arrays.asList(datasetDTO));
-
 
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
@@ -990,7 +990,12 @@ public class AdvanceValidatorTest {
 		final MeasurementVariable replicationVariable = this.mockMeasurementVariable(TermId.REP_NO.getId());
 		final MeasurementVariable replicationNumberVariable = this.mockMeasurementVariable(TermId.NUMBER_OF_REPLICATES.getId(), "5");
 
-		this.advanceValidator.validateReplicationNumberSelection(Arrays.asList(5,3,1,4), Arrays.asList(replicationVariable, replicationNumberVariable));
+		this.mockGetEnvironmentDatasetWithVariables(Arrays.asList(replicationNumberVariable));
+
+		this.advanceValidator.validateReplicationNumberSelection(STUDY_ID, Arrays.asList(5, 3, 1, 4),
+			Arrays.asList(replicationVariable));
+
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
 	}
 
 	@Test
@@ -998,54 +1003,33 @@ public class AdvanceValidatorTest {
 		final MeasurementVariable variable = this.mockMeasurementVariable(TermId.REP_NO.getId());
 
 		try {
-			this.advanceValidator.validateReplicationNumberSelection(new ArrayList<>(), Arrays.asList(variable));
+			this.advanceValidator.validateReplicationNumberSelection(STUDY_ID, new ArrayList<>(), Arrays.asList(variable));
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.replication-number.selection.required"));
 		}
+
+		Mockito.verify(this.datasetService, Mockito.never()).getDatasetsWithVariables(ArgumentMatchers.anyInt(), ArgumentMatchers.anySet());
 	}
 
 	@Test
-	public void validateReplicationNumberSelection_FAIL_invalidReplicationNumberMinorToZero() {
-		final MeasurementVariable replicationVariable = this.mockMeasurementVariable(TermId.REP_NO.getId());
-		final MeasurementVariable replicationNumberVariable = this.mockMeasurementVariable(TermId.NUMBER_OF_REPLICATES.getId(), "2");
-
-		try {
-			this.advanceValidator.validateReplicationNumberSelection(Arrays.asList(-1), Arrays.asList(replicationVariable, replicationNumberVariable));
-			fail("should have failed");
-		} catch (final ApiRequestValidationException exception) {
-			assertThat(exception, instanceOf(ApiRequestValidationException.class));
-			assertThat(exception.getErrors().get(0).getCode(), is("advance.replication-number.invalid"));
-		}
-	}
-
-	@Test
-	public void validateReplicationNumberSelection_FAIL_invalidReplicationNumberEqualsToZero() {
-		final MeasurementVariable replicationVariable = this.mockMeasurementVariable(TermId.REP_NO.getId());
-		final MeasurementVariable replicationNumberVariable = this.mockMeasurementVariable(TermId.NUMBER_OF_REPLICATES.getId(), "2");
-
-		try {
-			this.advanceValidator.validateReplicationNumberSelection(Arrays.asList(0), Arrays.asList(replicationVariable, replicationNumberVariable));
-			fail("should have failed");
-		} catch (final ApiRequestValidationException exception) {
-			assertThat(exception, instanceOf(ApiRequestValidationException.class));
-			assertThat(exception.getErrors().get(0).getCode(), is("advance.replication-number.invalid"));
-		}
-	}
-
-	@Test
-	public void validateReplicationNumberSelection_FAIL_invalidReplicationGreaterThanReplicationNumbers() {
+	public void validateReplicationNumberSelection_FAIL_invalidReplicationNumbers() {
 		final MeasurementVariable replicationVariable = this.mockMeasurementVariable(TermId.REP_NO.getId());
 		final MeasurementVariable replicationNumberVariable = this.mockMeasurementVariable(TermId.NUMBER_OF_REPLICATES.getId(), "5");
 
+		this.mockGetEnvironmentDatasetWithVariables(Arrays.asList(replicationNumberVariable));
+
 		try {
-			this.advanceValidator.validateReplicationNumberSelection(Arrays.asList(3,1,4,6), Arrays.asList(replicationVariable, replicationNumberVariable));
+			this.advanceValidator.validateReplicationNumberSelection(STUDY_ID, Arrays.asList(-1, 0, 4, 5 ,1, 6, -1), Arrays.asList(replicationVariable));
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.replication-number.invalid"));
+			assertThat(exception.getErrors().get(0).getArguments()[0], is("-1, 0, 6"));
 		}
+
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
 	}
 
 	@Test
@@ -1237,7 +1221,8 @@ public class AdvanceValidatorTest {
 	}
 
 	private MeasurementVariable mockMeasurementVariable(final Integer variableId) {
-		return this.mockMeasurementVariable(variableId, RandomStringUtils.randomAlphabetic(10), VariableType.ENTRY_DETAIL, RandomStringUtils.randomAlphabetic(3));
+		return this.mockMeasurementVariable(variableId, RandomStringUtils.randomAlphabetic(10), VariableType.ENTRY_DETAIL,
+			RandomStringUtils.randomAlphabetic(3));
 	}
 
 	private MeasurementVariable mockMeasurementVariable(final Integer variableId, final String value) {
@@ -1248,7 +1233,8 @@ public class AdvanceValidatorTest {
 		return this.mockMeasurementVariable(variableId, property, variableType, RandomStringUtils.randomAlphabetic(3));
 	}
 
-	private MeasurementVariable mockMeasurementVariable(final Integer variableId, final String property, final VariableType variableType, final String value) {
+	private MeasurementVariable mockMeasurementVariable(final Integer variableId, final String property, final VariableType variableType,
+		final String value) {
 		final MeasurementVariable measurementVariable = Mockito.mock(MeasurementVariable.class);
 		Mockito.when(measurementVariable.getTermId()).thenReturn(variableId);
 		Mockito.when(measurementVariable.getProperty()).thenReturn(property);
@@ -1263,6 +1249,13 @@ public class AdvanceValidatorTest {
 		Mockito.when(request.getSelectedReplications()).thenReturn(new ArrayList<>());
 		Mockito.when(request.getBreedingMethodId()).thenReturn(breedingMethodId);
 		return request;
+	}
+
+	private void mockGetEnvironmentDatasetWithVariables(final List<MeasurementVariable> variables) {
+		final DatasetDTO datasetDTO = Mockito.mock(DatasetDTO.class);
+		Mockito.when(datasetDTO.getVariables()).thenReturn(variables);
+		Mockito.when(this.datasetService.getDatasetsWithVariables(STUDY_ID, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId())))
+			.thenReturn(Arrays.asList(datasetDTO));
 	}
 
 }
