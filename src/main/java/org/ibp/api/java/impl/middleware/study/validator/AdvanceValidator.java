@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.ruleengine.naming.expression.SelectionTraitExpression;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -62,6 +63,9 @@ public class AdvanceValidator {
 	@Resource
 	private StudyService studyService;
 
+	@Resource
+	private StudyDataManager studyDataManager;
+
 	public void validateAdvanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 		checkNotNull(request, "request.null");
 
@@ -70,7 +74,7 @@ public class AdvanceValidator {
 		final List<MeasurementVariable> plotDatasetVariables = this.datasetService.getObservationSetVariables(plotDatasetId);
 		final BreedingMethodDTO selectedBreedingMethodDTO =
 			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), plotDatasetVariables);
-		this.validateLineSelection(request, selectedBreedingMethodDTO, plotDatasetVariables);
+		this.validateLineSelection(request, selectedBreedingMethodDTO, plotDatasetId, plotDatasetVariables);
 		this.validateBulkingSelection(request, selectedBreedingMethodDTO, plotDatasetVariables);
 		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
 		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), plotDatasetVariables);
@@ -175,7 +179,7 @@ public class AdvanceValidator {
 	}
 
 	void validateLineSelection(final AdvanceStudyRequest request, final BreedingMethodDTO selectedBreedingMethod,
-		final List<MeasurementVariable> plotDatasetVariables) {
+		final Integer plotDatasetId, final List<MeasurementVariable> plotDatasetVariables) {
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			request.getBreedingMethodSelectionRequest();
 		if ((breedingMethodSelectionRequest.getBreedingMethodId() != null && (Boolean.FALSE
@@ -203,6 +207,13 @@ public class AdvanceValidator {
 				if (!SELECTED_LINE_VARIABLE_PROPERTY.equals(variable.getProperty())) {
 					throw new ApiRequestValidationException("advance.lines.selection.variate.property.invalid",
 						new Object[] {SELECTED_LINE_VARIABLE_PROPERTY});
+				}
+
+				final int plots = this.studyDataManager
+					.countPlotsWithRecordedVariatesInDataset(plotDatasetId, Arrays.asList(lineSelectionRequest.getLineVariateId()));
+				if (plots == 0) {
+					throw new ApiRequestValidationException("advance.lines.selection.variate.empty.observations",
+						new Object[] {lineSelectionRequest.getLineVariateId().toString()});
 				}
 			}
 		}
