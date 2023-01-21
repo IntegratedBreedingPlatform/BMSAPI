@@ -12,6 +12,7 @@ import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingExcepti
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.ruleengine.RuleException;
+import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
 import org.generationcp.middleware.ruleengine.RuleFactory;
 import org.generationcp.middleware.ruleengine.coding.CodingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
@@ -161,7 +162,7 @@ public class GermplasmCodeGenerationServiceImplTest {
 			Mockito.when(this.germplasmService.getGermplasmDtoById(gid)).thenReturn(germplasmDto);
 		}
 		Mockito.when(this.germplasmNameService.getGermplasmNamesByGids(Mockito.anyList())).thenReturn(germplasmNames);
-		Mockito.when(this.ruleFactory.getRuleSequenceForNamespace(GermplasmCodeGenerationServiceImpl.CODING_RULE_SEQUENCE))
+		Mockito.when(this.ruleFactory.getRuleSequenceForNamespace(RuleExecutionNamespace.CODING))
 			.thenReturn(new String[] {});
 		Mockito.when(this.rulesService.runRules(Mockito.any(CodingRuleExecutionContext.class)))
 			.thenReturn(PREFIX + NAMING_CONFIG_STARTING_SEQUENCE + SUFFIX, PREFIX + (NAMING_CONFIG_STARTING_SEQUENCE + 1) + SUFFIX,

@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.ruleengine.RuleException;
+import org.generationcp.middleware.ruleengine.RuleExecutionNamespace;
 import org.generationcp.middleware.ruleengine.RuleFactory;
 import org.generationcp.middleware.ruleengine.coding.CodingRuleExecutionContext;
 import org.generationcp.middleware.ruleengine.service.RulesService;
@@ -44,7 +45,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerationService {
 
-	protected static final String CODING_RULE_SEQUENCE = "coding";
 	protected static final String GERMPLASM_CODE_NAME_GERMPLASM_NOT_PART_OF_MANAGEMENT_GROUP =
 		"germplasm.code.name.germplasm.not.part.of.management.group";
 	protected static final String GERMPLASM_CODE_NAME_GERMPLASM_HAS_EXISTING_NAME_FOR_NAME_TYPE =
@@ -111,7 +111,7 @@ public class GermplasmCodeGenerationServiceImpl implements GermplasmCodeGenerati
 
 		final NamingConfiguration namingConfiguration = this.namingConfigurationService.getNamingConfigurationByName(nameType.getName());
 
-		final List<String> executionOrder = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace(CODING_RULE_SEQUENCE));
+		final List<String> executionOrder = Arrays.asList(this.ruleFactory.getRuleSequenceForNamespace(RuleExecutionNamespace.CODING));
 		final CodingRuleExecutionContext codingRuleExecutionContext = new CodingRuleExecutionContext(executionOrder, namingConfiguration);
 		final List<GermplasmCodingResult> assignCodesResultsList = new ArrayList<>();
 
