@@ -71,8 +71,6 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 		this.validateProgram(cropName, programUUID);
 		this.studyTreeValidator.validateFolderHasNoChildren(folderId, "study.folder.delete.has.child", programUUID);
 
-		// TODO: should only the owner be able to delete the folder?
-
 		this.studyTreeService.deleteStudyFolder(folderId);
 	}
 

@@ -43,6 +43,6 @@ public interface StudyService {
 
 	long countSearchStudies(String programUUID, StudySearchRequest studySearchRequest);
 
-	StudyDetailsDTO getStudyDetails(final String programUUID, Integer studyId);
+	StudyDetailsDTO getStudyDetails(String programUUID, Integer studyId);
 
 }
