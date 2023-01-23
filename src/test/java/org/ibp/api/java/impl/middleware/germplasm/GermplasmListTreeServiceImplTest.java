@@ -118,6 +118,8 @@ public class GermplasmListTreeServiceImplTest {
 			this.loggedInUser = new WorkbenchUser(USER_ID);
 		}
 		Mockito.when(this.securityService.getCurrentlyLoggedInUser()).thenReturn(this.loggedInUser);
+
+		ContextHolder.setLoggedInUserId(USER_ID);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -796,18 +798,17 @@ public class GermplasmListTreeServiceImplTest {
 	public void testGetUserTreeState_NoSavedTreeState() {
 		final String userId = RandomStringUtils.randomNumeric(3);
 		Mockito.doReturn(Collections.emptyList()).when(this.userProgramStateDataManager)
-			.getUserProgramTreeState(Integer.parseInt(userId), GermplasmListTreeServiceImplTest.PROGRAM_UUID,
+			.getUserProgramTreeState(USER_ID, GermplasmListTreeServiceImplTest.PROGRAM_UUID,
 				ListTreeState.GERMPLASM_LIST.name());
 
 		final List<TreeNode> treeNodes = this.germplasmListTreeService
-			.getUserTreeState(GermplasmListTreeServiceImplTest.CROP, GermplasmListTreeServiceImplTest.PROGRAM_UUID, userId);
+			.getUserTreeState(GermplasmListTreeServiceImplTest.CROP, GermplasmListTreeServiceImplTest.PROGRAM_UUID);
 		final ArgumentCaptor<ProgramDTO> programCaptor = ArgumentCaptor.forClass(ProgramDTO.class);
 		Mockito.verify(this.programValidator).validate(programCaptor.capture(), any());
 		Assert.assertThat(programCaptor.getValue().getCrop(), is(GermplasmListTreeServiceImplTest.CROP));
 		Assert.assertThat(programCaptor.getValue().getUniqueID(), is(GermplasmListTreeServiceImplTest.PROGRAM_UUID));
-		Mockito.verify(this.userValidator).validateUserId(any(), eq(userId));
 		Mockito.verify(this.userProgramStateDataManager)
-			.getUserProgramTreeState(Integer.parseInt(userId), GermplasmListTreeServiceImplTest.PROGRAM_UUID,
+			.getUserProgramTreeState(USER_ID, GermplasmListTreeServiceImplTest.PROGRAM_UUID,
 				ListTreeState.GERMPLASM_LIST.name());
 		Assert.assertThat(treeNodes.size(), is(2));
 		Assert.assertThat(treeNodes.get(0).getKey(), is(GermplasmListTreeServiceImpl.CROP_LISTS));
@@ -820,7 +821,7 @@ public class GermplasmListTreeServiceImplTest {
 	public void testGetUserTreeState_WithSavedTreeState() {
 		final String userId = RandomStringUtils.randomNumeric(3);
 		Mockito.doReturn(Arrays.asList("Program Lists", " 2", " 4", " 5")).when(this.userProgramStateDataManager)
-			.getUserProgramTreeState(Integer.parseInt(userId), GermplasmListTreeServiceImplTest.PROGRAM_UUID,
+			.getUserProgramTreeState(USER_ID, GermplasmListTreeServiceImplTest.PROGRAM_UUID,
 				ListTreeState.GERMPLASM_LIST.name());
 		// Test Tree looks like this:
 		//   > "Program Lists"
@@ -845,14 +846,13 @@ public class GermplasmListTreeServiceImplTest {
 			.getGermplasmListById(any());
 
 		final List<TreeNode> treeNodes = this.germplasmListTreeService
-			.getUserTreeState(GermplasmListTreeServiceImplTest.CROP, GermplasmListTreeServiceImplTest.PROGRAM_UUID, userId);
+			.getUserTreeState(GermplasmListTreeServiceImplTest.CROP, GermplasmListTreeServiceImplTest.PROGRAM_UUID);
 		final ArgumentCaptor<ProgramDTO> programCaptor = ArgumentCaptor.forClass(ProgramDTO.class);
 		Mockito.verify(this.programValidator).validate(programCaptor.capture(), any());
 		Assert.assertThat(programCaptor.getValue().getCrop(), is(GermplasmListTreeServiceImplTest.CROP));
 		Assert.assertThat(programCaptor.getValue().getUniqueID(), is(GermplasmListTreeServiceImplTest.PROGRAM_UUID));
-		Mockito.verify(this.userValidator).validateUserId(any(), eq(userId));
 		Mockito.verify(this.userProgramStateDataManager)
-			.getUserProgramTreeState(Integer.parseInt(userId), GermplasmListTreeServiceImplTest.PROGRAM_UUID,
+			.getUserProgramTreeState(USER_ID, GermplasmListTreeServiceImplTest.PROGRAM_UUID,
 				ListTreeState.GERMPLASM_LIST.name());
 		Assert.assertThat(treeNodes.size(), is(2));
 		// Verify root Crop and Program Nodes
@@ -896,7 +896,6 @@ public class GermplasmListTreeServiceImplTest {
 			.getGermplasmListById(any());
 		final String userId = org.apache.commons.lang.RandomStringUtils.randomNumeric(2);
 		final UserTreeState treeState = new UserTreeState();
-		treeState.setUserId(userId);
 		treeState.setProgramFolders(Lists.newArrayList(GermplasmListTreeServiceImpl.PROGRAM_LISTS, "5", "7"));
 		treeState.setCropFolders(Lists.newArrayList(GermplasmListTreeServiceImpl.CROP_LISTS, "15", "17"));
 
@@ -906,9 +905,8 @@ public class GermplasmListTreeServiceImplTest {
 		Mockito.verify(this.programValidator).validate(programCaptor.capture(), any());
 		Assert.assertThat(programCaptor.getValue().getCrop(), is(GermplasmListTreeServiceImplTest.CROP));
 		Assert.assertThat(programCaptor.getValue().getUniqueID(), is(GermplasmListTreeServiceImplTest.PROGRAM_UUID));
-		Mockito.verify(this.userValidator).validateUserId(any(), eq(userId));
 		Mockito.verify(this.userProgramStateDataManager)
-			.saveOrUpdateUserProgramTreeState(Integer.parseInt(userId), GermplasmListTreeServiceImplTest.PROGRAM_UUID,
+			.saveOrUpdateUserProgramTreeState(USER_ID, GermplasmListTreeServiceImplTest.PROGRAM_UUID,
 				ListTreeState.GERMPLASM_LIST
 					.name(), treeState.getProgramFolders());
 	}
@@ -917,7 +915,6 @@ public class GermplasmListTreeServiceImplTest {
 	public void testSaveTreeState_NoProgramFolderToSave() {
 		final String userId = org.apache.commons.lang.RandomStringUtils.randomNumeric(2);
 		final UserTreeState treeState = new UserTreeState();
-		treeState.setUserId(userId);
 		treeState.setCropFolders(Lists.newArrayList(GermplasmListTreeServiceImpl.CROP_LISTS, "15", "17"));
 
 		try {
@@ -939,7 +936,6 @@ public class GermplasmListTreeServiceImplTest {
 			.getGermplasmListById(any());
 		final String userId = org.apache.commons.lang.RandomStringUtils.randomNumeric(2);
 		final UserTreeState treeState = new UserTreeState();
-		treeState.setUserId(userId);
 		treeState.setProgramFolders(Lists.newArrayList(GermplasmListTreeServiceImpl.PROGRAM_LISTS, "15", "17"));
 
 		try {
