@@ -309,8 +309,26 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 		final Map<String, String> gidPedigreeMap = new HashMap<>();
 
+		final Set<String> visibleColumns = new HashSet<>();
+
+		// Add required fields.
+		visibleColumns.add(PLOT_NO);
+		visibleColumns.add(ENTRY_NO);
+		visibleColumns.add(TRIAL_INSTANCE);
+		visibleColumns.add(GID);
+		visibleColumns.add(OBS_UNIT_ID);
+
+		combinedKeys.stream().forEach((key) -> {
+			final Field labelField = combinedKeyFieldMap.getOrDefault(key, null);
+			// Add the selected Label Fields to the visible columns list
+			// To make sure that only the fields requested by the user are processed and returned from the query.
+			if (labelField != null && labelField.getFieldType() != FieldType.STATIC) {
+				visibleColumns.add(labelField.getName());
+			}
+		});
+
 		final List<ObservationUnitRow> observationUnitRows =
-			this.middlewareDatasetService.getAllObservationUnitRows(labelsGeneratorInput.getStudyId(), labelsGeneratorInput.getDatasetId());
+			this.middlewareDatasetService.getAllObservationUnitRows(labelsGeneratorInput.getStudyId(), labelsGeneratorInput.getDatasetId(), visibleColumns);
 
 		Collections.sort(
 			observationUnitRows,
