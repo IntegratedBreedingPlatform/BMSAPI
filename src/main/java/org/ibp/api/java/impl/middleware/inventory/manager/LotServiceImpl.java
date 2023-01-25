@@ -1,5 +1,8 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
+import com.google.common.collect.Sets;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.spring.util.ContextUtil;
@@ -20,6 +23,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -211,6 +215,12 @@ public class LotServiceImpl implements LotService {
 					final DatasetDTO datasetDTO = this.studyDatasetService.getDataset(Integer.valueOf(observationUnitsSearchDTO.getDatasetId()));
 					this.studyValidator.validate(datasetDTO.getParentDatasetId(), false);
 					this.datasetValidator.validateDataset(datasetDTO.getParentDatasetId(), observationUnitsSearchDTO.getDatasetId());
+
+					// We only need the GID column here
+					// Adding only the GID to the visible columns list so that other columns will not be processed/returned
+					// thus improving the execution performance.
+					observationUnitsSearchDTO.setVisibleColumns(Sets.newHashSet(TermId.GID.name()));
+
 					gids = this.studyDatasetService.getObservationUnitRows(datasetDTO.getParentDatasetId(),
 						observationUnitsSearchDTO.getDatasetId(), observationUnitsSearchDTO, null).stream().map(
 						ObservationUnitRow::getGid).collect(Collectors.toList());
