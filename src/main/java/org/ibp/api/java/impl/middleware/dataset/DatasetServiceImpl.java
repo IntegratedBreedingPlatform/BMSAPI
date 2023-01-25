@@ -49,6 +49,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValid
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
+import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
@@ -145,6 +146,9 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private GermplasmNameTypeValidator germplasmNameTypeValidator;
+
+	@Autowired
+	private SecurityService securityService;
 
 	static final String PLOT_DATASET_NAME = "Observations";
 
@@ -252,6 +256,8 @@ public class DatasetServiceImpl implements DatasetService {
 		this.datasetValidator.validateExistingDatasetVariables(studyId, datasetId, Arrays.asList(observation.getVariableId()));
 		this.observationValidator.validateObservationUnit(datasetId, observationUnitId);
 		this.observationValidator.validateVariableValue(observation.getVariableId(), observation.getValue());
+
+		observation.setCreatedBy(this.securityService.getCurrentlyLoggedInUser().getUserid());
 		return this.middlewareDatasetService.createObservation(observation);
 
 	}
@@ -265,6 +271,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.observationValidator.validateObservation(datasetId, observationUnitId, observationId, observationDto);
 		observationDto.setObservationUnitId(observationUnitId);
 		observationDto.setObservationId(observationId);
+		observationDto.setUpdatedBy(this.securityService.getCurrentlyLoggedInUser().getUserid());
 		return this.middlewareDatasetService.updatePhenotype(observationId, observationDto);
 
 	}
