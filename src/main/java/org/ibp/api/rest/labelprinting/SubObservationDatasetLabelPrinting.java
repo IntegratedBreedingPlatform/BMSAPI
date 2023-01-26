@@ -1,5 +1,6 @@
 package org.ibp.api.rest.labelprinting;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
@@ -12,9 +13,12 @@ import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
@@ -35,7 +39,6 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
-import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -53,6 +56,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @Transactional
@@ -78,6 +82,9 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 
 	@Autowired
 	private StudyTransactionsService studyTransactionsService;
+
+	@Autowired
+	private OntologyDataManager ontologyDataManager;
 
 	private Field studyNameField;
 	private Field yearField;
@@ -222,7 +229,8 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 
 		final List<MeasurementVariable> plotVariables = this.middlewareDatasetService.getObservationSetVariables(
 			plotDatasetId,
-			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
+			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId(),
+				VariableType.ENTRY_DETAIL.getId()));
 
 		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
 			.getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));
@@ -300,35 +308,34 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 		final Set<String> combinedKeys = new HashSet<>();
 		if (labelsGeneratorInput.isBarcodeRequired()) {
 			if (labelsGeneratorInput.isAutomaticBarcode()) {
-				combinedKeys.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId()));
+				combinedKeys.add(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,
+					LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId()));
 			} else {
 				combinedKeys.addAll(labelsGeneratorInput.getBarcodeFields());
 			}
 		}
 		labelsGeneratorInput.getFields().forEach(combinedKeys::addAll);
 
-		final Set<String> visibleColumns = new HashSet<>();
-
-		// Add required fields.
-		visibleColumns.add(PLOT_NO);
-		visibleColumns.add(ENTRY_NO);
-		visibleColumns.add(TRIAL_INSTANCE);
-		visibleColumns.add(GID);
-		visibleColumns.add(OBS_UNIT_ID);
+		// Add the required observations table columns necessary for this function
+		final Map<Integer, String> requiredColumns =
+			this.ontologyDataManager.getTermsByIds(Lists.newArrayList(TermId.TRIAL_INSTANCE_FACTOR.getId(),
+				TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
+				TermId.OBS_UNIT_ID.getId())).stream().collect(Collectors.toMap(Term::getId, Term::getName));
 
 		combinedKeys.stream().forEach((key) -> {
 			final Field labelField = combinedKeyFieldMap.getOrDefault(key, null);
 			// Add the selected Label Fields to the visible columns list
 			// To make sure that only the fields requested by the user are processed and returned from the query.
 			if (labelField != null && labelField.getFieldType() != FieldType.STATIC) {
-				visibleColumns.add(labelField.getName());
+				requiredColumns.put(labelField.getId(), labelField.getName());
 			}
 		});
 
 		final Map<String, String> gidPedigreeMap = new HashMap<>();
 
 		final List<ObservationUnitRow> observationUnitRows =
-			this.middlewareDatasetService.getAllObservationUnitRows(labelsGeneratorInput.getStudyId(), labelsGeneratorInput.getDatasetId(), visibleColumns);
+			this.middlewareDatasetService.getAllObservationUnitRows(labelsGeneratorInput.getStudyId(), labelsGeneratorInput.getDatasetId(),
+				new HashSet<>(requiredColumns.values()));
 
 		Collections.sort(
 			observationUnitRows,
@@ -359,7 +366,8 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 			results.add(row);
 		}
 
-		return new LabelsData(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId()), results);
+		return new LabelsData(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,
+			LabelPrintingStaticField.SUB_OBSERVATION_DATASET_OBS_UNIT_ID.getFieldId()), results);
 	}
 
 	@Override
