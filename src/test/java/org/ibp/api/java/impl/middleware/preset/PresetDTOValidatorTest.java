@@ -4,21 +4,23 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.ApiUnitTestBase;
+import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.ontology.VariableService;
-import org.ibp.api.java.program.ProgramService;
-import org.ibp.api.rest.preset.domain.FilePresetConfigurationDTO;
-import org.ibp.api.rest.preset.domain.LabelPrintingPresetDTO;
-import org.ibp.api.rest.preset.domain.PresetDTO;
-import org.ibp.api.rest.preset.domain.PresetType;
+import org.generationcp.middleware.domain.labelprinting.FilePresetConfigurationDTO;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetType;
+import org.ibp.api.rest.labelprinting.domain.FieldType;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -46,7 +48,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 
 	private String type;
 
-	private List<List<Integer>> selectedField;
+	private List<List<String>> selectedField;
 
 	private LabelPrintingPresetDTO.BarcodeSetting barcodeSetting;
 
@@ -63,6 +65,9 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 	@InjectMocks
 	private PresetDTOValidator presetDTOValidator;
 
+	@Mock
+	private GermplasmNameTypeService germplasmNameTypeService;
+
 	@Before
 	public void init() {
 		this.programUUID = RandomStringUtils.randomAlphabetic(10);
@@ -72,8 +77,8 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		this.toolId = 23;
 
 		this.type = PresetType.LABEL_PRINTING_PRESET.getName();
-		this.selectedField = Arrays.asList(Arrays.asList(4, 13));
-		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList(2));
+		this.selectedField = Arrays.asList(Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,4), LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,13)));
+		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,2)));
 		this.filePresetConfigurationDTO = new FilePresetConfigurationDTO();
 		this.filePresetConfigurationDTO.setOutputType("csv");
 		this.presetId = RandomUtils.nextInt();
@@ -240,7 +245,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setFileConfiguration(this.filePresetConfigurationDTO);
 		presetDTO.setBarcodeSetting(this.barcodeSetting);
 
-		final List<List<Integer>> selectedFields = Arrays.asList(Arrays.asList(-2));
+		final List<List<String>> selectedFields = Arrays.asList(Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,-2)));
 		presetDTO.setSelectedFields(selectedFields);
 
 		Mockito.doReturn(null).when(this.variableService).getVariableById(CROP_NAME, presetDTO.getProgramUUID(), "-1");
@@ -271,7 +276,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(true, true, Arrays.asList(1));
+			new LabelPrintingPresetDTO.BarcodeSetting(true, true, Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,1)));
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
@@ -329,7 +334,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(true, false, Arrays.asList(-2));
+			new LabelPrintingPresetDTO.BarcodeSetting(true, false, Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,-2)));
 		Mockito.doReturn(null).when(this.variableService).getVariableById(CROP_NAME, presetDTO.getProgramUUID(), "-1");
 
 		presetDTO.setBarcodeSetting(barcodeSetting);
@@ -388,7 +393,7 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(false, false, Arrays.asList(1));
+			new LabelPrintingPresetDTO.BarcodeSetting(false, false, Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,1)));
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)

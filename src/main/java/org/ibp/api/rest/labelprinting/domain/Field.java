@@ -9,11 +9,14 @@ public class Field {
 
 	private Integer id;
 
+	private FieldType fieldType;
+
 	private String name;
 
-	public Field(final Integer id, final String name) {
+	public Field(final FieldType fieldType, final Integer id, final String name) {
 		this.id = id;
 		this.name = name;
+		this.fieldType = fieldType;
 	}
 
 	public Field (final MeasurementVariable measurementVariable) {
@@ -22,7 +25,7 @@ public class Field {
 	}
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(final Integer id) {
@@ -30,11 +33,19 @@ public class Field {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	public FieldType getFieldType() {
+		return this.fieldType;
+	}
+
+	public void setFieldType(final FieldType fieldType) {
+		this.fieldType = fieldType;
 	}
 
 	@Override

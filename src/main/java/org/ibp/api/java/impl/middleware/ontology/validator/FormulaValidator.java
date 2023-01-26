@@ -85,6 +85,7 @@ public class FormulaValidator implements Validator {
 		// Validate inputs and set ids
 
 		final Set<Term> nonTraitInputs = new LinkedHashSet<>();
+		final Set<Term> obsoleteInputs = new LinkedHashSet<>();
 		final Map<String, DataType> inputVariablesDataTypeMap = new HashMap<>();
 
 		for (final FormulaVariable input : formulaDto.getInputs()) {
@@ -92,33 +93,32 @@ public class FormulaValidator implements Validator {
 			if (inputTerm == null) {
 				errors.reject("variable.input.not.exists", new Object[] {input.getName()}, "");
 			} else {
+				if (inputTerm.isObsolete()) {
+					obsoleteInputs.add(inputTerm);
+				} else {
+					final int id = inputTerm.getId();
 
-				final int id = inputTerm.getId();
+					// We need the datatype info of each variable so that we can properly create mock data later.
+					final Optional<DataType> dataTypeOptional = this.ontologyVariableDataManager.getDataType(id);
+					if (dataTypeOptional.isPresent()) {
+						inputVariablesDataTypeMap.put(DerivedVariableUtils.wrapTerm(inputTerm.getName()), dataTypeOptional.get());
+					}
 
-				// We need the datatype info of each variable so that we can properly create mock data later.
-				final Optional<DataType> dataTypeOptional = this.ontologyVariableDataManager.getDataType(id);
-				if (dataTypeOptional.isPresent()) {
-					inputVariablesDataTypeMap.put(DerivedVariableUtils.wrapTerm(inputTerm.getName()), dataTypeOptional.get());
+					input.setId(id); // it will be used to save the input
+					if (!this.isValidVariableTypeForFormula(id)) {
+						nonTraitInputs.add(inputTerm);
+					}
 				}
 
-				input.setId(id); // it will be used to save the input
-				if (!this.isValidVariableTypeForFormula(id)) {
-					nonTraitInputs.add(inputTerm);
-				}
 			}
 		}
 
-		if (!nonTraitInputs.isEmpty()) {
-			errors.reject("variable.formula.inputs.not.trait", new String[] {
-				StringUtils.join(Iterables.transform(
-					nonTraitInputs, new Function<Term, String>() {
+		if (!obsoleteInputs.isEmpty()) {
+			this.addMultipleTermError(errors, "variable.formula.inputs.obsolete", obsoleteInputs);
+		}
 
-						@Nullable
-						@Override
-						public String apply(@Nullable final Term term) {
-							return term.getName() + "(" + term.getId() + ")";
-						}
-					}), ", ")}, "");
+		if (!nonTraitInputs.isEmpty()) {
+			this.addMultipleTermError(errors, "variable.formula.inputs.not.trait", nonTraitInputs);
 		}
 
 		// Validate formula definition
@@ -132,8 +132,9 @@ public class FormulaValidator implements Validator {
 
 		try {
 			String formula = formulaDto.getDefinition();
-			final List<String> aggregateFunctionInputVariables = this.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, errors);
-			if(errors.hasErrors()) {
+			final List<String> aggregateFunctionInputVariables =
+				this.getAggregateFunctionInputVariables(formula, inputVariablesDataTypeMap, errors);
+			if (errors.hasErrors()) {
 				return;
 			}
 			final Map<String, Object> parameters = DerivedVariableUtils.extractParameters(formula);
@@ -142,14 +143,14 @@ public class FormulaValidator implements Validator {
 			for (final Map.Entry<String, Object> termEntry : parameters.entrySet()) {
 				if (aggregateFunctionInputVariables.contains(termEntry.getKey())) {
 					termEntry.setValue(new ArrayList<>());
-				} else if (inputVariablesDataTypeMap.get(termEntry.getKey()) == DataType.DATE_TIME_VARIABLE){
+				} else if (inputVariablesDataTypeMap.get(termEntry.getKey()) == DataType.DATE_TIME_VARIABLE) {
 					termEntry.setValue(new Date());
 				} else {
 					termEntry.setValue(BigDecimal.ONE);
 				}
 			}
 			formula = DerivedVariableUtils.replaceDelimiters(formula);
-			processor.evaluateFormula(formula, parameters);
+			this.processor.evaluateFormula(formula, parameters);
 		} catch (final Exception e) {
 			// Inform the ontology manager admin about the exception
 			// Mapping engine errors to UI errors would be impractical
@@ -157,19 +158,39 @@ public class FormulaValidator implements Validator {
 		}
 	}
 
-	List<String> getAggregateFunctionInputVariables(final String formula, final Map<String, DataType> inputVariablesDataTypeMap, final Errors errors) {
+	private void addMultipleTermError(final Errors errors, final String message, final Set<Term> invalidInputs) {
+		errors.reject(message, new String[] {
+			StringUtils.join(Iterables.transform(
+				invalidInputs, new Function<Term, String>() {
+
+					@Nullable
+					@Override
+					public String apply(@Nullable final Term term) {
+						if (term == null){
+							return "";
+						}
+						return term.getName() + "(" + term.getId() + ")";
+					}
+				}), ", ")}, "");
+	}
+
+	List<String> getAggregateFunctionInputVariables(final String formula, final Map<String, DataType> inputVariablesDataTypeMap,
+		final Errors errors) {
 		final List<String> inputVariables = new ArrayList<>();
-		final Map<String, List<String>> aggregateFunctionInputVariablesMap = DerivedVariableUtils.getAggregateFunctionInputVariablesMap(formula);
-		for(final String aggregateFunction: DerivedVariableUtils.AGGREGATE_FUNCTIONS) {
-			inputVariables.addAll(this.validateAggregateInputVariable(inputVariablesDataTypeMap, errors, aggregateFunction, aggregateFunctionInputVariablesMap.get(aggregateFunction)));
+		final Map<String, List<String>> aggregateFunctionInputVariablesMap =
+			DerivedVariableUtils.getAggregateFunctionInputVariablesMap(formula);
+		for (final String aggregateFunction : DerivedVariableUtils.AGGREGATE_FUNCTIONS) {
+			inputVariables.addAll(this.validateAggregateInputVariable(inputVariablesDataTypeMap, errors, aggregateFunction,
+				aggregateFunctionInputVariablesMap.get(aggregateFunction)));
 		}
 		return inputVariables;
 	}
 
-	List<String> validateAggregateInputVariable(final Map<String, DataType> inputVariablesDataTypeMap, final Errors errors, final String aggregateFunction, final List<String> inputVariables) {
+	List<String> validateAggregateInputVariable(final Map<String, DataType> inputVariablesDataTypeMap, final Errors errors,
+		final String aggregateFunction, final List<String> inputVariables) {
 		final List<String> aggregateInputVariable = new ArrayList<>();
-		for(final String inputVariable: inputVariables) {
-			if(DataType.NUMERIC_VARIABLE.getId() != inputVariablesDataTypeMap.get(inputVariable).getId()) {
+		for (final String inputVariable : inputVariables) {
+			if (DataType.NUMERIC_VARIABLE.getId() != inputVariablesDataTypeMap.get(inputVariable).getId()) {
 				errors.reject("variable.formula." + aggregateFunction + ".input.not.numeric", "");
 				return inputVariables;
 			}

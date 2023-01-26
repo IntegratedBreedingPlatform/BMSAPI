@@ -115,6 +115,7 @@ import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
+import org.generationcp.middleware.preset.PresetMapper;
 import org.generationcp.middleware.ruleengine.impl.RulesServiceImpl;
 import org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedGermplasmNamingServiceImpl;
 import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
@@ -828,7 +829,7 @@ public class MiddlewareFactory {
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public TrialServiceBrapi getTrialServiceBrapi() {
-		return new TrialServiceBrapiImpl(this.getCropDatabaseSessionProvider());
+		return new TrialServiceBrapiImpl(this.getCropDatabaseSessionProvider(), this.getWorkbenchSessionProvider());
 	}
 
 	@Bean
@@ -900,6 +901,11 @@ public class MiddlewareFactory {
 	@Bean
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();
+	}
+
+	@Bean
+	public PresetMapper getPresetMapper(){
+		return new PresetMapper();
 	}
 
 	@Bean

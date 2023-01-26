@@ -11,6 +11,7 @@ import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.user.RoleDto;
+import org.generationcp.middleware.service.api.user.RoleTypeDto;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserRoleDto;
 
@@ -33,7 +34,7 @@ public class StudyTestDataProvider {
 		user.setFirstName("admin");
 		user.setLastName("admin");
 		final UserRoleDto userRoleDto = new UserRoleDto(1,
-			new RoleDto(1, "Admin", "", "instance", true, true, true), null,
+			new RoleDto(1, "Admin", "", new RoleTypeDto(1, "instance"), true, true, true), null,
 			null, null);
 		final List<UserRoleDto> userRoleDtos = new ArrayList<>();
 		userRoleDtos.add(userRoleDto);

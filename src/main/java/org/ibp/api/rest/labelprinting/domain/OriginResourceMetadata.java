@@ -21,7 +21,7 @@ public class OriginResourceMetadata {
 	}
 
 	public String getDefaultFileName() {
-		return defaultFileName;
+		return this.defaultFileName;
 	}
 
 	public void setDefaultFileName(final String defaultFileName) {
@@ -29,7 +29,7 @@ public class OriginResourceMetadata {
 	}
 
 	public Map<String, String> getMetadata() {
-		return metadata;
+		return this.metadata;
 	}
 
 	public void setMetadata(final Map<String, String> metadata) {

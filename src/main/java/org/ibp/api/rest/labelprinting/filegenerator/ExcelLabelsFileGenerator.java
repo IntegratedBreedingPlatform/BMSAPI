@@ -6,11 +6,10 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
 import org.generationcp.commons.util.FileUtils;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
+import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.ibp.api.rest.labelprinting.domain.LabelsData;
 import org.ibp.api.rest.labelprinting.domain.LabelsGeneratorInput;
 import org.springframework.stereotype.Component;
@@ -36,7 +35,7 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 		final String fullFileName = fileName + "." + FileType.XLS.getExtension();
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + fullFileName;
 
-		final Map<Integer, Field> fieldsByKey = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), Field::getId);
+		final Map<String, Field> fieldsByKey = Maps.uniqueIndex(labelsGeneratorInput.getAllAvailablefields(), field -> LabelPrintingFieldUtils.buildCombinedKey(field.getFieldType(), field.getId()));
 
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 		final HSSFSheet sheet = xlsBook.createSheet(fileName);
@@ -45,7 +44,7 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 
 		final List<Field> headers = labelsGeneratorInput.getFields().stream()
 			.flatMap(Collection::stream)
-			.map(integer -> fieldsByKey.get(integer))
+			.map(field -> fieldsByKey.get(field))
 			.collect(Collectors.toList());
 
 		int rowIndex = 0;
@@ -62,13 +61,13 @@ public class ExcelLabelsFileGenerator implements LabelsFileGenerator {
 
 		// values
 
-		for (final Map<Integer, String> dataRow : labelsData.getData()) {
+		for (final Map<String, String> dataRow : labelsData.getData()) {
 			final HSSFRow row = sheet.createRow(rowIndex);
 
 			int colIndex = 0;
 			for (final Field header : headers) {
 				final HSSFCell cell = row.createCell(colIndex);
-				cell.setCellValue(dataRow.get(header.getId()));
+				cell.setCellValue(dataRow.get(LabelPrintingFieldUtils.buildCombinedKey(header.getFieldType(), header.getId())));
 				colIndex++;
 			}
 			rowIndex++;

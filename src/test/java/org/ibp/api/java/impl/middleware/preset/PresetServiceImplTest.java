@@ -5,16 +5,16 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.middleware.api.program.ProgramDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.preset.PresetMapper;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ForbiddenException;
-import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.program.ProgramService;
-import org.ibp.api.rest.preset.domain.PresetDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -82,9 +82,7 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 		final ProgramDTO programSummary = new ProgramDTO();
 		programSummary.setMembers(Sets.newHashSet(this.workbenchUser.getName()));
 		Mockito.doReturn(programSummary).when(this.programService).getByUUIDAndCrop(this.CROP_NAME, this.programUUID);
-		final ProgramPreset programPreset = new ProgramPreset();
-		Mockito.doReturn(programPreset).when(this.presetMapper).map(presetDTO);
-		Mockito.doThrow(MiddlewareQueryException.class).when(this.middlewarePresetService).saveProgramPreset(programPreset);
+		Mockito.doThrow(MiddlewareQueryException.class).when(this.middlewarePresetService).saveProgramPreset(Mockito.any());
 		this.presetService.savePreset(this.CROP_NAME, presetDTO);
 	}
 
@@ -99,7 +97,7 @@ public class PresetServiceImplTest extends ApiUnitTestBase {
 		Mockito.doReturn(programSummary).when(this.programService).getByUUIDAndCrop(this.CROP_NAME, this.programUUID);
 		final ProgramPreset programPreset = new ProgramPreset();
 		Mockito.doReturn(programPreset).when(this.presetMapper).map(presetDTO);
-		Mockito.doReturn(programPreset).when(this.middlewarePresetService).saveProgramPreset(programPreset);
+		Mockito.doReturn(programPreset).when(this.middlewarePresetService).saveProgramPreset(Mockito.any());
 		this.presetService.savePreset(this.CROP_NAME, presetDTO);
 	}
 

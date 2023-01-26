@@ -93,10 +93,9 @@ public class PedigreeResourceBrapi {
 	public ResponseEntity<EntityListResponse<PedigreeNodeDTO>> getGermplasmSearchResults(
 		@PathVariable final String crop,
 		@PathVariable final String searchResultsDbId,
-		// TODO IBP-6075
-		@ApiParam("<strong>(*Ignored)</strong>")
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION)
 		@RequestParam(value = "page", required = false) final Integer currentPage,
-		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION + " <strong>(*Ignored)</strong>")
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize
 	) {
 

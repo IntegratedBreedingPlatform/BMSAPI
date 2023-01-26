@@ -3,7 +3,6 @@ package org.ibp.api.rest.labelprinting.domain;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class LabelsNeededSummary {
 		}
 
 		public String getInstanceNumber() {
-			return instanceNumber;
+			return this.instanceNumber;
 		}
 
 		public void setInstanceNumber(final String instanceNumber) {
@@ -44,7 +43,7 @@ public class LabelsNeededSummary {
 		}
 
 		public Long getSubObservationNumber() {
-			return subObservationNumber;
+			return this.subObservationNumber;
 		}
 
 		public void setSubObservationNumber(final Long subObservationNumber) {
@@ -52,7 +51,7 @@ public class LabelsNeededSummary {
 		}
 
 		public Long getLabelsNeeded() {
-			return labelsNeeded;
+			return this.labelsNeeded;
 		}
 
 		public void setLabelsNeeded(final Long labelsNeeded) {
@@ -60,21 +59,19 @@ public class LabelsNeededSummary {
 		}
 
 		public Long getEntries() {
-			return entries;
+			return this.entries;
 		}
 
-		public Row setEntries(final Long entries) {
+		public void setEntries(final Long entries) {
 			this.entries = entries;
-			return this;
 		}
 
 		public Long getReps() {
-			return reps;
+			return this.reps;
 		}
 
-		public Row setReps(final Long reps) {
+		public void setReps(final Long reps) {
 			this.reps = reps;
-			return this;
 		}
 
 		@Override
@@ -98,7 +95,7 @@ public class LabelsNeededSummary {
 	private Long totalNumberOfLabelsNeeded;
 
 	public List<Row> getRows() {
-		return rows;
+		return this.rows;
 	}
 
 	public void setRows(final List<Row> rows) {
@@ -106,7 +103,7 @@ public class LabelsNeededSummary {
 	}
 
 	public Long getTotalNumberOfLabelsNeeded() {
-		return totalNumberOfLabelsNeeded;
+		return this.totalNumberOfLabelsNeeded;
 	}
 
 	public void setTotalNumberOfLabelsNeeded(final Long totalNumberOfLabelsNeeded) {
