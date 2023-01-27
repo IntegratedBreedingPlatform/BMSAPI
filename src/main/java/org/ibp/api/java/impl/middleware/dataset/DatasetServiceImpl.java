@@ -959,7 +959,7 @@ public class DatasetServiceImpl implements DatasetService {
 		// Add the required observation table columns necessary for this function
 		final Map<Integer, String> requiredColumns =
 			this.ontologyDataManager.getTermsByIds(Lists.newArrayList(TermId.TRIAL_INSTANCE_FACTOR.getId(),
-				TermId.OBS_UNIT_ID.getId())).stream().collect(Collectors.toMap(Term::getId, Term::getName));
+				TermId.OBS_UNIT_ID.getId(), TermId.GID.getId())).stream().collect(Collectors.toMap(Term::getId, Term::getName));
 		observationUnitsSearchDTO.setVisibleColumns(new HashSet<>(requiredColumns.values()));
 
 		// observation units
@@ -1007,7 +1007,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		// Add the required observation table columns necessary for this function
 		final Map<Integer, String> requiredColumns =
-			this.ontologyDataManager.getTermsByIds(Lists.newArrayList(TermId.TRIAL_INSTANCE_FACTOR.getId())).stream()
+			this.ontologyDataManager.getTermsByIds(Lists.newArrayList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.GID.getId())).stream()
 				.collect(Collectors.toMap(Term::getId, Term::getName));
 		observationUnitsSearchDTO.setVisibleColumns(new HashSet<>(requiredColumns.values()));
 
