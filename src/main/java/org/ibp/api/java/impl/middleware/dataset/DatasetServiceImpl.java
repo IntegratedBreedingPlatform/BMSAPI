@@ -288,7 +288,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		final List<org.generationcp.middleware.domain.dms.DatasetDTO> datasetDTOS =
-			this.middlewareDatasetService.getDatasets(studyId, datasetTypeIdList);
+			this.middlewareDatasetService.getDatasetsWithVariables(studyId, datasetTypeIdList);
 
 		final ModelMapper mapper = new ModelMapper();
 		mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
@@ -298,6 +298,9 @@ public class DatasetServiceImpl implements DatasetService {
 			if (datasetDto.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 				datasetDto.setName(PLOT_DATASET_NAME);
 			}
+			final List<org.generationcp.middleware.service.impl.study.StudyInstance> datasetInstances =
+				this.middlewareDatasetService.getDatasetInstances(datasetDTO.getDatasetId());
+			datasetDto.setInstances(this.convertToStudyInstances(mapper, datasetInstances));
 			datasetDTOs.add(datasetDto);
 		}
 		return datasetDTOs;
@@ -324,15 +327,15 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Integer countAllObservationUnitsForDataset(
-		final Integer datasetId, final Integer instanceId, final Boolean draftMode) {
-		return this.middlewareDatasetService.countAllObservationUnitsForDataset(datasetId, instanceId, draftMode);
+		final Integer datasetId, final List<Integer> instanceIds, final Boolean draftMode) {
+		return this.middlewareDatasetService.countAllObservationUnitsForDataset(datasetId, instanceIds, draftMode);
 	}
 
 	@Override
 	public long countFilteredObservationUnitsForDataset(
-		final Integer datasetId, final Integer instanceId, final Boolean draftMode,
+		final Integer datasetId, final List<Integer> instanceIds, final Boolean draftMode,
 		final ObservationUnitsSearchDTO.Filter filter) {
-		return this.middlewareDatasetService.countFilteredObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
+		return this.middlewareDatasetService.countFilteredObservationUnitsForDataset(datasetId, instanceIds, draftMode, filter);
 	}
 
 	@Override
@@ -399,11 +402,7 @@ public class DatasetServiceImpl implements DatasetService {
 			}
 		}
 
-		List<Integer> instanceIds = null;
-		if (searchDTO.getInstanceId() != null) {
-			instanceIds = Arrays.asList(searchDTO.getInstanceId());
-		}
-		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
+		this.validateStudyDatasetAndInstances(studyId, datasetId, searchDTO.getInstanceIds());
 
 		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> observationUnitRows =
 			this.middlewareDatasetService.getObservationUnitRows(studyId, datasetId, searchDTO, convertedPageable);
@@ -420,11 +419,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<Map<String, Object>> getObservationUnitRowsAsMapList(
 		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 
-		List<Integer> instanceIds = null;
-		if (searchDTO.getInstanceId() != null) {
-			instanceIds = Arrays.asList(searchDTO.getInstanceId());
-		}
-		this.validateStudyDatasetAndInstances(studyId, datasetId, instanceIds);
+		this.validateStudyDatasetAndInstances(studyId, datasetId, searchDTO.getInstanceIds());
 
 		return this.middlewareDatasetService.getObservationUnitRowsAsMapList(studyId, datasetId, searchDTO, null);
 	}
@@ -1037,6 +1032,13 @@ public class DatasetServiceImpl implements DatasetService {
 			plotDatasetId = datasetDTO.getParentDatasetId();
 		}
 		return this.middlewareDatasetService.getDatasetNameTypes(plotDatasetId);
+	}
+
+	@Override
+	public List<MeasurementVariable> getVariablesByVariableTypes(final Integer studyId, final List<Integer> variableTypes) {
+		this.studyValidator.validate(studyId, false);
+		variableTypes.forEach(this.datasetValidator::validateVariableType);
+		return this.middlewareDatasetService.getDatasetMeasurementVariablesByVariableType(studyId, variableTypes);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {

@@ -362,14 +362,14 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		obsDto.setVariables(map);
 
 		Mockito.when(this.studyDatasetService.countAllObservationUnitsForDataset(
-			org.mockito.Matchers.anyInt(),
-			org.mockito.Matchers.anyInt(), ArgumentMatchers.anyBoolean()))
+			ArgumentMatchers.anyInt(),
+			ArgumentMatchers.anyList(), ArgumentMatchers.anyBoolean()))
 			.thenReturn(100);
 		Mockito.when(this.studyDatasetService.countFilteredObservationUnitsForDataset(
-			org.mockito.Matchers.anyInt(),
-			org.mockito.Matchers.anyInt(), ArgumentMatchers.anyBoolean(), ArgumentMatchers.any()))
+			ArgumentMatchers.anyInt(),
+			ArgumentMatchers.anyList(), ArgumentMatchers.anyBoolean(), ArgumentMatchers.any()))
 			.thenReturn(100L);
-		Mockito.when(this.studyDatasetService.getObservationUnitRows(org.mockito.Matchers.anyInt(), org.mockito.Matchers.anyInt(),
+		Mockito.when(this.studyDatasetService.getObservationUnitRows(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(),
 			ArgumentMatchers.any(), ArgumentMatchers.any()))
 			.thenReturn(Lists.newArrayList(obsDto));
 		final Random random = new Random();
@@ -378,7 +378,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-		searchDTO.setInstanceId(instanceId);
+		searchDTO.setInstanceIds(Arrays.asList(instanceId));
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders.post(
@@ -430,7 +430,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-		searchDTO.setInstanceId(instanceId);
+		searchDTO.setInstanceIds(Arrays.asList(instanceId));
 		searchDTO.getFilterColumns().add("TRIAL_INSTANCE");
 		searchDTO.getFilterColumns().add("TRAIT1");
 		searchDTO.getFilterColumns().add("TRAIT2");
@@ -842,8 +842,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-
-		searchDTO.setInstanceId(instanceId);
+		searchDTO.setInstanceIds(Arrays.asList(instanceId));
 
 		paramDTO.setObservationUnitsSearchDTO(searchDTO);
 		paramDTO.setNewValue("123");
@@ -868,7 +867,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int instanceId = random.nextInt(10000);
 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-		searchDTO.setInstanceId(instanceId);
+		searchDTO.setInstanceIds(Arrays.asList(instanceId));
 		searchDTO.setDatasetId(datasetId);
 
 		this.mockMvc

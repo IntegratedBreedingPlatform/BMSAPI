@@ -17,6 +17,7 @@ import org.springframework.validation.MapBindingResult;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
 		for(final Integer instanceDBID: selectedDatasetInstancesMap.keySet()) {
 			final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-			searchDTO.setInstanceId(selectedDatasetInstancesMap.get(instanceDBID).getInstanceId());
+			searchDTO.setInstanceIds(Arrays.asList(selectedDatasetInstancesMap.get(instanceDBID).getInstanceId()));
 			final PageRequest pageRequest = new PageRequest(0, Integer.MAX_VALUE);
 			final List<ObservationUnitRow> observationUnitRows = this.studyDatasetService
 				.getObservationUnitRows(study.getId(), dataset.getDatasetId(), searchDTO, pageRequest);
