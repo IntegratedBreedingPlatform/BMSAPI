@@ -954,9 +954,17 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.processSearchComposite(request.getSearchRequest());
 
+		final ObservationUnitsSearchDTO observationUnitsSearchDTO = request.getSearchRequest().getSearchRequest();
+
+		// Add the required observation table columns necessary for this function
+		final Map<Integer, String> requiredColumns =
+			this.ontologyDataManager.getTermsByIds(Lists.newArrayList(TermId.TRIAL_INSTANCE_FACTOR.getId(),
+				TermId.OBS_UNIT_ID.getId())).stream().collect(Collectors.toMap(Term::getId, Term::getName));
+		observationUnitsSearchDTO.setVisibleColumns(new HashSet<>(requiredColumns.values()));
+
 		// observation units
 		final List<ObservationUnitRow> observationUnitRows =
-			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest().getSearchRequest(),null);
+			this.getObservationUnitRows(studyId, datasetId, observationUnitsSearchDTO, null);
 		if (observationUnitRows.isEmpty()) {
 			errors.reject("study.entry.replace.empty.units", "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
@@ -995,8 +1003,16 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.processSearchComposite(request);
 
+		final ObservationUnitsSearchDTO observationUnitsSearchDTO = request.getSearchRequest();
+
+		// Add the required observation table columns necessary for this function
+		final Map<Integer, String> requiredColumns =
+			this.ontologyDataManager.getTermsByIds(Lists.newArrayList(TermId.TRIAL_INSTANCE_FACTOR.getId())).stream()
+				.collect(Collectors.toMap(Term::getId, Term::getName));
+		observationUnitsSearchDTO.setVisibleColumns(new HashSet<>(requiredColumns.values()));
+
 		final List<ObservationUnitRow> observationUnitRows =
-			this.getObservationUnitRows(studyId, datasetId, request.getSearchRequest(),null);
+			this.getObservationUnitRows(studyId, datasetId, observationUnitsSearchDTO,null);
 
 		final ObservationUnitsMetadata observationUnitsMetadata = new ObservationUnitsMetadata();
 		observationUnitsMetadata.setObservationUnitsCount(Long.valueOf(observationUnitRows.size()));
