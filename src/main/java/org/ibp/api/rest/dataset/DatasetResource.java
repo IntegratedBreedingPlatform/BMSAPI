@@ -554,7 +554,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation( value = "Returns the variables associated to the given study filtered by a given variable types")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/variables/types/{variableTypeIds}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<MeasurementVariable>> getStudyVariablesByVariableTypes(@PathVariable final String crop,
