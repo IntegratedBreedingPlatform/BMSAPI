@@ -117,8 +117,8 @@ import org.generationcp.middleware.operation.transformer.etl.MeasurementVariable
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.preset.PresetMapper;
 import org.generationcp.middleware.ruleengine.impl.RulesServiceImpl;
-import org.generationcp.middleware.ruleengine.naming.impl.GermplasmNamingServiceImpl;
-import org.generationcp.middleware.ruleengine.naming.service.GermplasmNamingService;
+import org.generationcp.middleware.ruleengine.namingdeprecated.impl.DeprecatedGermplasmNamingServiceImpl;
+import org.generationcp.middleware.ruleengine.namingdeprecated.service.DeprecatedGermplasmNamingService;
 import org.generationcp.middleware.ruleengine.service.RulesService;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
@@ -154,6 +154,7 @@ import org.generationcp.middleware.service.api.rpackage.RPackageService;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.service.api.study.advance.AdvanceService;
 import org.generationcp.middleware.service.api.study.StudyTreeService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
@@ -179,6 +180,7 @@ import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyEntryServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
+import org.generationcp.middleware.service.impl.study.advance.AdvanceServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyTreeServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
@@ -506,8 +508,8 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public GermplasmNamingService getGermplasmNamingService() {
-		return new GermplasmNamingServiceImpl();
+	public DeprecatedGermplasmNamingService getGermplasmNamingService() {
+		return new DeprecatedGermplasmNamingServiceImpl();
 	}
 
 	@Bean
@@ -914,6 +916,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public StudyEntryObservationService getStudyEntryObservationService() {
 		return new StudyEntryObservationServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public AdvanceService getAdvanceService() {
+		return new AdvanceServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean

@@ -21,7 +21,8 @@ import org.springframework.stereotype.Component;
 @ComponentScan(basePackages = {
 	"org.generationcp.middleware.ruleengine.coding.expression",
 	"org.generationcp.middleware.ruleengine.coding",
-	"org.generationcp.middleware.ruleengine.stockid"
+	"org.generationcp.middleware.ruleengine.stockid",
+	"org.generationcp.middleware.ruleengine.naming"
 })
 public class RulesPostProcessor implements BeanPostProcessor {
 
@@ -35,16 +36,16 @@ public class RulesPostProcessor implements BeanPostProcessor {
 	private CodingExpressionFactory codingExpressionFactory;
 
 	@Override
-	public Object postProcessBeforeInitialization(Object o, String s) throws BeansException {
+	public Object postProcessBeforeInitialization(final Object o, final String s) throws BeansException {
 		// do nothing
 		return o;
 	}
 
 	@Override
-	public Object postProcessAfterInitialization(Object o, String s) throws BeansException {
+	public Object postProcessAfterInitialization(final Object o, final String s) throws BeansException {
 
 		if (o instanceof Rule) {
-			Rule rule = (Rule) o;
+			final Rule rule = (Rule) o;
 			this.ruleFactory.addRule(rule);
 		}
 		if (o instanceof Expression) {
