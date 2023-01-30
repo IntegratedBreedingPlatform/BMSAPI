@@ -11,20 +11,11 @@ import java.util.List;
 @AutoProperty
 public class UserTreeState {
 
-	private String userId;
 	private List<String> programFolders = new ArrayList<>();
 	private List<String> cropFolders = new ArrayList<>();
 
 	public UserTreeState() {
 
-	}
-
-	public String getUserId() {
-		return this.userId;
-	}
-
-	public void setUserId(final String userId) {
-		this.userId = userId;
 	}
 
 	public List<String> getProgramFolders() {

@@ -6,6 +6,7 @@ import org.generationcp.commons.constant.ListTreeState;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.commons.workbook.generator.RowColumnType;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -149,10 +150,9 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 	}
 
 	@Override
-	public List<TreeNode> getUserTreeState(final String crop, final String programUUID, final String userId) {
+	public List<TreeNode> getUserTreeState(final String crop, final String programUUID) {
 		this.errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.validateProgram(crop, programUUID);
-		this.userValidator.validateUserId(this.errors, userId);
 		if (this.errors.hasErrors()) {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
@@ -160,13 +160,13 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 		final List<TreeNode> treeNodesList = this.getChildrenNodes(programUUID, null, false);
 		// Retrieve the list of "Crop List" expanded nodes
 		final List<String> cropExpandedFolders = this.userProgramStateDataManager
-			.getUserProgramTreeState(Integer.parseInt(userId), null, ListTreeState.GERMPLASM_LIST.name());
+			.getUserProgramTreeState(ContextHolder.getLoggedInUserId(), null, ListTreeState.GERMPLASM_LIST.name());
 		this.setTreeExpandedFolders(programUUID, treeNodesList.get(0), cropExpandedFolders, false);
 
 		// Retrieve the list of "Program List" expanded nodes
 		if (StringUtils.isNotEmpty(programUUID)) {
 			final List<String> programExpandedFolders = this.userProgramStateDataManager
-				.getUserProgramTreeState(Integer.parseInt(userId), programUUID, ListTreeState.GERMPLASM_LIST.name());
+				.getUserProgramTreeState(ContextHolder.getLoggedInUserId(), programUUID, ListTreeState.GERMPLASM_LIST.name());
 			this.setTreeExpandedFolders(programUUID, treeNodesList.get(1), programExpandedFolders, true);
 		}
 
@@ -208,9 +208,6 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 		checkNotNull(userTreeState, "param.null", new String[] {"treeState"});
 		this.validateProgram(crop, programUUID);
 
-		final String userIdString = userTreeState.getUserId();
-		this.userValidator.validateUserId(this.errors, userIdString);
-
 		final List<String> programFolders = userTreeState.getProgramFolders();
 		this.validateFolders(programFolders, programUUID);
 		if(userTreeState.getCropFolders() != null) {
@@ -222,12 +219,11 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 		}
 
 		// Persist the Program and Crop tree state for user
-		final int userId = Integer.parseInt(userIdString);
-		this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(userId, programUUID, ListTreeState.GERMPLASM_LIST.name(),
+		this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(ContextHolder.getLoggedInUserId(), programUUID, ListTreeState.GERMPLASM_LIST.name(),
 			programFolders);
 		if(userTreeState.getCropFolders() != null) {
 			final List<String> cropFolders = userTreeState.getCropFolders();
-			this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(userId, null, ListTreeState.GERMPLASM_LIST.name(),
+			this.userProgramStateDataManager.saveOrUpdateUserProgramTreeState(ContextHolder.getLoggedInUserId(), null, ListTreeState.GERMPLASM_LIST.name(),
 				cropFolders);
 		}
 	}
