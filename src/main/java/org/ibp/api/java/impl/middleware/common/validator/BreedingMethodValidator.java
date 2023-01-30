@@ -42,6 +42,14 @@ public class BreedingMethodValidator {
 	@Autowired
 	private GermplasmNameTypeService germplasmNameTypeService;
 
+	public BreedingMethodDTO validateMethod(final Integer breedingMethodDbId) {
+		final Optional<BreedingMethodDTO> methodOptional = this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
+		if (!methodOptional.isPresent()) {
+			throw new ApiRequestValidationException("breeding.methods.not.exists", new Integer[] {breedingMethodDbId});
+		}
+		return methodOptional.get();
+	}
+
 	public void validateCreation(final BreedingMethodNewRequest breedingMethod) {
 		checkNotNull(breedingMethod, "request.null");
 		checkArgument(!isBlank(breedingMethod.getName()), FIELD_IS_REQUIRED, new String[] {"name"});
@@ -77,10 +85,7 @@ public class BreedingMethodValidator {
 	}
 
 	public void validateEdition(final Integer breedingMethodDbId, final BreedingMethodNewRequest breedingMethodRequest) {
-		final Optional<BreedingMethodDTO> methodOptional = this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
-		if (!methodOptional.isPresent()) {
-			throw new ApiRequestValidationException("breeding.methods.not.exists", new Integer[] {breedingMethodDbId});
-		}
+		this.validateMethod(breedingMethodDbId);
 
 		/*
 		 * Validate combinations of numberOfProgenitors, methodType, methodClasses
@@ -113,10 +118,7 @@ public class BreedingMethodValidator {
 	}
 
 	public void validateDeletion(final Integer breedingMethodDbId) {
-		final Optional<BreedingMethodDTO> methodOptional = this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
-		if (!methodOptional.isPresent()) {
-			throw new ApiRequestValidationException("breeding.methods.not.exists", new Integer[] {breedingMethodDbId});
-		}
+		final BreedingMethodDTO breedingMethodDTO = this.validateMethod(breedingMethodDbId);
 
 		// We avoid count for now as it can be slow
 		final Optional<Germplasm> germplasmOptional = this.germplasmMiddlewareService.findOneByMethodId(breedingMethodDbId);
@@ -125,7 +127,6 @@ public class BreedingMethodValidator {
 				new String[] {germplasmOptional.get().getGid().toString()});
 		}
 
-		final BreedingMethodDTO breedingMethodDTO = methodOptional.get();
 		final long projectCount = this.datasetService.countByVariableIdAndValue(TermId.BREEDING_METHOD_CODE.getId(),
 			breedingMethodDTO.getCode());
 		if (projectCount > 0) {
