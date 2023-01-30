@@ -229,7 +229,6 @@ public class DatasetResource {
 		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
 		Preconditions.checkNotNull(searchDTO, "params cannot be null");
 
-		final Integer instanceId = searchDTO.getInstanceId();
 		final Boolean draftMode = searchDTO.getDraftMode();
 
 		final PagedResult<ObservationUnitRow> pageResult =
@@ -237,13 +236,13 @@ public class DatasetResource {
 
 				@Override
 				public long getCount() {
-					return DatasetResource.this.studyDatasetService.countAllObservationUnitsForDataset(datasetId, instanceId, draftMode);
+					return DatasetResource.this.studyDatasetService.countAllObservationUnitsForDataset(datasetId, searchDTO.getInstanceIds(), draftMode);
 				}
 
 				@Override
 				public long getFilteredCount() {
 					return DatasetResource.this.studyDatasetService
-						.countFilteredObservationUnitsForDataset(datasetId, instanceId, searchDTO.getDraftMode(), searchDTO.getFilter());
+						.countFilteredObservationUnitsForDataset(datasetId, searchDTO.getInstanceIds(), searchDTO.getDraftMode(), searchDTO.getFilter());
 				}
 
 				@Override
@@ -548,6 +547,18 @@ public class DatasetResource {
 		@RequestBody final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO) {
 		this.studyDatasetService.updatePlotDatasetProperties(studyId, plotDatasetPropertiesDTO, programUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation( value = "Returns the variables associated to the given study filtered by a given variable types")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/variables/types/{variableTypeIds}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<MeasurementVariable>> getStudyVariablesByVariableTypes(@PathVariable final String crop,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@PathVariable final List<Integer> variableTypeIds) {
+		final List<MeasurementVariable> variables = this.studyDatasetService.getVariablesByVariableTypes(studyId, variableTypeIds);
+		return new ResponseEntity<>(variables, HttpStatus.OK);
 	}
 
 	public ResourceBundleMessageSource getMessageSource() {

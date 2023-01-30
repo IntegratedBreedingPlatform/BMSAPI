@@ -70,6 +70,14 @@ public class DatasetValidator {
 		this.validateDatasetBelongsToStudy(studyId, datasetId);
 	}
 
+	public void validateDataset(final Integer datasetId) {
+		final DatasetDTO datasetDTO = this.middlewareDatasetService.getDataset(datasetId);
+		if (datasetDTO == null) {
+			this.errors.reject("dataset.does.not.exist", "");
+			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
+		}
+	}
+
 	public void validateObservationDatasetType(final Integer datasetId) {
 		final DatasetDTO datasetBasicDTO = this.middlewareDatasetService.getDataset(datasetId);
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(datasetBasicDTO.getDatasetTypeId());
@@ -176,14 +184,18 @@ public class DatasetValidator {
 		}
 	}
 
-	private VariableType validateDatasetVariableType(final DatasetTypeDTO datasetType, final Integer variableTypeId,
-		final Boolean studyHasExperimentDesign) {
+	public VariableType validateVariableType(final Integer variableTypeId) {
 		final VariableType variableType = VariableType.getById(variableTypeId);
 		if (variableType == null) {
 			this.errors.reject("variable.type.does.not.exist", "");
 			throw new ResourceNotFoundException(this.errors.getAllErrors().get(0));
 		}
+		return variableType;
+	}
 
+	private VariableType validateDatasetVariableType(final DatasetTypeDTO datasetType, final Integer variableTypeId,
+		final Boolean studyHasExperimentDesign) {
+		final VariableType variableType = this.validateVariableType(variableTypeId);
 		if (this.isInvalidVariableTypeForDatasetType(datasetType, variableType)) {
 			this.errors.reject("variable.type.not.supported", "");
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));

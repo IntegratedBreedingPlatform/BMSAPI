@@ -47,8 +47,7 @@ public interface DatasetService {
 	 * @param datasetId Id of the Dataset
 	 * @return List of Measurement Variables.
 	 */
-	List<MeasurementVariable> getSubObservationSetVariables(
-		Integer studyId, Integer datasetId);
+	List<MeasurementVariable> getSubObservationSetVariables(Integer studyId, Integer datasetId);
 
 	/**
 	 * Given a dataset and a list of variables, it will count how many observations it has associated.
@@ -260,11 +259,11 @@ public interface DatasetService {
 	 * units with at least one draft observation)
 	 *
 	 * @param datasetId  Id of the dataset
-	 * @param instanceId Id of the instance
+	 * @param instanceIds Id of the instance
 	 * @param draftMode  Indicates to count all observation units  or draft observations
 	 * @return Number of observations units that matches the dataset id and draftMode
 	 */
-	Integer countAllObservationUnitsForDataset(Integer datasetId, Integer instanceId, Boolean draftMode);
+	Integer countAllObservationUnitsForDataset(Integer datasetId, List<Integer> instanceIds, Boolean draftMode);
 
 	/**
 	 * Count how many observation units are affected by a filter
@@ -272,13 +271,13 @@ public interface DatasetService {
 	 * units with at least one draft observation)
 	 *
 	 * @param datasetId  Id of the dataset
-	 * @param instanceId Id of the instance
+	 * @param instanceIds Id of the instance
 	 * @param draftMode  draftMode
 	 * @param filter     Filyer
 	 * @return Number of observation units that matches the datasetId, draftMode and filter
 	 */
 	long countFilteredObservationUnitsForDataset(
-		Integer datasetId, Integer instanceId, Boolean draftMode, ObservationUnitsSearchDTO.Filter filter);
+		Integer datasetId, List<Integer> instanceIds, Boolean draftMode, ObservationUnitsSearchDTO.Filter filter);
 
 	/**
 	 * It will accept all the draft data even when there are out of bounds values for numerical types.
@@ -351,5 +350,7 @@ public interface DatasetService {
 	void updatePlotDatasetProperties(Integer studyId, PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, String programUUID);
 
 	List<GermplasmNameTypeDTO> getAllPlotDatasetNameTypes(Integer datasetId);
+
+	List<MeasurementVariable> getVariablesByVariableTypes(Integer studyId, List<Integer> variableTypes);
 
 }
