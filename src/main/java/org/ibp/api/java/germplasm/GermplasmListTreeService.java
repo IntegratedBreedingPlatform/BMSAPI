@@ -10,7 +10,7 @@ public interface GermplasmListTreeService {
 	List<TreeNode> getGermplasmListChildrenNodes(
 		String crop, String programUUID, String parentId, Boolean folderOnly);
 
-	List<TreeNode> getUserTreeState(String crop, String programUUID, String userId);
+	List<TreeNode> getUserTreeState(String crop, String programUUID);
 
 	void saveGermplasmListTreeState(String crop, String programUUID, UserTreeState userTreeState);
 

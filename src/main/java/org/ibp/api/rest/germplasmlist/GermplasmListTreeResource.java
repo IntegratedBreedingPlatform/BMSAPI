@@ -115,9 +115,8 @@ public class GermplasmListTreeResource {
 	@ResponseBody
 	public ResponseEntity<List<TreeNode>> getUserTreeState(
 		@ApiParam(value = "The crop type", required = true) @PathVariable final String crop,
-		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
-		@ApiParam(value = "The User ID") @RequestParam(required = true) final String userId) {
-		return new ResponseEntity<>(this.germplasmListTreeService.getUserTreeState(crop, programUUID, userId), HttpStatus.OK);
+		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID) {
+		return new ResponseEntity<>(this.germplasmListTreeService.getUserTreeState(crop, programUUID), HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Save hierarchy of germplasm list folders last used by user", notes = "Save hierarchy of germplasm list folders last used by user")
