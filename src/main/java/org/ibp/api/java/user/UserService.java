@@ -13,15 +13,15 @@ public interface UserService {
 
 	List<UserDto> getAllUsersSortedByLastName();
 
-	Integer createUser(final UserDto user);
+	Integer createUser(UserDto user);
 
-	Integer updateUser(final UserDto user);
+	Integer updateUser(UserDto user);
 
-	List<UserDto> getUsersByProjectUUID(final String projectUUID);
+	List<UserDto> getUsersByProjectUUID(String projectUUID);
 
-	UserDto getUserWithAuthorities(final String cropName, final String programUuid);
+	UserDto getUserWithAuthorities(String cropName, String programUuid);
 
-	void updateUserProfile(final UserProfileUpdateRequestDTO userProfileUpdateRequestDTO, final WorkbenchUser workbenchUser);
+	void updateUserProfile(UserProfileUpdateRequestDTO userProfileUpdateRequestDTO, WorkbenchUser workbenchUser);
 
 	List<UserDto> getMembersEligibleUsers(String programUUID, ProgramEligibleUsersSearchRequest searchRequest, Pageable pageable);
 
