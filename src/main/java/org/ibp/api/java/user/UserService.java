@@ -1,6 +1,7 @@
 
 package org.ibp.api.java.user;
 
+import org.generationcp.middleware.api.user.UserSearchRequest;
 import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserDto;
@@ -27,4 +28,7 @@ public interface UserService {
 
 	long countAllMembersEligibleUsers(String programUUID, ProgramEligibleUsersSearchRequest searchRequest);
 
+	long countSearchUsers(UserSearchRequest userSearchRequest);
+
+	List<UserDto> searchUsers(UserSearchRequest userSearchRequest, Pageable pageable);
 }
