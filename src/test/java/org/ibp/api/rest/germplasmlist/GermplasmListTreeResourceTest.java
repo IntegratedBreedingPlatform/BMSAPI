@@ -34,15 +34,14 @@ public class GermplasmListTreeResourceTest extends ApiUnitTestBase {
 	public void testGetUserTreeState() throws Exception {
 
 		final String crop = CropType.CropEnum.MAIZE.name().toLowerCase();
-		final String userId = RandomStringUtils.randomNumeric(2);
 		final List<TreeNode> list = this.getTreeNodes();
-		doReturn(list).when(this.germplasmListTreeService).getUserTreeState(crop, GermplasmListTreeResourceTest.PROGRAM_UUID, userId);
+		doReturn(list).when(this.germplasmListTreeService).getUserTreeState(crop, GermplasmListTreeResourceTest.PROGRAM_UUID);
 
 		final TreeNode firstNode = list.get(0);
 		final TreeNode secondNode = list.get(1);
 		final TreeNode childNode = list.get(1).getChildren().get(0);
 		this.mockMvc.perform(MockMvcRequestBuilders.get("/crops/{crop}/germplasm-lists/tree-state",
-			crop).param("programUUID", GermplasmListTreeResourceTest.PROGRAM_UUID).param("userId", userId)
+			crop).param("programUUID", GermplasmListTreeResourceTest.PROGRAM_UUID)
 			.contentType(this.contentType))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print())
@@ -76,9 +75,7 @@ public class GermplasmListTreeResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testSaveUserTreeState() throws Exception {
 		final String crop = CropType.CropEnum.MAIZE.name().toLowerCase();
-		final String userId = RandomStringUtils.randomNumeric(2);
 		final UserTreeState treeState = new UserTreeState();
-		treeState.setUserId(userId);
 		treeState.setProgramFolders(Lists.newArrayList(GermplasmListTreeServiceImpl.PROGRAM_LISTS, "5", "7"));
 		treeState.setCropFolders(Lists.newArrayList(GermplasmListTreeServiceImpl.CROP_LISTS, "15", "17"));
 		this.mockMvc.perform(MockMvcRequestBuilders.post("/crops/{crop}/germplasm-lists/tree-state",
