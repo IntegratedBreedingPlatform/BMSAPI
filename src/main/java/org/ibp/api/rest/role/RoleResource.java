@@ -1,11 +1,17 @@
 package org.ibp.api.rest.role;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.RoleGeneratorInput;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.role.RoleService;
+import org.ibp.api.rest.common.PaginatedSearch;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -26,11 +33,19 @@ public class RoleResource {
 	@Autowired
 	private RoleService roleService;
 
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "Results page you want to retrieve (0..N)"),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page.")
+	})
 	@ApiOperation(value = "Filter roles", notes = "Filter roles")
 	@RequestMapping(value = "/roles/search", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<List<RoleDto>> getFilteredRoles(@RequestBody final RoleSearchDto searchDTO) {
-		return new ResponseEntity<>(this.roleService.getRoles(searchDTO), HttpStatus.OK);
+	public ResponseEntity<List<RoleDto>> getFilteredRoles(@RequestBody final RoleSearchDto searchDTO,
+		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+		return new PaginatedSearch().getPagedResult(() -> this.roleService.countRolesUsers(searchDTO),
+			() -> this.roleService.searchRoles(searchDTO, pageable), pageable);
 	}
 
 	@ApiOperation(value = "Save role", notes = "Save role. ")
