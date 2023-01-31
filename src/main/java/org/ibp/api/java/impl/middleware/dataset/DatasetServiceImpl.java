@@ -392,7 +392,7 @@ public class DatasetServiceImpl implements DatasetService {
 				final String sortProperty;
 				if (NumberUtils.isNumber(sort.getProperty()) && Integer.valueOf(sort.getProperty()) > 0) {
 					final Term term = this.ontologyDataManager.getTermById(Integer.valueOf(sort.getProperty()));
-						sortProperty = term.getName();
+					sortProperty = term.getName();
 				} else {
 					sortProperty = sort.getProperty();
 				}
@@ -602,7 +602,8 @@ public class DatasetServiceImpl implements DatasetService {
 				observationUnitsTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
 		}
 		if (!errors.hasErrors()) {
-			final Table<String, Integer, Integer> observationDbIdsTable = this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode(), true);
+			final Table<String, Integer, Integer> observationDbIdsTable =
+				this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode(), true);
 			// We need to return the observationDbIds (mapped in a table by observationUnitId and variableId) of the created/updated observations.
 			observations.stream().forEach(
 				o -> o.setObservationDbId(observationDbIdsTable.get(o.getObservationUnitDbId(), o.getObservationVariableDbId())));
@@ -973,7 +974,8 @@ public class DatasetServiceImpl implements DatasetService {
 			Collectors.toList());
 		final StudyTransactionsRequest studyTransactionsRequest = new StudyTransactionsRequest();
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
-		transactionsSearchDto.setTransactionStatus(Lists.newArrayList(TransactionStatus.PENDING.getIntValue(),TransactionStatus.CONFIRMED.getIntValue()));
+		transactionsSearchDto.setTransactionStatus(
+			Lists.newArrayList(TransactionStatus.PENDING.getIntValue(), TransactionStatus.CONFIRMED.getIntValue()));
 		studyTransactionsRequest.setTransactionsSearch(transactionsSearchDto);
 		studyTransactionsRequest.setObservationUnitIds(observationUnitIds);
 
@@ -995,7 +997,6 @@ public class DatasetServiceImpl implements DatasetService {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), SearchCompositeDto.class.getName());
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(request, errors);
 
-
 		this.processSearchComposite(request);
 
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = request.getSearchRequest();
@@ -1007,11 +1008,12 @@ public class DatasetServiceImpl implements DatasetService {
 		observationUnitsSearchDTO.setVisibleColumns(new HashSet<>(requiredColumns.values()));
 
 		final List<ObservationUnitRow> observationUnitRows =
-			this.getObservationUnitRows(studyId, datasetId, observationUnitsSearchDTO,null);
+			this.getObservationUnitRows(studyId, datasetId, observationUnitsSearchDTO, null);
 
 		final ObservationUnitsMetadata observationUnitsMetadata = new ObservationUnitsMetadata();
 		observationUnitsMetadata.setObservationUnitsCount(Long.valueOf(observationUnitRows.size()));
-		observationUnitsMetadata.setInstancesCount(observationUnitRows.stream().map(ObservationUnitRow::getTrialInstance).distinct().count());
+		observationUnitsMetadata.setInstancesCount(
+			observationUnitRows.stream().map(ObservationUnitRow::getTrialInstance).distinct().count());
 		return observationUnitsMetadata;
 	}
 
@@ -1022,7 +1024,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void updatePlotDatasetProperties(final Integer studyId, final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO, final String programUUID) {
+	public void updatePlotDatasetProperties(final Integer studyId, final PlotDatasetPropertiesDTO plotDatasetPropertiesDTO,
+		final String programUUID) {
 		this.studyValidator.validate(studyId, true);
 
 		if (!CollectionUtils.isEmpty(plotDatasetPropertiesDTO.getVariableIds())) {
@@ -1032,7 +1035,8 @@ public class DatasetServiceImpl implements DatasetService {
 		if (!CollectionUtils.isEmpty(plotDatasetPropertiesDTO.getNameTypeIds())) {
 			this.germplasmNameTypeValidator.validate(new HashSet<>(plotDatasetPropertiesDTO.getNameTypeIds()));
 		}
-		this.studyValidator.validateUpdateStudyEntryColumnsWithSupportedVariableTypes(plotDatasetPropertiesDTO.getVariableIds(), programUUID);
+		this.studyValidator.validateUpdateStudyEntryColumnsWithSupportedVariableTypes(plotDatasetPropertiesDTO.getVariableIds(),
+			programUUID);
 		this.studyValidator.validateMaxStudyEntryColumnsAllowed(plotDatasetPropertiesDTO, programUUID);
 
 		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, plotDatasetPropertiesDTO, programUUID);
@@ -1070,8 +1074,8 @@ public class DatasetServiceImpl implements DatasetService {
 	private void correctKSUDateFormatIfNecessary(final Table<String, String, String> table,
 		final List<MeasurementVariable> measurementVariables) {
 		final List<String> dateVariables = measurementVariables.stream().filter(
-			measurementVariable -> measurementVariable.getDataTypeId() != null
-				&& measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId())
+				measurementVariable -> measurementVariable.getDataTypeId() != null
+					&& measurementVariable.getDataTypeId() == TermId.DATE_VARIABLE.getId())
 			.map(MeasurementVariable::getName).collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(dateVariables)) {
 			for (final String colVariable : table.columnKeySet()) {

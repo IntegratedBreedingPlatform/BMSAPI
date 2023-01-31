@@ -1,8 +1,6 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
 import com.google.common.collect.Sets;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.service.StockService;
 import org.generationcp.commons.spring.util.ContextUtil;
@@ -161,7 +159,8 @@ public class LotServiceImpl implements LotService {
 			lotGeneratorInputDto.setStockId(nextStockIDPrefix + "1");
 		}
 
-		return this.lotService.saveLot(this.contextUtil.getProjectInContext().getCropType(), loggedInUser.getUserid(), lotGeneratorInputDto);
+		return this.lotService.saveLot(this.contextUtil.getProjectInContext().getCropType(), loggedInUser.getUserid(),
+			lotGeneratorInputDto);
 	}
 
 	@Override
@@ -212,7 +211,8 @@ public class LotServiceImpl implements LotService {
 						(ObservationUnitsSearchDTO) this.searchRequestService
 							.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(),
 								ObservationUnitsSearchDTO.class);
-					final DatasetDTO datasetDTO = this.studyDatasetService.getDataset(Integer.valueOf(observationUnitsSearchDTO.getDatasetId()));
+					final DatasetDTO datasetDTO =
+						this.studyDatasetService.getDataset(Integer.valueOf(observationUnitsSearchDTO.getDatasetId()));
 					this.studyValidator.validate(datasetDTO.getParentDatasetId(), false);
 					this.datasetValidator.validateDataset(datasetDTO.getParentDatasetId(), observationUnitsSearchDTO.getDatasetId());
 
@@ -310,9 +310,9 @@ public class LotServiceImpl implements LotService {
 		this.lotMergeValidator.validate(keepLotUUID, lotDtos);
 
 		final ExtendedLotDto lotDto = lotDtos.stream()
-				.filter(extendedLotDto -> keepLotUUID.equals(extendedLotDto.getLotUUID()))
-				.findFirst()
-				.get();
+			.filter(extendedLotDto -> keepLotUUID.equals(extendedLotDto.getLotUUID()))
+			.findFirst()
+			.get();
 
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		this.lotService.mergeLots(loggedInUser.getUserid(), lotDto.getLotId(), lotsSearchDto);
@@ -329,7 +329,8 @@ public class LotServiceImpl implements LotService {
 
 		final ExtendedLotDto splitLotDto = splitLotDtosSearchResult.get(0);
 		final LotSplitRequestDto.InitialLotDepositDto initialDeposit = lotSplitRequestDto.getInitialDeposit();
-		this.lotSplitValidator.validateSplitLot(programUUID, splitLotDto, lotSplitRequestDto.getNewLot(), lotSplitRequestDto.getInitialDeposit());
+		this.lotSplitValidator.validateSplitLot(programUUID, splitLotDto, lotSplitRequestDto.getNewLot(),
+			lotSplitRequestDto.getInitialDeposit());
 
 		//Creates the new lot
 		final LotSplitRequestDto.NewLotSplitDto newLot = lotSplitRequestDto.getNewLot();

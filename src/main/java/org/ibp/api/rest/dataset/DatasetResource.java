@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.fest.util.Collections;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
@@ -95,7 +94,8 @@ public class DatasetResource {
 		+ "that will be shown in the Observation Table")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/table/columns", method = RequestMethod.GET)
-	public ResponseEntity<List<MeasurementVariable>> getObservationSetColumns(@PathVariable final String crop, @PathVariable final String programUUID,
+	public ResponseEntity<List<MeasurementVariable>> getObservationSetColumns(@PathVariable final String crop,
+		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId,
 		@RequestParam(required = false) final Boolean draftMode) {
@@ -203,7 +203,8 @@ public class DatasetResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/datasets/{parentId}/generation", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<DatasetDTO> generateDataset(@PathVariable final String cropName, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+	public ResponseEntity<DatasetDTO> generateDataset(@PathVariable final String cropName, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
 		@PathVariable final Integer parentId, @RequestBody final DatasetGeneratorInput datasetGeneratorInput) {
 
 		return new ResponseEntity<>(
@@ -222,7 +223,8 @@ public class DatasetResource {
 		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
 			value = "Sorting criteria in the format: property,asc|desc. ")
 	})
-	public ResponseEntity<List<ObservationUnitRow>> getObservationUnitTable(@PathVariable final String cropname, @PathVariable final String programUUID,
+	public ResponseEntity<List<ObservationUnitRow>> getObservationUnitTable(@PathVariable final String cropname,
+		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId, //
 		@PathVariable final Integer datasetId, //
 		@RequestBody final ObservationUnitsSearchDTO searchDTO,
@@ -236,13 +238,15 @@ public class DatasetResource {
 
 				@Override
 				public long getCount() {
-					return DatasetResource.this.studyDatasetService.countAllObservationUnitsForDataset(datasetId, searchDTO.getInstanceIds(), draftMode);
+					return DatasetResource.this.studyDatasetService.countAllObservationUnitsForDataset(datasetId,
+						searchDTO.getInstanceIds(), draftMode);
 				}
 
 				@Override
 				public long getFilteredCount() {
 					return DatasetResource.this.studyDatasetService
-						.countFilteredObservationUnitsForDataset(datasetId, searchDTO.getInstanceIds(), searchDTO.getDraftMode(), searchDTO.getFilter());
+						.countFilteredObservationUnitsForDataset(datasetId, searchDTO.getInstanceIds(), searchDTO.getDraftMode(),
+							searchDTO.getFilter());
 				}
 
 				@Override
@@ -267,7 +271,8 @@ public class DatasetResource {
 		@RequestBody final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
 
 		final Locale locale = LocaleContextHolder.getLocale();
-		Preconditions.checkNotNull(observationUnitsSearchDTO, this.getMessageSource().getMessage("parameters.cannot.be.null", null, locale));
+		Preconditions.checkNotNull(observationUnitsSearchDTO,
+			this.getMessageSource().getMessage("parameters.cannot.be.null", null, locale));
 
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(observationUnitsSearchDTO, ObservationUnitsSearchDTO.class).toString();
@@ -294,7 +299,8 @@ public class DatasetResource {
 	@ApiOperation(value = "It will retrieve a list of datasets", notes = "Retrieves the list of datasets for the specified study.")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets", method = RequestMethod.GET)
-	public ResponseEntity<List<DatasetDTO>> getDatasets(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+	public ResponseEntity<List<DatasetDTO>> getDatasets(@PathVariable final String crop, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
 		@RequestParam(value = "datasetTypeIds", required = false) final Set<Integer> datasetTypeIds) {
 
 		return new ResponseEntity<>(this.studyDatasetService.getDatasets(studyId, datasetTypeIds), HttpStatus.OK);
@@ -315,7 +321,8 @@ public class DatasetResource {
 	@RequestMapping(
 		value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}",
 		method = RequestMethod.DELETE)
-	public ResponseEntity<Void> deleteObservation(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+	public ResponseEntity<Void> deleteObservation(@PathVariable final String crop, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @PathVariable final Integer observationUnitId,
 		@PathVariable final Integer observationId) {
 
@@ -328,7 +335,8 @@ public class DatasetResource {
 	@RequestMapping(
 		value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations",
 		method = RequestMethod.PUT)
-	public ResponseEntity<Void> postObservationUnits(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+	public ResponseEntity<Void> postObservationUnits(@PathVariable final String crop, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestBody final ObservationsPutRequestInput input) {
 
 		this.studyDatasetService.importObservations(studyId, datasetId, input);
@@ -346,7 +354,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Exports the dataset to a specified file type", notes = "Exports the dataset to a specified file type")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')"  + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/{fileType}", method = RequestMethod.GET)
 	public ResponseEntity<FileSystemResource> exportDataset(
 		@PathVariable final String crop, @PathVariable final String programUUID,
@@ -391,7 +399,8 @@ public class DatasetResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/acceptance", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Void> acceptDraftData(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+	public ResponseEntity<Void> acceptDraftData(@PathVariable final String crop, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 
 		this.studyDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
@@ -402,7 +411,8 @@ public class DatasetResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/rejection", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Void> rejectDraftData(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+	public ResponseEntity<Void> rejectDraftData(@PathVariable final String crop, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 
 		this.studyDatasetService.rejectDatasetDraftData(studyId, datasetId);
@@ -428,7 +438,8 @@ public class DatasetResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/drafts/set-as-missing", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Void> setValuesToMissing(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+	public ResponseEntity<Void> setValuesToMissing(@PathVariable final String crop, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId) {
 
 		this.studyDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
@@ -523,7 +534,7 @@ public class DatasetResource {
 		return new ResponseEntity<>(this.studyDatasetService.getObservationUnitsMetadata(studyId, datasetId, request), HttpStatus.OK);
 	}
 
-	@ApiOperation( value = "Count observation units of dataset", notes = "Returns count of observation units of dataset")
+	@ApiOperation(value = "Count observation units of dataset", notes = "Returns count of observation units of dataset")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES', 'BROWSE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units", method = RequestMethod.HEAD)
 	public ResponseEntity<String> countObservationUnits(
@@ -549,7 +560,7 @@ public class DatasetResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation( value = "Returns the variables associated to the given study filtered by a given variable types")
+	@ApiOperation(value = "Returns the variables associated to the given study filtered by a given variable types")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/variables/types", method = RequestMethod.GET)
 	@ResponseBody
