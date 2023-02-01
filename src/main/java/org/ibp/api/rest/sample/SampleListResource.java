@@ -31,9 +31,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Api(value = "Sample Services")
 @Controller
@@ -76,6 +78,17 @@ public class SampleListResource {
 			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
 		}
 		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Delete sample list entries", notes = "Delete sample list entries. ")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS', 'DELETE_SAMPLES')")
+	@RequestMapping(value = "/{crop}/sample-lists/{sampleListId}/entries", method = RequestMethod.DELETE)
+	@ResponseBody
+	public ResponseEntity deleteSampleListEntries(@PathVariable final String crop, @RequestParam final String programUUID,
+		@PathVariable final Integer sampleListId,
+		@RequestParam(required = true) final Set<Integer> selectedEntries) {
+		this.sampleListService.deleteSampleListEntries(sampleListId, new ArrayList<>(selectedEntries));
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create sample list folder", notes = "Create sample list folder. ")
