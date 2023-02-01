@@ -29,6 +29,7 @@ public interface VariableService {
 	 * @param variableFilter variable filter that to be applied to get variables
 	 * @return
 	 */
+	@Deprecated
 	List<VariableDetails> getVariablesByFilter(String cropName, String programId, VariableFilter variableFilter);
 
 	/**
@@ -74,11 +75,14 @@ public interface VariableService {
 	 * @param variablesIds array of ids to remove
 	 * @param programId program unique id
 	 */
-	void deleteVariablesFromCache(String cropname, final Integer[] variablesIds, String programId);
+	void deleteVariablesFromCache(String cropname, Integer[] variablesIds, String programId);
 
 	List<VariableDetails> getVariablesByFilter(VariableFilter variableFilter);
 
 	List<Variable> searchAttributeVariables(String query, List<Integer> variableTypeIds, String programUUID);
 
 	List<VariableDetails> createAnalysisVariables(AnalysisVariablesImportRequest analysisVariablesImportRequest);
+
+	List<Variable> searchVariables(org.generationcp.middleware.manager.ontology.daoElements.VariableFilter filter);
+
 }
