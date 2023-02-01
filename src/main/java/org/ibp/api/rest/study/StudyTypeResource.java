@@ -3,7 +3,6 @@ package org.ibp.api.rest.study;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.study.StudyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +19,7 @@ import java.util.List;
 
 @Api(value = "StudyType Services")
 @Controller
-@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
 @RequestMapping("/crops")
 public class StudyTypeResource {
 
