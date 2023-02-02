@@ -384,6 +384,7 @@ public class DatasetServiceImpl implements DatasetService {
 		// TODO: we need to remove this because it won't work when names will be added to observations table.
 		// We are assuming that every sort property correspond to a term, and this won't be longer valid for names
 		Pageable convertedPageable = null;
+		// TODO: Fix me! pagination must not depends if the sort parameter is present or not.
 		if (pageable != null && pageable.getSort() != null) {
 			final Iterator<Sort.Order> iterator = pageable.getSort().iterator();
 			if (iterator.hasNext()) {

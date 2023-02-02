@@ -6,12 +6,14 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.api.study.MyStudiesService;
 import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
+import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
@@ -52,7 +54,7 @@ public class StudyResource {
 	@ApiOperation(value = "Check if a study is sampled.",
 		notes = "Returns boolean indicating if there are samples associated to the study.")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/sampled", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<Boolean> hasSamples(final @PathVariable String cropName, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {
@@ -73,20 +75,9 @@ public class StudyResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get the study tree")
-	@RequestMapping(value = "/{cropName}/studies/tree", method = RequestMethod.GET)
-	@ResponseBody
-	public ResponseEntity<List<TreeNode>> getStudyTree(final @PathVariable String cropName,
-		@ApiParam("The program UUID") @RequestParam(required = false) final String programUUID,
-		@ApiParam(value = "The id of the parent folder") @RequestParam(required = false) final String parentFolderId) {
-
-		final List<TreeNode> studyTree = this.studyService.getStudyTree(parentFolderId, programUUID);
-		return new ResponseEntity<>(studyTree, HttpStatus.OK);
-	}
-
 	@ApiOperation("Get my studies along with statistical information")
 	@RequestMapping(value = "/{cropName}/my-studies", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
 			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
@@ -107,12 +98,12 @@ public class StudyResource {
 
 				@Override
 				public long getCount() {
-					return myStudiesService.countMyStudies(programUUID, userId);
+					return StudyResource.this.myStudiesService.countMyStudies(programUUID, userId);
 				}
 
 				@Override
 				public List<MyStudiesDTO> getResults(final PagedResult<MyStudiesDTO> pagedResult) {
-					return myStudiesService.getMyStudies(programUUID, pageable, userId);
+					return StudyResource.this.myStudiesService.getMyStudies(programUUID, pageable, userId);
 				}
 			});
 		final List<MyStudiesDTO> pageResults = result.getPageResults();
@@ -132,6 +123,7 @@ public class StudyResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
+	@Deprecated
 	@ApiOperation("Return a paginated list of studies.")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies", method = RequestMethod.GET)
 	@ApiImplicitParams({
@@ -151,7 +143,7 @@ public class StudyResource {
 	) {
 
 		final StudySearchRequest studySearchRequest = new StudySearchRequest();
-		studySearchRequest.setStudyName(studyNameContainsString);
+		studySearchRequest.setStudyNameFilter(new SqlTextFilter(studyNameContainsString, SqlTextFilter.Type.CONTAINS));
 
 		return new PaginatedSearch().getPagedResult(
 			() -> this.studyService.countFilteredStudies(programUUID, studySearchRequest),
@@ -167,6 +159,41 @@ public class StudyResource {
 		@RequestParam(required = false) final String programUUID, @PathVariable final Integer nameTypeId) {
 		this.studyService.deleteNameTypeFromStudies(nameTypeId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@ApiOperation("Search studies")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES','VIEW_STUDIES')")
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/search", method = RequestMethod.POST)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
+			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
+		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
+			value = "Number of records per page."),
+		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
+			value = "Sorting criteria in the format: property,asc|desc. ")
+	})
+	@ResponseBody
+	public ResponseEntity<List<StudySearchResponse>> searchStudies(
+		@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@RequestBody final StudySearchRequest studySearchRequest,
+		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
+	) {
+		return new PaginatedSearch().getPagedResult(
+			() -> this.studyService.countSearchStudies(programUUID, studySearchRequest),
+			() -> this.studyService.searchStudies(programUUID, studySearchRequest, pageable),
+			pageable);
+	}
+
+	@ApiOperation(value = "Get the details for the given study",
+		notes = "Returns boolean indicating if there are samples associated to the study.")
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/details", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
+	@ResponseBody
+	public ResponseEntity<StudyDetailsDTO> getDetails(final @PathVariable String cropName, @PathVariable final String programUUID,
+		@PathVariable final Integer studyId) {
+		final StudyDetailsDTO studyDetails = this.studyService.getStudyDetails(programUUID, studyId);
+		return new ResponseEntity<>(studyDetails, HttpStatus.OK);
 	}
 
 }

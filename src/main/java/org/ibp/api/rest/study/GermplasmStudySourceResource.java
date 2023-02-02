@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.ibp.api.domain.common.PagedResult;
@@ -42,8 +41,7 @@ public class GermplasmStudySourceResource {
 
 	@ApiOperation(value = "It will retrieve all generated germplasm in a study",
 		notes = "It will retrieve all generated germplasm in a study")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')"
-		+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/germplasm-sources/table", method = RequestMethod.POST)
 	@ResponseBody
 	@ApiImplicitParams({
@@ -70,8 +68,7 @@ public class GermplasmStudySourceResource {
 
 	@ApiOperation(value = "Post generated germplasm in a study search", notes = "Post generated germplasm in a study search")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/germplasm-sources/search", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'BROWSE_STUDIES')"
-		+ PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
 	@ResponseBody
 	public ResponseEntity<SearchDto> postGermplasmStudySourceTable(final @PathVariable String cropname,
 		@PathVariable final String programUUID,

@@ -1,17 +1,12 @@
 
 package org.ibp.api.java.impl.middleware.study;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.commons.constant.AppConstants;
-import org.generationcp.commons.pojo.treeview.TreeNode;
-import org.generationcp.commons.util.TreeViewUtil;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
-import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
+import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -32,7 +27,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +42,7 @@ public class StudyServiceImpl implements StudyService {
 	private org.generationcp.middleware.service.api.study.StudyService middlewareStudyService;
 
 	@Autowired
-	org.generationcp.middleware.service.api.SampleService sampleService;
+	private org.generationcp.middleware.service.api.SampleService sampleService;
 
 	@Autowired
 	private StudyDataManager studyDataManager;
@@ -101,22 +95,6 @@ public class StudyServiceImpl implements StudyService {
 	}
 
 	@Override
-	public List<TreeNode> getStudyTree(final String parentKey, final String programUUID) {
-		List<TreeNode> nodes = new ArrayList<>();
-		if (StringUtils.isBlank(parentKey)) {
-			final TreeNode rootNode = new TreeNode(AppConstants.STUDIES.name(), AppConstants.STUDIES.getString(), true, null);
-			nodes.add(rootNode);
-		} else if (parentKey.equals(AppConstants.STUDIES.name())) {
-			final List<Reference> children = this.studyDataManager.getRootFolders(programUUID);
-			nodes = TreeViewUtil.convertStudyFolderReferencesToTreeView(children, true);
-		} else if (NumberUtils.isNumber(parentKey)) {
-			final List<Reference> folders = this.studyDataManager.getChildrenOfFolder(Integer.valueOf(parentKey), programUUID);
-			nodes = TreeViewUtil.convertStudyFolderReferencesToTreeView(folders, true);
-		}
-		return nodes;
-	}
-
-	@Override
 	public Integer getEnvironmentDatasetId(final Integer studyId) {
 		final List<DatasetDTO> datasets =
 			this.middlewareDatasetService.getDatasets(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
@@ -133,8 +111,6 @@ public class StudyServiceImpl implements StudyService {
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		return this.middlewareStudyService.getGermplasmStudies(gid);
 	}
-
-
 
 	@Override
 	public void deleteStudy(final Integer studyId) {
@@ -157,6 +133,23 @@ public class StudyServiceImpl implements StudyService {
 	public void deleteNameTypeFromStudies(final Integer nameTypeId) {
 		this.germplasmNameTypeValidator.validate(nameTypeId);
 		this.middlewareStudyService.deleteNameTypeFromStudies(nameTypeId);
+	}
+
+	@Override
+	public List<StudySearchResponse> searchStudies(final String programUUID, final StudySearchRequest studySearchRequest,
+		final Pageable pageable) {
+		return this.middlewareStudyService.searchStudies(programUUID, studySearchRequest, pageable);
+	}
+
+	@Override
+	public long countSearchStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
+		return this.middlewareStudyService.countSearchStudies(programUUID, studySearchRequest);
+	}
+
+	@Override
+	public StudyDetailsDTO getStudyDetails(final String programUUID, final Integer studyId) {
+		this.studyValidator.validate(studyId, false);
+		return this.middlewareStudyService.getStudyDetails(programUUID, studyId);
 	}
 
 }
