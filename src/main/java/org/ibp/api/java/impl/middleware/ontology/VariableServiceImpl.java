@@ -589,4 +589,9 @@ public class VariableServiceImpl extends ServiceBaseImpl implements VariableServ
 		return this.getVariablesByFilter(variableFilter);
 	}
 
+	@Override
+	public List<Variable> searchVariables(final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter filter) {
+		return this.ontologyVariableService.searchVariables(filter);
+	}
+
 }

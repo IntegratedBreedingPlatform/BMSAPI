@@ -155,6 +155,7 @@ import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.advance.AdvanceService;
+import org.generationcp.middleware.service.api.study.StudyTreeService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -180,6 +181,7 @@ import org.generationcp.middleware.service.impl.study.StudyEntryServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.impl.study.advance.AdvanceServiceImpl;
+import org.generationcp.middleware.service.impl.study.StudyTreeServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentDesignServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.service.impl.study.germplasm.source.GermplasmStudySourceServiceImpl;
@@ -920,6 +922,12 @@ public class MiddlewareFactory {
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	public AdvanceService getAdvanceService() {
 		return new AdvanceServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public StudyTreeService getStudyTreeService() {
+		return new StudyTreeServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {

@@ -5,7 +5,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
+import org.generationcp.middleware.api.ontology.VariableSearchRequest;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.ibp.api.Util;
 import org.ibp.api.domain.common.GenericResponse;
 import org.ibp.api.domain.ontology.VariableDetails;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -92,6 +95,7 @@ public class VariableResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
+	@Deprecated
 	@ApiOperation(value = "All variables using given filter", notes = "Gets all variables using filter")
 	@RequestMapping(value = "/{cropname}/variables/filter", method = RequestMethod.GET)
 	@ResponseBody
@@ -225,4 +229,30 @@ public class VariableResource {
 		return new ResponseEntity<>(this.variableService.searchAttributeVariables(query,
 			variableTypeList, programUUID), HttpStatus.OK);
 	}
+
+	// TODO: implement pagination
+	@ApiOperation("Search variables")
+	@RequestMapping(value = "/{cropName}/programs/{programUUID}/variables/search", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<List<Variable>> searchVariables(
+		@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@RequestBody final VariableSearchRequest request
+	) {
+		final org.generationcp.middleware.manager.ontology.daoElements.VariableFilter filter =
+			new org.generationcp.middleware.manager.ontology.daoElements.VariableFilter();
+		if (request.getNameFilter() != null) {
+			filter.setNameFilter(request.getNameFilter());
+		}
+		if (!CollectionUtils.isEmpty(request.getVariableIds())) {
+			request.getVariableIds().forEach(filter::addVariableId);
+		}
+		if (!CollectionUtils.isEmpty(request.getVariableTypeIds())) {
+			VariableType.getByIds(request.getVariableTypeIds()).forEach(filter::addVariableType);
+		}
+
+		final List<Variable> results = this.variableService.searchVariables(filter);
+		return new ResponseEntity<>(results, HttpStatus.OK);
+	}
+
 }

@@ -3,7 +3,6 @@ package org.ibp.api.rest.design;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
-import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.design.ExperimentalDesignService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,7 @@ import java.util.List;
 
 @Api(value = "Experimental Design Type Service")
 @Controller
-@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')" + PermissionsEnum.HAS_MANAGE_STUDIES_VIEW)
+@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
 @RequestMapping("/crops")
 public class ExperimentalDesignTypeResource {
 
