@@ -137,22 +137,22 @@ public class SampleListValidatorTest {
 	}
 
 	@Test
-	public void testVerifyListEntryIdsExist_EmptyEntryIds() {
+	public void testVerifySamplesExist_EmptyEntryIds() {
 		try {
-			this.validator.verifyListEntryIdsExist(1, Collections.emptyList());
+			this.validator.verifySamplesExist(1, Collections.emptyList());
 		} catch (final ApiRequestValidationException e) {
 			final List<String> codes = new ArrayList<>();
 			for (final ObjectError error : e.getErrors()) {
 				codes.add(error.getCode());
 			}
-			Assert.assertTrue(codes.contains("sample.ids.selected.entries"));
+			Assert.assertTrue(codes.contains("sample.ids.selected.samples.empty"));
 		}
 	}
-	
+
 	@Test
-	public void testVerifyListEntryIdsExist_NonExistentEntryIds() {
+	public void testVerifySamplesExist_NonExistentEntryIds() {
 		try {
-			this.validator.verifyListEntryIdsExist(1, Collections.singletonList(1));
+			this.validator.verifySamplesExist(1, Collections.singletonList(1));
 		} catch (final ApiRequestValidationException e) {
 			final List<String> codes = new ArrayList<>();
 			for (final ObjectError error : e.getErrors()) {

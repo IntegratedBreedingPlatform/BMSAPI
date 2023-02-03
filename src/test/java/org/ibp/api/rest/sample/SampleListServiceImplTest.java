@@ -171,10 +171,10 @@ public class SampleListServiceImplTest {
 	public void testDeleteSampleListEntries() {
 		final Integer listId = 1;
 		final List<Integer> selectedEntries = Arrays.asList(1, 2);
-		this.sampleListService.deleteSampleListEntries(listId, selectedEntries);
+		this.sampleListService.deleteSamples(listId, selectedEntries);
 		Mockito.verify(this.sampleListValidator).validateSampleList(listId);
-		Mockito.verify(this.sampleListValidator).verifyListEntryIdsExist(listId, selectedEntries);
-		Mockito.verify(this.sampleListServiceMW).deleteSampleListEntries(listId, selectedEntries);
+		Mockito.verify(this.sampleListValidator).verifySamplesExist(listId, selectedEntries);
+		Mockito.verify(this.sampleListServiceMW).deleteSamples(listId, selectedEntries);
 	}
 
 	private List<SampleDTO> createSampleDto() {

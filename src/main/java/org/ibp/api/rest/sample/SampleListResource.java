@@ -87,7 +87,7 @@ public class SampleListResource {
 	public ResponseEntity deleteSampleListEntries(@PathVariable final String crop, @RequestParam final String programUUID,
 		@PathVariable final Integer sampleListId,
 		@RequestParam(required = true) final Set<Integer> selectedEntries) {
-		this.sampleListService.deleteSampleListEntries(sampleListId, new ArrayList<>(selectedEntries));
+		this.sampleListService.deleteSamples(sampleListId, new ArrayList<>(selectedEntries));
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

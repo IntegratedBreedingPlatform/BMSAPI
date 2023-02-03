@@ -228,11 +228,10 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public void deleteSampleListEntries(final Integer sampleListId,
-		final List<Integer> selectedEntries){
+	public void deleteSamples(final Integer sampleListId, final List<Integer> sampleIds){
 		this.sampleListValidator.validateSampleList(sampleListId);
-		this.sampleListValidator.verifyListEntryIdsExist(sampleListId, new ArrayList<>(selectedEntries));
-		this.sampleListServiceMW.deleteSampleListEntries(sampleListId, selectedEntries);
+		this.sampleListValidator.verifySamplesExist(sampleListId, new ArrayList<>(sampleIds));
+		this.sampleListServiceMW.deleteSamples(sampleListId, sampleIds);
 	}
 
 	protected SampleListDTO translateToSampleListDto(final SampleListDto dto) {

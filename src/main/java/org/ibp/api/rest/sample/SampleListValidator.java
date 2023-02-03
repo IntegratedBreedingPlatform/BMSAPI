@@ -2,7 +2,7 @@ package org.ibp.api.rest.sample;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.pojos.Sample;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.pojos.SampleList;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,16 +74,16 @@ public class SampleListValidator {
 		}
 	}
 
-	public void verifyListEntryIdsExist(final Integer sampleListId, final List<Integer> entryIds) {
+	public void verifySamplesExist(final Integer sampleListId, final List<Integer> sampleIds) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
-		if(CollectionUtils.isEmpty(entryIds)) {
-			errors.reject("sample.ids.selected.entries", "Selected entries can not be empty");
+		if(CollectionUtils.isEmpty(sampleIds)) {
+			errors.reject("sample.ids.selected.samples.empty", "Selected entries can not be empty");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final List<Sample> samples = this.sampleListServiceMW.getSampleListEntries(sampleListId, entryIds);
-		if (samples.size() != entryIds.size()) {
+		final List<SampleDTO> samples = this.sampleListServiceMW.getSampleListEntries(sampleListId, sampleIds);
+		if (samples.size() != sampleIds.size()) {
 			errors.reject("sample.ids.not.exist", "Some sampleIds were not found in the system. Please check");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
