@@ -2,6 +2,8 @@ package org.ibp.api.rest.sample;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.enumeration.SampleListType;
+import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.junit.Assert;
@@ -10,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.ObjectError;
 
@@ -100,6 +103,36 @@ public class SampleListValidatorTest {
 			Assert.assertTrue(codes.contains("sample.list.notes.exceed.length"));
 		}
 
+	}
+
+	@Test
+	public void testValidateSampleList_InvalidListId() {
+		try {
+			this.validator.validateSampleList(1);
+		} catch (final ApiRequestValidationException e) {
+			final List<String> codes = new ArrayList<>();
+			for (final ObjectError error : e.getErrors()) {
+				codes.add(error.getCode());
+			}
+			Assert.assertTrue(codes.contains("sample.list.id.is.invalid"));
+		}
+	}
+
+	@Test
+	public void testValidateSampleList_InvalidListType() {
+		final Integer listId = 1;
+		final SampleList sampleList = new SampleList();
+		sampleList.setType(SampleListType.FOLDER);
+		Mockito.when(this.sampleListServiceMW.getSampleList(listId)).thenReturn(sampleList);
+		try {
+			this.validator.validateSampleList(1);
+		} catch (final ApiRequestValidationException e) {
+			final List<String> codes = new ArrayList<>();
+			for (final ObjectError error : e.getErrors()) {
+				codes.add(error.getCode());
+			}
+			Assert.assertTrue(codes.contains("sample.list.type.is.invalid"));
+		}
 	}
 
 	@Test
