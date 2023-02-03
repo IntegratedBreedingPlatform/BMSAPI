@@ -18,6 +18,7 @@ import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -132,6 +133,32 @@ public class SampleListValidatorTest {
 				codes.add(error.getCode());
 			}
 			Assert.assertTrue(codes.contains("sample.list.type.is.invalid"));
+		}
+	}
+
+	@Test
+	public void testVerifyListEntryIdsExist_EmptyEntryIds() {
+		try {
+			this.validator.verifyListEntryIdsExist(1, Collections.emptyList());
+		} catch (final ApiRequestValidationException e) {
+			final List<String> codes = new ArrayList<>();
+			for (final ObjectError error : e.getErrors()) {
+				codes.add(error.getCode());
+			}
+			Assert.assertTrue(codes.contains("sample.ids.selected.entries"));
+		}
+	}
+	
+	@Test
+	public void testVerifyListEntryIdsExist_NonExistentEntryIds() {
+		try {
+			this.validator.verifyListEntryIdsExist(1, Collections.singletonList(1));
+		} catch (final ApiRequestValidationException e) {
+			final List<String> codes = new ArrayList<>();
+			for (final ObjectError error : e.getErrors()) {
+				codes.add(error.getCode());
+			}
+			Assert.assertTrue(codes.contains("sample.ids.not.exist"));
 		}
 	}
 
