@@ -78,14 +78,14 @@ public class SampleListValidator {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		if(CollectionUtils.isEmpty(sampleIds)) {
-			errors.reject("sample.ids.selected.samples.empty", "Selected entries can not be empty");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("sample.ids.selected.samples.empty", "Selected entries can not be empty");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
 		final List<SampleDTO> samples = this.sampleListServiceMW.getSampleListEntries(sampleListId, sampleIds);
 		if (samples.size() != sampleIds.size()) {
-			errors.reject("sample.ids.not.exist", "Some sampleIds were not found in the system. Please check");
-			throw new ApiRequestValidationException(errors.getAllErrors());
+			this.errors.reject("sample.ids.not.exist", "Some sampleIds were not found in the system. Please check");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
 

@@ -225,14 +225,14 @@ public class SampleListServiceImplTest {
 
 		final Map<Integer, ListMetadata> sampleListsMetaData = new HashMap<>();
 
-		Mockito.when(sampleListServiceMW.getAllSampleTopLevelLists(PROGRAM_UUID)).thenReturn(sampleLists);
-		Mockito.when(sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
+		Mockito.when(this.sampleListServiceMW.getAllSampleTopLevelLists(PROGRAM_UUID)).thenReturn(sampleLists);
+		Mockito.when(this.sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
 
-		List<TreeNode> treeNodes = sampleListService.getSampleListChildrenNodes( "maize", PROGRAM_UUID, SampleListServiceImpl.PROGRAM_LISTS, false);
+		final List<TreeNode> treeNodes = this.sampleListService.getSampleListChildrenNodes( "maize", PROGRAM_UUID, SampleListServiceImpl.PROGRAM_LISTS, false);
 
-		Mockito.verify(sampleListServiceMW).getAllSampleTopLevelLists(PROGRAM_UUID);
+		Mockito.verify(this.sampleListServiceMW).getAllSampleTopLevelLists(PROGRAM_UUID);
 
-		TreeNode node = treeNodes.get(0);
+		final TreeNode node = treeNodes.get(0);
 		Assert.assertEquals(String.valueOf(id), node.getKey());
 		Assert.assertEquals(listName, node.getTitle());
 		Assert.assertFalse(node.getIsLazy());
@@ -254,14 +254,14 @@ public class SampleListServiceImplTest {
 
 		final Map<Integer, ListMetadata> sampleListsMetaData = new HashMap<>();
 
-		Mockito.when(sampleListServiceMW.getAllSampleTopLevelLists(null)).thenReturn(sampleLists);
-		Mockito.when(sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
+		Mockito.when(this.sampleListServiceMW.getAllSampleTopLevelLists(null)).thenReturn(sampleLists);
+		Mockito.when(this.sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
 
-		List<TreeNode> treeNodes = sampleListService.getSampleListChildrenNodes("maize", PROGRAM_UUID, SampleListServiceImpl.CROP_LISTS, false);
+		final List<TreeNode> treeNodes = this.sampleListService.getSampleListChildrenNodes("maize", PROGRAM_UUID, SampleListServiceImpl.CROP_LISTS, false);
 
-		Mockito.verify(sampleListServiceMW).getAllSampleTopLevelLists(null);
+		Mockito.verify(this.sampleListServiceMW).getAllSampleTopLevelLists(null);
 
-		TreeNode node = treeNodes.get(0);
+		final TreeNode node = treeNodes.get(0);
 		Assert.assertEquals(String.valueOf(id), node.getKey());
 		Assert.assertEquals(listName, node.getTitle());
 		Assert.assertFalse(node.getIsLazy());
@@ -288,15 +288,15 @@ public class SampleListServiceImplTest {
 
 		final Map<Integer, ListMetadata> sampleListsMetaData = new HashMap<>();
 
-		Mockito.when(sampleListServiceMW.getSampleList(Integer.valueOf(parentFolderId))).thenReturn(parentFolder);
-		Mockito.when(sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE)).thenReturn(sampleLists);
-		Mockito.when(sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
+		Mockito.when(this.sampleListServiceMW.getSampleList(Integer.valueOf(parentFolderId))).thenReturn(parentFolder);
+		Mockito.when(this.sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE)).thenReturn(sampleLists);
+		Mockito.when(this.sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
 
-		List<TreeNode> treeNodes = sampleListService.getSampleListChildrenNodes("maize", PROGRAM_UUID, parentFolderId, false);
+		final List<TreeNode> treeNodes = this.sampleListService.getSampleListChildrenNodes("maize", PROGRAM_UUID, parentFolderId, false);
 
-		Mockito.verify(sampleListServiceMW).getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE);
+		Mockito.verify(this.sampleListServiceMW).getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE);
 
-		TreeNode node = treeNodes.get(0);
+		final TreeNode node = treeNodes.get(0);
 		Assert.assertEquals(String.valueOf(id), node.getKey());
 		Assert.assertEquals(listName, node.getTitle());
 		Assert.assertFalse(node.getIsLazy());
@@ -322,19 +322,19 @@ public class SampleListServiceImplTest {
 		final List<SampleList> sampleLists = Arrays.asList(sampleList);
 
 		final Map<Integer, ListMetadata> sampleListsMetaData = new HashMap<>();
-		ListMetadata listMetadata = new ListMetadata();
+		final ListMetadata listMetadata = new ListMetadata();
 		listMetadata.setNumberOfChildren(123);
 		sampleListsMetaData.put(id, listMetadata);
 
-		Mockito.when(sampleListServiceMW.getSampleList(Integer.valueOf(parentFolderId))).thenReturn(parentFolder);
-		Mockito.when(sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE)).thenReturn(sampleLists);
-		Mockito.when(sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
+		Mockito.when(this.sampleListServiceMW.getSampleList(Integer.valueOf(parentFolderId))).thenReturn(parentFolder);
+		Mockito.when(this.sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE)).thenReturn(sampleLists);
+		Mockito.when(this.sampleListServiceMW.getListMetadata(sampleLists)).thenReturn(sampleListsMetaData);
 
-		List<TreeNode> treeNodes = sampleListService.getSampleListChildrenNodes("maize", PROGRAM_UUID, parentFolderId, false);
+		final List<TreeNode> treeNodes = this.sampleListService.getSampleListChildrenNodes("maize", PROGRAM_UUID, parentFolderId, false);
 
-		Mockito.verify(sampleListServiceMW).getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE);
+		Mockito.verify(this.sampleListServiceMW).getSampleListByParentFolderIdBatched(Integer.valueOf(parentFolderId), PROGRAM_UUID, SampleListServiceImpl.BATCH_SIZE);
 
-		TreeNode node = treeNodes.get(0);
+		final TreeNode node = treeNodes.get(0);
 		Assert.assertEquals(String.valueOf(id), node.getKey());
 		Assert.assertEquals(listName, node.getTitle());
 		Assert.assertTrue(node.getIsLazy());
