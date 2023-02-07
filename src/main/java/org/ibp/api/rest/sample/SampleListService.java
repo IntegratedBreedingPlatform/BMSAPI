@@ -72,4 +72,6 @@ public interface SampleListService {
 
 	List<TreeNode> getSampleListChildrenNodes(final String crop, final String programUUID, final String parentId, final Boolean folderOnly);
 
+	void deleteSamples(Integer sampleListId, List<Integer> sampleIds);
+
 }

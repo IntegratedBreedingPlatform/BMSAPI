@@ -227,6 +227,13 @@ public class SampleListServiceImpl implements SampleListService {
 		return treeNodes;
 	}
 
+	@Override
+	public void deleteSamples(final Integer sampleListId, final List<Integer> sampleIds){
+		this.sampleListValidator.validateSampleList(sampleListId);
+		this.sampleListValidator.verifySamplesExist(sampleListId, new ArrayList<>(sampleIds));
+		this.sampleListServiceMW.deleteSamples(sampleListId, sampleIds);
+	}
+
 	protected SampleListDTO translateToSampleListDto(final SampleListDto dto) {
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
