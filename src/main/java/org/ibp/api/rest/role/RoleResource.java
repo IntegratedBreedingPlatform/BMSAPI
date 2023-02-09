@@ -44,7 +44,7 @@ public class RoleResource {
 	@ResponseBody
 	public ResponseEntity<List<RoleDto>> getFilteredRoles(@RequestBody final RoleSearchDto searchDTO,
 		@ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
-		return new PaginatedSearch().getPagedResult(() -> this.roleService.countRolesUsers(searchDTO),
+		return new PaginatedSearch().getPagedResult(() -> this.roleService.countRoles(searchDTO),
 			() -> this.roleService.searchRoles(searchDTO, pageable), pageable);
 	}
 

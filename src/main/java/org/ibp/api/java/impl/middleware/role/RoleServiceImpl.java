@@ -32,8 +32,8 @@ public class RoleServiceImpl implements org.ibp.api.java.role.RoleService {
 	private RoleService roleService;
 
 	@Override
-	public long countRolesUsers(final RoleSearchDto roleSearchDto) {
-		return this.roleService.countRolesUsers(roleSearchDto);
+	public long countRoles(final RoleSearchDto roleSearchDto) {
+		return this.roleService.countRoles(roleSearchDto);
 	}
 
 	@Override
