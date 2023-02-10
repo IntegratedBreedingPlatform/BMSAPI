@@ -11,6 +11,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
 import org.ibp.api.rest.role.RoleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -31,8 +32,13 @@ public class RoleServiceImpl implements org.ibp.api.java.role.RoleService {
 	private RoleService roleService;
 
 	@Override
-	public List<RoleDto> getRoles(final RoleSearchDto roleSearchDto) {
-		return  this.roleService.getRoles(roleSearchDto);
+	public long countRoles(final RoleSearchDto roleSearchDto) {
+		return this.roleService.countRoles(roleSearchDto);
+	}
+
+	@Override
+	public List<RoleDto> searchRoles(final RoleSearchDto roleSearchDto, Pageable pageable) {
+		return this.roleService.searchRoles(roleSearchDto, pageable);
 	}
 
 	@Override
