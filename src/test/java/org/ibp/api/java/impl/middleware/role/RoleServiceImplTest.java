@@ -58,7 +58,7 @@ public class RoleServiceImplTest extends ApiUnitTestBase {
 		this.createTestRoles();
 		final List<Role> assignableRoles = new ArrayList<>(this.allRoles);
 		assignableRoles.remove(this.restrictedRole);
-		Mockito.doReturn(assignableRoles).when(this.roleService).getRoles(new RoleSearchDto(Boolean.TRUE, null, null));
+		Mockito.doReturn(assignableRoles).when(this.roleService).searchRoles(new RoleSearchDto(Boolean.TRUE, null, null), null);
 	}
 
 	@Test

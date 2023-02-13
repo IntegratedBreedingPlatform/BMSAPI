@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.api.user.UserSearchRequest;
 import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -138,6 +139,16 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public long countAllMembersEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest) {
 		return this.userService.countProgramMembersEligibleUsers(programUUID, searchRequest);
+	}
+
+	@Override
+	public long countSearchUsers(final UserSearchRequest userSearchRequest) {
+		return this.userService.countSearchUsers(userSearchRequest);
+	}
+
+	@Override
+	public List<UserDto> searchUsers(final UserSearchRequest userSearchRequest, final Pageable pageable) {
+		return this.userService.searchUsers(userSearchRequest, pageable);
 	}
 
 	public void setSecurityService(final SecurityService securityService) {
