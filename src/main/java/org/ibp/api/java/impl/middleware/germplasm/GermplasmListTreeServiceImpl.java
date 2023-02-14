@@ -320,6 +320,8 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
+		this.germplasmListValidator.validateListIsUnlocked(germplasmListToMove);
+
 		this.germplasmListValidator.validateFolderHasNoChildren(Integer.parseInt(folderId), "list.move.folder.has.child");
 
 		final Integer parent = this.getFolderIdAsInteger(newParentFolderId);
