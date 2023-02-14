@@ -209,7 +209,7 @@ public class UserValidator {
 			// Roles in the list must exist
 			final Set<Integer> roleIds = userRoles.stream().map(p -> p.getRole().getId()).collect(Collectors.toSet());
 
-			final List<RoleDto> savedRoles = this.roleService.getRoles(new RoleSearchDto(null, null, roleIds));
+			final List<RoleDto> savedRoles = this.roleService.searchRoles(new RoleSearchDto(null, null, roleIds), null);
 
 			if (savedRoles.size() != roleIds.size()) {
 				this.errors.reject("user.invalid.roles", new String[] {
