@@ -42,6 +42,13 @@ import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.ch
 @Component
 public class AdvanceValidator {
 
+	private static final Set<Integer> ALLOWED_DATASET_TYPES = new HashSet<>();
+
+	static {
+		ALLOWED_DATASET_TYPES.add(DatasetTypeEnum.PLOT_DATA.getId());
+		ALLOWED_DATASET_TYPES.add(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
+	}
+
 	public static final String BREEDING_METHOD_VARIABLE_PROPERTY = "Breeding method";
 	public static final String SELECTED_LINE_VARIABLE_PROPERTY = "Selections";
 
@@ -69,15 +76,15 @@ public class AdvanceValidator {
 	public void validateAdvanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 		checkNotNull(request, "request.null");
 
-		final Integer plotDatasetId = this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
+		this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
 
-		final List<MeasurementVariable> plotDatasetVariables = this.datasetService.getObservationSetVariables(plotDatasetId);
+		final List<MeasurementVariable> datasetVariables = this.validateDatasetAndGetVariables(studyId, request.getDatasetId());
 		final BreedingMethodDTO selectedBreedingMethodDTO =
-			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), plotDatasetVariables);
-		this.validateLineSelection(request, selectedBreedingMethodDTO, plotDatasetId, plotDatasetVariables);
-		this.validateBulkingSelection(request, selectedBreedingMethodDTO, plotDatasetId, plotDatasetVariables);
+			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), datasetVariables);
+		this.validateLineSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), datasetVariables);
+		this.validateBulkingSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), datasetVariables);
 		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
-		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), plotDatasetVariables);
+		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), datasetVariables);
 	}
 
 	public void validateAdvanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
@@ -123,9 +130,24 @@ public class AdvanceValidator {
 		return dataset.getId();
 	}
 
+	List<MeasurementVariable> validateDatasetAndGetVariables(final Integer studyId, final Integer datasetId) {
+		if (datasetId == null) {
+			throw new ApiRequestValidationException("advance.dataset.required", new Object[] {});
+		}
+
+		final DatasetDTO dataset = this.datasetService.getDataset(datasetId);
+		if (!ALLOWED_DATASET_TYPES.contains(dataset.getDatasetTypeId())) {
+			throw new ApiRequestValidationException("advance.dataset.not-supported", new Object[] {datasetId.toString()});
+		}
+
+		this.datasetValidator.validateDatasetBelongsToStudy(studyId, datasetId);
+
+		return dataset.getVariables();
+	}
+
 	BreedingMethodDTO validateAdvanceStudyBreedingMethodSelection(
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest,
-		final List<MeasurementVariable> plotDatasetVariables) {
+		final List<MeasurementVariable> datasetVariables) {
 		checkNotNull(breedingMethodSelectionRequest, "request.null");
 
 		if ((breedingMethodSelectionRequest.getBreedingMethodId() == null && breedingMethodSelectionRequest.getMethodVariateId() == null)
@@ -148,7 +170,7 @@ public class AdvanceValidator {
 
 		if (breedingMethodSelectionRequest.getMethodVariateId() != null) {
 			final MeasurementVariable variable =
-				this.validatePlotdataSetHasVariable(plotDatasetVariables, breedingMethodSelectionRequest.getMethodVariateId(),
+				this.validateDataSetHasVariable(datasetVariables, breedingMethodSelectionRequest.getMethodVariateId(),
 					"advance.breeding-method.selection.variate.not-present");
 			if (variable.getVariableType() != VariableType.SELECTION_METHOD) {
 				throw new ApiRequestValidationException("advance.breeding-method.selection.variate.type.invalid",
@@ -179,7 +201,7 @@ public class AdvanceValidator {
 	}
 
 	void validateLineSelection(final AdvanceStudyRequest request, final BreedingMethodDTO selectedBreedingMethod,
-		final Integer plotDatasetId, final List<MeasurementVariable> plotDatasetVariables) {
+		final Integer datasetId, final List<MeasurementVariable> plotDatasetVariables) {
 
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			request.getBreedingMethodSelectionRequest();
@@ -199,7 +221,7 @@ public class AdvanceValidator {
 
 			if (lineSelectionRequest.getLineVariateId() != null) {
 				final MeasurementVariable variable =
-					this.validatePlotdataSetHasVariable(plotDatasetVariables, lineSelectionRequest.getLineVariateId(),
+					this.validateDataSetHasVariable(plotDatasetVariables, lineSelectionRequest.getLineVariateId(),
 						"advance.lines.selection.variate.not-present");
 				if (variable.getVariableType() != VariableType.SELECTION_METHOD) {
 					throw new ApiRequestValidationException("advance.lines.selection.variate.type.invalid",
@@ -209,14 +231,14 @@ public class AdvanceValidator {
 					throw new ApiRequestValidationException("advance.lines.selection.variate.property.invalid",
 						new Object[] {SELECTED_LINE_VARIABLE_PROPERTY});
 				}
-				this.validateCountPlotsWithRecordedVariatesInDataset(plotDatasetId, lineSelectionRequest.getLineVariateId(),
+				this.validateCountPlotsWithRecordedVariatesInDataset(datasetId, lineSelectionRequest.getLineVariateId(),
 					"advance.lines.selection.variate.empty.observations");
 			}
 		}
 	}
 
 	void validateBulkingSelection(final AdvanceStudyRequest request, final BreedingMethodDTO selectedBreedingMethod,
-		final Integer plotDatasetId, final List<MeasurementVariable> plotDatasetVariables) {
+		final Integer datasetId, final List<MeasurementVariable> plotDatasetVariables) {
 
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			request.getBreedingMethodSelectionRequest();
@@ -235,7 +257,7 @@ public class AdvanceValidator {
 
 			if (bulkingRequest.getPlotVariateId() != null) {
 				final MeasurementVariable variable =
-					this.validatePlotdataSetHasVariable(plotDatasetVariables, bulkingRequest.getPlotVariateId(),
+					this.validateDataSetHasVariable(plotDatasetVariables, bulkingRequest.getPlotVariateId(),
 						"advance.bulking.selection.variate.not-present");
 				if (variable.getVariableType() != VariableType.SELECTION_METHOD) {
 					throw new ApiRequestValidationException("advance.bulking.selection.variate.type.invalid",
@@ -245,7 +267,7 @@ public class AdvanceValidator {
 					throw new ApiRequestValidationException("advance.bulking.selection.variate.property.invalid",
 						new Object[] {SELECTED_LINE_VARIABLE_PROPERTY});
 				}
-				this.validateCountPlotsWithRecordedVariatesInDataset(plotDatasetId, bulkingRequest.getPlotVariateId(),
+				this.validateCountPlotsWithRecordedVariatesInDataset(datasetId, bulkingRequest.getPlotVariateId(),
 					"advance.bulking.selection.variate.empty.observations");
 			}
 		}
@@ -322,7 +344,7 @@ public class AdvanceValidator {
 		}
 	}
 
-	private MeasurementVariable validatePlotdataSetHasVariable(final List<MeasurementVariable> plotDatasetVariables,
+	private MeasurementVariable validateDataSetHasVariable(final List<MeasurementVariable> plotDatasetVariables,
 		final Integer variableId,
 		final String errorCode) {
 		final Optional<MeasurementVariable> methodVariate = this.findVariableById(plotDatasetVariables, variableId);
