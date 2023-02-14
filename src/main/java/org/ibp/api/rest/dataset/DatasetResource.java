@@ -19,6 +19,7 @@ import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstanc
 import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.dataset.PhenotypeAuditDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -563,6 +564,24 @@ public class DatasetResource {
 		@RequestParam final List<Integer> variableTypeIds) {
 		final List<MeasurementVariable> variables = this.studyDatasetService.getVariablesByVariableTypes(studyId, variableTypeIds);
 		return new ResponseEntity<>(variables, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get Observation Audit", notes = "Update Observation")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/"
+		+ "observationUnits/{observationUnitId}/variable/{variableId}/phenotype-audit", method = RequestMethod.GET)
+	public ResponseEntity<List<PhenotypeAuditDTO>> getPhenotypeAudit(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @PathVariable final String observationUnitId, @PathVariable final Integer variableId,
+		@PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+
+		final List<PhenotypeAuditDTO> phenotypeAuditList =
+			this.studyDatasetService.getPhenotypeAuditList(observationUnitId, variableId, pageable);
+
+		return new PaginatedSearch().getPagedResult(() ->
+				this.studyDatasetService.countPhenotypeAudit(observationUnitId, variableId),
+			() -> phenotypeAuditList,
+			pageable);
 	}
 
 	public ResourceBundleMessageSource getMessageSource() {

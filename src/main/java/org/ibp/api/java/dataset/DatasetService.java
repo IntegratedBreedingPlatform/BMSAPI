@@ -3,6 +3,7 @@ package org.ibp.api.java.dataset;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
+import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -10,6 +11,7 @@ import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstanc
 import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.dataset.PhenotypeAuditDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
@@ -18,7 +20,6 @@ import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
-import org.generationcp.middleware.domain.dataset.PlotDatasetPropertiesDTO;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -353,4 +354,7 @@ public interface DatasetService {
 
 	List<MeasurementVariable> getVariablesByVariableTypes(Integer studyId, List<Integer> variableTypes);
 
+	List<PhenotypeAuditDTO> getPhenotypeAuditList(String observationUnitId, Integer variableId, Pageable pageable);
+
+	long countPhenotypeAudit(String observationUnitId, Integer variableId);
 }

@@ -29,6 +29,7 @@ import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstanc
 import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.dataset.PhenotypeAuditDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -1040,6 +1041,17 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, false);
 		variableTypes.forEach(this.datasetValidator::validateVariableType);
 		return this.middlewareDatasetService.getDatasetMeasurementVariablesByVariableType(studyId, variableTypes);
+	}
+
+	@Override
+	public List<PhenotypeAuditDTO> getPhenotypeAuditList(final String observationUnitId, final Integer variableId,
+		final Pageable pageable) {
+		return this.middlewareDatasetService.getPhenotypeAuditList(observationUnitId, variableId, pageable);
+	}
+
+	@Override
+	public long countPhenotypeAudit(final String observationUnitId, final Integer variableId) {
+		return this.middlewareDatasetService.countPhenotypeAudit(observationUnitId, variableId);
 	}
 
 	private void processSearchComposite(final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchDTO) {
