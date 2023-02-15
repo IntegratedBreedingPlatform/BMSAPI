@@ -41,8 +41,6 @@ public class ObservationAuditResourceTest extends ApiUnitTestBase {
 	@Test
 	public void testGetPhenotypeAuditList() throws Exception {
 		final Random random = new Random();
-		final int studyId = random.nextInt(10000);
-		final int datasetId = random.nextInt(10000);
 		final String observationUnitId = random.nextInt(10000) + "";
 		final int variableId = random.nextInt(10000);
 
@@ -51,10 +49,8 @@ public class ObservationAuditResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}"
-						+ "/observationUnits/{observationUnitId}/variable/{variableId}/phenotype-audit",
-					this.cropName, this.programUuid, studyId, datasetId,
-					observationUnitId, variableId, pageable)
+					"/crops/{crop}/observationUnits/{observationUnitId}/variable/{variableId}/changes",
+					this.cropName, observationUnitId, variableId, pageable)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
