@@ -249,10 +249,10 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 
 		//Validate if there is a folder with same name in parent folder
 		final Integer parent = this.getFolderIdAsInteger(parentId);
-		this.germplasmListValidator.validateNotSameFolderNameInParent(folderName, parent, programUUID);
+		final String dependantProgramUUID = GermplasmListHelper.calculateProgramUUID(programUUID, parentFolder, parentId);
+		this.germplasmListValidator.validateNotSameFolderNameInParent(folderName, parent, dependantProgramUUID);
 
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
-		final String dependantProgramUUID = GermplasmListHelper.calculateProgramUUID(programUUID, parentFolder, parentId);
 		return this.germplasmListService.createGermplasmListFolder(createdBy.getUserid(), folderName, parent, dependantProgramUUID);
 	}
 
@@ -319,6 +319,8 @@ public class GermplasmListTreeServiceImpl implements GermplasmListTreeService {
 			this.errors.reject("list.folder.id.not.exist", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
+
+		this.germplasmListValidator.validateListIsUnlocked(germplasmListToMove);
 
 		this.germplasmListValidator.validateFolderHasNoChildren(Integer.parseInt(folderId), "list.move.folder.has.child");
 
