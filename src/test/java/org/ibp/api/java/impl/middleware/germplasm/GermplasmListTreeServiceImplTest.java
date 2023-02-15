@@ -382,6 +382,7 @@ public class GermplasmListTreeServiceImplTest {
 		Mockito.verify(this.germplasmListValidator).validateFolderHasNoChildren(folderId, "list.move.folder.has.child");
 		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListByParentAndName(folderName, newParentId, PROGRAM_UUID);
 		Mockito.verify(this.germplasmListServiceMiddleware).moveGermplasmListFolder(folderId, newParentId, PROGRAM_UUID);
+		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(actualFolder);
 
 		Mockito.verifyNoMoreInteractions(this.programValidator);
 		Mockito.verifyNoMoreInteractions(this.germplasmListValidator);
@@ -428,6 +429,7 @@ public class GermplasmListTreeServiceImplTest {
 		Mockito.verify(this.germplasmListValidator).validateFolderId(newParentId, PROGRAM_UUID, GermplasmListValidator.ListNodeType.PARENT);
 		Mockito.verify(this.germplasmListValidator).validateFolderHasNoChildren(folderId, "list.move.folder.has.child");
 		Mockito.verify(this.germplasmListValidator).validateNodeId(folderId.toString(), GermplasmListValidator.ListNodeType.FOLDER);
+		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(actualFolder);
 
 		Mockito.verifyNoMoreInteractions(this.programValidator);
 		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
@@ -656,6 +658,7 @@ public class GermplasmListTreeServiceImplTest {
 		Mockito.verify(this.germplasmListValidator).validateFolderHasNoChildren(folderId, "list.move.folder.has.child");
 
 		Mockito.verify(this.germplasmListServiceMiddleware).getGermplasmListByParentAndName(folderName, newParentId, PROGRAM_UUID);
+		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(actualFolder);
 
 		Mockito.verifyNoMoreInteractions(this.programValidator);
 		Mockito.verifyNoMoreInteractions(this.germplasmListServiceMiddleware);
