@@ -32,8 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -984,31 +982,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		datasetDTO.setInstances(instances);
 
 		return datasetDTO;
-	}
-
-	@Test
-	public void testGetPhenotypeAuditList() throws Exception {
-		final Random random = new Random();
-		final int studyId = random.nextInt(10000);
-		final int datasetId = random.nextInt(10000);
-		final String observationUnitId = random.nextInt(10000) + "";
-		final int variableId = random.nextInt(10000);
-
-		final Pageable pageable = new PageRequest(0, 1000);
-
-		this.mockMvc
-			.perform(MockMvcRequestBuilders
-				.get(
-					"/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}"
-						+ "/observationUnits/{observationUnitId}/variable/{variableId}/phenotype-audit",
-					this.cropName, this.programUuid, studyId, datasetId,
-					observationUnitId, variableId, pageable)
-				.contentType(this.contentType))
-			.andDo(MockMvcResultHandlers.print())
-			.andExpect(MockMvcResultMatchers.status().isOk());
-
-		Mockito.verify(this.studyDatasetService).getPhenotypeAuditList(observationUnitId, variableId, pageable);
-		Mockito.verify(this.studyDatasetService).countPhenotypeAudit(observationUnitId, variableId);
 	}
 
 	private List<DatasetDTO> createDatasets(final List<Integer> datasetTypeIds) {

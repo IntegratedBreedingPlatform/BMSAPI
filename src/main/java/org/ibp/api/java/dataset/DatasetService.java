@@ -11,7 +11,6 @@ import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstanc
 import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
-import org.generationcp.middleware.service.api.dataset.PhenotypeAuditDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.study.StudyInstance;
@@ -353,8 +352,4 @@ public interface DatasetService {
 	List<GermplasmNameTypeDTO> getAllPlotDatasetNameTypes(Integer datasetId);
 
 	List<MeasurementVariable> getVariablesByVariableTypes(Integer studyId, List<Integer> variableTypes);
-
-	List<PhenotypeAuditDTO> getPhenotypeAuditList(String observationUnitId, Integer variableId, Pageable pageable);
-
-	long countPhenotypeAudit(String observationUnitId, Integer variableId);
 }

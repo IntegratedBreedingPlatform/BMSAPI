@@ -20,7 +20,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryRepla
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
-import org.generationcp.middleware.service.api.dataset.PhenotypeAuditDTO;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.domain.dataset.DatasetVariable;
@@ -50,7 +49,6 @@ import org.mockito.Spy;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1134,24 +1132,5 @@ public class DatasetServiceImplTest {
 		Assert.assertEquals(DatasetServiceImpl.LOCATION_ID_VARIABLE_NAME, measurementVariableList.get(0).getName());
 		Assert.assertEquals(TermId.LOCATION_ABBR.name(), measurementVariableList.get(1).getAlias());
 		Assert.assertEquals(DatasetServiceImpl.LOCATION_ABBR_VARIABLE_NAME, measurementVariableList.get(1).getName());
-	}
-
-	@Test
-	public void testGetPhenotypeAuditList() {
-		final List<PhenotypeAuditDTO> auditList = new ArrayList<>();
-
-		final Random random = new Random();
-		final int variableId = random.nextInt();
-		final String obsUnitId = random.nextInt() + "";
-		final Pageable pageable = new PageRequest(0, 1000);
-
-		Mockito.doReturn(auditList).when(this.middlewareDatasetService)
-			.getPhenotypeAuditList(ArgumentMatchers.eq(obsUnitId), ArgumentMatchers.eq(variableId),
-				ArgumentMatchers.eq(pageable));
-		final List<PhenotypeAuditDTO> result =
-			this.studyDatasetService.getPhenotypeAuditList(obsUnitId, variableId, pageable);
-
-		Assert.assertSame(auditList, result);
-
 	}
 }
