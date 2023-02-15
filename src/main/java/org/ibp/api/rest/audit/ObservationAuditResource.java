@@ -3,19 +3,16 @@ package org.ibp.api.rest.audit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.service.api.dataset.ObservationAuditDTO;
-import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.audit.ObservationAuditService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -32,7 +29,7 @@ public class ObservationAuditResource {
 	@RequestMapping(value = "/{crop}/observationUnits/{observationUnitId}/variable/{variableId}/changes", method = RequestMethod.GET)
 	public ResponseEntity<List<ObservationAuditDTO>> getPhenotypeAudit(
 		@PathVariable final String crop, @PathVariable final String observationUnitId, @PathVariable final Integer variableId,
-		@PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable) {
+		final Pageable pageable) {
 
 		final List<ObservationAuditDTO> phenotypeAuditList =
 			this.observationAuditService.getObservationAuditList(observationUnitId, variableId, pageable);

@@ -44,7 +44,7 @@ public class ObservationAuditResourceTest extends ApiUnitTestBase {
 		final String observationUnitId = random.nextInt(10000) + "";
 		final int variableId = random.nextInt(10000);
 
-		final Pageable pageable = new PageRequest(0, 1000);
+		final Pageable pageable = new PageRequest(0, 20);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
