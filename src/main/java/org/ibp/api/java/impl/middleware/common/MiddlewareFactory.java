@@ -136,6 +136,7 @@ import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 import org.generationcp.middleware.service.api.audit.GermplasmAuditService;
+import org.generationcp.middleware.service.api.audit.ObservationAuditService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
@@ -164,6 +165,7 @@ import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.generationcp.middleware.service.impl.NamingConfigurationServiceImpl;
 import org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl;
 import org.generationcp.middleware.service.impl.audit.GermplasmAuditServiceImpl;
+import org.generationcp.middleware.service.impl.audit.ObservationAuditServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
@@ -929,6 +931,13 @@ public class MiddlewareFactory {
 	public StudyTreeService getStudyTreeService() {
 		return new StudyTreeServiceImpl(this.getCropDatabaseSessionProvider());
 	}
+
+	@Bean
+	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+	public ObservationAuditService getObservationAuditService() {
+		return new ObservationAuditServiceImpl(this.getCropDatabaseSessionProvider());
+	}
+
 
 	private HibernateSessionPerRequestProvider getWorkbenchSessionProvider() {
 		return new HibernateSessionPerRequestProvider(this.WORKBENCH_SessionFactory);
