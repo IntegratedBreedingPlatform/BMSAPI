@@ -362,6 +362,7 @@ public class AdvanceValidator {
 		final Set<Integer> datasetTypeIds = new HashSet<>();
 		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
 		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
+		datasetTypeIds.add(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		final Map<Integer, List<MeasurementVariable>> envAndPlotDatasetSelectionTraitVariables =
 			this.datasetService.getDatasetsWithVariables(studyId, datasetTypeIds).stream()
 				.collect(Collectors

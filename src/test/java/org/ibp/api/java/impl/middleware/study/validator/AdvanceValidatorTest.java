@@ -45,6 +45,14 @@ import static org.junit.Assert.fail;
 
 public class AdvanceValidatorTest {
 
+	private static final Set<Integer> ALLOWED_DATASET_TYPES = new HashSet<>();
+
+	static {
+		ALLOWED_DATASET_TYPES.add(DatasetTypeEnum.PLOT_DATA.getId());
+		ALLOWED_DATASET_TYPES.add(DatasetTypeEnum.SUMMARY_DATA.getId());
+		ALLOWED_DATASET_TYPES.add(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
+	}
+
 	private static final Integer STUDY_ID = new Random().nextInt(Integer.MAX_VALUE);
 	private static final Integer PLOT_DATASET_ID = new Random().nextInt(Integer.MAX_VALUE);
 	private static final Integer INSTANCE_ID = new Random().nextInt(Integer.MAX_VALUE);
@@ -216,9 +224,6 @@ public class AdvanceValidatorTest {
 
 		Mockito.when(this.datasetService.getObservationSetVariables(PLOT_DATASET_ID)).thenReturn(datasetVariables);
 
-		final Set<Integer> datasetTypeIds = new HashSet<>();
-		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
-		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
 		final MeasurementVariable selectionTraitDatasetVariables =
 			this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID, SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY,
 				VariableType.TRAIT);
@@ -226,7 +231,7 @@ public class AdvanceValidatorTest {
 		Mockito.when(datasetDTO.getDatasetId()).thenReturn(SELECTION_TRAIT_DATASET_ID);
 		Mockito.when(datasetDTO.getVariables()).thenReturn(Arrays.asList(selectionTraitDatasetVariables));
 		Mockito.when(
-			this.datasetService.getDatasetsWithVariables(STUDY_ID, datasetTypeIds)).thenReturn(Arrays.asList(datasetDTO));
+			this.datasetService.getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES)).thenReturn(Arrays.asList(datasetDTO));
 
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
@@ -249,7 +254,7 @@ public class AdvanceValidatorTest {
 
 		Mockito.verify(this.datasetService)
 			.getDatasetMeasurementVariablesByVariableType(STUDY_ID, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, datasetTypeIds);
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES);
 
 		Mockito.verify(this.datasetValidator)
 			.validateDatasetBelongsToStudy(STUDY_ID, SELECTION_TRAIT_DATASET_ID);
@@ -273,9 +278,6 @@ public class AdvanceValidatorTest {
 
 		Mockito.when(this.datasetService.getObservationSetVariables(PLOT_DATASET_ID)).thenReturn(datasetVariables);
 
-		final Set<Integer> datasetTypeIds = new HashSet<>();
-		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
-		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
 		final MeasurementVariable selectionTraitDatasetVariables =
 			this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID, SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY,
 				VariableType.TRAIT);
@@ -283,7 +285,7 @@ public class AdvanceValidatorTest {
 		Mockito.when(datasetDTO.getDatasetId()).thenReturn(SELECTION_TRAIT_DATASET_ID);
 		Mockito.when(datasetDTO.getVariables()).thenReturn(Arrays.asList(selectionTraitDatasetVariables));
 		Mockito.when(
-			this.datasetService.getDatasetsWithVariables(STUDY_ID, datasetTypeIds)).thenReturn(Arrays.asList(datasetDTO));
+			this.datasetService.getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES)).thenReturn(Arrays.asList(datasetDTO));
 
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
@@ -310,7 +312,7 @@ public class AdvanceValidatorTest {
 
 		Mockito.verify(this.datasetService)
 			.getDatasetMeasurementVariablesByVariableType(STUDY_ID, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, datasetTypeIds);
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES);
 
 		Mockito.verify(this.datasetValidator).validateDatasetBelongsToStudy(STUDY_ID, SELECTION_TRAIT_DATASET_ID);
 
@@ -880,9 +882,6 @@ public class AdvanceValidatorTest {
 	@Test
 	public void validateSelectionTrait_OK_datasetIdAsGivenSelectionTraitDatasetId() {
 
-		final Set<Integer> datasetTypeIds = new HashSet<>();
-		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
-		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
 		final MeasurementVariable selectionTraitDatasetVariables =
 			this.mockMeasurementVariable(SELECTION_TRAIT_VARIABLE_ID, SelectionTraitDataResolver.SELECTION_TRAIT_PROPERTY,
 				VariableType.TRAIT);
@@ -890,7 +889,7 @@ public class AdvanceValidatorTest {
 		Mockito.when(datasetDTO.getDatasetId()).thenReturn(SELECTION_TRAIT_DATASET_ID);
 		Mockito.when(datasetDTO.getVariables()).thenReturn(Arrays.asList(selectionTraitDatasetVariables));
 		Mockito.when(
-			this.datasetService.getDatasetsWithVariables(STUDY_ID, datasetTypeIds)).thenReturn(Arrays.asList(datasetDTO));
+			this.datasetService.getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES)).thenReturn(Arrays.asList(datasetDTO));
 
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
@@ -905,7 +904,7 @@ public class AdvanceValidatorTest {
 
 		Mockito.verify(this.datasetService)
 			.getDatasetMeasurementVariablesByVariableType(STUDY_ID, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, datasetTypeIds);
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES);
 
 		Mockito.verify(this.datasetValidator)
 			.validateDatasetBelongsToStudy(STUDY_ID, SELECTION_TRAIT_DATASET_ID);
@@ -937,10 +936,7 @@ public class AdvanceValidatorTest {
 		Mockito.verify(this.datasetService)
 			.getDatasetMeasurementVariablesByVariableType(STUDY_ID, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 
-		final Set<Integer> datasetTypeIds = new HashSet<>();
-		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
-		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
-		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, datasetTypeIds);
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES);
 
 		Mockito.verify(this.datasetValidator, Mockito.never())
 			.validateDatasetBelongsToStudy(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
@@ -974,10 +970,7 @@ public class AdvanceValidatorTest {
 		Mockito.verify(this.datasetService)
 			.getDatasetMeasurementVariablesByVariableType(STUDY_ID, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 
-		final Set<Integer> datasetTypeIds = new HashSet<>();
-		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
-		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
-		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, datasetTypeIds);
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES);
 
 		Mockito.verify(this.datasetValidator, Mockito.never())
 			.validateDatasetBelongsToStudy(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
@@ -1011,10 +1004,7 @@ public class AdvanceValidatorTest {
 		Mockito.verify(this.datasetService)
 			.getDatasetMeasurementVariablesByVariableType(STUDY_ID, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 
-		final Set<Integer> datasetTypeIds = new HashSet<>();
-		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
-		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
-		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, datasetTypeIds);
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES);
 
 		Mockito.verify(this.datasetValidator, Mockito.never())
 			.validateDatasetBelongsToStudy(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
@@ -1049,10 +1039,7 @@ public class AdvanceValidatorTest {
 		Mockito.verify(this.datasetService)
 			.getDatasetMeasurementVariablesByVariableType(STUDY_ID, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 
-		final Set<Integer> datasetTypeIds = new HashSet<>();
-		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
-		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
-		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, datasetTypeIds);
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES);
 
 		Mockito.verify(this.datasetValidator, Mockito.never())
 			.validateDatasetBelongsToStudy(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
@@ -1088,10 +1075,7 @@ public class AdvanceValidatorTest {
 		Mockito.verify(this.datasetService)
 			.getDatasetMeasurementVariablesByVariableType(STUDY_ID, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 
-		final Set<Integer> datasetTypeIds = new HashSet<>();
-		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
-		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
-		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, datasetTypeIds);
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES);
 
 		Mockito.verify(this.datasetValidator, Mockito.never())
 			.validateDatasetBelongsToStudy(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
@@ -1128,10 +1112,7 @@ public class AdvanceValidatorTest {
 		Mockito.verify(this.datasetService)
 			.getDatasetMeasurementVariablesByVariableType(STUDY_ID, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
 
-		final Set<Integer> datasetTypeIds = new HashSet<>();
-		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
-		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
-		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, datasetTypeIds);
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, ALLOWED_DATASET_TYPES);
 
 		Mockito.verify(this.datasetValidator, Mockito.never())
 			.validateDatasetBelongsToStudy(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
