@@ -73,11 +73,6 @@ public class GermplasmNameTypeValidator {
 				this.errors.reject("germplasm.name.type.code.can.not.be.modified", "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
-			if (germplasmNameTypeRequestDTO.getName() != null && !germplasmNameTypeRequestDTO.getName()
-				.equalsIgnoreCase(germplasmNameTypeDTO.getName())) {
-				this.errors.reject("germplasm.name.type.name.can.not.be.modified", "");
-				throw new ApiRequestValidationException(this.errors.getAllErrors());
-			}
 		} else {
 			if (germplasmNameTypeRequestDTO.getCode() != null) {
 				this.validateNameTypeCode(germplasmNameTypeRequestDTO);
