@@ -8,12 +8,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.api.study.MyStudiesService;
-import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.dms.Study;
-import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.study.StudyService;
@@ -121,34 +119,6 @@ public class StudyResource {
 		@PathVariable final Integer studyId) {
 		this.studyService.deleteStudy(studyId);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-	}
-
-	@Deprecated
-	@ApiOperation("Return a paginated list of studies.")
-	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies", method = RequestMethod.GET)
-	@ApiImplicitParams({
-		@ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
-			value = "page number. Start at " + PagedResult.DEFAULT_PAGE_NUMBER),
-		@ApiImplicitParam(name = "size", dataType = "integer", paramType = "query",
-			value = "Number of records per page."),
-		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
-			value = "Sorting criteria in the format: property,asc|desc. ")
-	})
-	@ResponseBody
-	public ResponseEntity<List<StudyDTO>> getStudies(
-		@PathVariable final String cropName,
-		@PathVariable final String programUUID,
-		@RequestParam(required = false) final String studyNameContainsString,
-		@ApiIgnore @PageableDefault(page = PagedResult.DEFAULT_PAGE_NUMBER, size = PagedResult.DEFAULT_PAGE_SIZE) final Pageable pageable
-	) {
-
-		final StudySearchRequest studySearchRequest = new StudySearchRequest();
-		studySearchRequest.setStudyNameFilter(new SqlTextFilter(studyNameContainsString, SqlTextFilter.Type.CONTAINS));
-
-		return new PaginatedSearch().getPagedResult(
-			() -> this.studyService.countFilteredStudies(programUUID, studySearchRequest),
-			() -> this.studyService.getFilteredStudies(programUUID, studySearchRequest, pageable),
-			pageable);
 	}
 
 	@ApiOperation(value = "Delete a name type associated to studies", notes = "Delete a name type associated to studies")

@@ -2,7 +2,6 @@
 package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
-import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudyDetailsDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.api.study.StudySearchResponse;
@@ -116,17 +115,6 @@ public class StudyServiceImpl implements StudyService {
 	public void deleteStudy(final Integer studyId) {
 		this.studyValidator.validateDeleteStudy(studyId);
 		this.middlewareStudyService.deleteStudy(studyId);
-	}
-
-	@Override
-	public List<StudyDTO> getFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest,
-		final Pageable pageable) {
-		return this.middlewareStudyService.getFilteredStudies(programUUID, studySearchRequest, pageable);
-	}
-
-	@Override
-	public long countFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
-		return this.middlewareStudyService.countFilteredStudies(programUUID, studySearchRequest);
 	}
 
 	@Override
