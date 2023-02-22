@@ -1,5 +1,6 @@
 package org.ibp.api.rest.labelprinting;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
@@ -11,9 +12,12 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
@@ -36,7 +40,6 @@ import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummary;
 import org.ibp.api.rest.labelprinting.domain.LabelsNeededSummaryResponse;
 import org.ibp.api.rest.labelprinting.domain.OriginResourceMetadata;
 import org.ibp.api.rest.labelprinting.domain.SortableFieldDto;
-import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -56,6 +59,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @Transactional
@@ -81,6 +85,9 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	@Autowired
 	private StudyTransactionsService studyTransactionsService;
+
+	@Autowired
+	private OntologyDataManager ontologyDataManager;
 
 	private Field studyNameField;
 	private Field yearField;
@@ -226,7 +233,8 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 		final List<MeasurementVariable> plotVariables = this.middlewareDatasetService.getObservationSetVariables(
 			plotDatasetId,
-			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
+			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId(),
+				VariableType.ENTRY_DETAIL.getId()));
 
 		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
 			.getObservationSetVariables(
@@ -309,8 +317,24 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 		final Map<String, String> gidPedigreeMap = new HashMap<>();
 
+		// Add the required observation table columns necessary for this function
+		final Map<Integer, String> requiredColumns =
+			this.ontologyDataManager.getTermsByIds(Lists.newArrayList(TermId.TRIAL_INSTANCE_FACTOR.getId(),
+				TermId.PLOT_NO.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
+				TermId.OBS_UNIT_ID.getId())).stream().collect(Collectors.toMap(Term::getId, Term::getName));
+
+		combinedKeys.stream().forEach((key) -> {
+			final Field labelField = combinedKeyFieldMap.getOrDefault(key, null);
+			// Add the selected Label Fields to the visible columns list
+			// To make sure that only the fields requested by the user are processed and returned from the query.
+			if (labelField != null && labelField.getFieldType() != FieldType.STATIC) {
+				requiredColumns.put(labelField.getId(), labelField.getName());
+			}
+		});
+
 		final List<ObservationUnitRow> observationUnitRows =
-			this.middlewareDatasetService.getAllObservationUnitRows(labelsGeneratorInput.getStudyId(), labelsGeneratorInput.getDatasetId());
+			this.middlewareDatasetService.getAllObservationUnitRows(labelsGeneratorInput.getStudyId(), labelsGeneratorInput.getDatasetId(),
+				new HashSet<>(requiredColumns.values()));
 
 		Collections.sort(
 			observationUnitRows,
@@ -329,7 +353,8 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 				if (FieldType.VARIABLE.equals(field.getFieldType())) {
 					this.putVariableValueInColumns(row, field, combinedKey, observationUnitRow);
 				} else if (FieldType.STATIC.equals(field.getFieldType())) {
-					this.putStaticValueInColumns(row, field, combinedKey, observationUnitRow, study, observationUnitDtoTransactionDtoMap, gidPedigreeMap);
+					this.putStaticValueInColumns(row, field, combinedKey, observationUnitRow, study, observationUnitDtoTransactionDtoMap,
+						gidPedigreeMap);
 				} else if (FieldType.NAME.equals(field.getFieldType())) {
 					this.putNameValueInColumns(row, field, combinedKey, observationUnitRow);
 				}
@@ -340,7 +365,8 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 		return new LabelsData(LabelPrintingFieldUtils.buildCombinedKey(FieldType.VARIABLE, TermId.OBS_UNIT_ID.getId()), results);
 	}
 
-	protected void putVariableValueInColumns(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow) {
+	protected void putVariableValueInColumns(final Map<String, String> row, final Field field, final String combinedKey,
+		final ObservationUnitRow observationUnitRow) {
 		// Special cases: LOCATION_NAME, PLOT OBS_UNIT_ID, CROP_SEASON_CODE
 		final TermId term = TermId.getById(field.getId());
 		switch (term) {
@@ -374,14 +400,17 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	}
 
-	protected void putStaticValueInColumns(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow, final StudyDetails study, final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap,
+	protected void putStaticValueInColumns(final Map<String, String> row, final Field field, final String combinedKey,
+		final ObservationUnitRow observationUnitRow, final StudyDetails study,
+		final Map<String, StudyTransactionsDto> observationUnitDtoTransactionDtoMap,
 		final Map<String, String> gidPedigreeMap) {
 
 		final Optional<LabelPrintingStaticField> staticField =
 			LabelPrintingStaticField.getByFieldId(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(combinedKey));
 		switch (staticField.get()) {
 			case YEAR:
-				row.put(combinedKey, StringUtils.isNotEmpty(study.getStartDate()) ? study.getStartDate().substring(0, 4) : StringUtils.EMPTY);
+				row.put(combinedKey,
+					StringUtils.isNotEmpty(study.getStartDate()) ? study.getStartDate().substring(0, 4) : StringUtils.EMPTY);
 				break;
 			case STUDY_NAME:
 				row.put(combinedKey, study.getStudyName());
@@ -432,7 +461,8 @@ public class ObservationDatasetLabelPrinting extends LabelPrintingStrategy {
 
 	}
 
-	protected void putNameValueInColumns(final Map<String, String> row, final Field field, final String combinedKey, final ObservationUnitRow observationUnitRow) {
+	protected void putNameValueInColumns(final Map<String, String> row, final Field field, final String combinedKey,
+		final ObservationUnitRow observationUnitRow) {
 		final Optional<ObservationUnitData> observationVariables =
 			ObservationLabelPrintingHelper.getObservationUnitData(observationUnitRow.getVariables(), field);
 		if (observationVariables.isPresent()) {

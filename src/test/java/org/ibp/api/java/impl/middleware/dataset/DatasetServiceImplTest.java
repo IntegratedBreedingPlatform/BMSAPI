@@ -14,6 +14,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
@@ -131,6 +132,9 @@ public class DatasetServiceImplTest {
 
 	@Mock
 	private StudyService studyService;
+
+	@Mock
+	private OntologyDataManager ontologyDataManager;
 
 	@InjectMocks
 	private DatasetServiceImpl studyDatasetService;
