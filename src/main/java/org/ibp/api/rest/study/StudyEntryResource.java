@@ -55,7 +55,7 @@ public class StudyEntryResource {
 	@ApiOperation(value = "Replace germplasm entry in study",
 		notes = "Replace germplasm entry in study")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/{entryId}", method = RequestMethod.PUT)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'REPLACE_GERMPLASM')")
 	@ResponseBody
 	public ResponseEntity<Void> replaceStudyEntry(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
