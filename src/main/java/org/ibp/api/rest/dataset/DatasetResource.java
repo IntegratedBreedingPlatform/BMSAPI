@@ -542,7 +542,7 @@ public class DatasetResource {
 	}
 
 	@ApiIgnore
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'MODIFY_COLUMNS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/plot-datasets/properties", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<Void> updatePlotDatasetProperties(@PathVariable final String crop,
