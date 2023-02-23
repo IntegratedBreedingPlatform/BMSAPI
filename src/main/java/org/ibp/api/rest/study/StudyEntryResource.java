@@ -67,7 +67,7 @@ public class StudyEntryResource {
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm ids",
 		notes = "Create germplasm entries in study based on the specified germplasm ids")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.PUT)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'ADD_NEW_ENTRIES')")
 	@ResponseBody
 	public ResponseEntity<Void> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID, @PathVariable final Integer studyId,
