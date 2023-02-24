@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(value = "Variable Cache Controller")
 @RestController
-@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'CROP_MANAGEMENT', 'MANAGE_ONTOLOGIES')")
+@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'CROP_MANAGEMENT', 'MANAGE_ONTOLOGIES', 'GERMPLASM_AND_CHECKS', 'ADD_ENTRY_DETAILS_VARIABLES')")
 public class VariableCacheController {
 
 	@Autowired
