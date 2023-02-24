@@ -82,7 +82,7 @@ public class StudyEntryResource {
 	@ApiOperation(value = "Create germplasm entries in study based on the specified germplasm list id",
 		notes = "Create germplasm entries in study based on the specified germplasm list id ")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/generation", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'ADD_NEW_ENTRIES')")
 	@ResponseBody
 	public ResponseEntity<Void> createStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID, @PathVariable final Integer studyId,
@@ -96,7 +96,7 @@ public class StudyEntryResource {
 	@ApiOperation(value = "Delete germplasm entries in study",
 		notes = "Delete germplasm entries in study")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'ADD_NEW_ENTRIES')")
 	@ResponseBody
 	public ResponseEntity deleteStudyEntries(final @PathVariable String cropname,
 		@PathVariable final String programUUID,
@@ -112,7 +112,7 @@ public class StudyEntryResource {
 	@ApiOperation(value = "Update germplasm entries property",
 		notes = "Update germplasm entries property")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/properties", method = RequestMethod.PUT)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'ADD_ENTRY_DETAILS_VALUES')")
 	@ResponseBody
 	public ResponseEntity updateStudyEntriesProperty(final @PathVariable String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final StudyEntryPropertyBatchUpdateRequest updateRequestDto) {
