@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.ruleengine.naming.expression.SelectionTraitExpression;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -251,6 +252,7 @@ public class AdvanceValidatorTest {
 		Mockito.verify(this.instanceValidator).validateStudyInstance(ArgumentMatchers.eq(STUDY_ID), ArgumentMatchers.anySet());
 
 		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyDataManager).getMethodsFromExperiments(PLOT_DATASET_ID, METHOD_VARIATE_ID, Arrays.asList("1"));
 
 		Mockito.verify(this.datasetService)
 			.getDatasetMeasurementVariablesByVariableType(STUDY_ID, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
@@ -309,6 +311,7 @@ public class AdvanceValidatorTest {
 		Mockito.verify(this.instanceValidator).validateStudyInstance(ArgumentMatchers.eq(STUDY_ID), ArgumentMatchers.anySet());
 
 		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyDataManager).getMethodsFromExperiments(PLOT_DATASET_ID, METHOD_VARIATE_ID, Arrays.asList("1"));
 
 		Mockito.verify(this.datasetService)
 			.getDatasetMeasurementVariablesByVariableType(STUDY_ID, Arrays.asList(VariableType.STUDY_DETAIL.getId()));
@@ -323,22 +326,9 @@ public class AdvanceValidatorTest {
 	}
 
 	@Test
-	public void validateAdvanceStudyBreedingMethodSelection_FAIL_requestRequired() {
+	public void validateAndGetDataset_FAIL_datasetRequired() {
 		try {
-			this.advanceValidator.validateAdvanceStudyBreedingMethodSelection(null, new ArrayList<>());
-			fail("should have failed");
-		} catch (final ApiRequestValidationException exception) {
-			assertThat(exception, instanceOf(ApiRequestValidationException.class));
-			assertThat(exception.getErrors().get(0).getCode(), is("request.null"));
-		}
-
-		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
-	}
-
-	@Test
-	public void validateAdvanceStudyDatasetAndGetVariables_FAIL_datasetRequired() {
-		try {
-			this.advanceValidator.validateDatasetAndGetVariables(STUDY_ID, null);
+			this.advanceValidator.validateAndGetDataset(STUDY_ID, null);
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
@@ -350,7 +340,7 @@ public class AdvanceValidatorTest {
 	}
 
 	@Test
-	public void validateAdvanceStudyDatasetAndGetVariables_FAIL_notAllowedDataset() {
+	public void validateAndGetDataset_FAIL_notAllowedDataset() {
 		this.mockGetDataset(true, new ArrayList<>());
 
 		final DatasetDTO datasetDTO = Mockito.mock(DatasetDTO.class);
@@ -358,7 +348,7 @@ public class AdvanceValidatorTest {
 		Mockito.when(this.datasetService.getDataset(PLOT_DATASET_ID)).thenReturn(datasetDTO);
 
 		try {
-			this.advanceValidator.validateDatasetAndGetVariables(STUDY_ID, PLOT_DATASET_ID);
+			this.advanceValidator.validateAndGetDataset(STUDY_ID, PLOT_DATASET_ID);
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
@@ -371,12 +361,28 @@ public class AdvanceValidatorTest {
 	}
 
 	@Test
+	public void validateAdvanceStudyBreedingMethodSelection_FAIL_requestRequired() {
+		final DatasetDTO datasetDTO = this.mockDatasetDTO(true, new ArrayList<>());
+		try {
+			this.advanceValidator.validateAdvanceStudyBreedingMethodSelection(null, datasetDTO, Arrays.asList(INSTANCE_ID));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("request.null"));
+		}
+
+		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyDataManager, Mockito.never()).getMethodsFromExperiments(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
+	}
+
+	@Test
 	public void validateAdvanceStudyBreedingMethodSelection_FAIL_selectionRequired() {
+		final DatasetDTO datasetDTO = this.mockDatasetDTO(true, new ArrayList<>());
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(null, null);
 
 		try {
-			this.advanceValidator.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, new ArrayList<>());
+			this.advanceValidator.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, datasetDTO, Arrays.asList(INSTANCE_ID));
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
@@ -384,15 +390,17 @@ public class AdvanceValidatorTest {
 		}
 
 		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyDataManager, Mockito.never()).getMethodsFromExperiments(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
 	public void validateAdvanceStudyBreedingMethodSelection_FAIL_bothSelectionPresent() {
+		final DatasetDTO datasetDTO = this.mockDatasetDTO(true, new ArrayList<>());
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(BREEDING_METHOD_ID, METHOD_VARIATE_ID);
 
 		try {
-			this.advanceValidator.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, new ArrayList<>());
+			this.advanceValidator.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, datasetDTO, Arrays.asList(INSTANCE_ID));
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
@@ -400,17 +408,19 @@ public class AdvanceValidatorTest {
 		}
 
 		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyDataManager, Mockito.never()).getMethodsFromExperiments(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
 	public void validateAdvanceStudyBreedingMethodSelection_FAIL_generativeMethod() {
+		final DatasetDTO datasetDTO = this.mockDatasetDTO(true, new ArrayList<>());
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(BREEDING_METHOD_ID, null);
 
 		this.mockValidateMethod(MethodType.GENERATIVE, false);
 
 		try {
-			this.advanceValidator.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, new ArrayList<>());
+			this.advanceValidator.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, datasetDTO, Arrays.asList(INSTANCE_ID));
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
@@ -418,15 +428,17 @@ public class AdvanceValidatorTest {
 		}
 
 		Mockito.verify(this.breedingMethodValidator).validateMethod(BREEDING_METHOD_ID);
+		Mockito.verify(this.studyDataManager, Mockito.never()).getMethodsFromExperiments(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
 	public void validateAdvanceStudyBreedingMethodSelection_FAIL_methodVariateNotPresent() {
+		final DatasetDTO datasetDTO = this.mockDatasetDTO(true, new ArrayList<>());
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
 
 		try {
-			this.advanceValidator.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, new ArrayList<>());
+			this.advanceValidator.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, datasetDTO, Arrays.asList(INSTANCE_ID));
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
@@ -435,19 +447,20 @@ public class AdvanceValidatorTest {
 		}
 
 		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyDataManager, Mockito.never()).getMethodsFromExperiments(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
 	public void validateAdvanceStudyBreedingMethodSelection_FAIL_invalidMethodVariableType() {
+		final MeasurementVariable datasetVariables =
+			this.mockMeasurementVariable(METHOD_VARIATE_ID, AdvanceValidator.BREEDING_METHOD_VARIABLE_PROPERTY, VariableType.ENTRY_DETAIL);
+		final DatasetDTO datasetDTO = this.mockDatasetDTO(true, Arrays.asList(datasetVariables));
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
 
-		final MeasurementVariable datasetVariables =
-			this.mockMeasurementVariable(METHOD_VARIATE_ID, AdvanceValidator.BREEDING_METHOD_VARIABLE_PROPERTY, VariableType.ENTRY_DETAIL);
-
 		try {
 			this.advanceValidator
-				.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, Arrays.asList(datasetVariables));
+				.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, datasetDTO, Arrays.asList(INSTANCE_ID));
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
@@ -456,19 +469,20 @@ public class AdvanceValidatorTest {
 		}
 
 		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyDataManager, Mockito.never()).getMethodsFromExperiments(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
 	}
 
 	@Test
 	public void validateAdvanceStudyBreedingMethodSelection_FAIL_invalidMethodProperty() {
+		final MeasurementVariable datasetVariables =
+			this.mockMeasurementVariable(METHOD_VARIATE_ID, RandomStringUtils.randomAlphabetic(10), VariableType.SELECTION_METHOD);
+		final DatasetDTO datasetDTO = this.mockDatasetDTO(true, Arrays.asList(datasetVariables));
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
 
-		final MeasurementVariable datasetVariables =
-			this.mockMeasurementVariable(METHOD_VARIATE_ID, RandomStringUtils.randomAlphabetic(10), VariableType.SELECTION_METHOD);
-
 		try {
 			this.advanceValidator
-				.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, Arrays.asList(datasetVariables));
+				.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, datasetDTO, Arrays.asList(INSTANCE_ID));
 			fail("should have failed");
 		} catch (final ApiRequestValidationException exception) {
 			assertThat(exception, instanceOf(ApiRequestValidationException.class));
@@ -477,6 +491,35 @@ public class AdvanceValidatorTest {
 		}
 
 		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyDataManager, Mockito.never()).getMethodsFromExperiments(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt(), ArgumentMatchers.anyList());
+	}
+
+	@Test
+	public void validateAdvanceStudyBreedingMethodSelection_FAIL_generativeMethodsDefinedInObservations() {
+		final MeasurementVariable datasetVariables =
+			this.mockMeasurementVariable(METHOD_VARIATE_ID, AdvanceValidator.BREEDING_METHOD_VARIABLE_PROPERTY, VariableType.SELECTION_METHOD);
+		final DatasetDTO datasetDTO = this.mockDatasetDTO(true, Arrays.asList(datasetVariables));
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
+			this.mockBreedingMethodSelectionRequest(null, METHOD_VARIATE_ID);
+
+		final String methodCode = RandomStringUtils.randomAlphabetic(10);
+		final Method method = Mockito.mock(Method.class);
+		Mockito.when(method.getMcode()).thenReturn(methodCode);
+		Mockito.when(method.getMtype()).thenReturn(MethodType.GENERATIVE.getCode());
+		Mockito.when(this.studyDataManager.getMethodsFromExperiments(PLOT_DATASET_ID, METHOD_VARIATE_ID, Arrays.asList("1"))).thenReturn(Arrays.asList(method));
+
+		try {
+			this.advanceValidator
+				.validateAdvanceStudyBreedingMethodSelection(breedingMethodSelectionRequest, datasetDTO, Arrays.asList(INSTANCE_ID));
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.breeding-method.selection.variate.invalid-methods"));
+			assertThat(exception.getErrors().get(0).getArguments()[0], is(methodCode));
+		}
+
+		Mockito.verify(this.breedingMethodValidator, Mockito.never()).validateMethod(ArgumentMatchers.anyInt());
+		Mockito.verify(this.studyDataManager).getMethodsFromExperiments(PLOT_DATASET_ID, METHOD_VARIATE_ID, Arrays.asList("1"));
 	}
 
 	@Test
@@ -1284,14 +1327,22 @@ public class AdvanceValidatorTest {
 	}
 
 	private void mockGetDataset(final boolean hasExperimentalDesign, final List<MeasurementVariable> variables) {
+		final DatasetDTO datasetDTO = this.mockDatasetDTO(hasExperimentalDesign, variables);
+		Mockito.when(this.datasetService.getDataset(PLOT_DATASET_ID)).thenReturn(datasetDTO);
+	}
+
+	private DatasetDTO mockDatasetDTO(final boolean hasExperimentalDesign, final List<MeasurementVariable> variables) {
 		final StudyInstance studyInstance = Mockito.mock(StudyInstance.class);
+		Mockito.when(studyInstance.getInstanceId()).thenReturn(INSTANCE_ID);
+		Mockito.when(studyInstance.getInstanceNumber()).thenReturn(1);
 		Mockito.when(studyInstance.isHasExperimentalDesign()).thenReturn(hasExperimentalDesign);
 
 		final DatasetDTO datasetDTO = Mockito.mock(DatasetDTO.class);
 		Mockito.when(datasetDTO.getInstances()).thenReturn(Arrays.asList(studyInstance));
+		Mockito.when(datasetDTO.getDatasetId()).thenReturn(PLOT_DATASET_ID);
 		Mockito.when(datasetDTO.getDatasetTypeId()).thenReturn(DatasetTypeEnum.PLOT_DATA.getId());
 		Mockito.when(datasetDTO.getVariables()).thenReturn(variables);
-		Mockito.when(this.datasetService.getDataset(PLOT_DATASET_ID)).thenReturn(datasetDTO);
+		return datasetDTO;
 	}
 
 	private void mockValidateMethod(final MethodType type, final Boolean isBulking) {
