@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.study.AbstractAdvanceRequest;
 import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
@@ -12,6 +13,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.ruleengine.naming.expression.SelectionTraitExpression;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -24,6 +26,7 @@ import org.ibp.api.java.study.StudyService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -78,13 +81,14 @@ public class AdvanceValidator {
 
 		this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
 
-		final List<MeasurementVariable> datasetVariables = this.validateDatasetAndGetVariables(studyId, request.getDatasetId());
+		final DatasetDTO dataset = this.validateAndGetDataset(studyId, request.getDatasetId());
 		final BreedingMethodDTO selectedBreedingMethodDTO =
-			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), datasetVariables);
-		this.validateLineSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), datasetVariables);
-		this.validateBulkingSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), datasetVariables);
+			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), dataset,
+				request.getInstanceIds());
+		this.validateLineSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), dataset.getVariables());
+		this.validateBulkingSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), dataset.getVariables());
 		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
-		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), datasetVariables);
+		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), dataset.getVariables());
 	}
 
 	public void validateAdvanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
@@ -130,7 +134,7 @@ public class AdvanceValidator {
 		return dataset.getId();
 	}
 
-	List<MeasurementVariable> validateDatasetAndGetVariables(final Integer studyId, final Integer datasetId) {
+	DatasetDTO validateAndGetDataset(final Integer studyId, final Integer datasetId) {
 		if (datasetId == null) {
 			throw new ApiRequestValidationException("advance.dataset.required", new Object[] {});
 		}
@@ -142,12 +146,12 @@ public class AdvanceValidator {
 
 		this.datasetValidator.validateDatasetBelongsToStudy(studyId, datasetId);
 
-		return dataset.getVariables();
+		return dataset;
 	}
 
 	BreedingMethodDTO validateAdvanceStudyBreedingMethodSelection(
-		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest,
-		final List<MeasurementVariable> datasetVariables) {
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest, final DatasetDTO observationDataset,
+		final List<Integer> instanceIds) {
 		checkNotNull(breedingMethodSelectionRequest, "request.null");
 
 		if ((breedingMethodSelectionRequest.getBreedingMethodId() == null && breedingMethodSelectionRequest.getMethodVariateId() == null)
@@ -170,7 +174,7 @@ public class AdvanceValidator {
 
 		if (breedingMethodSelectionRequest.getMethodVariateId() != null) {
 			final MeasurementVariable variable =
-				this.validateDataSetHasVariable(datasetVariables, breedingMethodSelectionRequest.getMethodVariateId(),
+				this.validateDataSetHasVariable(observationDataset.getVariables(), breedingMethodSelectionRequest.getMethodVariateId(),
 					"advance.breeding-method.selection.variate.not-present");
 			if (variable.getVariableType() != VariableType.SELECTION_METHOD) {
 				throw new ApiRequestValidationException("advance.breeding-method.selection.variate.type.invalid",
@@ -179,6 +183,20 @@ public class AdvanceValidator {
 			if (!BREEDING_METHOD_VARIABLE_PROPERTY.equals(variable.getProperty())) {
 				throw new ApiRequestValidationException("advance.breeding-method.selection.variate.property.invalid",
 					new Object[] {BREEDING_METHOD_VARIABLE_PROPERTY});
+			}
+
+			// Validate that there are not generative methods defined in the observations
+			final List<String> instanceNumbers =
+				observationDataset.getInstances().stream().filter(instance -> instanceIds.contains(instance.getInstanceId()))
+					.map(instance -> String.valueOf(instance.getInstanceNumber())).collect(Collectors.toList());
+			final List<Method> methods = this.studyDataManager
+				.getMethodsFromExperiments(observationDataset.getDatasetId(), breedingMethodSelectionRequest.getMethodVariateId(),
+					new ArrayList<>(instanceNumbers));
+			final Set<String> nonAdvancingMethods = methods.stream().filter(method ->
+				!MethodType.getAdvancingMethodTypes().contains(method.getMtype())).map(Method::getMcode).collect(Collectors.toSet());
+			if (!CollectionUtils.isEmpty(nonAdvancingMethods)) {
+				throw new ApiRequestValidationException("advance.breeding-method.selection.variate.invalid-methods",
+					new Object[] {StringUtils.join(nonAdvancingMethods, ", ")});
 			}
 		}
 
