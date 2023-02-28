@@ -136,6 +136,24 @@ public class DatasetResource {
 		return new ResponseEntity<>(variable, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Add Entry Details Dataset Variable", notes = "Add Entry Details Dataset Variable")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'ADD_ENTRY_DETAILS_VARIABLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/entry-details", method = RequestMethod.PUT)
+	public ResponseEntity<MeasurementVariable> addEntryDetails(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetVariable) {
+		MeasurementVariable variable = null;
+		datasetVariable.setVariableTypeId(VariableType.ENTRY_DETAIL.getId());
+		try {
+			// TODO: We need to find a better way to lock the specific dataset where the variable is added instead of the resource.
+			this.datasetLock.lockWrite();
+			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
+		} finally {
+			this.datasetLock.unlockWrite();
+		}
+		return new ResponseEntity<>(variable, HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Remove dataset variables", notes = "Remove a set of variables from dataset")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.DELETE)
