@@ -56,7 +56,9 @@ public class SampleListResource {
 	public CsvExportSampleListService csvExportSampleListService;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','CREATE_STUDIES', 'DELETE_STUDY', 'CLOSE_STUDY', 'LOCK_STUDY','MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY','MS_CREATE_PENDING_WITHDRAWALS', "
+		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS','MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES','MS_CREATE_LOTS', 'GERMPLASM_AND_CHECKS','VIEW_GERMPLASM_AND_CHECKS','ADD_ENTRY_DETAILS_VARIABLES','ADD_ENTRY_DETAILS_VALUES', "
+		+ "'MODIFY_COLUMNS','REPLACE_GERMPLASM','ADD_NEW_ENTRIES','IMPORT_ENTRY_DETAILS', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/sample-lists", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createSampleList(@PathVariable final String crop, @RequestParam final String programUUID, @RequestBody final SampleListDto dto) {
