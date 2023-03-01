@@ -112,7 +112,7 @@ public class StudyEntryResource {
 	@ApiOperation(value = "Update germplasm entries property",
 		notes = "Update germplasm entries property")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/entries/properties", method = RequestMethod.PUT)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'ADD_ENTRY_DETAILS_VALUES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'MODIFY_ENTRY_DETAILS_VALUES')")
 	@ResponseBody
 	public ResponseEntity updateStudyEntriesProperty(final @PathVariable String cropname, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final StudyEntryPropertyBatchUpdateRequest updateRequestDto) {
