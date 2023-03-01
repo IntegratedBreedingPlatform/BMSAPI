@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.study.AbstractAdvanceRequest;
 import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
@@ -12,6 +13,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.ruleengine.naming.expression.SelectionTraitExpression;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -24,6 +26,7 @@ import org.ibp.api.java.study.StudyService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,6 +44,13 @@ import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.ch
 
 @Component
 public class AdvanceValidator {
+
+	private static final Set<Integer> ALLOWED_DATASET_TYPES = new HashSet<>();
+
+	static {
+		ALLOWED_DATASET_TYPES.add(DatasetTypeEnum.PLOT_DATA.getId());
+		ALLOWED_DATASET_TYPES.add(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
+	}
 
 	public static final String BREEDING_METHOD_VARIABLE_PROPERTY = "Breeding method";
 	public static final String SELECTED_LINE_VARIABLE_PROPERTY = "Selections";
@@ -69,15 +79,16 @@ public class AdvanceValidator {
 	public void validateAdvanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 		checkNotNull(request, "request.null");
 
-		final Integer plotDatasetId = this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
+		this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
 
-		final List<MeasurementVariable> plotDatasetVariables = this.datasetService.getObservationSetVariables(plotDatasetId);
+		final DatasetDTO dataset = this.validateAndGetDataset(studyId, request.getDatasetId());
 		final BreedingMethodDTO selectedBreedingMethodDTO =
-			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), plotDatasetVariables);
-		this.validateLineSelection(request, selectedBreedingMethodDTO, plotDatasetId, plotDatasetVariables);
-		this.validateBulkingSelection(request, selectedBreedingMethodDTO, plotDatasetId, plotDatasetVariables);
+			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), dataset,
+				request.getInstanceIds());
+		this.validateLineSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), dataset.getVariables());
+		this.validateBulkingSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), dataset.getVariables());
 		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
-		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), plotDatasetVariables);
+		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), dataset.getVariables());
 	}
 
 	public void validateAdvanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
@@ -123,9 +134,24 @@ public class AdvanceValidator {
 		return dataset.getId();
 	}
 
+	DatasetDTO validateAndGetDataset(final Integer studyId, final Integer datasetId) {
+		if (datasetId == null) {
+			throw new ApiRequestValidationException("advance.dataset.required", new Object[] {});
+		}
+
+		final DatasetDTO dataset = this.datasetService.getDataset(datasetId);
+		if (!ALLOWED_DATASET_TYPES.contains(dataset.getDatasetTypeId())) {
+			throw new ApiRequestValidationException("advance.dataset.not-supported", new Object[] {datasetId.toString()});
+		}
+
+		this.datasetValidator.validateDatasetBelongsToStudy(studyId, datasetId);
+
+		return dataset;
+	}
+
 	BreedingMethodDTO validateAdvanceStudyBreedingMethodSelection(
-		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest,
-		final List<MeasurementVariable> plotDatasetVariables) {
+		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest, final DatasetDTO observationDataset,
+		final List<Integer> instanceIds) {
 		checkNotNull(breedingMethodSelectionRequest, "request.null");
 
 		if ((breedingMethodSelectionRequest.getBreedingMethodId() == null && breedingMethodSelectionRequest.getMethodVariateId() == null)
@@ -148,7 +174,7 @@ public class AdvanceValidator {
 
 		if (breedingMethodSelectionRequest.getMethodVariateId() != null) {
 			final MeasurementVariable variable =
-				this.validatePlotdataSetHasVariable(plotDatasetVariables, breedingMethodSelectionRequest.getMethodVariateId(),
+				this.validateDataSetHasVariable(observationDataset.getVariables(), breedingMethodSelectionRequest.getMethodVariateId(),
 					"advance.breeding-method.selection.variate.not-present");
 			if (variable.getVariableType() != VariableType.SELECTION_METHOD) {
 				throw new ApiRequestValidationException("advance.breeding-method.selection.variate.type.invalid",
@@ -157,6 +183,20 @@ public class AdvanceValidator {
 			if (!BREEDING_METHOD_VARIABLE_PROPERTY.equals(variable.getProperty())) {
 				throw new ApiRequestValidationException("advance.breeding-method.selection.variate.property.invalid",
 					new Object[] {BREEDING_METHOD_VARIABLE_PROPERTY});
+			}
+
+			// Validate that there are not generative methods defined in the observations
+			final List<String> instanceNumbers =
+				observationDataset.getInstances().stream().filter(instance -> instanceIds.contains(instance.getInstanceId()))
+					.map(instance -> String.valueOf(instance.getInstanceNumber())).collect(Collectors.toList());
+			final List<Method> methods = this.studyDataManager
+				.getMethodsFromExperiments(observationDataset.getDatasetId(), breedingMethodSelectionRequest.getMethodVariateId(),
+					new ArrayList<>(instanceNumbers));
+			final Set<String> nonAdvancingMethods = methods.stream().filter(method ->
+				!MethodType.getAdvancingMethodTypes().contains(method.getMtype())).map(Method::getMcode).collect(Collectors.toSet());
+			if (!CollectionUtils.isEmpty(nonAdvancingMethods)) {
+				throw new ApiRequestValidationException("advance.breeding-method.selection.variate.invalid-methods",
+					new Object[] {StringUtils.join(nonAdvancingMethods, ", ")});
 			}
 		}
 
@@ -179,7 +219,7 @@ public class AdvanceValidator {
 	}
 
 	void validateLineSelection(final AdvanceStudyRequest request, final BreedingMethodDTO selectedBreedingMethod,
-		final Integer plotDatasetId, final List<MeasurementVariable> plotDatasetVariables) {
+		final Integer datasetId, final List<MeasurementVariable> plotDatasetVariables) {
 
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			request.getBreedingMethodSelectionRequest();
@@ -199,7 +239,7 @@ public class AdvanceValidator {
 
 			if (lineSelectionRequest.getLineVariateId() != null) {
 				final MeasurementVariable variable =
-					this.validatePlotdataSetHasVariable(plotDatasetVariables, lineSelectionRequest.getLineVariateId(),
+					this.validateDataSetHasVariable(plotDatasetVariables, lineSelectionRequest.getLineVariateId(),
 						"advance.lines.selection.variate.not-present");
 				if (variable.getVariableType() != VariableType.SELECTION_METHOD) {
 					throw new ApiRequestValidationException("advance.lines.selection.variate.type.invalid",
@@ -209,14 +249,14 @@ public class AdvanceValidator {
 					throw new ApiRequestValidationException("advance.lines.selection.variate.property.invalid",
 						new Object[] {SELECTED_LINE_VARIABLE_PROPERTY});
 				}
-				this.validateCountPlotsWithRecordedVariatesInDataset(plotDatasetId, lineSelectionRequest.getLineVariateId(),
+				this.validateCountPlotsWithRecordedVariatesInDataset(datasetId, lineSelectionRequest.getLineVariateId(),
 					"advance.lines.selection.variate.empty.observations");
 			}
 		}
 	}
 
 	void validateBulkingSelection(final AdvanceStudyRequest request, final BreedingMethodDTO selectedBreedingMethod,
-		final Integer plotDatasetId, final List<MeasurementVariable> plotDatasetVariables) {
+		final Integer datasetId, final List<MeasurementVariable> plotDatasetVariables) {
 
 		final AdvanceStudyRequest.BreedingMethodSelectionRequest breedingMethodSelectionRequest =
 			request.getBreedingMethodSelectionRequest();
@@ -235,7 +275,7 @@ public class AdvanceValidator {
 
 			if (bulkingRequest.getPlotVariateId() != null) {
 				final MeasurementVariable variable =
-					this.validatePlotdataSetHasVariable(plotDatasetVariables, bulkingRequest.getPlotVariateId(),
+					this.validateDataSetHasVariable(plotDatasetVariables, bulkingRequest.getPlotVariateId(),
 						"advance.bulking.selection.variate.not-present");
 				if (variable.getVariableType() != VariableType.SELECTION_METHOD) {
 					throw new ApiRequestValidationException("advance.bulking.selection.variate.type.invalid",
@@ -245,7 +285,7 @@ public class AdvanceValidator {
 					throw new ApiRequestValidationException("advance.bulking.selection.variate.property.invalid",
 						new Object[] {SELECTED_LINE_VARIABLE_PROPERTY});
 				}
-				this.validateCountPlotsWithRecordedVariatesInDataset(plotDatasetId, bulkingRequest.getPlotVariateId(),
+				this.validateCountPlotsWithRecordedVariatesInDataset(datasetId, bulkingRequest.getPlotVariateId(),
 					"advance.bulking.selection.variate.empty.observations");
 			}
 		}
@@ -322,7 +362,7 @@ public class AdvanceValidator {
 		}
 	}
 
-	private MeasurementVariable validatePlotdataSetHasVariable(final List<MeasurementVariable> plotDatasetVariables,
+	private MeasurementVariable validateDataSetHasVariable(final List<MeasurementVariable> plotDatasetVariables,
 		final Integer variableId,
 		final String errorCode) {
 		final Optional<MeasurementVariable> methodVariate = this.findVariableById(plotDatasetVariables, variableId);
@@ -340,6 +380,7 @@ public class AdvanceValidator {
 		final Set<Integer> datasetTypeIds = new HashSet<>();
 		datasetTypeIds.add(DatasetTypeEnum.PLOT_DATA.getId());
 		datasetTypeIds.add(DatasetTypeEnum.SUMMARY_DATA.getId());
+		datasetTypeIds.add(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		final Map<Integer, List<MeasurementVariable>> envAndPlotDatasetSelectionTraitVariables =
 			this.datasetService.getDatasetsWithVariables(studyId, datasetTypeIds).stream()
 				.collect(Collectors
