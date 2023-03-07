@@ -239,7 +239,7 @@ public class StudyEntryResource {
 	}
 
 	@ApiOperation(value = "Import Study Entry Details")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'IMPORT_ENTRY_DETAILS')")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}/entries/import", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> importStudyEntryDetails(
