@@ -58,8 +58,11 @@ public class FileResource {
 		@RequestParam(required = false) final Integer termId
 	) {
 		this.validateFileStorage();
-		if (!isBlank(observationUnitUUID) || instanceId != null) {
-			FileResource.verifyHasAuthorityStudy(this.request);
+		if (!isBlank(observationUnitUUID)) {
+			FileResource.verifyHasAuthorityStudyObservation(this.request);
+		}
+		else if (instanceId != null) {
+			FileResource.verifyHasAuthorityStudyEnvironment(this.request);
 		} else if(lotId != null) {
 			verifyHasAuthorityLots(this.request);
 		}  else {
@@ -105,8 +108,10 @@ public class FileResource {
 	) {
 		this.validateFileStorage();
 		final FileMetadataDTO fileMetadataDTO = this.fileMetadataService.getByFileUUID(fileUUID);
-		if (!isBlank(fileMetadataDTO.getObservationUnitUUID())) {
-			verifyHasAuthorityStudy(this.request);
+		if (fileMetadataDTO.getInstanceId() != null) {
+			verifyHasAuthorityStudyEnvironment(this.request);
+		} else if (!isBlank(fileMetadataDTO.getObservationUnitUUID())) {
+			verifyHasAuthorityStudyObservation(this.request);
 		} else if(fileMetadataDTO.getLotId() != null) {
 			verifyHasAuthorityLots(this.request);
 		} else {
@@ -143,12 +148,22 @@ public class FileResource {
 		}
 	}
 
-	public static void verifyHasAuthorityStudy(final HttpServletRequest request) {
+	public static void verifyHasAuthorityStudyObservation(final HttpServletRequest request) {
 		if (!(request.isUserInRole(PermissionsEnum.ADMIN.name())
 			|| request.isUserInRole(PermissionsEnum.STUDIES.name())
 			|| request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name())
 			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_OBSERVATION_UNITS.name())
 			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_FILES.name()))) {
+			throw new AccessDeniedException("");
+		}
+	}
+
+	public static void verifyHasAuthorityStudyEnvironment(final HttpServletRequest request) {
+		if (!(request.isUserInRole(PermissionsEnum.ADMIN.name())
+			|| request.isUserInRole(PermissionsEnum.STUDIES.name())
+			|| request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name())
+			|| request.isUserInRole(PermissionsEnum.ENVIRONMENT.name())
+			|| request.isUserInRole(PermissionsEnum.MANAGE_FILES_ENVIRONMENT.name()))) {
 			throw new AccessDeniedException("");
 		}
 	}
