@@ -43,7 +43,7 @@ public class GenotypeResource {
     @ApiOperation(value = "It will retrieve all genotypes of the study",
             notes = "It will retrieve all genotypes of the study")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
-    @RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/genotypes/table", method = RequestMethod.POST)
+    @RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/studies/{studyId}/genotypes/table", method = RequestMethod.POST)
     @ResponseBody
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "integer", paramType = "query",
