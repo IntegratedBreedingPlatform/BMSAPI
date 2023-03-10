@@ -139,7 +139,7 @@ public class SampleListValidatorTest {
 	@Test
 	public void testVerifySamplesExist_EmptyEntryIds() {
 		try {
-			this.validator.verifySamplesExist(1, Collections.emptyList());
+			this.validator.verifySamplesExist(Collections.emptyList());
 		} catch (final ApiRequestValidationException e) {
 			final List<String> codes = new ArrayList<>();
 			for (final ObjectError error : e.getErrors()) {
@@ -152,7 +152,7 @@ public class SampleListValidatorTest {
 	@Test
 	public void testVerifySamplesExist_NonExistentEntryIds() {
 		try {
-			this.validator.verifySamplesExist(1, Collections.singletonList(1));
+			this.validator.verifySamplesExist(Collections.singletonList(1));
 		} catch (final ApiRequestValidationException e) {
 			final List<String> codes = new ArrayList<>();
 			for (final ObjectError error : e.getErrors()) {

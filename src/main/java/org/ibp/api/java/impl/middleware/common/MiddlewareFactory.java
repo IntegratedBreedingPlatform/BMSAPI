@@ -40,8 +40,8 @@ import org.generationcp.middleware.api.cropparameter.CropParameterService;
 import org.generationcp.middleware.api.cropparameter.CropParameterServiceImpl;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
-import org.generationcp.middleware.api.genotype.GenotypeService;
-import org.generationcp.middleware.api.genotype.GenotypeServiceImpl;
+import org.generationcp.middleware.api.genotype.SampleGenotypeService;
+import org.generationcp.middleware.api.genotype.SampleGenotypeServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
@@ -704,8 +704,8 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public GenotypeService getGenotypeService() {
-		return new GenotypeServiceImpl(this.getCropDatabaseSessionProvider());
+	public SampleGenotypeService getGenotypeService() {
+		return new SampleGenotypeServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
 	@Bean

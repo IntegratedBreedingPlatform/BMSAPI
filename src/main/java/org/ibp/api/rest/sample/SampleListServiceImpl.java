@@ -230,7 +230,7 @@ public class SampleListServiceImpl implements SampleListService {
 	@Override
 	public void deleteSamples(final Integer sampleListId, final List<Integer> sampleIds){
 		this.sampleListValidator.validateSampleList(sampleListId);
-		this.sampleListValidator.verifySamplesExist(sampleListId, new ArrayList<>(sampleIds));
+		this.sampleListValidator.verifySamplesExist(new ArrayList<>(sampleIds));
 		this.sampleListServiceMW.deleteSamples(sampleListId, sampleIds);
 	}
 
