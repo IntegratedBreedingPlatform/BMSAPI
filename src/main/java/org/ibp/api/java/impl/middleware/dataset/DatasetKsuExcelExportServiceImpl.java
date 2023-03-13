@@ -21,7 +21,8 @@ public class DatasetKsuExcelExportServiceImpl extends BaseDatasetKsuExportServic
 	private DatasetKsuExcelGenerator datasetKsuExcelGenerator;
 
 	@Override
-	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean singleFile) {
+	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId,
+		final boolean singleFile) {
 
 		this.validate(studyId, datasetId, instanceIds);
 

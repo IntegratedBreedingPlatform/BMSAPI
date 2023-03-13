@@ -1,8 +1,8 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.ZipUtil;
+import org.generationcp.middleware.api.genotype.SampleGenotypeService;
 import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -44,6 +44,7 @@ import java.util.Set;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -87,6 +88,9 @@ public class DatasetExcelExportServiceImplTest {
 	@Mock
 	private DatasetCollectionOrderService datasetCollectionOrderService;
 
+	@Mock
+	private SampleGenotypeService sampleGenotypeService;
+
 	@InjectMocks
 	private DatasetExcelExportServiceImpl datasetExportService;
 
@@ -129,8 +133,8 @@ public class DatasetExcelExportServiceImplTest {
 		final File zipFile = new File("");
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2));
 		when(this.zipUtil.zipFiles(contains(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
-		Mockito.when(this.datasetExportService.getColumns(this.study.getId(), this.dataSetDTO.getDatasetId()))
-			.thenReturn(this.measurementVariables);
+		Mockito.when(this.sampleGenotypeService.getSampleGenotypeVariables(this.study.getId(), this.dataSetDTO.getDatasetId()))
+			.thenReturn(new HashMap<>());
 		final File result = this.datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
 			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
 
@@ -148,7 +152,7 @@ public class DatasetExcelExportServiceImplTest {
 		final File zipFile = new File("");
 
 		when(this.datasetExcelGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables),
-			ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(), any(StudyInstance.class)))
+			ArgumentMatchers.<ObservationUnitRow>anyList(), anyMap(), anyString(), any(StudyInstance.class)))
 			.thenReturn(new File(""));
 		when(this.zipUtil.zipFiles(contains(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 		this.datasetExportService.setZipUtil(this.zipUtil);
@@ -161,11 +165,12 @@ public class DatasetExcelExportServiceImplTest {
 
 		final File result = this.datasetExportService
 			.generateFiles(
-				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<>(),
+				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new HashMap<>(), new ArrayList<>(),
 				this.datasetExcelGenerator, AbstractDatasetExportService.XLS);
 		verify(this.datasetExcelGenerator, Mockito.times(studyInstanceMap.size()))
 			.generateSingleInstanceFile(
-				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(),
+				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyMap(),
+				anyString(),
 				any(StudyInstance.class));
 
 		verify(this.zipUtil).zipFiles(contains(this.study.getName()), anyListOf(File.class));
@@ -181,16 +186,17 @@ public class DatasetExcelExportServiceImplTest {
 		instanceObservationUnitRowsMap.put(2, new ArrayList<>());
 
 		when(
-			this.datasetExcelGenerator.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), eq(measurementVariables), anyString()))
+			this.datasetExcelGenerator.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), anyMap(),
+				eq(measurementVariables), anyString()))
 			.thenReturn(excelFile);
 
 		final File result = this.datasetExportService
 			.generateInSingleFile(
 				this.study, this.dataSetDTO, instanceObservationUnitRowsMap,
-				measurementVariables, this.datasetExcelGenerator, AbstractDatasetExportService.XLS);
+				new HashMap<>(), measurementVariables, this.datasetExcelGenerator, AbstractDatasetExportService.XLS);
 
 		verify(this.datasetExcelGenerator)
-			.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), eq(measurementVariables), anyString());
+			.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), anyMap(), eq(measurementVariables), anyString());
 		assertSame(result, excelFile);
 	}
 
@@ -201,7 +207,7 @@ public class DatasetExcelExportServiceImplTest {
 		final File excelFile = new File("");
 
 		when(this.datasetExcelGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables),
-			ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(), any(StudyInstance.class)))
+			ArgumentMatchers.<ObservationUnitRow>anyList(), anyMap(), anyString(), any(StudyInstance.class)))
 			.thenReturn(excelFile);
 
 		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
@@ -211,12 +217,13 @@ public class DatasetExcelExportServiceImplTest {
 		final Map<Integer, StudyInstance> studyInstanceMap = new HashMap<>();
 		studyInstanceMap.put(1, studyInstance);
 		final File result = this.datasetExportService.generateFiles(
-				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<>(),
-				this.datasetExcelGenerator, AbstractDatasetExportService.XLS);
+			this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new HashMap<>(), new ArrayList<>(),
+			this.datasetExcelGenerator, AbstractDatasetExportService.XLS);
 
 		verify(this.datasetExcelGenerator)
 			.generateSingleInstanceFile(
-				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyString(),
+				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.<ObservationUnitRow>anyList(), anyMap(),
+				anyString(),
 				any(StudyInstance.class));
 
 		verify(this.zipUtil, times(0)).zipFiles(anyString(), anyListOf(File.class));
@@ -259,7 +266,8 @@ public class DatasetExcelExportServiceImplTest {
 
 	private List<MeasurementVariable> createColumnHeaders() {
 
-		final MeasurementVariable mvar1 = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GID.getId(), TermId.GID.name());
+		final MeasurementVariable mvar1 =
+			MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GID.getId(), TermId.GID.name());
 		mvar1.setAlias("DIG");
 		this.measurementVariables.add(mvar1);
 

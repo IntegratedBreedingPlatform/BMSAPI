@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.dataset;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.genotype.GenotypeDTO;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,9 @@ import java.util.Map;
 public class DatasetKsuCSVGenerator extends DatasetCSVGenerator implements DatasetFileGenerator {
 
 	@Override
-	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final List<MeasurementVariable> columns,
 		final String fileNameFullPath) throws IOException {
 		throw new UnsupportedOperationException();
 	}

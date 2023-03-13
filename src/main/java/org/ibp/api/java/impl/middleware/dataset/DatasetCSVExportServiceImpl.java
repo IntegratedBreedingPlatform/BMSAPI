@@ -1,10 +1,10 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
-import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.genotype.GenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -20,12 +20,13 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @Transactional
@@ -52,6 +53,9 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
 
 		final List<MeasurementVariable> allVariables = new ArrayList<>(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
+		// Add Genotype Marker variables to the list of columns
+		allVariables.addAll(this.sampleGenotypeService.getSampleGenotypeVariables(studyId, datasetId).values());
+
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.TRIAL_INSTANCE_FACTOR.getId());
 	}
 
@@ -63,6 +67,21 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 				new ArrayList<>(selectedDatasetInstancesMap.keySet()));
 		this.addLocationValues(observationUnitRowMap, selectedDatasetInstancesMap);
 		return observationUnitRowMap;
+	}
+
+	@Override
+	protected Map<Integer, List<GenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+
+		final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
+		sampleGenotypeSearchRequestDTO.setStudyId(study.getId());
+		final SampleGenotypeSearchRequestDTO.GenotypeFilter filter = new SampleGenotypeSearchRequestDTO.GenotypeFilter();
+		filter.setDatasetId(dataset.getDatasetId());
+		filter.setInstanceIds(selectedDatasetInstancesMap.values().stream().map(StudyInstance::getInstanceId).collect(Collectors.toList()));
+		sampleGenotypeSearchRequestDTO.setFilter(filter);
+		return this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null).stream()
+			.collect(groupingBy(GenotypeDTO::getObservationUnitId));
+
 	}
 
 	void addLocationValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,

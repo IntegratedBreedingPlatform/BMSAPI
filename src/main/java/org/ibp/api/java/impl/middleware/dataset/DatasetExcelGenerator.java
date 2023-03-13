@@ -23,6 +23,8 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.genotype.GenotypeDTO;
+import org.generationcp.middleware.domain.genotype.GenotypeData;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -53,6 +55,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class DatasetExcelGenerator implements DatasetFileGenerator {
@@ -100,6 +104,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final Integer studyId,
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> reorderedObservationUnitRows,
+		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
 		final String fileNamePath, final StudyInstance studyInstance) throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
@@ -107,7 +112,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, studyInstance);
 		final Locale locale = LocaleContextHolder.getLocale();
 		this.writeObservationSheet(
-			orderedColumns, reorderedObservationUnitRows, xlsBook,
+			orderedColumns, reorderedObservationUnitRows, genotypeDTORowMap, xlsBook,
 			this.messageSource.getMessage("export.study.sheet.observation", null, locale));
 
 		final File file = new File(fileNamePath);
@@ -121,7 +126,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	@Override
 	public File generateMultiInstanceFile(
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final List<MeasurementVariable> columns,
 		final String fileNameFullPath) {
 		throw new UnsupportedOperationException();
 	}
@@ -139,9 +146,11 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		for (final MeasurementVariable measurementVariable : columns) {
 			if (TermId.OBS_UNIT_ID.getId() == measurementVariable.getTermId()) {
 				orderedColumns.add(0, measurementVariable);
-			} else if (measurementVariable.getVariableType() != null && VariableType.TRAIT.getId().equals(measurementVariable.getVariableType().getId())) {
+			} else if (measurementVariable.getVariableType() != null && VariableType.TRAIT.getId()
+				.equals(measurementVariable.getVariableType().getId())) {
 				trait.add(measurementVariable);
-			} else if (measurementVariable.getVariableType() != null &&  VariableType.SELECTION_METHOD.getId().equals(measurementVariable.getVariableType().getId())) {
+			} else if (measurementVariable.getVariableType() != null && VariableType.SELECTION_METHOD.getId()
+				.equals(measurementVariable.getVariableType().getId())) {
 				selection.add(measurementVariable);
 			} else {
 				orderedColumns.add(measurementVariable);
@@ -155,17 +164,20 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	void writeObservationSheet(
 		final List<MeasurementVariable> columns, final List<ObservationUnitRow> reorderedObservationUnitRows,
+		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
 		final HSSFWorkbook xlsBook, final String sheetName) {
 		final HSSFSheet xlsSheet = xlsBook.createSheet(sheetName);
 		this.writeObservationHeader(xlsBook, xlsSheet, columns);
 		int currentRowNum = 1;
 		for (final ObservationUnitRow dataRow : reorderedObservationUnitRows) {
-			this.writeObservationRow(currentRowNum++, xlsSheet, dataRow, columns);
+			final List<GenotypeDTO> genotypeDtoList = genotypeDTORowMap.getOrDefault(dataRow.getObservationUnitId(), new ArrayList<>());
+			this.writeObservationRow(currentRowNum++, xlsSheet, dataRow, genotypeDtoList, columns);
 		}
 	}
 
 	private void writeObservationRow(
 		final int currentRowNum, final HSSFSheet xlsSheet, final ObservationUnitRow dataRow,
+		final List<GenotypeDTO> genotypeDtoList,
 		final List<MeasurementVariable> columns) {
 
 		final HSSFRow row = xlsSheet.createRow(currentRowNum);
@@ -195,6 +207,19 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 					}
 				}
 			}
+
+			if (CollectionUtils.isNotEmpty(genotypeDtoList) && column.getVariableType().equals(VariableType.GENOTYPE_MARKER)) {
+				final HSSFCell cell = row.createCell(currentColNum++);
+				// If the observation unit has multiple samples associated to it,
+				// Concatenate the sample genotype values of the samples (delimited by ";")
+				final String genotypeValue =
+					genotypeDtoList.stream()
+						.map(genotypeDTO -> genotypeDTO.getGenotypeDataMap().getOrDefault(column.getName(), new GenotypeData()).getValue())
+						.filter(
+							Objects::nonNull).collect(Collectors.joining(";"));
+				cell.setCellType(CellType.STRING);
+				cell.setCellValue(genotypeValue);
+			}
 		}
 	}
 
@@ -207,7 +232,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			for (final MeasurementVariable variable : variables) {
 				final HSSFCell cell = row.createCell(currentColNum++);
 				cell.setCellStyle(this.getObservationHeaderStyle(variable.isFactor(), xlsBook));
-				cell.setCellValue(variable.getAlias());
+				cell.setCellValue(StringUtils.isNotEmpty(variable.getAlias()) ? variable.getAlias() : variable.getName());
 			}
 		}
 	}
@@ -272,7 +297,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 
-		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs  = this.datasetServiceMiddlewareService.getDatasetNameTypes(plotDatasetId);
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.datasetServiceMiddlewareService.getDatasetNameTypes(plotDatasetId);
 
 		currentRowNum = this.writeStudyDetails(currentRowNum, xlsBook, xlsSheet, studyDetails);
 		xlsSheet.createRow(currentRowNum++);
@@ -337,7 +362,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			filterByVariableType(plotVariables, VariableType.GERMPLASM_DESCRIPTOR), PLOT);
 		xlsSheet.createRow(currentRowNum++);
 
-		this.createNameTypeHeader(xlsBook, xlsSheet, currentRowNum++,"export.study.description.column.name.type",
+		this.createNameTypeHeader(xlsBook, xlsSheet, currentRowNum++, "export.study.description.column.name.type",
 			this.getColorIndex(xlsBook, 51, 153, 102));
 		currentRowNum = this.writeNameTypeSection(
 			currentRowNum,

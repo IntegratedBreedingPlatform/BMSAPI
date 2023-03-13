@@ -35,7 +35,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -231,10 +230,11 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_ID);
+
 		final File
 			file = this.datasetExcelGenerator
 			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, new ArrayList<>(),
-				new ArrayList<>(), filename, studyInstance);
+				new ArrayList<>(), new HashMap<>(), filename, studyInstance);
 		assertEquals(filename, file.getName());
 		Mockito.verify(this.studyDataManager).getStudyDetails(INSTANCE_ID);
 		Mockito.verify(this.datasetService)
@@ -265,7 +265,7 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setDatasetId(INSTANCE_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_ID);
 		this.datasetExcelGenerator
-			.generateMultiInstanceFile(new HashMap<>(), new ArrayList<>(), filename);
+			.generateMultiInstanceFile(new HashMap<>(), new HashMap<>(), new ArrayList<>(), filename);
 	}
 
 	@Test
@@ -281,7 +281,7 @@ public class DatasetExcelGeneratorTest {
 		final File
 			file = this.datasetExcelGenerator
 			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, this.measurementVariables,
-				this.observationUnitRows, filename, studyInstance);
+				this.observationUnitRows, new HashMap<>(), filename, studyInstance);
 
 		final FileInputStream inputStream = new FileInputStream(file);
 		final Workbook workbook = new HSSFWorkbook(inputStream);
