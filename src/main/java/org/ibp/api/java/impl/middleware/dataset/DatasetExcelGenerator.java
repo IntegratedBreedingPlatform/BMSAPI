@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.genotype.SampleGenotypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
@@ -98,6 +99,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
+
+	@Resource
+	private SampleGenotypeService sampleGenotypeService;
 
 	@Override
 	public File generateSingleInstanceFile(
@@ -297,6 +301,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 
+		final List<MeasurementVariable> genotypeMarkerVariables =
+			new ArrayList<>(this.sampleGenotypeService.getSampleGenotypeVariables(studyId, dataSetDto.getDatasetId()).values());
+
 		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.datasetServiceMiddlewareService.getDatasetNameTypes(plotDatasetId);
 
 		currentRowNum = this.writeStudyDetails(currentRowNum, xlsBook, xlsSheet, studyDetails);
@@ -425,6 +432,17 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			xlsBook,
 			xlsSheet,
 			filterByVariableType(datasetVariables, VariableType.SELECTION_METHOD),
+			datasetType.getName());
+
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.genotype.markers",
+			this.getColorIndex(xlsBook, 51, 51, 153));
+		this.writeSection(
+			currentRowNum,
+			xlsBook,
+			xlsSheet,
+			genotypeMarkerVariables,
 			datasetType.getName());
 
 		xlsSheet.setColumnWidth(0, 20 * PIXEL_SIZE);
