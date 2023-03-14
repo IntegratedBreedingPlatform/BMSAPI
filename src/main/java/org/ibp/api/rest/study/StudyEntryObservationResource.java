@@ -26,7 +26,7 @@ public class StudyEntryObservationResource {
 	private StudyEntryObservationService studyEntryObservationService;
 
 	@ApiOperation(value = "Add new observation for a given study entry", notes = "Add new observation for a given study entry")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'MODIFY_ENTRY_DETAILS_VALUES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_GERMPLASM_AND_CHECKS', 'MS_MODIFY_ENTRY_DETAILS_VALUES')")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations", method = RequestMethod.POST)
 	public ResponseEntity<Integer> createObservation(
 		@PathVariable final String cropName,
@@ -38,7 +38,7 @@ public class StudyEntryObservationResource {
 	}
 
 	@ApiOperation(value = "Updates the given study entry observation", notes = "Updates the given study entry observation")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'MODIFY_ENTRY_DETAILS_VALUES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_GERMPLASM_AND_CHECKS', 'MS_MODIFY_ENTRY_DETAILS_VALUES')")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations", method = RequestMethod.PATCH)
 	public ResponseEntity<Integer> updateObservation(
 		@PathVariable final String cropName,
@@ -50,7 +50,7 @@ public class StudyEntryObservationResource {
 	}
 
 	@ApiOperation(value = "Deletes the given study entry observation", notes = "Deletes the given study entry observation")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'MODIFY_ENTRY_DETAILS_VALUES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_GERMPLASM_AND_CHECKS', 'MS_MODIFY_ENTRY_DETAILS_VALUES')")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations/{observationId}", method = RequestMethod.DELETE)
 	public ResponseEntity<Void> deleteObservation(
 		@PathVariable final String cropName,
@@ -62,7 +62,7 @@ public class StudyEntryObservationResource {
 	}
 
 	@ApiOperation(value = "Count study entry observations", notes = "Returns count of study entry observations given a set of variables")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'MODIFY_ENTRY_DETAILS_VALUES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_GERMPLASM_AND_CHECKS', 'MS_MODIFY_ENTRY_DETAILS_VALUES')")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations", method = RequestMethod.HEAD)
 	public ResponseEntity<Void> countObservationsByVariables(
 		@PathVariable final String cropName,
