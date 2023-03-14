@@ -120,9 +120,9 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Add Dataset Variable", notes = "Add Dataset Variable")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','CREATE_STUDIES', 'DELETE_STUDY', 'CLOSE_STUDY', 'LOCK_STUDY','MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY','MS_CREATE_PENDING_WITHDRAWALS', "
-		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS','MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES','MS_CREATE_LOTS', 'GERMPLASM_AND_CHECKS','VIEW_GERMPLASM_AND_CHECKS','ADD_ENTRY_DETAILS_VARIABLES','MODIFY_ENTRY_DETAILS_VALUES', "
-		+ "'MODIFY_COLUMNS','REPLACE_GERMPLASM','ADD_NEW_ENTRIES','IMPORT_ENTRY_DETAILS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','CREATE_STUDIES', 'DELETE_STUDY', 'CLOSE_STUDY', 'LOCK_STUDY', 'MS_MANAGE_OBSERVATION_UNITS', 'MS_WITHDRAW_INVENTORY', 'MS_CREATE_PENDING_WITHDRAWALS', "
+		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS','MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES','MS_CREATE_LOTS', 'MS_GERMPLASM_AND_CHECKS', 'MS_VIEW_GERMPLASM_AND_CHECKS', 'MS_ADD_ENTRY_DETAILS_VARIABLES', 'MS_MODIFY_ENTRY_DETAILS_VALUES', "
+		+ "'MS_MODIFY_COLUMNS', 'MS_REPLACE_GERMPLASM', 'MS_ADD_NEW_ENTRIES', 'MS_IMPORT_ENTRY_DETAILS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.PUT)
 	public ResponseEntity<MeasurementVariable> addVariable(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
@@ -139,7 +139,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Add Entry Details Dataset Variable", notes = "Add Entry Details Dataset Variable")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'ADD_ENTRY_DETAILS_VARIABLES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_GERMPLASM_AND_CHECKS', 'MS_ADD_ENTRY_DETAILS_VARIABLES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/entry-details", method = RequestMethod.PUT)
 	public ResponseEntity<MeasurementVariable> addEntryDetails(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
@@ -157,9 +157,9 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Remove dataset variables", notes = "Remove a set of variables from dataset")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','CREATE_STUDIES', 'DELETE_STUDY', 'CLOSE_STUDY', 'LOCK_STUDY','MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY','MS_CREATE_PENDING_WITHDRAWALS', "
-		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS','MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES','MS_CREATE_LOTS', 'GERMPLASM_AND_CHECKS','VIEW_GERMPLASM_AND_CHECKS','ADD_ENTRY_DETAILS_VARIABLES','MODIFY_ENTRY_DETAILS_VALUES', "
-		+ "'MODIFY_COLUMNS','REPLACE_GERMPLASM','ADD_NEW_ENTRIES','IMPORT_ENTRY_DETAILS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','CREATE_STUDIES', 'DELETE_STUDY', 'CLOSE_STUDY', 'LOCK_STUDY', 'MS_MANAGE_OBSERVATION_UNITS', 'MS_WITHDRAW_INVENTORY', 'MS_CREATE_PENDING_WITHDRAWALS', "
+		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS', 'MS_CANCEL_PENDING_TRANSACTIONS', 'MS_MANAGE_FILES', 'MS_CREATE_LOTS', 'MS_GERMPLASM_AND_CHECKS', 'MS_VIEW_GERMPLASM_AND_CHECKS', 'MS_ADD_ENTRY_DETAILS_VARIABLES', 'MS_MODIFY_ENTRY_DETAILS_VALUES', "
+		+ "'MS_MODIFY_COLUMNS', 'MS_REPLACE_GERMPLASM', 'MS_ADD_NEW_ENTRIES', 'MS_IMPORT_ENTRY_DETAILS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.DELETE)
 	public ResponseEntity<Void> removeVariables(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
@@ -183,8 +183,8 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Add Observation", notes = "Add Observation")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','CREATE_STUDIES', 'DELETE_STUDY', 'CLOSE_STUDY', 'LOCK_STUDY','MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY','MS_CREATE_PENDING_WITHDRAWALS', "
-		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS','MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES','MS_CREATE_LOTS', 'GERMPLASM_AND_CHECKS','VIEW_GERMPLASM_AND_CHECKS','ADD_ENTRY_DETAILS_VARIABLES','MODIFY_ENTRY_DETAILS_VALUES', "
-		+ "'MODIFY_COLUMNS','REPLACE_GERMPLASM','ADD_NEW_ENTRIES','IMPORT_ENTRY_DETAILS')")
+		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS', 'MS_CANCEL_PENDING_TRANSACTIONS', 'MS_MANAGE_FILES','MS_CREATE_LOTS', 'MS_GERMPLASM_AND_CHECKS', 'MS_VIEW_GERMPLASM_AND_CHECKS', 'MS_ADD_ENTRY_DETAILS_VARIABLES', 'MS_MODIFY_ENTRY_DETAILS_VALUES', "
+		+ "'MS_MODIFY_COLUMNS', 'MS_REPLACE_GERMPLASM', 'MS_ADD_NEW_ENTRIES', 'MS_IMPORT_ENTRY_DETAILS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations", method = RequestMethod.POST)
 	public ResponseEntity<ObservationDto> addObservation(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
@@ -196,9 +196,9 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Update Observation", notes = "Update Observation")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','CREATE_STUDIES', 'DELETE_STUDY', 'CLOSE_STUDY', 'LOCK_STUDY','MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY','MS_CREATE_PENDING_WITHDRAWALS', "
-		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS','MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES','MS_CREATE_LOTS', 'GERMPLASM_AND_CHECKS','VIEW_GERMPLASM_AND_CHECKS','ADD_ENTRY_DETAILS_VARIABLES','MODIFY_ENTRY_DETAILS_VALUES', "
-		+ "'MODIFY_COLUMNS','REPLACE_GERMPLASM','ADD_NEW_ENTRIES','IMPORT_ENTRY_DETAILS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'CREATE_STUDIES', 'DELETE_STUDY', 'CLOSE_STUDY', 'LOCK_STUDY', 'MS_MANAGE_OBSERVATION_UNITS', 'MS_WITHDRAW_INVENTORY', 'MS_CREATE_PENDING_WITHDRAWALS', "
+		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS', 'MS_CANCEL_PENDING_TRANSACTIONS', 'MS_MANAGE_FILES', 'MS_CREATE_LOTS', 'MS_GERMPLASM_AND_CHECKS', 'MS_VIEW_GERMPLASM_AND_CHECKS', 'MS_ADD_ENTRY_DETAILS_VARIABLES', 'MS_MODIFY_ENTRY_DETAILS_VALUES', "
+		+ "'MS_MODIFY_COLUMNS', 'MS_REPLACE_GERMPLASM', 'MS_ADD_NEW_ENTRIES', 'MS_IMPORT_ENTRY_DETAILS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/{observationUnitId}/observations/{observationId}", method = RequestMethod.PATCH)
 	public ResponseEntity<ObservationDto> updateObservation(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
@@ -356,7 +356,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Put Observations Dataset", notes = "Put Observations Dataset")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_MANAGE_PENDING_OBSERVATIONS')")
 	@RequestMapping(
 		value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observationUnits/observations",
 		method = RequestMethod.PUT)
@@ -574,7 +574,7 @@ public class DatasetResource {
 	}
 
 	@ApiIgnore
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'GERMPLASM_AND_CHECKS', 'MODIFY_COLUMNS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_GERMPLASM_AND_CHECKS', 'MS_MODIFY_COLUMNS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/plot-datasets/properties", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<Void> updatePlotDatasetProperties(@PathVariable final String crop,
