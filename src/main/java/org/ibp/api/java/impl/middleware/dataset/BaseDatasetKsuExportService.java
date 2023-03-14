@@ -14,7 +14,6 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.GenotypeDTO;
-import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -34,9 +33,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.groupingBy;
 
 public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportService {
 
@@ -73,7 +69,8 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		throws IOException {
 		final File temporaryFolder = Files.createTempDir();
 		final List<File> files =
-			this.getInstanceFiles(study, dataSetDto, selectedDatasetInstancesMap, observationUnitRowMap, genotypeDTORowMap, columns, generator, fileExtension,
+			this.getInstanceFiles(study, dataSetDto, selectedDatasetInstancesMap, observationUnitRowMap, genotypeDTORowMap, columns,
+				generator, fileExtension,
 				temporaryFolder);
 
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
@@ -90,7 +87,8 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		}
 
 		final String traitsAndSelectionFilename =
-			temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedTraitsAndSelectionFilename, "trt");
+			temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedTraitsAndSelectionFilename,
+				"trt");
 		final List<MeasurementVariable> traitAndSelectionVariables = this.getTraitAndSelectionVariables(dataSetDto.getDatasetId());
 		files.add(
 			generator.generateTraitAndSelectionVariablesFile(this.convertTraitAndSelectionVariablesData(traitAndSelectionVariables),
@@ -162,11 +160,12 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	}
 
 	protected List<MeasurementVariable> getTraitAndSelectionVariables(final int datasetId) {
-		return this.datasetService.getObservationSetVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+		return this.datasetService.getObservationSetVariables(datasetId,
+			Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 	}
 
 	@Override
-	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
+	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotpeValues) {
 		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
 		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
 
@@ -209,7 +208,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 
 	@Override
 	protected Map<Integer, List<GenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
-		final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotpeValues) {
 		return new HashMap<>();
 	}
 

@@ -128,7 +128,7 @@ public class DatasetExcelExportServiceImplTest {
 	}
 
 	@Test
-	public void testExport() throws IOException {
+	public void testExport_IncludeSampleGenotypeValues() throws IOException {
 
 		final File zipFile = new File("");
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2));
@@ -136,11 +136,28 @@ public class DatasetExcelExportServiceImplTest {
 		Mockito.when(this.sampleGenotypeService.getSampleGenotypeVariables(this.study.getId(), this.dataSetDTO.getDatasetId()))
 			.thenReturn(new HashMap<>());
 		final File result = this.datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
-			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
+			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false, true);
 
 		verify(this.studyValidator).validate(this.study.getId(), false);
 		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId());
 		verify(this.instanceValidator).validate(this.dataSetDTO.getDatasetId(), instanceIds);
+		verify(this.sampleGenotypeService).getSampleGenotypeVariables(this.study.getId(), this.dataSetDTO.getDatasetId());
+		assertSame(result, zipFile);
+	}
+
+	@Test
+	public void testExport_ExcludeSampleGenotypeValues() throws IOException {
+
+		final File zipFile = new File("");
+		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2));
+		when(this.zipUtil.zipFiles(contains(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
+		final File result = this.datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
+			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false, false);
+
+		verify(this.studyValidator).validate(this.study.getId(), false);
+		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId());
+		verify(this.instanceValidator).validate(this.dataSetDTO.getDatasetId(), instanceIds);
+		verify(this.sampleGenotypeService, times(0)).getSampleGenotypeVariables(this.study.getId(), this.dataSetDTO.getDatasetId());
 		assertSame(result, zipFile);
 	}
 

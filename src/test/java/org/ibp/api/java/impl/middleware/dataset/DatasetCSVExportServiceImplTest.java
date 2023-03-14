@@ -150,7 +150,7 @@ public class DatasetCSVExportServiceImplTest {
 			.thenReturn(instanceObservationUnitRowsMap);
 
 		final File result = this.datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
-			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
+			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false, false);
 
 		verify(this.studyValidator).validate(this.study.getId(), false);
 		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId());
@@ -270,13 +270,17 @@ public class DatasetCSVExportServiceImplTest {
 	}
 
 	@Test
-	public void testGetColumns() {
-		final List<Integer> subObsTypeIds = new ArrayList<>();
-		subObsTypeIds.add(5);
-
-		this.datasetExportService.getColumns(1, 1);
+	public void testGetColumns_includeSampleGenotypeValuesTrue() {
+		this.datasetExportService.getColumns(1, 1, true);
 		Mockito.verify(this.studyDatasetService).getAllDatasetVariables(1, 1);
 		Mockito.verify(this.sampleGenotypeService).getSampleGenotypeVariables(1, 1);
+	}
+
+	@Test
+	public void testGetColumns_includeSampleGenotypeValuesFalse() {
+		this.datasetExportService.getColumns(1, 1, false);
+		Mockito.verify(this.studyDatasetService).getAllDatasetVariables(1, 1);
+		Mockito.verify(this.sampleGenotypeService, times(0)).getSampleGenotypeVariables(1, 1);
 	}
 
 	@Test

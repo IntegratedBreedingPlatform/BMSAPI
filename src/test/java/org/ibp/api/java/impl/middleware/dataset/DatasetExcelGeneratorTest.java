@@ -1,11 +1,13 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.genotype.SampleGenotypeService;
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -65,6 +67,7 @@ public class DatasetExcelGeneratorTest {
 	private static final String OBSERVATION_UNIT_TEST = "ObservationUnitTest";
 	private static final String TRAITS_TEST = "TraitsTest";
 	private static final String SELECTION_TEST = "SelectionTest";
+	private static final String GENOTYPE_MARKER_TEST = "GenotypeMarkerTest";
 	private static final String VARIABLE_NAME_1 = "VARIABLE_NAME_1";
 	private static final String VARIABLE_NAME_2 = "VARIABLE_NAME_2";
 	private static final String VARIABLE_VALUE_1 = "VARIABLE_VALUE_1";
@@ -94,6 +97,9 @@ public class DatasetExcelGeneratorTest {
 
 	@Mock
 	private OntologyDataManager ontologyDataManager;
+
+	@Mock
+	private SampleGenotypeService sampleGenotypeService;
 
 	@InjectMocks
 	private DatasetExcelGenerator datasetExcelGenerator;
@@ -155,6 +161,12 @@ public class DatasetExcelGeneratorTest {
 		selectionVariable.setValue(SELECTION_TEST);
 		selectionVariable.setVariableType(VariableType.SELECTION_METHOD);
 
+		final MeasurementVariable genotypeMarkerVariable = new MeasurementVariable();
+		genotypeMarkerVariable.setTermId(1);
+		genotypeMarkerVariable.setDataTypeId(VariableType.GENOTYPE_MARKER.getId());
+		genotypeMarkerVariable.setValue(GENOTYPE_MARKER_TEST);
+		genotypeMarkerVariable.setVariableType(VariableType.GENOTYPE_MARKER);
+
 		final List<MeasurementVariable> studyDetailVariables = Lists.newArrayList(studyDetailVariable);
 		final List<MeasurementVariable> environmentVariables =
 			Lists.newArrayList(environmentDetailsVariable, experimentalDesignVariable, environmentConditionsVariable);
@@ -213,6 +225,10 @@ public class DatasetExcelGeneratorTest {
 			.getMeasurementVariables(dataSet.getId(), Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId())))
 			.thenReturn(datasetVariables);
+
+		final Map<Integer, MeasurementVariable> sampleGenotypeVariablesMap = new HashedMap();
+		sampleGenotypeVariablesMap.put(genotypeMarkerVariable.getTermId(), genotypeMarkerVariable);
+		when(this.sampleGenotypeService.getSampleGenotypeVariables(STUDY_ID, PLOT_DATASET_ID)).thenReturn(sampleGenotypeVariablesMap);
 
 		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
 		when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);

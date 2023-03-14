@@ -37,11 +37,13 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 
 	@Override
 	public File export(
-		final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean singleFile) {
+		final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean singleFile,
+		final boolean includeSampleGenotpeValues) {
 
 		this.validate(studyId, datasetId, instanceIds);
 		try {
-			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetCSVGenerator, singleFile, CSV);
+			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetCSVGenerator, singleFile, CSV,
+				includeSampleGenotpeValues);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("cannot.exportAsCSV.dataset", "");
@@ -50,12 +52,14 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	}
 
 	@Override
-	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
+	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotpeValues) {
 
 		final List<MeasurementVariable> allVariables = new ArrayList<>(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
-		// Add Genotype Marker variables to the list of columns
-		allVariables.addAll(this.sampleGenotypeService.getSampleGenotypeVariables(studyId, datasetId).values());
 
+		if (includeSampleGenotpeValues) {
+			// Add Genotype Marker variables to the list of columns
+			allVariables.addAll(this.sampleGenotypeService.getSampleGenotypeVariables(studyId, datasetId).values());
+		}
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.TRIAL_INSTANCE_FACTOR.getId());
 	}
 
@@ -71,17 +75,19 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 
 	@Override
 	protected Map<Integer, List<GenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
-		final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
-
-		final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
-		sampleGenotypeSearchRequestDTO.setStudyId(study.getId());
-		final SampleGenotypeSearchRequestDTO.GenotypeFilter filter = new SampleGenotypeSearchRequestDTO.GenotypeFilter();
-		filter.setDatasetId(dataset.getDatasetId());
-		filter.setInstanceIds(selectedDatasetInstancesMap.values().stream().map(StudyInstance::getInstanceId).collect(Collectors.toList()));
-		sampleGenotypeSearchRequestDTO.setFilter(filter);
-		return this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null).stream()
-			.collect(groupingBy(GenotypeDTO::getObservationUnitId));
-
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotpeValues) {
+		if (includeSampleGenotpeValues) {
+			final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
+			sampleGenotypeSearchRequestDTO.setStudyId(study.getId());
+			final SampleGenotypeSearchRequestDTO.GenotypeFilter filter = new SampleGenotypeSearchRequestDTO.GenotypeFilter();
+			filter.setDatasetId(dataset.getDatasetId());
+			filter.setInstanceIds(
+				selectedDatasetInstancesMap.values().stream().map(StudyInstance::getInstanceId).collect(Collectors.toList()));
+			sampleGenotypeSearchRequestDTO.setFilter(filter);
+			return this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null).stream()
+				.collect(groupingBy(GenotypeDTO::getObservationUnitId));
+		}
+		return new HashMap<>();
 	}
 
 	void addLocationValues(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,

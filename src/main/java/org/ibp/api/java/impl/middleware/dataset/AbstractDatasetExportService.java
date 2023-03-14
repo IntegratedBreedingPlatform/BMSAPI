@@ -95,7 +95,7 @@ public abstract class AbstractDatasetExportService {
 
 	File generate(
 		final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId,
-		final DatasetFileGenerator generator, final boolean singleFile, final String fileExtension) throws IOException {
+		final DatasetFileGenerator generator, final boolean singleFile, final String fileExtension, final boolean includeSampleGenotpeValues) throws IOException {
 
 		final Study study = this.studyDataManager.getStudy(studyId);
 		final DatasetDTO dataSet = this.datasetService.getDataset(datasetId);
@@ -103,7 +103,7 @@ public abstract class AbstractDatasetExportService {
 			dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId()) ? //
 				dataSet.getDatasetId() : dataSet.getParentDatasetId();
 		// Get all variables for the dataset
-		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId());
+		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId(), includeSampleGenotpeValues);
 
 		final List<MeasurementVariable> descriptors = new ArrayList<>();
 		final List<MeasurementVariable> passports = new ArrayList<>();
@@ -169,7 +169,7 @@ public abstract class AbstractDatasetExportService {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
 			this.getObservationUnitRowMap(study, dataSet, selectedDatasetInstancesMap);
 
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap = this.getSampleGenotypeRowMap(study, dataSet, selectedDatasetInstancesMap);
+		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap = this.getSampleGenotypeRowMap(study, dataSet, selectedDatasetInstancesMap, includeSampleGenotpeValues);
 
 		// Reorder
 		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder =
@@ -294,13 +294,13 @@ public abstract class AbstractDatasetExportService {
 		return columns;
 	}
 
-	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
+	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId, boolean includeSampleGenotpeValues);
 
 	protected abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(
 		Study study, DatasetDTO dataset, Map<Integer, StudyInstance> selectedDatasetInstancesMap);
 
 	protected abstract Map<Integer, List<GenotypeDTO>> getSampleGenotypeRowMap(
-		Study study, DatasetDTO dataset, Map<Integer, StudyInstance> selectedDatasetInstancesMap);
+		Study study, DatasetDTO dataset, Map<Integer, StudyInstance> selectedDatasetInstancesMap, boolean includeSampleGenotpeValues);
 
 	void setZipUtil(final ZipUtil zipUtil) {
 		this.zipUtil = zipUtil;

@@ -22,13 +22,14 @@ public class DatasetKsuExcelExportServiceImpl extends BaseDatasetKsuExportServic
 
 	@Override
 	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId,
-		final boolean singleFile) {
+		final boolean singleFile, final boolean includeSampleGenotpeValues) {
 
 		this.validate(studyId, datasetId, instanceIds);
 
 		try {
 			//TODO: use the singleFile boolean after implementing singleFile download for KSU Excel option
-			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetKsuExcelGenerator, false, XLS);
+			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetKsuExcelGenerator, false, XLS,
+				includeSampleGenotpeValues);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 			errors.reject("cannot.exportAsXLS.dataset", "");
