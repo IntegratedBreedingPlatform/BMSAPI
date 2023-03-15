@@ -313,6 +313,7 @@ public class DatasetExcelGeneratorTest {
 		assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(33).getCell(valueIndex).getStringCellValue());
 		assertEquals(TRAITS_TEST, descriptionSheet.getRow(36).getCell(valueIndex).getStringCellValue());
 		assertEquals(SELECTION_TEST, descriptionSheet.getRow(39).getCell(valueIndex).getStringCellValue());
+		assertEquals(GENOTYPE_MARKER_TEST, descriptionSheet.getRow(42).getCell(valueIndex).getStringCellValue());
 		assertEquals(VARIABLE_ALIAS_1, observationSheet.getRow(0).getCell(0).getStringCellValue());
 		assertEquals(VARIABLE_ALIAS_2, observationSheet.getRow(0).getCell(1).getStringCellValue());
 		assertEquals(VARIABLE_VALUE_1, observationSheet.getRow(1).getCell(0).getStringCellValue());

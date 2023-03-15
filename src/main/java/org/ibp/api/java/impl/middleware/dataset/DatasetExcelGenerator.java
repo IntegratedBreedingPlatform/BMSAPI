@@ -427,7 +427,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.selections",
 			this.getColorIndex(xlsBook, 51, 51, 153));
-		this.writeSection(
+		currentRowNum = this.writeSection(
 			currentRowNum,
 			xlsBook,
 			xlsSheet,
