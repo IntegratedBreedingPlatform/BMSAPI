@@ -4,7 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
-import org.generationcp.middleware.ruleengine.pojo.AdvancedGermplasm;
+import org.generationcp.middleware.ruleengine.pojo.AdvanceGermplasmPreview;
 import org.ibp.api.java.study.AdvanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,15 +30,15 @@ public class AdvanceResource {
 	// TODO: define granular permission for advance
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
 	@ResponseBody
-	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/advance-preview", method = RequestMethod.POST)
-	public ResponseEntity<List<AdvancedGermplasm>> advanceStudyPreview(
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/advance/preview", method = RequestMethod.POST)
+	public ResponseEntity<List<AdvanceGermplasmPreview>> advanceStudyPreview(
 		@PathVariable final String cropName,
 		@PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
 		@RequestBody final AdvanceStudyRequest request) {
 
-		final List<AdvancedGermplasm> advancedGermplasms = this.advanceService.advanceStudyPreview(studyId, request);
-		return new ResponseEntity<>(advancedGermplasms, HttpStatus.OK);
+		final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList = this.advanceService.advanceStudyPreview(studyId, request);
+		return new ResponseEntity<>(advanceGermplasmPreviewList, HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Advance study")
