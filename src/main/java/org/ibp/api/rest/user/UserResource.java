@@ -44,7 +44,7 @@ public class UserResource {
 	@ApiOperation(value = "Filter users", notes = "List all users in this deployment instance of BMSAPI. ")
 	@RequestMapping(value = "/users/filter", method = RequestMethod.GET)
 	@ResponseBody
-	@PreAuthorize("hasAnyAuthority('ADMIN','ADMINISTRATION','SITE_ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'ADMINISTRATION', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
 	public ResponseEntity<List<UserDto>> filterUsers(@RequestParam final String cropName, @RequestParam final String programUUID) {
 		return new ResponseEntity<>(this.userService.getUsersByProjectUUID(programUUID), HttpStatus.OK);
 	}
