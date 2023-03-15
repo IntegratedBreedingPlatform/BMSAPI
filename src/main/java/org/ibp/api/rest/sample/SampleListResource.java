@@ -56,9 +56,7 @@ public class SampleListResource {
 	public CsvExportSampleListService csvExportSampleListService;
 
 	@ApiOperation(value = "Create sample list", notes = "Create sample list. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','CREATE_STUDIES', 'DELETE_STUDY', 'CLOSE_STUDY', 'LOCK_STUDY','MS_MANAGE_OBSERVATION_UNITS','MS_WITHDRAW_INVENTORY','MS_CREATE_PENDING_WITHDRAWALS', "
-		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS','MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES','MS_CREATE_LOTS', 'GERMPLASM_AND_CHECKS','VIEW_GERMPLASM_AND_CHECKS','ADD_ENTRY_DETAILS_VARIABLES','MODIFY_ENTRY_DETAILS_VALUES', "
-		+ "'MODIFY_COLUMNS','REPLACE_GERMPLASM','ADD_NEW_ENTRIES','IMPORT_ENTRY_DETAILS', 'LISTS', 'SAMPLES_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_CREATE_GENOTYPING_SAMPLES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/sample-lists", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createSampleList(@PathVariable final String crop, @RequestParam final String programUUID, @RequestBody final SampleListDto dto) {
@@ -83,7 +81,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Delete sample list entries", notes = "Delete sample list entries. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'MS_SAMPLE_LIST', 'MS_DELETE_SAMPLES', 'LISTS', 'SAMPLES_LISTS', 'DELETE_SAMPLES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_SAMPLE_LIST', 'MS_DELETE_SAMPLES', 'LISTS', 'SAMPLES_LISTS', 'DELETE_SAMPLES')")
 	@RequestMapping(value = "/{crop}/sample-lists/{sampleListId}/entries", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteSampleListEntries(@PathVariable final String crop, @RequestParam final String programUUID,
@@ -94,7 +92,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Create sample list folder", notes = "Create sample list folder. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_CREATE_GENOTYPING_SAMPLES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID, @RequestParam final String folderName,
@@ -113,7 +111,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Update sample list folder", notes = "Update sample list folder. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_CREATE_GENOTYPING_SAMPLES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders/{folderId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateSampleListFolderName(@PathVariable final String crop, @PathVariable final String programUUID,
@@ -131,7 +129,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Move sample list folder", notes = "Move sample list folder. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_CREATE_GENOTYPING_SAMPLES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders/{folderId}/move", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity moveSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID,
@@ -150,7 +148,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Delete sample list folder", notes = "Delete sample list folder. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_CREATE_GENOTYPING_SAMPLES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders/{folderId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer folderId) {
