@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface SampleGenotypeService {
 
-    List<Integer> importSampleGenotypes(String programUUID, List<SampleGenotypeImportRequestDto> genotypeImportRequestDtos);
+    List<Integer> importSampleGenotypes(String programUUID, Integer studyId, List<SampleGenotypeImportRequestDto> genotypeImportRequestDtos);
 
     List<GenotypeDTO> searchSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO, Pageable pageable);
 

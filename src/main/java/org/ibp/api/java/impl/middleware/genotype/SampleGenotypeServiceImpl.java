@@ -16,15 +16,15 @@ import java.util.List;
 public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 
 	@Autowired
-	private GenotypeValidator genotypeValidator;
+	private SampleGenotypeValidator sampleGenotypeValidator;
 
 	@Autowired
 	private org.generationcp.middleware.api.genotype.SampleGenotypeService sampleGenotypeServiceMW;
 
 	@Override
-	public List<Integer> importSampleGenotypes(final String programUUID,
+	public List<Integer> importSampleGenotypes(final String programUUID, final Integer studyId,
 		final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtos) {
-		this.genotypeValidator.validateImport(programUUID, sampleGenotypeImportRequestDtos);
+		this.sampleGenotypeValidator.validateImport(programUUID, studyId, sampleGenotypeImportRequestDtos);
 		return this.sampleGenotypeServiceMW.importSampleGenotypes(sampleGenotypeImportRequestDtos);
 	}
 

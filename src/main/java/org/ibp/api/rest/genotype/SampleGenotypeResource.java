@@ -34,13 +34,14 @@ public class SampleGenotypeResource {
 	@Autowired
 	private SampleGenotypeService sampleGenotypeService;
 
-	@ApiOperation(value = "Import genotypes", notes = "Import genotypes")
+	@ApiOperation(value = "Import sample genotypes into study", notes = "Import sample genotypes into study")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/samples/genotypes", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/samples/genotypes/{studyId}", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<Integer>> importSampleGenotypes(final @PathVariable String crop,
-		@PathVariable final String programUUID, @RequestBody final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtos) {
-		return new ResponseEntity<>(this.sampleGenotypeService.importSampleGenotypes(programUUID, sampleGenotypeImportRequestDtos),
+		@PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@RequestBody final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtos) {
+		return new ResponseEntity<>(this.sampleGenotypeService.importSampleGenotypes(programUUID, studyId, sampleGenotypeImportRequestDtos),
 			HttpStatus.OK);
 	}
 
