@@ -116,16 +116,20 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 					Util.getObservationUnitData(row.getVariables(), column).getValue());
 			} else if (!Util.isNullOrEmpty(Util.getObservationUnitData(row.getVariables(), column))) {
 				values.add(Util.getObservationUnitData(row.getVariables(), column).getValue());
-			} else if (CollectionUtils.isNotEmpty(genotypeDtoList) && column.getVariableType().equals(VariableType.GENOTYPE_MARKER)) {
-				// If the observation unit has multiple samples associated to it,
-				// Concatenate the sample genotype values of the samples (delimited by ";")
-				final String genotypeValue =
-					genotypeDtoList.stream()
-						.map(genotypeDTO -> genotypeDTO.getGenotypeDataMap().getOrDefault(column.getName(), new GenotypeData()).getValue())
-						.filter(
-							Objects::nonNull).collect(Collectors.joining(";"));
-				values.add(genotypeValue);
-
+			} else if (column.getVariableType().equals(VariableType.GENOTYPE_MARKER)) {
+				if (CollectionUtils.isNotEmpty(genotypeDtoList)) {
+					// If the observation unit has multiple samples associated to it,
+					// Concatenate the sample genotype values of the samples (delimited by ";")
+					final String genotypeValue =
+						genotypeDtoList.stream()
+							.map(genotypeDTO -> genotypeDTO.getGenotypeDataMap().getOrDefault(column.getName(), new GenotypeData())
+								.getValue())
+							.filter(
+								Objects::nonNull).collect(Collectors.joining(";"));
+					values.add(genotypeValue);
+				} else {
+					values.add(StringUtils.EMPTY);
+				}
 			}
 
 		}

@@ -103,6 +103,8 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	@Resource
 	private SampleGenotypeService sampleGenotypeService;
 
+	private boolean includeSampleGenotpeValues;
+
 	@Override
 	public File generateSingleInstanceFile(
 		final Integer studyId,
@@ -212,17 +214,23 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 				}
 			}
 
-			if (CollectionUtils.isNotEmpty(genotypeDtoList) && column.getVariableType().equals(VariableType.GENOTYPE_MARKER)) {
+			if (column.getVariableType().equals(VariableType.GENOTYPE_MARKER)) {
 				final HSSFCell cell = row.createCell(currentColNum++);
-				// If the observation unit has multiple samples associated to it,
-				// Concatenate the sample genotype values of the samples (delimited by ";")
-				final String genotypeValue =
-					genotypeDtoList.stream()
-						.map(genotypeDTO -> genotypeDTO.getGenotypeDataMap().getOrDefault(column.getName(), new GenotypeData()).getValue())
-						.filter(
-							Objects::nonNull).collect(Collectors.joining(";"));
 				cell.setCellType(CellType.STRING);
-				cell.setCellValue(genotypeValue);
+				if (CollectionUtils.isNotEmpty(genotypeDtoList)) {
+					// If the observation unit has multiple samples associated to it,
+					// Concatenate the sample genotype values of the samples (delimited by ";")
+					final String genotypeValue =
+						genotypeDtoList.stream()
+							.map(genotypeDTO -> genotypeDTO.getGenotypeDataMap().getOrDefault(column.getName(), new GenotypeData())
+								.getValue())
+							.filter(
+								Objects::nonNull).collect(Collectors.joining(";"));
+
+					cell.setCellValue(genotypeValue);
+				} else {
+					cell.setCellValue(StringUtils.EMPTY);
+				}
 			}
 		}
 	}
@@ -436,14 +444,16 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 		xlsSheet.createRow(currentRowNum++);
 
-		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.genotype.markers",
-			this.getColorIndex(xlsBook, 51, 51, 153));
-		this.writeSection(
-			currentRowNum,
-			xlsBook,
-			xlsSheet,
-			genotypeMarkerVariables,
-			datasetType.getName());
+		if (this.includeSampleGenotpeValues) {
+			currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.genotype.markers",
+				this.getColorIndex(xlsBook, 51, 51, 153));
+			this.writeSection(
+				currentRowNum,
+				xlsBook,
+				xlsSheet,
+				genotypeMarkerVariables,
+				datasetType.getName());
+		}
 
 		xlsSheet.setColumnWidth(0, 20 * PIXEL_SIZE);
 		xlsSheet.setColumnWidth(1, 24 * PIXEL_SIZE);
@@ -843,5 +853,9 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	void setMessageSource(final ResourceBundleMessageSource messageSource) {
 		this.messageSource = messageSource;
+	}
+
+	public void setIncludeSampleGenotpeValues(final boolean includeSampleGenotpeValues) {
+		this.includeSampleGenotpeValues = includeSampleGenotpeValues;
 	}
 }

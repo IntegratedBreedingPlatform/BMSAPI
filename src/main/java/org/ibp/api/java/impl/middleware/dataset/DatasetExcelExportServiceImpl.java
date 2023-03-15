@@ -43,6 +43,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 
 		try {
 			//TODO: use the singleFile boolean after implementing singleFile download for XLS option
+			this.datasetExcelGenerator.setIncludeSampleGenotpeValues(includeSampleGenotpeValues);
 			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetExcelGenerator, false, XLS,
 				includeSampleGenotpeValues);
 		} catch (final IOException e) {
