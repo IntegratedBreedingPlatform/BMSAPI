@@ -10,6 +10,7 @@ import org.generationcp.commons.service.impl.CsvExportSampleListServiceImpl;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.ibp.api.domain.common.ErrorResponse;
 import org.slf4j.Logger;
@@ -59,7 +60,8 @@ public class SampleListResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/sample-lists", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity createSampleList(@PathVariable final String crop, @RequestParam final String programUUID, @RequestBody final SampleListDto dto) {
+	public ResponseEntity createSampleList(@PathVariable final String crop, @RequestParam final String programUUID,
+		@RequestBody final SampleListDto dto) {
 		dto.setCropName(crop);
 		// The programUUID in request is the program where sample list is made from. It is used to filter permissions for a program-level user
 		// It is not necessarily set in the SampleListDto as the list might be a crop-level list
@@ -95,7 +97,8 @@ public class SampleListResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity createSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID, @RequestParam final String folderName,
+	public ResponseEntity createSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID,
+		@RequestParam final String folderName,
 		@RequestParam final Integer parentId) {
 		final Map<String, Object> map;
 		try {
@@ -151,7 +154,8 @@ public class SampleListResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-list-folders/{folderId}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity deleteSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer folderId) {
+	public ResponseEntity deleteSampleListFolder(@PathVariable final String crop, @PathVariable final String programUUID,
+		@PathVariable final Integer folderId) {
 		try {
 			this.sampleListService.deleteSampleListFolder(folderId);
 		} catch (final MiddlewareException e) {
@@ -179,7 +183,8 @@ public class SampleListResource {
 	@ApiOperation(value = "Download Sample List as CSV file", notes = "Download Sample List as CSV file")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/sample-lists/{listId}/download", method = RequestMethod.GET)
-	public ResponseEntity<FileSystemResource> download(@PathVariable final String crop, @PathVariable final Integer listId, @RequestParam final String programUUID,
+	public ResponseEntity<FileSystemResource> download(@PathVariable final String crop, @PathVariable final Integer listId,
+		@RequestParam final String programUUID,
 		@RequestParam final String listName) throws IOException {
 
 		final List<SampleDetailsDTO> sampleDetailsDTOs = this.sampleListService.getSampleDetailsDTOs(listId);
@@ -195,7 +200,8 @@ public class SampleListResource {
 
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", exportInfo.getDownloadFileName()));
-		headers.add(HttpHeaders.CONTENT_TYPE, String.format("%s;charset=utf-8", FileUtils.detectMimeType(exportInfo.getDownloadFileName())));
+		headers.add(HttpHeaders.CONTENT_TYPE,
+			String.format("%s;charset=utf-8", FileUtils.detectMimeType(exportInfo.getDownloadFileName())));
 		final File file = new File(exportInfo.getFilePath());
 		final FileSystemResource fileSystemResource = new FileSystemResource(file);
 
@@ -208,7 +214,8 @@ public class SampleListResource {
 	@RequestMapping(value = "/{crop}/sample-lists/{listId}/samples", method = RequestMethod.PATCH)
 	@ResponseBody
 	public ResponseEntity saveSamplePlateInformation(
-		@PathVariable final String crop, @PathVariable final Integer listId, @RequestParam final String programUUID, @RequestBody final List<SampleDTO> sampleDTOs) {
+		@PathVariable final String crop, @PathVariable final Integer listId, @RequestParam final String programUUID,
+		@RequestBody final List<SampleDTO> sampleDTOs) {
 		this.sampleListService.importSamplePlateInformation(sampleDTOs, listId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -224,5 +231,17 @@ public class SampleListResource {
 		@ApiParam(value = "Only folders") @RequestParam(required = true) final Boolean onlyFolders) {
 		final List<TreeNode> children = this.sampleListService.getSampleListChildrenNodes(crop, programUUID, parentFolderId, onlyFolders);
 		return new ResponseEntity<>(children, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get sample lists associated to study", notes = "Get sample lists associated to study")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-lists/{studyId}", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<List<SampleListDTO>> getSampleListsByStudy(
+		@PathVariable final String crop,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@RequestParam(required = false) final boolean withGenotypesOnly) {
+		return new ResponseEntity<>(this.sampleListService.getSampleListsByStudy(studyId, withGenotypesOnly), HttpStatus.OK);
 	}
 }

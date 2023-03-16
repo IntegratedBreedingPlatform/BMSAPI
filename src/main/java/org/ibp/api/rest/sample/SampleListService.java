@@ -3,6 +3,7 @@ package org.ibp.api.rest.sample;
 import org.generationcp.commons.pojo.treeview.TreeNode;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.SampleList;
 import org.springframework.data.domain.Pageable;
 
@@ -74,4 +75,5 @@ public interface SampleListService {
 
 	void deleteSamples(Integer sampleListId, List<Integer> sampleIds);
 
+	List<SampleListDTO> getSampleListsByStudy(Integer studyId, boolean withGenotypesOnly);
 }
