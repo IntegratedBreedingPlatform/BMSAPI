@@ -1,5 +1,6 @@
 package org.ibp.api.java.genotype;
 
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.GenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
@@ -16,4 +17,6 @@ public interface SampleGenotypeService {
     long countSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
 
     long countFilteredSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
+
+    List<MeasurementVariable> getSampleGenotypeColumns(final Integer studyId);
 }

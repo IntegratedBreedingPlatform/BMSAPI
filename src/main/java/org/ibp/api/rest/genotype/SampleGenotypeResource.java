@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.GenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
@@ -66,5 +67,19 @@ public class SampleGenotypeResource {
 				() -> this.sampleGenotypeService.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO),
 				() -> this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, pageable), pageable
 			);
+	}
+
+	@ApiOperation(value = "Get Sample Genotype Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the Sample Genotypes, "
+			+ "that will be shown in the Sample Genotypes Table")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/samples/genotypes/table/columns", method = RequestMethod.GET)
+	public ResponseEntity<List<MeasurementVariable>> getSampleGenotypeColumns(@PathVariable final String crop,
+																			  @PathVariable final String programUUID,
+																			  @PathVariable final Integer studyId) {
+
+		final List<MeasurementVariable> sampleGenotypeColumns =
+				this.sampleGenotypeService.getSampleGenotypeColumns(studyId);
+
+		return new ResponseEntity<>(sampleGenotypeColumns, HttpStatus.OK);
 	}
 }

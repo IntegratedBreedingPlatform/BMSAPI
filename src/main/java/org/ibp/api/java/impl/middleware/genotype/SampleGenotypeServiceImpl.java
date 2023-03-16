@@ -1,9 +1,11 @@
 package org.ibp.api.java.impl.middleware.genotype;
 
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.GenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.ibp.api.java.genotype.SampleGenotypeService;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,9 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 
 	@Autowired
 	private SampleGenotypeValidator sampleGenotypeValidator;
+
+	@Autowired
+	private StudyValidator studyValidator;
 
 	@Autowired
 	private org.generationcp.middleware.api.genotype.SampleGenotypeService sampleGenotypeServiceMW;
@@ -41,5 +46,11 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	@Override
 	public long countFilteredSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
 		return this.sampleGenotypeServiceMW.countFilteredSampleGenotypes(searchRequestDTO);
+	}
+
+	@Override
+	public List<MeasurementVariable> getSampleGenotypeColumns(final Integer studyId) {
+		this.studyValidator.validate(studyId, false);
+		return this.sampleGenotypeServiceMW.getSampleGenotypeColumns(studyId);
 	}
 }

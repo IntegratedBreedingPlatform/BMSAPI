@@ -704,7 +704,7 @@ public class MiddlewareFactory {
 
 	@Bean
 	@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
-	public SampleGenotypeService getGenotypeService() {
+	public SampleGenotypeService getSampleGenotypeService() {
 		return new SampleGenotypeServiceImpl(this.getCropDatabaseSessionProvider());
 	}
 
