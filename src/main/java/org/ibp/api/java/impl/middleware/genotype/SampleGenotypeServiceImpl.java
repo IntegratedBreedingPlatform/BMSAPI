@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.genotype;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.ibp.api.java.genotype.SampleGenotypeService;
@@ -34,7 +34,7 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	}
 
 	@Override
-	public List<GenotypeDTO> searchSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final Pageable pageable) {
+	public List<SampleGenotypeDTO> searchSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO, final Pageable pageable) {
 		return this.sampleGenotypeServiceMW.searchSampleGenotypes(searchRequestDTO, pageable);
 	}
 

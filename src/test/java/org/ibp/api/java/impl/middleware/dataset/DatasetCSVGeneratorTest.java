@@ -3,8 +3,8 @@ package org.ibp.api.java.impl.middleware.dataset;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
-import org.generationcp.middleware.domain.genotype.GenotypeData;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeData;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -139,13 +139,13 @@ public class DatasetCSVGeneratorTest {
 		variables.add(markerVariable2);
 		variables.add(markerVariable3);
 
-		final List<GenotypeDTO> genotypeDTOList = new ArrayList<>();
-		genotypeDTOList.add(this.createGenotypeDto(markerVariable1, "A"));
-		genotypeDTOList.add(this.createGenotypeDto(markerVariable1, "B"));
-		genotypeDTOList.add(this.createGenotypeDto(markerVariable2, "C"));
+		final List<SampleGenotypeDTO> sampleGenotypeDTOList = new ArrayList<>();
+		sampleGenotypeDTOList.add(this.createGenotypeDto(markerVariable1, "A"));
+		sampleGenotypeDTOList.add(this.createGenotypeDto(markerVariable1, "B"));
+		sampleGenotypeDTOList.add(this.createGenotypeDto(markerVariable2, "C"));
 
 		final String[] result =
-			this.datasetCSVGenerator.getColumnValues(this.observationUnitRows.get(0), genotypeDTOList, variables,
+			this.datasetCSVGenerator.getColumnValues(this.observationUnitRows.get(0), sampleGenotypeDTOList, variables,
 				categoricalValuesMap);
 		assertEquals(7, result.length);
 		assertEquals(this.variableValue1, result[0]);
@@ -193,13 +193,13 @@ public class DatasetCSVGeneratorTest {
 		Assert.assertEquals(ENVIRONMENT_DETAIL_CATEGORICAL_VALUE, categoricalValuesMap.get(this.variableName3).get("1"));
 	}
 
-	private GenotypeDTO createGenotypeDto(final MeasurementVariable measurementVariable, final String value) {
-		final GenotypeDTO genotypeDTO = new GenotypeDTO();
-		final Map<String, GenotypeData> genotypeDataMap = new HashMap<>();
-		final GenotypeData genotypeData = new GenotypeData();
-		genotypeData.setValue(value);
-		genotypeDataMap.put(measurementVariable.getName(), genotypeData);
-		genotypeDTO.setGenotypeDataMap(genotypeDataMap);
-		return genotypeDTO;
+	private SampleGenotypeDTO createGenotypeDto(final MeasurementVariable measurementVariable, final String value) {
+		final SampleGenotypeDTO sampleGenotypeDTO = new SampleGenotypeDTO();
+		final Map<String, SampleGenotypeData> genotypeDataMap = new HashMap<>();
+		final SampleGenotypeData sampleGenotypeData = new SampleGenotypeData();
+		sampleGenotypeData.setValue(value);
+		genotypeDataMap.put(measurementVariable.getName(), sampleGenotypeData);
+		sampleGenotypeDTO.setGenotypeDataMap(genotypeDataMap);
+		return sampleGenotypeDTO;
 	}
 }

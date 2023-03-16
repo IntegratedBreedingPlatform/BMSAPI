@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.ibp.api.domain.common.PagedResult;
@@ -59,7 +59,7 @@ public class SampleGenotypeResource {
 		@ApiImplicitParam(name = "sort", allowMultiple = false, dataType = "string", paramType = "query",
 			value = "Sorting criteria in the format: property,asc|desc. ")
 	})
-	public ResponseEntity<List<GenotypeDTO>> getGenotypesTable(final @PathVariable String crop,
+	public ResponseEntity<List<SampleGenotypeDTO>> getGenotypesTable(final @PathVariable String crop,
 		@PathVariable final String programUUID, @RequestBody final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO,
 		final @ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) Pageable pageable) {
 		return new PaginatedSearch()

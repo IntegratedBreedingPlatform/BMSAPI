@@ -6,8 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
-import org.generationcp.middleware.domain.genotype.GenotypeData;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeData;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -39,7 +39,7 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	@Override
 	public File generateSingleInstanceFile(final Integer studyId, final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> observationUnitRows,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final String fileNameFullPath, final StudyInstance studyInstance) throws IOException {
 		try (final CSVWriter csvWriter = new CSVWriter(
 			new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')) {
@@ -53,8 +53,8 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 				final Map<String, Map<String, String>> studyAndEnvironmentCategoricalValuesMap =
 					this.getStudyAndEnvironmentCategoricalValuesMap(columns);
 				for (final ObservationUnitRow row : observationUnitRows) {
-					final List<GenotypeDTO> genotypeDtoList = genotypeDTORowMap.getOrDefault(row.getObservationUnitId(), new ArrayList<>());
-					rowValues.add(this.getColumnValues(row, genotypeDtoList, columns, studyAndEnvironmentCategoricalValuesMap));
+					final List<SampleGenotypeDTO> sampleGenotypeDtoList = genotypeDTORowMap.getOrDefault(row.getObservationUnitId(), new ArrayList<>());
+					rowValues.add(this.getColumnValues(row, sampleGenotypeDtoList, columns, studyAndEnvironmentCategoricalValuesMap));
 				}
 			}
 
@@ -70,7 +70,7 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 
 	@Override
 	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final List<MeasurementVariable> columns,
 		final String fileNameFullPath) throws IOException {
 		final List<ObservationUnitRow> allObservationUnitRows = new ArrayList<>();
@@ -100,7 +100,7 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	}
 
 	String[] getColumnValues(final ObservationUnitRow row,
-		final List<GenotypeDTO> genotypeDtoList,
+		final List<SampleGenotypeDTO> sampleGenotypeDtoList,
 		final List<MeasurementVariable> subObservationSetColumns,
 		final Map<String, Map<String, String>> studyAndEnvironmentCategoricalValuesMap) {
 		final List<String> values = new LinkedList<>();
@@ -117,12 +117,12 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 			} else if (!Util.isNullOrEmpty(Util.getObservationUnitData(row.getVariables(), column))) {
 				values.add(Util.getObservationUnitData(row.getVariables(), column).getValue());
 			} else if (column.getVariableType().equals(VariableType.GENOTYPE_MARKER)) {
-				if (CollectionUtils.isNotEmpty(genotypeDtoList)) {
+				if (CollectionUtils.isNotEmpty(sampleGenotypeDtoList)) {
 					// If the observation unit has multiple samples associated to it,
 					// Concatenate the sample genotype values of the samples (delimited by ";")
 					final String genotypeValue =
-						genotypeDtoList.stream()
-							.map(genotypeDTO -> genotypeDTO.getGenotypeDataMap().getOrDefault(column.getName(), new GenotypeData())
+						sampleGenotypeDtoList.stream()
+							.map(genotypeDTO -> genotypeDTO.getGenotypeDataMap().getOrDefault(column.getName(), new SampleGenotypeData())
 								.getValue())
 							.filter(
 								Objects::nonNull).collect(Collectors.joining(";"));

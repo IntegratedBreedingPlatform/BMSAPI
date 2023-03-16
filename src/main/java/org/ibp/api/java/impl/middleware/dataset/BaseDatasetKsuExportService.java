@@ -13,7 +13,7 @@ import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -63,7 +63,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		final Study study, final DatasetDTO dataSetDto,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final List<MeasurementVariable> columns,
 		final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
@@ -207,7 +207,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	}
 
 	@Override
-	protected Map<Integer, List<GenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
+	protected Map<Integer, List<SampleGenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotpeValues) {
 		return new HashMap<>();
 	}

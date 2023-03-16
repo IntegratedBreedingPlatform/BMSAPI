@@ -3,7 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -74,7 +74,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	}
 
 	@Override
-	protected Map<Integer, List<GenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
+	protected Map<Integer, List<SampleGenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotpeValues) {
 		if (includeSampleGenotpeValues) {
 			final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
@@ -85,7 +85,7 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 				selectedDatasetInstancesMap.values().stream().map(StudyInstance::getInstanceId).collect(Collectors.toList()));
 			sampleGenotypeSearchRequestDTO.setFilter(filter);
 			return this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null).stream()
-				.collect(groupingBy(GenotypeDTO::getObservationUnitId));
+				.collect(groupingBy(SampleGenotypeDTO::getObservationUnitId));
 		}
 		return new HashMap<>();
 	}

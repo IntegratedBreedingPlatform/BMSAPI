@@ -4,7 +4,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
@@ -26,7 +26,7 @@ public class DatasetKsuExcelGenerator extends DatasetExcelGenerator implements D
 		final Integer studyId,
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> reorderedObservationUnitRows,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final String fileNamePath, final StudyInstance studyInstance) throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 		this.writeObservationSheet(columns, reorderedObservationUnitRows, genotypeDTORowMap, xlsBook, dataSetDto.getName());

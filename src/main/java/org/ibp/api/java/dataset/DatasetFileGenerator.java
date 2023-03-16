@@ -2,7 +2,7 @@ package org.ibp.api.java.dataset;
 
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 
@@ -15,11 +15,11 @@ public interface DatasetFileGenerator {
 
 	File generateSingleInstanceFile(Integer studyId, DatasetDTO dataSetDto, List<MeasurementVariable> columns,
 		List<ObservationUnitRow> observationUnitRows,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		String fileNamePath, StudyInstance studyInstance) throws IOException;
 
 	File generateMultiInstanceFile(Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		List<MeasurementVariable> columns,
 		String fileNameFullPath) throws IOException;
 

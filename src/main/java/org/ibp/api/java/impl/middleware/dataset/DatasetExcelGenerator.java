@@ -24,8 +24,8 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
-import org.generationcp.middleware.domain.genotype.GenotypeData;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeData;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -110,7 +110,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final Integer studyId,
 		final DatasetDTO dataSetDto, final List<MeasurementVariable> columns,
 		final List<ObservationUnitRow> reorderedObservationUnitRows,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final String fileNamePath, final StudyInstance studyInstance) throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
@@ -133,7 +133,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	@Override
 	public File generateMultiInstanceFile(
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final List<MeasurementVariable> columns,
 		final String fileNameFullPath) {
 		throw new UnsupportedOperationException();
@@ -170,20 +170,20 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 	void writeObservationSheet(
 		final List<MeasurementVariable> columns, final List<ObservationUnitRow> reorderedObservationUnitRows,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final HSSFWorkbook xlsBook, final String sheetName) {
 		final HSSFSheet xlsSheet = xlsBook.createSheet(sheetName);
 		this.writeObservationHeader(xlsBook, xlsSheet, columns);
 		int currentRowNum = 1;
 		for (final ObservationUnitRow dataRow : reorderedObservationUnitRows) {
-			final List<GenotypeDTO> genotypeDtoList = genotypeDTORowMap.getOrDefault(dataRow.getObservationUnitId(), new ArrayList<>());
-			this.writeObservationRow(currentRowNum++, xlsSheet, dataRow, genotypeDtoList, columns);
+			final List<SampleGenotypeDTO> sampleGenotypeDtoList = genotypeDTORowMap.getOrDefault(dataRow.getObservationUnitId(), new ArrayList<>());
+			this.writeObservationRow(currentRowNum++, xlsSheet, dataRow, sampleGenotypeDtoList, columns);
 		}
 	}
 
 	private void writeObservationRow(
 		final int currentRowNum, final HSSFSheet xlsSheet, final ObservationUnitRow dataRow,
-		final List<GenotypeDTO> genotypeDtoList,
+		final List<SampleGenotypeDTO> sampleGenotypeDtoList,
 		final List<MeasurementVariable> columns) {
 
 		final HSSFRow row = xlsSheet.createRow(currentRowNum);
@@ -217,12 +217,12 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			if (column.getVariableType().equals(VariableType.GENOTYPE_MARKER)) {
 				final HSSFCell cell = row.createCell(currentColNum++);
 				cell.setCellType(CellType.STRING);
-				if (CollectionUtils.isNotEmpty(genotypeDtoList)) {
+				if (CollectionUtils.isNotEmpty(sampleGenotypeDtoList)) {
 					// If the observation unit has multiple samples associated to it,
 					// Concatenate the sample genotype values of the samples (delimited by ";")
 					final String genotypeValue =
-						genotypeDtoList.stream()
-							.map(genotypeDTO -> genotypeDTO.getGenotypeDataMap().getOrDefault(column.getName(), new GenotypeData())
+						sampleGenotypeDtoList.stream()
+							.map(genotypeDTO -> genotypeDTO.getGenotypeDataMap().getOrDefault(column.getName(), new SampleGenotypeData())
 								.getValue())
 							.filter(
 								Objects::nonNull).collect(Collectors.joining(";"));

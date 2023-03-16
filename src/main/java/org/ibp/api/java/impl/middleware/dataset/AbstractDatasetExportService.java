@@ -12,8 +12,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.genotype.GenotypeDTO;
-import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -169,7 +168,7 @@ public abstract class AbstractDatasetExportService {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
 			this.getObservationUnitRowMap(study, dataSet, selectedDatasetInstancesMap);
 
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap = this.getSampleGenotypeRowMap(study, dataSet, selectedDatasetInstancesMap, includeSampleGenotpeValues);
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap = this.getSampleGenotypeRowMap(study, dataSet, selectedDatasetInstancesMap, includeSampleGenotpeValues);
 
 		// Reorder
 		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder =
@@ -190,7 +189,7 @@ public abstract class AbstractDatasetExportService {
 	File generateInSingleFile(
 		final Study study,
 		final DatasetDTO dataSet, final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final List<MeasurementVariable> columns,
 		final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
@@ -211,7 +210,7 @@ public abstract class AbstractDatasetExportService {
 		final Study study, final DatasetDTO dataSetDto,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final List<MeasurementVariable> columns,
 		final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
@@ -233,7 +232,7 @@ public abstract class AbstractDatasetExportService {
 	List<File> getInstanceFiles(
 		final Study study, final DatasetDTO dataSetDto, final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
-		final Map<Integer, List<GenotypeDTO>> genotypeDTORowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final List<MeasurementVariable> columns,
 		final DatasetFileGenerator generator, final String fileExtension, final File temporaryFolder) throws IOException {
 		final List<File> files = new ArrayList<>();
@@ -299,7 +298,7 @@ public abstract class AbstractDatasetExportService {
 	protected abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(
 		Study study, DatasetDTO dataset, Map<Integer, StudyInstance> selectedDatasetInstancesMap);
 
-	protected abstract Map<Integer, List<GenotypeDTO>> getSampleGenotypeRowMap(
+	protected abstract Map<Integer, List<SampleGenotypeDTO>> getSampleGenotypeRowMap(
 		Study study, DatasetDTO dataset, Map<Integer, StudyInstance> selectedDatasetInstancesMap, boolean includeSampleGenotpeValues);
 
 	void setZipUtil(final ZipUtil zipUtil) {
