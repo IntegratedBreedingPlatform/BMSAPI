@@ -49,8 +49,8 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getSampleGenotypeColumns(final Integer studyId) {
+	public List<MeasurementVariable> getSampleGenotypeColumns(final Integer studyId, final List<Integer> sampleListIds) {
 		this.studyValidator.validate(studyId, false);
-		return this.sampleGenotypeServiceMW.getSampleGenotypeColumns(studyId);
+		return this.sampleGenotypeServiceMW.getSampleGenotypeColumns(studyId, sampleListIds);
 	}
 }

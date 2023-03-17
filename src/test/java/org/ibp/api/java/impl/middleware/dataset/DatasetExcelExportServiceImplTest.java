@@ -133,7 +133,7 @@ public class DatasetExcelExportServiceImplTest {
 		final File zipFile = new File("");
 		final Set<Integer> instanceIds = new HashSet<>(Arrays.asList(this.instanceId1, this.instanceId2));
 		when(this.zipUtil.zipFiles(contains(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
-		Mockito.when(this.sampleGenotypeService.getSampleGenotypeVariables(this.study.getId(), this.dataSetDTO.getDatasetId()))
+		Mockito.when(this.sampleGenotypeService.getSampleGenotypeVariables(any()))
 			.thenReturn(new HashMap<>());
 		final File result = this.datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
 			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false, true);
@@ -141,7 +141,7 @@ public class DatasetExcelExportServiceImplTest {
 		verify(this.studyValidator).validate(this.study.getId(), false);
 		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId());
 		verify(this.instanceValidator).validate(this.dataSetDTO.getDatasetId(), instanceIds);
-		verify(this.sampleGenotypeService).getSampleGenotypeVariables(this.study.getId(), this.dataSetDTO.getDatasetId());
+		verify(this.sampleGenotypeService).getSampleGenotypeVariables(any());
 		assertSame(result, zipFile);
 	}
 
@@ -157,7 +157,7 @@ public class DatasetExcelExportServiceImplTest {
 		verify(this.studyValidator).validate(this.study.getId(), false);
 		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId());
 		verify(this.instanceValidator).validate(this.dataSetDTO.getDatasetId(), instanceIds);
-		verify(this.sampleGenotypeService, times(0)).getSampleGenotypeVariables(this.study.getId(), this.dataSetDTO.getDatasetId());
+		verify(this.sampleGenotypeService, times(0)).getSampleGenotypeVariables(any());
 		assertSame(result, zipFile);
 	}
 

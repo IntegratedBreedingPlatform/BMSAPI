@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeData;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearchFilter;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -50,6 +51,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -176,7 +178,8 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		this.writeObservationHeader(xlsBook, xlsSheet, columns);
 		int currentRowNum = 1;
 		for (final ObservationUnitRow dataRow : reorderedObservationUnitRows) {
-			final List<SampleGenotypeDTO> sampleGenotypeDtoList = genotypeDTORowMap.getOrDefault(dataRow.getObservationUnitId(), new ArrayList<>());
+			final List<SampleGenotypeDTO> sampleGenotypeDtoList =
+				genotypeDTORowMap.getOrDefault(dataRow.getObservationUnitId(), new ArrayList<>());
 			this.writeObservationRow(currentRowNum++, xlsSheet, dataRow, sampleGenotypeDtoList, columns);
 		}
 	}
@@ -309,8 +312,11 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 
+		final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
+		filter.setStudyId(studyId);
+		filter.setDatasetIds(Arrays.asList(dataSetDto.getDatasetId()));
 		final List<MeasurementVariable> genotypeMarkerVariables =
-			new ArrayList<>(this.sampleGenotypeService.getSampleGenotypeVariables(studyId, dataSetDto.getDatasetId()).values());
+			new ArrayList<>(this.sampleGenotypeService.getSampleGenotypeVariables(filter).values());
 
 		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.datasetServiceMiddlewareService.getDatasetNameTypes(plotDatasetId);
 

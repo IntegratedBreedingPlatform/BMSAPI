@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearchFilter;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -20,6 +21,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +60,10 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 
 		if (includeSampleGenotpeValues) {
 			// Add Genotype Marker variables to the list of columns
-			allVariables.addAll(this.sampleGenotypeService.getSampleGenotypeVariables(studyId, datasetId).values());
+			final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
+			filter.setStudyId(studyId);
+			filter.setDatasetIds(Arrays.asList(datasetId));
+			allVariables.addAll(this.sampleGenotypeService.getSampleGenotypeVariables(filter).values());
 		}
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.TRIAL_INSTANCE_FACTOR.getId());
 	}

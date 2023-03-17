@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearchFilter;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -60,8 +61,11 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 
 		if (includeSampleGenotpeValues) {
 			// Add Genotype Marker variables to the list of columns
+			final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
+			filter.setStudyId(studyId);
+			filter.setDatasetIds(Arrays.asList(datasetId));
 			final Map<Integer, MeasurementVariable> genotypeVariablesMap =
-				this.sampleGenotypeService.getSampleGenotypeVariables(studyId, datasetId);
+				this.sampleGenotypeService.getSampleGenotypeVariables(filter);
 			columns.addAll(genotypeVariablesMap.values());
 		}
 

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -69,16 +70,18 @@ public class SampleGenotypeResource {
 			);
 	}
 
-	@ApiOperation(value = "Get Sample Genotype Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the Sample Genotypes, "
+	@ApiOperation(value = "Get Sample Genotype Columns", notes =
+		"Retrieves ALL MeasurementVariables (columns) associated to the Sample Genotypes, "
 			+ "that will be shown in the Sample Genotypes Table")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/samples/genotypes/table/columns", method = RequestMethod.GET)
 	public ResponseEntity<List<MeasurementVariable>> getSampleGenotypeColumns(@PathVariable final String crop,
-																			  @PathVariable final String programUUID,
-																			  @PathVariable final Integer studyId) {
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@RequestParam final List<Integer> sampleListIds) {
 
 		final List<MeasurementVariable> sampleGenotypeColumns =
-				this.sampleGenotypeService.getSampleGenotypeColumns(studyId);
+			this.sampleGenotypeService.getSampleGenotypeColumns(studyId, sampleListIds);
 
 		return new ResponseEntity<>(sampleGenotypeColumns, HttpStatus.OK);
 	}

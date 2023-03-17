@@ -10,13 +10,14 @@ import java.util.List;
 
 public interface SampleGenotypeService {
 
-    List<Integer> importSampleGenotypes(String programUUID, Integer studyId, List<SampleGenotypeImportRequestDto> genotypeImportRequestDtos);
+	List<Integer> importSampleGenotypes(String programUUID, Integer studyId,
+		List<SampleGenotypeImportRequestDto> genotypeImportRequestDtos);
 
-    List<SampleGenotypeDTO> searchSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO, Pageable pageable);
+	List<SampleGenotypeDTO> searchSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO, Pageable pageable);
 
-    long countSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
+	long countSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
 
-    long countFilteredSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
+	long countFilteredSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
 
-    List<MeasurementVariable> getSampleGenotypeColumns(final Integer studyId);
+	List<MeasurementVariable> getSampleGenotypeColumns(Integer studyId, List<Integer> sampleListIds);
 }

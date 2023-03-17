@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -228,7 +229,7 @@ public class DatasetExcelGeneratorTest {
 
 		final Map<Integer, MeasurementVariable> sampleGenotypeVariablesMap = new HashedMap();
 		sampleGenotypeVariablesMap.put(genotypeMarkerVariable.getTermId(), genotypeMarkerVariable);
-		when(this.sampleGenotypeService.getSampleGenotypeVariables(STUDY_ID, PLOT_DATASET_ID)).thenReturn(sampleGenotypeVariablesMap);
+		when(this.sampleGenotypeService.getSampleGenotypeVariables(any())).thenReturn(sampleGenotypeVariablesMap);
 
 		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
 		when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
