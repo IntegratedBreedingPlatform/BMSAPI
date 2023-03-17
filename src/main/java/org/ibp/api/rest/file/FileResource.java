@@ -152,8 +152,8 @@ public class FileResource {
 		if (!(request.isUserInRole(PermissionsEnum.ADMIN.name())
 			|| request.isUserInRole(PermissionsEnum.STUDIES.name())
 			|| request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name())
-			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_OBSERVATION_UNITS.name())
-			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_FILES.name()))) {
+			|| request.isUserInRole(PermissionsEnum.MS_OBSERVATIONS.name())
+			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_FILES_OBSERVATIONS.name()))) {
 			throw new AccessDeniedException("");
 		}
 	}
@@ -162,8 +162,8 @@ public class FileResource {
 		if (!(request.isUserInRole(PermissionsEnum.ADMIN.name())
 			|| request.isUserInRole(PermissionsEnum.STUDIES.name())
 			|| request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name())
-			|| request.isUserInRole(PermissionsEnum.ENVIRONMENT.name())
-			|| request.isUserInRole(PermissionsEnum.MANAGE_FILES_ENVIRONMENT.name()))) {
+			|| request.isUserInRole(PermissionsEnum.MS_ENVIRONMENT.name())
+			|| request.isUserInRole(PermissionsEnum.MS_MANAGE_FILES_ENVIRONMENT.name()))) {
 			throw new AccessDeniedException("");
 		}
 	}
