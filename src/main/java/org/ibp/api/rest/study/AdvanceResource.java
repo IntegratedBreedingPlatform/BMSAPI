@@ -27,7 +27,6 @@ public class AdvanceResource {
 	private AdvanceService advanceService;
 
 	@ApiOperation(value = "Advance study Preview")
-	// TODO: define granular permission for advance
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
 	@ResponseBody
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/advance/preview", method = RequestMethod.POST)
@@ -71,4 +70,17 @@ public class AdvanceResource {
 		return new ResponseEntity<>(advancedGids, HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Advance Samples Preview")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
+	@ResponseBody
+	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/advance/samples/preview", method = RequestMethod.POST)
+	public ResponseEntity<List<AdvanceGermplasmPreview>> advanceSamplePreview(
+		@PathVariable final String cropName,
+		@PathVariable final String programUUID,
+		@PathVariable final Integer studyId,
+		@RequestBody final AdvanceSamplesRequest request) {
+
+		final List<AdvanceGermplasmPreview> advanceGermplasmPreviewList = this.advanceService.advanceSamplesPreview(studyId, request);
+		return new ResponseEntity<>(advanceGermplasmPreviewList, HttpStatus.OK);
+	}
 }

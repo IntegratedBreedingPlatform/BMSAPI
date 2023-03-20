@@ -40,4 +40,9 @@ public class AdvanceServiceImpl implements AdvanceService {
 		return this.advanceService.advanceSamples(studyId, request);
 	}
 
+	@Override
+	public List<AdvanceGermplasmPreview> advanceSamplesPreview(final Integer studyId, final AdvanceSamplesRequest request) {
+		this.advanceValidator.validateAdvanceSamples(studyId, request);
+		return this.advanceService.advanceSamplesPreview(studyId, request);
+	}
 }
