@@ -41,7 +41,7 @@ public class DatasetKsuExcelGenerator extends DatasetExcelGenerator implements D
 
 	@Override
 	public File generateTraitAndSelectionVariablesFile(final List<String[]> rowValues, final String filenamePath) throws IOException{
-		try (CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(filenamePath), StandardCharsets.UTF_8), ',')){
+		try (final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(new FileOutputStream(filenamePath), StandardCharsets.UTF_8), ',')){
 			final File newFile = new File(filenamePath);
 			csvWriter.writeAll(rowValues);
 			return newFile;

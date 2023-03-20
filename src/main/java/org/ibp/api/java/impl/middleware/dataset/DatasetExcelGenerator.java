@@ -554,7 +554,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	}
 
 	private void createNameTypeHeader(
-		HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final int currentRowNum, final String typeLabel, final short color) {
+			final HSSFWorkbook xlsBook, final HSSFSheet xlsSheet, final int currentRowNum, final String typeLabel, final short color) {
 		final Locale locale = LocaleContextHolder.getLocale();
 		final HSSFRow row = xlsSheet.createRow(currentRowNum);
 
@@ -646,7 +646,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		backgroundStyle.setFont(blackFont);
 		int rowNumIndex = currentRowNum;
 		if (germplasmNameTypeDTOs != null && !germplasmNameTypeDTOs.isEmpty()) {
-			for (GermplasmNameTypeDTO germplasmNameTypeDTO : germplasmNameTypeDTOs) {
+			for (final GermplasmNameTypeDTO germplasmNameTypeDTO : germplasmNameTypeDTOs) {
 				final HSSFRow row = xlsSheet.createRow(rowNumIndex++);
 
 				HSSFCell cell = row.createCell(VARIABLE_NAME_COLUMN_INDEX, CellType.STRING);
