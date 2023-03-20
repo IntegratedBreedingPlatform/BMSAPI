@@ -125,12 +125,10 @@ public class DatasetResource {
 		return new ResponseEntity<>("", respHeaders, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Add Dataset Variable", notes = "Add Dataset Variable")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','CREATE_STUDIES', 'DELETE_STUDY', 'CLOSE_STUDY', 'LOCK_STUDY', 'MS_MANAGE_OBSERVATION_UNITS', 'MS_WITHDRAW_INVENTORY', 'MS_CREATE_PENDING_WITHDRAWALS', "
-		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS','MS_CANCEL_PENDING_TRANSACTIONS','MS_MANAGE_FILES','MS_CREATE_LOTS', 'MS_GERMPLASM_AND_CHECKS', 'MS_VIEW_GERMPLASM_AND_CHECKS', 'MS_ADD_ENTRY_DETAILS_VARIABLES', 'MS_MODIFY_ENTRY_DETAILS_VALUES', "
-		+ "'MS_MODIFY_COLUMNS', 'MS_REPLACE_GERMPLASM', 'MS_ADD_NEW_ENTRIES', 'MS_IMPORT_ENTRY_DETAILS')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.PUT)
-	public ResponseEntity<MeasurementVariable> addVariable(
+	@ApiOperation(value = "Add Enviromental Conditions Variable to the Dataset", notes = "Add Enviromental Conditions Variable to the Dataset")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','MS_ENVIRONMENT', 'MS_ADD_ENVIRONMENTAL_CONDITIONS_VARIABLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/enviromental-conditions", method = RequestMethod.PUT)
+	public ResponseEntity<MeasurementVariable> addEnviromentalConditions(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetVariable) {
 		MeasurementVariable variable = null;
@@ -144,7 +142,58 @@ public class DatasetResource {
 		return new ResponseEntity<>(variable, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Add Entry Details Dataset Variable", notes = "Add Entry Details Dataset Variable")
+	@ApiOperation(value = "Add Environment Details Variable to the Dataset", notes = "Add Environment Details Variable to the Dataset")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','MS_ENVIRONMENT', 'MS_ADD_ENVIRONMENT_DETAILS_VARIABLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/environment-details", method = RequestMethod.PUT)
+	public ResponseEntity<MeasurementVariable> addEnviromentDetails(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetVariable) {
+		MeasurementVariable variable = null;
+		try {
+			// TODO: We need to find a better way to lock the specific dataset where the variable is added instead of the resource.
+			this.datasetLock.lockWrite();
+			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
+		} finally {
+			this.datasetLock.unlockWrite();
+		}
+		return new ResponseEntity<>(variable, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Add Selections Variable to the Dataset", notes = "Add Selections Variable to the Dataset")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','MS_OBSERVATIONS', 'MS_ADD_OBSERVATION_SELECTION_VARIABLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/selections", method = RequestMethod.PUT)
+	public ResponseEntity<MeasurementVariable> addSelections(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetVariable) {
+		MeasurementVariable variable = null;
+		try {
+			// TODO: We need to find a better way to lock the specific dataset where the variable is added instead of the resource.
+			this.datasetLock.lockWrite();
+			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
+		} finally {
+			this.datasetLock.unlockWrite();
+		}
+		return new ResponseEntity<>(variable, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Add Traits Variable to the Dataset", notes = "Add Traits Variable to the Dataset")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','MS_OBSERVATIONS', 'MS_ADD_OBSERVATION_TRAIT_VARIABLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/traits", method = RequestMethod.PUT)
+	public ResponseEntity<MeasurementVariable> addTraits(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetVariable) {
+		MeasurementVariable variable = null;
+		try {
+			// TODO: We need to find a better way to lock the specific dataset where the variable is added instead of the resource.
+			this.datasetLock.lockWrite();
+			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
+		} finally {
+			this.datasetLock.unlockWrite();
+		}
+		return new ResponseEntity<>(variable, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Add Entry Details Variable to the Dataset", notes = "Add Entry Details Variable to the Dataset")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_GERMPLASM_AND_CHECKS', 'MS_ADD_ENTRY_DETAILS_VARIABLES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/entry-details", method = RequestMethod.PUT)
 	public ResponseEntity<MeasurementVariable> addEntryDetails(
@@ -162,12 +211,54 @@ public class DatasetResource {
 		return new ResponseEntity<>(variable, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Remove dataset variables", notes = "Remove a set of variables from dataset")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','CREATE_STUDIES', 'DELETE_STUDY', 'CLOSE_STUDY', 'LOCK_STUDY', 'MS_MANAGE_OBSERVATION_UNITS', 'MS_WITHDRAW_INVENTORY', 'MS_CREATE_PENDING_WITHDRAWALS', "
-		+ "'MS_CREATE_CONFIRMED_WITHDRAWALS', 'MS_CANCEL_PENDING_TRANSACTIONS', 'MS_MANAGE_FILES', 'MS_CREATE_LOTS', 'MS_GERMPLASM_AND_CHECKS', 'MS_VIEW_GERMPLASM_AND_CHECKS', 'MS_ADD_ENTRY_DETAILS_VARIABLES', 'MS_MODIFY_ENTRY_DETAILS_VALUES', "
-		+ "'MS_MODIFY_COLUMNS', 'MS_REPLACE_GERMPLASM', 'MS_ADD_NEW_ENTRIES', 'MS_IMPORT_ENTRY_DETAILS')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", method = RequestMethod.DELETE)
-	public ResponseEntity<Void> removeVariables(
+	@ApiOperation(value = "Remove Traits Variables to the Dataset", notes = "Remove Traits Variables to the Dataset")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','MS_OBSERVATIONS', 'MS_ADD_OBSERVATION_TRAIT_VARIABLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/traits", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> removeTraits(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
+
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Remove Selection Variables to the Dataset", notes = "Remove Selection Variables to the Dataset")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','MS_OBSERVATIONS', 'MS_ADD_OBSERVATION_SELECTION_VARIABLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/selections", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> removeSelections(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
+
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Remove Enviroment Details Variables to the Dataset", notes = "Remove Enviroment Details Variables to the Dataset")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','MS_OBSERVATIONS', 'MS_ADD_OBSERVATION_SELECTION_VARIABLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/environment-details", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> removeEnviromentDetails(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
+
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Remove Entry Details Variables to the Dataset", notes = "Remove Entry Details Variables to the Dataset")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_GERMPLASM_AND_CHECKS', 'MS_ADD_ENTRY_DETAILS_VARIABLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/entry-details", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> removeEntryDetails(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
+
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Remove Enviromental Conditions Variables to the Dataset", notes = "Remove Enviromental Conditions Variables to the Dataset")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','MS_OBSERVATIONS', 'MS_ADD_OBSERVATION_SELECTION_VARIABLES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/enviromental-conditions", method = RequestMethod.DELETE)
+	public ResponseEntity<Void> removeEnviromentalConditions(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 
