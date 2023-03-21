@@ -161,7 +161,7 @@ public class DatasetResource {
 
 	@ApiOperation(value = "Add Selection Variables to the Dataset", notes = "Add Selection Variables to the Dataset")
 	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES','MS_OBSERVATIONS', 'MS_ADD_OBSERVATION_SELECTION_VARIABLES')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/selection", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/selections", method = RequestMethod.PUT)
 	public ResponseEntity<MeasurementVariable> addSelections(
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestBody final DatasetVariable datasetVariable) {
