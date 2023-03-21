@@ -135,7 +135,7 @@ public class DatasetResource {
 		try {
 			// TODO: We need to find a better way to lock the specific dataset where the variable is added instead of the resource.
 			this.datasetLock.lockWrite();
-			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
+			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable, VariableType.ENVIRONMENT_CONDITION);
 		} finally {
 			this.datasetLock.unlockWrite();
 		}
@@ -169,7 +169,7 @@ public class DatasetResource {
 		try {
 			// TODO: We need to find a better way to lock the specific dataset where the variable is added instead of the resource.
 			this.datasetLock.lockWrite();
-			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
+			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable, VariableType.SELECTION_METHOD);
 		} finally {
 			this.datasetLock.unlockWrite();
 		}
@@ -186,7 +186,7 @@ public class DatasetResource {
 		try {
 			// TODO: We need to find a better way to lock the specific dataset where the variable is added instead of the resource.
 			this.datasetLock.lockWrite();
-			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
+			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable, VariableType.TRAIT);
 		} finally {
 			this.datasetLock.unlockWrite();
 		}
@@ -204,7 +204,7 @@ public class DatasetResource {
 		try {
 			// TODO: We need to find a better way to lock the specific dataset where the variable is added instead of the resource.
 			this.datasetLock.lockWrite();
-			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
+			variable = this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable, VariableType.ENTRY_DETAIL);
 		} finally {
 			this.datasetLock.unlockWrite();
 		}
@@ -218,7 +218,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 
-		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds), VariableType.TRAIT);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -229,7 +229,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 
-		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds), VariableType.SELECTION_METHOD);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -240,7 +240,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 
-		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds), VariableType.ENVIRONMENT_DETAIL);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -251,7 +251,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 
-		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds),VariableType.ENTRY_DETAIL);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -262,7 +262,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 
-		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds));
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds),VariableType.ENVIRONMENT_CONDITION);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
