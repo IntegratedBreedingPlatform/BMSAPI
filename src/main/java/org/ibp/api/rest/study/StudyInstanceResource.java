@@ -31,7 +31,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Create new study instances",
 		notes = "Create new study instances")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_ENVIRONMENT', 'MODIFY_NUMBER_OF_ENVIRONMENT')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_ENVIRONMENT', 'MS_MODIFY_NUMBER_OF_ENVIRONMENTS')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances/generation", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<StudyInstance>> createStudyInstances(final @PathVariable String cropname,
@@ -45,7 +45,7 @@ public class StudyInstanceResource {
 
 	@ApiOperation(value = "Delete study instances",
 		notes = "Delete study instances")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'MS_ENVIRONMENT', 'MODIFY_NUMBER_OF_ENVIRONMENT')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'MS_ENVIRONMENT', 'MS_MODIFY_NUMBER_OF_ENVIRONMENTS')")
 	@RequestMapping(value = "/{cropname}/programs/{programUUID}/studies/{studyId}/instances", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity<Void> deleteStudyInstances(final @PathVariable String cropname, @PathVariable final String programUUID,
