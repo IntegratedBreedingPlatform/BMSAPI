@@ -78,11 +78,12 @@ public interface DatasetService {
 	 * @param studyId         Id of the study
 	 * @param datasetId       Id of the dataset
 	 * @param datasetVariable Variable to be added
+	 * @param variableType Type of variable
 	 * @return A measurement variable.
 	 */
-	MeasurementVariable addDatasetVariable(Integer studyId, Integer datasetId, DatasetVariable datasetVariable);
+	MeasurementVariable addDatasetVariable(Integer studyId, Integer datasetId, DatasetVariable datasetVariable, VariableType variableType);
 
-	void addDatasetVariables(Integer studyId, Integer datasetId, List<DatasetVariable> datasetVariable);
+	void addDatasetVariables(Integer studyId, Integer datasetId, List<DatasetVariable> datasetVariable, VariableType variableType);
 
 	/**
 	 * Get the list of dataset variables of an specific variable type
@@ -111,8 +112,9 @@ public interface DatasetService {
 	 * @param studyId     Id of the study
 	 * @param datasetId   Id of the dataset
 	 * @param variableIds List of variables
+	 * @param variableType Type of variable
 	 */
-	void removeDatasetVariables(Integer studyId, Integer datasetId, List<Integer> variableIds);
+	void removeDatasetVariables(Integer studyId, Integer datasetId, List<Integer> variableIds, VariableType variableType);
 
 	/**
 	 * Return the list of instances for an specific dataset
