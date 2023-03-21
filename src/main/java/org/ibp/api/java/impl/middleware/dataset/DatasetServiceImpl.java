@@ -185,12 +185,12 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable) {
+	public MeasurementVariable addDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable, final VariableType variableType) {
 		this.studyValidator.validate(studyId, true);
 
 		final Integer variableId = datasetVariable.getVariableId();
 		final StandardVariable traitVariable =
-			this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
+			this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false, variableType);
 
 		final String alias = this.getAlias(datasetVariable, traitVariable);
 		final VariableType type = VariableType.getById(datasetVariable.getVariableTypeId());
@@ -205,12 +205,12 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void addDatasetVariables(final Integer studyId, final Integer datasetId,
-		final List<DatasetVariable> datasetVariables) {
+		final List<DatasetVariable> datasetVariables, VariableType variableType) {
 		this.studyValidator.validate(studyId, true);
 
 		datasetVariables.forEach(datasetVariable -> {
 			final StandardVariable traitVariable =
-				this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
+				this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false, variableType);
 
 			this.middlewareDatasetService.addDatasetVariable(datasetId, datasetVariable.getVariableId(),
 				VariableType.getById(datasetVariable.getVariableTypeId()), this.getAlias(datasetVariable, traitVariable));
@@ -230,7 +230,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void removeDatasetVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
+	public void removeDatasetVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds, final VariableType variableType) {
 		this.studyValidator.validate(studyId, true);
 		for (final Integer variableId : variableIds) {
 			if (DatasetServiceImpl.PROTECTED_VARIABLE_IDS.contains(variableId)) {
