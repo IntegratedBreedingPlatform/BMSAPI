@@ -81,7 +81,7 @@ public class SampleListResource {
 	}
 
 	@ApiOperation(value = "Delete sample list entries", notes = "Delete sample list entries. ")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_SAMPLE_LIST', 'MS_DELETE_SAMPLES', 'LISTS', 'SAMPLES_LISTS', 'DELETE_SAMPLES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_SAMPLE_LISTS', 'MS_DELETE_SAMPLES', 'LISTS', 'SAMPLES_LISTS', 'DELETE_SAMPLES')")
 	@RequestMapping(value = "/{crop}/sample-lists/{sampleListId}/entries", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteSampleListEntries(@PathVariable final String crop, @RequestParam final String programUUID,
