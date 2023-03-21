@@ -276,7 +276,7 @@ public class StudyEntryServiceImplTest {
 
 		this.studyEntryService.importUpdates(studyId, studyEntryDetailsImportRequest);
 
-		Mockito.verify(this.datasetService).addDatasetVariables(studyId, datasetId, datasetVariables);
+		Mockito.verify(this.datasetService).addDatasetVariables(studyId, datasetId, datasetVariables, VariableType.ENTRY_DETAIL);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.studyEntryValidator).validateStudyContainsEntryNumbers(studyId, Collections.singleton(entryId));
 		Mockito.verify(this.middlewareStudyEntryService).getStudyEntries(ArgumentMatchers.eq(studyId),
