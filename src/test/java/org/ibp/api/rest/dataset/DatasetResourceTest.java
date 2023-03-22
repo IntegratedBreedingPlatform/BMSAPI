@@ -144,7 +144,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.put("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/selection", this.cropName,
+				.put("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/selections", this.cropName,
 					this.programUuid, studyId, datasetId)
 				.contentType(this.contentType).content(this.convertObjectToByte(datasetVariable)))
 			.andDo(MockMvcResultHandlers.print())
