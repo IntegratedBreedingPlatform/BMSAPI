@@ -81,9 +81,11 @@ public class AdvanceValidator {
 
 		final Integer plotDatasetId = this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
 
+		final DatasetDTO dataset = this.validateAndGetDataset(studyId, request.getDatasetId());
+
+		// retrieve plot dataset variables for rep_no
 		final List<MeasurementVariable> plotDatasetVariables = this.datasetService.getObservationSetVariables(plotDatasetId);
 
-		final DatasetDTO dataset = this.validateAndGetDataset(studyId, request.getDatasetId());
 		final BreedingMethodDTO selectedBreedingMethodDTO =
 			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), dataset,
 				request.getInstanceIds());
