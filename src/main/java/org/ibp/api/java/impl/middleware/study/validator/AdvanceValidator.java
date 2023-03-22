@@ -144,11 +144,9 @@ public class AdvanceValidator {
 			throw new ApiRequestValidationException("advance.dataset.required", new Object[] {});
 		}
 
-		final DatasetDTO dataset = this.datasetService.getDataset(datasetId);
+		this.datasetValidator.validateDataset(datasetId);
 
-		if (dataset == null) {
-			throw new ApiRequestValidationException("advance.dataset.invalid", new Object[] {datasetId.toString()});
-		}
+		final DatasetDTO dataset = this.datasetService.getDataset(datasetId);
 
 		if (!ALLOWED_DATASET_TYPES.contains(dataset.getDatasetTypeId())) {
 			throw new ApiRequestValidationException("advance.dataset.not-supported", new Object[] {datasetId.toString()});
