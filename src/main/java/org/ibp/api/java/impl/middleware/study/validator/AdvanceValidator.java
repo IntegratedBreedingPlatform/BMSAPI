@@ -79,16 +79,19 @@ public class AdvanceValidator {
 	public void validateAdvanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 		checkNotNull(request, "request.null");
 
-		this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
+		final Integer plotDatasetId = this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
+
+		final List<MeasurementVariable> plotDatasetVariables = this.datasetService.getObservationSetVariables(plotDatasetId);
 
 		final DatasetDTO dataset = this.validateAndGetDataset(studyId, request.getDatasetId());
 		final BreedingMethodDTO selectedBreedingMethodDTO =
 			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), dataset,
 				request.getInstanceIds());
+
 		this.validateLineSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), dataset.getVariables());
 		this.validateBulkingSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), dataset.getVariables());
 		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
-		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), dataset.getVariables());
+		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), plotDatasetVariables);
 	}
 
 	public void validateAdvanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
