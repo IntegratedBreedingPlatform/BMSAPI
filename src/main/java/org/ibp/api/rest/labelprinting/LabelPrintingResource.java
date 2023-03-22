@@ -244,7 +244,12 @@ public class LabelPrintingResource {
 					|| this.request.isUserInRole(PermissionsEnum.MS_DESIGN_AND_PLANNING_OPTIONS.name())
 					|| this.request.isUserInRole(PermissionsEnum.MS_CREATE_PLANTING_LABELS.name());
 			case STUDY_ENTRIES:
-				return true;
+				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
+					|| this.request.isUserInRole(PermissionsEnum.STUDIES.name())
+					|| this.request.isUserInRole(PermissionsEnum.MANAGE_STUDIES.name())
+					|| this.request.isUserInRole(PermissionsEnum.MS_STUDY_ACTIONS.name())
+					|| this.request.isUserInRole(PermissionsEnum.MS_MANAGE_OBSERVATION_UNITS.name())
+					|| this.request.isUserInRole(PermissionsEnum.MS_EXPORT_STUDY_ENTRIES.name());
 			case LOT:
 				return this.request.isUserInRole(PermissionsEnum.ADMIN.name())
 					|| this.request.isUserInRole(PermissionsEnum.CROP_MANAGEMENT.name())
