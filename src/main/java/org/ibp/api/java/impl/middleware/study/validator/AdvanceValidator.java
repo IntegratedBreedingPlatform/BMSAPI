@@ -140,6 +140,11 @@ public class AdvanceValidator {
 		}
 
 		final DatasetDTO dataset = this.datasetService.getDataset(datasetId);
+
+		if (dataset == null) {
+			throw new ApiRequestValidationException("advance.dataset.invalid", new Object[] {datasetId.toString()});
+		}
+
 		if (!ALLOWED_DATASET_TYPES.contains(dataset.getDatasetTypeId())) {
 			throw new ApiRequestValidationException("advance.dataset.not-supported", new Object[] {datasetId.toString()});
 		}
