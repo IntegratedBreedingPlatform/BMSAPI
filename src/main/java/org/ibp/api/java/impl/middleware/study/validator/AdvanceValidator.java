@@ -79,16 +79,21 @@ public class AdvanceValidator {
 	public void validateAdvanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 		checkNotNull(request, "request.null");
 
-		this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
+		final Integer plotDatasetId = this.validateBasicInfoAndGetPlotDatasetId(studyId, request.getInstanceIds());
 
 		final DatasetDTO dataset = this.validateAndGetDataset(studyId, request.getDatasetId());
+
+		// retrieve plot dataset variables for rep_no
+		final List<MeasurementVariable> plotDatasetVariables = this.datasetService.getObservationSetVariables(plotDatasetId);
+
 		final BreedingMethodDTO selectedBreedingMethodDTO =
 			this.validateAdvanceStudyBreedingMethodSelection(request.getBreedingMethodSelectionRequest(), dataset,
 				request.getInstanceIds());
+
 		this.validateLineSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), dataset.getVariables());
 		this.validateBulkingSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), dataset.getVariables());
 		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
-		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), dataset.getVariables());
+		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), plotDatasetVariables);
 	}
 
 	public void validateAdvanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
@@ -139,7 +144,10 @@ public class AdvanceValidator {
 			throw new ApiRequestValidationException("advance.dataset.required", new Object[] {});
 		}
 
+		this.datasetValidator.validateDataset(datasetId);
+
 		final DatasetDTO dataset = this.datasetService.getDataset(datasetId);
+
 		if (!ALLOWED_DATASET_TYPES.contains(dataset.getDatasetTypeId())) {
 			throw new ApiRequestValidationException("advance.dataset.not-supported", new Object[] {datasetId.toString()});
 		}
