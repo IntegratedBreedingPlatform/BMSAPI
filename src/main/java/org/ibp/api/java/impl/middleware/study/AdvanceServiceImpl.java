@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.study;
 
 import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
+import org.generationcp.middleware.ruleengine.pojo.AdvanceGermplasmPreview;
 import org.ibp.api.java.impl.middleware.study.validator.AdvanceValidator;
 import org.ibp.api.java.study.AdvanceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,20 @@ public class AdvanceServiceImpl implements AdvanceService {
 	}
 
 	@Override
+	public List<AdvanceGermplasmPreview> advanceStudyPreview(final Integer studyId, final AdvanceStudyRequest request) {
+		this.advanceValidator.validateAdvanceStudy(studyId, request);
+		return this.advanceService.advanceStudyPreview(studyId, request);
+	}
+
+	@Override
 	public List<Integer> advanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
 		this.advanceValidator.validateAdvanceSamples(studyId, request);
 		return this.advanceService.advanceSamples(studyId, request);
 	}
 
+	@Override
+	public List<AdvanceGermplasmPreview> advanceSamplesPreview(final Integer studyId, final AdvanceSamplesRequest request) {
+		this.advanceValidator.validateAdvanceSamples(studyId, request);
+		return this.advanceService.advanceSamplesPreview(studyId, request);
+	}
 }
