@@ -674,7 +674,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int collectionOrderId = DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId();
 
 		final File file = File.createTempFile("test", ".csv");
-		Mockito.when(this.datasetCSVExportService.export(studyId, datasetId, instanceIds, collectionOrderId, false)).thenReturn(file);
+		Mockito.when(this.datasetCSVExportService.export(studyId, datasetId, instanceIds, collectionOrderId, false, false))
+			.thenReturn(file);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -684,6 +685,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.param("instanceIds", "1,2,3")
 				.param("collectionOrderId", String.valueOf(collectionOrderId))
 				.param("singleFile", String.valueOf(false))
+				.param("includeSampleGenotypeValues", String.valueOf(false))
 				.contentType(this.csvContentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
@@ -703,7 +705,8 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final int collectionOrderId = DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId();
 
 		final File file = File.createTempFile("test", ".xls");
-		Mockito.when(this.datasetCSVExportService.export(studyId, datasetId, instanceIds, collectionOrderId, false)).thenReturn(file);
+		Mockito.when(this.datasetCSVExportService.export(studyId, datasetId, instanceIds, collectionOrderId, false, false))
+			.thenReturn(file);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -713,6 +716,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.param("instanceIds", "1,2,3")
 				.param("collectionOrderId", String.valueOf(collectionOrderId))
 				.param("singleFile", String.valueOf(false))
+				.param("includeSampleGenotypeValues", String.valueOf(false))
 				.contentType(this.xlsContentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());

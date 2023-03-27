@@ -3,6 +3,8 @@ package org.ibp.api.java.impl.middleware.dataset;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeData;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.ibp.api.rest.dataset.ObservationUnitData;
@@ -120,12 +122,39 @@ public class DatasetCSVGeneratorTest {
 		categoricalValuesForEnvironmentVariable.put(this.variableValue3, ENVIRONMENT_VALUE);
 		categoricalValuesMap.put(this.variableName3, categoricalValuesForEnvironmentVariable);
 
-		final String[] result = this.datasetCSVGenerator.getColumnValues(this.observationUnitRows.get(0), this.measurementVariables, categoricalValuesMap);
-		assertEquals(result.length, this.headerNames.size());
+		final MeasurementVariable markerVariable1 = new MeasurementVariable();
+		markerVariable1.setName(RandomStringUtils.randomAlphabetic(10));
+		markerVariable1.setVariableType(VariableType.GENOTYPE_MARKER);
+
+		final MeasurementVariable markerVariable2 = new MeasurementVariable();
+		markerVariable2.setName(RandomStringUtils.randomAlphabetic(10));
+		markerVariable2.setVariableType(VariableType.GENOTYPE_MARKER);
+
+		final MeasurementVariable markerVariable3 = new MeasurementVariable();
+		markerVariable3.setName(RandomStringUtils.randomAlphabetic(10));
+		markerVariable3.setVariableType(VariableType.GENOTYPE_MARKER);
+
+		final List<MeasurementVariable> variables = new ArrayList<>(this.measurementVariables);
+		variables.add(markerVariable1);
+		variables.add(markerVariable2);
+		variables.add(markerVariable3);
+
+		final List<SampleGenotypeDTO> sampleGenotypeDTOList = new ArrayList<>();
+		sampleGenotypeDTOList.add(this.createGenotypeDto(markerVariable1, "A"));
+		sampleGenotypeDTOList.add(this.createGenotypeDto(markerVariable1, "B"));
+		sampleGenotypeDTOList.add(this.createGenotypeDto(markerVariable2, "C"));
+
+		final String[] result =
+			this.datasetCSVGenerator.getColumnValues(this.observationUnitRows.get(0), sampleGenotypeDTOList, variables,
+				categoricalValuesMap);
+		assertEquals(7, result.length);
 		assertEquals(this.variableValue1, result[0]);
 		assertEquals(STUDY_DETAIL_VALUE, result[1]);
 		assertEquals(ENVIRONMENT_VALUE, result[2]);
 		assertEquals(this.variableValue4, result[3]);
+		assertEquals("A;B", result[4]);
+		assertEquals("C", result[5]);
+		assertEquals("", result[6]);
 	}
 
 	@Test
@@ -140,7 +169,7 @@ public class DatasetCSVGeneratorTest {
 	public void testGenerateMultiInstanceFile() throws IOException {
 		final String filename = "filename";
 		final File file = this.datasetCSVGenerator
-			.generateMultiInstanceFile(new HashMap<>(), new ArrayList<>(), filename);
+			.generateMultiInstanceFile(new HashMap<>(), new HashMap<>(), new ArrayList<>(), filename);
 		Assert.assertEquals(filename, file.getName());
 	}
 
@@ -148,18 +177,29 @@ public class DatasetCSVGeneratorTest {
 	public void testGenerateSingleInstanceFile() throws IOException {
 		final String filename = "filename";
 		final File file = this.datasetCSVGenerator
-			.generateSingleInstanceFile(null, null, new ArrayList<>(), new ArrayList<>(), filename,
+			.generateSingleInstanceFile(null, null, new ArrayList<>(), new ArrayList<>(), new HashMap<>(), filename,
 				null);
 		Assert.assertEquals(filename, file.getName());
 	}
 
 	@Test
 	public void testGetStudyAndEnvironmentCategoricalValuesMap() {
-		final Map<String, Map<String, String>> categoricalValuesMap = this.datasetCSVGenerator.getStudyAndEnvironmentCategoricalValuesMap(this.measurementVariables);
+		final Map<String, Map<String, String>> categoricalValuesMap =
+			this.datasetCSVGenerator.getStudyAndEnvironmentCategoricalValuesMap(this.measurementVariables);
 		Assert.assertEquals(2, categoricalValuesMap.size());
 		Assert.assertNotNull(categoricalValuesMap.get(this.variableName2));
 		Assert.assertEquals(STUDY_DETAIL_CATEGORICAL_VALUE, categoricalValuesMap.get(this.variableName2).get("1"));
 		Assert.assertNotNull(categoricalValuesMap.get(this.variableName3));
 		Assert.assertEquals(ENVIRONMENT_DETAIL_CATEGORICAL_VALUE, categoricalValuesMap.get(this.variableName3).get("1"));
+	}
+
+	private SampleGenotypeDTO createGenotypeDto(final MeasurementVariable measurementVariable, final String value) {
+		final SampleGenotypeDTO sampleGenotypeDTO = new SampleGenotypeDTO();
+		final Map<String, SampleGenotypeData> genotypeDataMap = new HashMap<>();
+		final SampleGenotypeData sampleGenotypeData = new SampleGenotypeData();
+		sampleGenotypeData.setValue(value);
+		genotypeDataMap.put(measurementVariable.getName(), sampleGenotypeData);
+		sampleGenotypeDTO.setGenotypeDataMap(genotypeDataMap);
+		return sampleGenotypeDTO;
 	}
 }

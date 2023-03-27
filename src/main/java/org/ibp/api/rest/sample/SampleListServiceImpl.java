@@ -19,6 +19,7 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.common.validator.ProgramValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,9 @@ public class SampleListServiceImpl implements SampleListService {
 	@Autowired
 	private ProgramValidator programValidator;
 
+	@Autowired
+	private StudyValidator studyValidator;
+
 	@Override
 	public Map<String, Object> createSampleList(final SampleListDto sampleListDto) {
 
@@ -87,7 +91,6 @@ public class SampleListServiceImpl implements SampleListService {
 
 		this.sampleListValidator.validateFolderName(folderName);
 		this.sampleListValidator.validateFolderIdAndProgram(parentId);
-
 
 		final HashMap<String, Object> mapResponse = new HashMap<>();
 		final WorkbenchUser createdBy = this.securityService.getCurrentlyLoggedInUser();
@@ -128,7 +131,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Override
 	public Map<String, Object> moveSampleListFolder(final Integer folderId, final Integer newParentId, final boolean isCropList,
-			final String programUUID) {
+		final String programUUID) {
 
 		this.sampleListValidator.validateFolderIdAndProgram(folderId);
 		this.sampleListValidator.validateFolderId(newParentId);
@@ -161,7 +164,7 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public void importSamplePlateInformation(final List<SampleDTO> sampleDTOs, final Integer listId){
+	public void importSamplePlateInformation(final List<SampleDTO> sampleDTOs, final Integer listId) {
 
 		this.sampleValidator.validateSamplesForImportPlate(listId, sampleDTOs);
 
@@ -185,13 +188,15 @@ public class SampleListServiceImpl implements SampleListService {
 
 		final List<TreeNode> treeNodes = new ArrayList<>();
 		if (parentId == null) {
-			final TreeNode cropFolderNode = new TreeNode(SampleListServiceImpl.CROP_LISTS, AppConstants.CROP_LISTS.getString(), true, LEAD_CLASS,
-				AppConstants.FOLDER_ICON_PNG.getString(), null);
+			final TreeNode cropFolderNode =
+				new TreeNode(SampleListServiceImpl.CROP_LISTS, AppConstants.CROP_LISTS.getString(), true, LEAD_CLASS,
+					AppConstants.FOLDER_ICON_PNG.getString(), null);
 			cropFolderNode.setNumOfChildren(this.sampleListServiceMW.getAllSampleTopLevelLists(null).size());
 			treeNodes.add(cropFolderNode);
 			if (programUUID != null) {
-				final TreeNode programFolderNode = new TreeNode(SampleListServiceImpl.PROGRAM_LISTS, AppConstants.SAMPLE_LISTS.getString(), true, LEAD_CLASS,
-					AppConstants.FOLDER_ICON_PNG.getString(), programUUID);
+				final TreeNode programFolderNode =
+					new TreeNode(SampleListServiceImpl.PROGRAM_LISTS, AppConstants.SAMPLE_LISTS.getString(), true, LEAD_CLASS,
+						AppConstants.FOLDER_ICON_PNG.getString(), programUUID);
 				programFolderNode.setNumOfChildren(this.sampleListServiceMW.getAllSampleTopLevelLists(programUUID).size());
 				treeNodes.add(programFolderNode);
 			}
@@ -202,7 +207,8 @@ public class SampleListServiceImpl implements SampleListService {
 			} else if (SampleListServiceImpl.CROP_LISTS.equals(parentId)) {
 				rootLists = this.sampleListServiceMW.getAllSampleTopLevelLists(null);
 			} else {
-				rootLists = this.sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID, SampleListServiceImpl.BATCH_SIZE);
+				rootLists = this.sampleListServiceMW.getSampleListByParentFolderIdBatched(Integer.parseInt(parentId), programUUID,
+					SampleListServiceImpl.BATCH_SIZE);
 			}
 
 			final List<TreeNode> childNodes = TreeViewUtil.convertListToTreeView(rootLists, folderOnly);
@@ -228,10 +234,16 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public void deleteSamples(final Integer sampleListId, final List<Integer> sampleIds){
+	public void deleteSamples(final Integer sampleListId, final List<Integer> sampleIds) {
 		this.sampleListValidator.validateSampleList(sampleListId);
-		this.sampleListValidator.verifySamplesExist(sampleListId, new ArrayList<>(sampleIds));
+		this.sampleListValidator.verifySamplesExist(new ArrayList<>(sampleIds));
 		this.sampleListServiceMW.deleteSamples(sampleListId, sampleIds);
+	}
+
+	@Override
+	public List<SampleListDTO> getSampleListsByStudy(final Integer studyId, final boolean withGenotypesOnly) {
+		this.studyValidator.validate(studyId, false);
+		return this.sampleListServiceMW.getSampleListsByStudy(studyId, withGenotypesOnly);
 	}
 
 	protected SampleListDTO translateToSampleListDto(final SampleListDto dto) {

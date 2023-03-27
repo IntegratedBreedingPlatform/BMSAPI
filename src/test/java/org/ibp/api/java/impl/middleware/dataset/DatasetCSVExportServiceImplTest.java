@@ -4,12 +4,11 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.ZipUtil;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.genotype.SampleGenotypeService;
 import org.generationcp.middleware.data.initializer.DatasetTypeTestDataInitializer;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
-import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -49,6 +48,7 @@ import java.util.Set;
 import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -100,6 +100,9 @@ public class DatasetCSVExportServiceImplTest {
 	@Mock
 	private OntologyDataManager ontologyDataManager;
 
+	@Mock
+	private SampleGenotypeService sampleGenotypeService;
+
 	@InjectMocks
 	private DatasetCSVExportServiceImpl datasetExportService;
 
@@ -147,7 +150,7 @@ public class DatasetCSVExportServiceImplTest {
 			.thenReturn(instanceObservationUnitRowsMap);
 
 		final File result = this.datasetExportService.export(this.study.getId(), this.dataSetDTO.getDatasetId(), instanceIds,
-			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false);
+			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), false, false);
 
 		verify(this.studyValidator).validate(this.study.getId(), false);
 		verify(this.datasetValidator).validateDataset(this.study.getId(), this.dataSetDTO.getDatasetId());
@@ -168,7 +171,7 @@ public class DatasetCSVExportServiceImplTest {
 		final File zipFile = new File("");
 
 		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables),
-			ArgumentMatchers.anyList(), anyString(), any(StudyInstance.class)))
+			ArgumentMatchers.anyList(), anyMap(), anyString(), any(StudyInstance.class)))
 			.thenReturn(new File(""));
 		when(this.zipUtil.zipFiles(contains(this.study.getName()), anyListOf(File.class))).thenReturn(zipFile);
 		this.datasetExportService.setZipUtil(this.zipUtil);
@@ -181,11 +184,12 @@ public class DatasetCSVExportServiceImplTest {
 
 		final File result = this.datasetExportService
 			.generateFiles(
-				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<MeasurementVariable>(),
+				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new HashMap<>(),
+				new ArrayList<MeasurementVariable>(),
 				this.datasetCSVGenerator, AbstractDatasetExportService.CSV);
 		verify(this.datasetCSVGenerator, Mockito.times(studyInstanceMap.size()))
 			.generateSingleInstanceFile(
-				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.anyList(), anyString(),
+				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.anyList(), anyMap(), anyString(),
 				any(StudyInstance.class));
 
 		verify(this.zipUtil).zipFiles(eq(FileNameGenerator.generateFileName(this.study.getName())), anyListOf(File.class));
@@ -200,16 +204,17 @@ public class DatasetCSVExportServiceImplTest {
 		instanceObservationUnitRowsMap.put(1, new ArrayList<ObservationUnitRow>());
 		instanceObservationUnitRowsMap.put(2, new ArrayList<ObservationUnitRow>());
 
-		when(this.datasetCSVGenerator.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), eq(measurementVariables), anyString()))
+		when(this.datasetCSVGenerator.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), Mockito.anyMap(),
+			eq(measurementVariables), anyString()))
 			.thenReturn(csvFile);
 
 		final File result = this.datasetExportService
 			.generateInSingleFile(
 				this.study, this.dataSetDTO, instanceObservationUnitRowsMap,
-				measurementVariables, this.datasetCSVGenerator, AbstractDatasetExportService.CSV);
+				new HashMap<>(), measurementVariables, this.datasetCSVGenerator, AbstractDatasetExportService.CSV);
 
 		verify(this.datasetCSVGenerator)
-			.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), eq(measurementVariables), anyString());
+			.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), anyMap(), eq(measurementVariables), anyString());
 		assertSame(result, csvFile);
 	}
 
@@ -220,7 +225,7 @@ public class DatasetCSVExportServiceImplTest {
 		final File csvFile = new File("");
 
 		when(this.datasetCSVGenerator.generateSingleInstanceFile(anyInt(), eq(this.dataSetDTO), eq(measurementVariables),
-			ArgumentMatchers.anyList(), anyString(), any(StudyInstance.class)))
+			ArgumentMatchers.anyList(), anyMap(), anyString(), any(StudyInstance.class)))
 			.thenReturn(csvFile);
 
 		final Map<Integer, List<ObservationUnitRow>> instanceObservationUnitRowsMap = new HashMap<>();
@@ -231,12 +236,13 @@ public class DatasetCSVExportServiceImplTest {
 		studyInstanceMap.put(1, studyInstance);
 		final File result = this.datasetExportService
 			.generateFiles(
-				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new ArrayList<MeasurementVariable>(),
+				this.study, this.dataSetDTO, studyInstanceMap, instanceObservationUnitRowsMap, new HashMap<>(),
+				new ArrayList<MeasurementVariable>(),
 				this.datasetCSVGenerator, AbstractDatasetExportService.CSV);
 
 		verify(this.datasetCSVGenerator)
 			.generateSingleInstanceFile(
-				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.anyList(), anyString(),
+				anyInt(), eq(this.dataSetDTO), eq(measurementVariables), ArgumentMatchers.anyList(), anyMap(), anyString(),
 				any(StudyInstance.class));
 
 		verify(this.zipUtil, times(0)).zipFiles(anyString(), anyListOf(File.class));
@@ -264,12 +270,17 @@ public class DatasetCSVExportServiceImplTest {
 	}
 
 	@Test
-	public void testGetColumns() {
-		final List<Integer> subObsTypeIds = new ArrayList<>();
-		subObsTypeIds.add(5);
-
-		this.datasetExportService.getColumns(1, 1);
+	public void testGetColumns_includeSampleGenotypeValuesTrue() {
+		this.datasetExportService.getColumns(1, 1, true);
 		Mockito.verify(this.studyDatasetService).getAllDatasetVariables(1, 1);
+		Mockito.verify(this.sampleGenotypeService).getSampleGenotypeVariables(any());
+	}
+
+	@Test
+	public void testGetColumns_includeSampleGenotypeValuesFalse() {
+		this.datasetExportService.getColumns(1, 1, false);
+		Mockito.verify(this.studyDatasetService).getAllDatasetVariables(1, 1);
+		Mockito.verify(this.sampleGenotypeService, times(0)).getSampleGenotypeVariables(any());
 	}
 
 	@Test

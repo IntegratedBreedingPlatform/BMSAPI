@@ -13,6 +13,7 @@ import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,12 +62,15 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	protected File generateFiles(
 		final Study study, final DatasetDTO dataSetDto,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
+		final List<MeasurementVariable> columns,
 		final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
 		final File temporaryFolder = Files.createTempDir();
 		final List<File> files =
-			this.getInstanceFiles(study, dataSetDto, selectedDatasetInstancesMap, observationUnitRowMap, columns, generator, fileExtension,
+			this.getInstanceFiles(study, dataSetDto, selectedDatasetInstancesMap, observationUnitRowMap, genotypeDTORowMap, columns,
+				generator, fileExtension,
 				temporaryFolder);
 
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSetDto.getDatasetTypeId());
@@ -82,7 +87,8 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		}
 
 		final String traitsAndSelectionFilename =
-			temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedTraitsAndSelectionFilename, "trt");
+			temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedTraitsAndSelectionFilename,
+				"trt");
 		final List<MeasurementVariable> traitAndSelectionVariables = this.getTraitAndSelectionVariables(dataSetDto.getDatasetId());
 		files.add(
 			generator.generateTraitAndSelectionVariablesFile(this.convertTraitAndSelectionVariablesData(traitAndSelectionVariables),
@@ -154,11 +160,12 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	}
 
 	protected List<MeasurementVariable> getTraitAndSelectionVariables(final int datasetId) {
-		return this.datasetService.getObservationSetVariables(datasetId, Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+		return this.datasetService.getObservationSetVariables(datasetId,
+			Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 	}
 
 	@Override
-	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
+	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotypeValues) {
 		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
 		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
 
@@ -197,6 +204,12 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		return this.studyDatasetService.getInstanceObservationUnitRowsMap(study.getId(), dataset.getDatasetId(),
 			new ArrayList<>(selectedDatasetInstancesMap.keySet()));
+	}
+
+	@Override
+	protected Map<Integer, List<SampleGenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotypeValues) {
+		return new HashMap<>();
 	}
 
 }

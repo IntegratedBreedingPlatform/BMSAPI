@@ -52,8 +52,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyListOf;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -105,7 +105,8 @@ public class DatasetKsuExportServiceImplTest {
 	@InjectMocks
 	private DatasetKsuExcelExportServiceImpl datasetKSUExcelExportService;
 
-	private final MeasurementVariable measurementVariable = MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GENERAL_TRAIT_CLASS.getId(), "GW100", "2");
+	private final MeasurementVariable measurementVariable =
+		MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.GENERAL_TRAIT_CLASS.getId(), "GW100", "2");
 
 	@Before
 	public void setUp() {
@@ -131,7 +132,7 @@ public class DatasetKsuExportServiceImplTest {
 
 	private void testGenerateDatasetKSUExportService(
 		final AbstractDatasetExportService datasetKSUExportService, final String fileExtension, final
-		DatasetFileGenerator generator) throws IOException {
+	DatasetFileGenerator generator) throws IOException {
 		final Study study = new Study();
 		final DataSet trialDataSet = new DataSet();
 		final DatasetDTO dataSetDTO = new DatasetDTO();
@@ -165,7 +166,7 @@ public class DatasetKsuExportServiceImplTest {
 			ArrayList.class))).thenReturn(instanceObservationUnitRowsMap);
 
 		final File result = datasetKSUExportService.generate(study.getId(), dataSetDTO.getDatasetId(), instanceIds,
-			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), generator, false, fileExtension);
+			DatasetCollectionOrderServiceImpl.CollectionOrder.PLOT_ORDER.getId(), generator, false, fileExtension, false);
 
 		verify(this.studyDatasetService)
 			.getInstanceObservationUnitRowsMap(eq(study.getId()), eq(dataSetDTO.getDatasetId()), any(ArrayList.class));
@@ -181,7 +182,8 @@ public class DatasetKsuExportServiceImplTest {
 	@Test
 	public void testGetTraitAndSelectionVariables() {
 		this.datasetKSUCSVExportService.getTraitAndSelectionVariables(1);
-		verify(this.datasetService).getObservationSetVariables(1, Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+		verify(this.datasetService).getObservationSetVariables(1,
+			Lists.newArrayList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 	}
 
 	@Test
@@ -208,7 +210,8 @@ public class DatasetKsuExportServiceImplTest {
 		methods.add(MethodTestDataInitializer.createMethod(1, "GEN", "AGB1"));
 		methods.add(MethodTestDataInitializer.createMethod(2, "GEN", "AGB2"));
 		this.measurementVariable.setProperty("Property");
-		String possibleValuesString = this.datasetKSUCSVExportService.getPossibleValuesString("Property", methods, this.measurementVariable);
+		String possibleValuesString =
+			this.datasetKSUCSVExportService.getPossibleValuesString("Property", methods, this.measurementVariable);
 		Assert.assertEquals("AGB1/AGB2", possibleValuesString);
 
 		this.measurementVariable.setProperty("");
