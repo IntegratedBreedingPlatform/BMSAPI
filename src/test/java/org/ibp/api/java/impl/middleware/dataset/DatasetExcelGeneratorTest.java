@@ -1,11 +1,13 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.genotype.SampleGenotypeService;
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -35,7 +37,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,6 +48,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -66,6 +68,7 @@ public class DatasetExcelGeneratorTest {
 	private static final String OBSERVATION_UNIT_TEST = "ObservationUnitTest";
 	private static final String TRAITS_TEST = "TraitsTest";
 	private static final String SELECTION_TEST = "SelectionTest";
+	private static final String GENOTYPE_MARKER_TEST = "GenotypeMarkerTest";
 	private static final String VARIABLE_NAME_1 = "VARIABLE_NAME_1";
 	private static final String VARIABLE_NAME_2 = "VARIABLE_NAME_2";
 	private static final String VARIABLE_VALUE_1 = "VARIABLE_VALUE_1";
@@ -95,6 +98,9 @@ public class DatasetExcelGeneratorTest {
 
 	@Mock
 	private OntologyDataManager ontologyDataManager;
+
+	@Mock
+	private SampleGenotypeService sampleGenotypeService;
 
 	@InjectMocks
 	private DatasetExcelGenerator datasetExcelGenerator;
@@ -156,6 +162,12 @@ public class DatasetExcelGeneratorTest {
 		selectionVariable.setValue(SELECTION_TEST);
 		selectionVariable.setVariableType(VariableType.SELECTION_METHOD);
 
+		final MeasurementVariable genotypeMarkerVariable = new MeasurementVariable();
+		genotypeMarkerVariable.setTermId(1);
+		genotypeMarkerVariable.setDataTypeId(VariableType.GENOTYPE_MARKER.getId());
+		genotypeMarkerVariable.setValue(GENOTYPE_MARKER_TEST);
+		genotypeMarkerVariable.setVariableType(VariableType.GENOTYPE_MARKER);
+
 		final List<MeasurementVariable> studyDetailVariables = Lists.newArrayList(studyDetailVariable);
 		final List<MeasurementVariable> environmentVariables =
 			Lists.newArrayList(environmentDetailsVariable, experimentalDesignVariable, environmentConditionsVariable);
@@ -215,6 +227,10 @@ public class DatasetExcelGeneratorTest {
 				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId())))
 			.thenReturn(datasetVariables);
 
+		final Map<Integer, MeasurementVariable> sampleGenotypeVariablesMap = new HashedMap();
+		sampleGenotypeVariablesMap.put(genotypeMarkerVariable.getTermId(), genotypeMarkerVariable);
+		when(this.sampleGenotypeService.getSampleGenotypeVariables(any())).thenReturn(sampleGenotypeVariablesMap);
+
 		final DatasetTypeDTO datasetType = new DatasetTypeDTO(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId(), "PLANT_SUBOBSERVATIONS");
 		when(this.datasetTypeService.getDatasetTypeById(datasetType.getDatasetTypeId())).thenReturn(datasetType);
 
@@ -231,10 +247,11 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_ID);
+
 		final File
 			file = this.datasetExcelGenerator
 			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, new ArrayList<>(),
-				new ArrayList<>(), filename, studyInstance);
+				new ArrayList<>(), new HashMap<>(), filename, studyInstance);
 		assertEquals(filename, file.getName());
 		Mockito.verify(this.studyDataManager).getStudyDetails(INSTANCE_ID);
 		Mockito.verify(this.datasetService)
@@ -265,7 +282,7 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setDatasetId(INSTANCE_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_ID);
 		this.datasetExcelGenerator
-			.generateMultiInstanceFile(new HashMap<>(), new ArrayList<>(), filename);
+			.generateMultiInstanceFile(new HashMap<>(), new HashMap<>(), new ArrayList<>(), filename);
 	}
 
 	@Test
@@ -278,10 +295,11 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setDatasetId(INSTANCE_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_ID);
 
+		this.datasetExcelGenerator.setIncludeSampleGenotypeValues(true);
 		final File
 			file = this.datasetExcelGenerator
 			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, this.measurementVariables,
-				this.observationUnitRows, filename, studyInstance);
+				this.observationUnitRows, new HashMap<>(), filename, studyInstance);
 
 		final FileInputStream inputStream = new FileInputStream(file);
 		final Workbook workbook = new HSSFWorkbook(inputStream);
@@ -297,6 +315,7 @@ public class DatasetExcelGeneratorTest {
 		assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(33).getCell(valueIndex).getStringCellValue());
 		assertEquals(TRAITS_TEST, descriptionSheet.getRow(36).getCell(valueIndex).getStringCellValue());
 		assertEquals(SELECTION_TEST, descriptionSheet.getRow(39).getCell(valueIndex).getStringCellValue());
+		assertEquals(GENOTYPE_MARKER_TEST, descriptionSheet.getRow(42).getCell(valueIndex).getStringCellValue());
 		assertEquals(VARIABLE_ALIAS_1, observationSheet.getRow(0).getCell(0).getStringCellValue());
 		assertEquals(VARIABLE_ALIAS_2, observationSheet.getRow(0).getCell(1).getStringCellValue());
 		assertEquals(VARIABLE_VALUE_1, observationSheet.getRow(1).getCell(0).getStringCellValue());

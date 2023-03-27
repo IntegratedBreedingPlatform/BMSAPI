@@ -3,6 +3,9 @@ package org.ibp.api.java.impl.middleware.dataset;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearchFilter;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -22,6 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @Transactional
@@ -31,29 +37,46 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 	private DatasetExcelGenerator datasetExcelGenerator;
 
 	@Override
-	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean singleFile) {
+	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId,
+		final boolean singleFile, final boolean includeSampleGenotypeValues) {
 
 		this.validate(studyId, datasetId, instanceIds);
 
 		try {
 			//TODO: use the singleFile boolean after implementing singleFile download for XLS option
-			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetExcelGenerator, false, XLS);
+			this.datasetExcelGenerator.setIncludeSampleGenotypeValues(includeSampleGenotypeValues);
+			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetExcelGenerator, false, XLS,
+					includeSampleGenotypeValues);
 		} catch (final IOException e) {
-			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("cannot.exportAsXLS.dataset", "");
 			throw new ResourceNotFoundException(errors.getAllErrors().get(0));
 		}
 	}
 
 	@Override
-	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId) {
-		return this.studyDatasetService.getSubObservationSetVariables(studyId, datasetId);
+	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotypeValues) {
+
+		final List<MeasurementVariable> columns = this.studyDatasetService.getSubObservationSetVariables(studyId, datasetId);
+
+		if (includeSampleGenotypeValues) {
+			// Add Genotype Marker variables to the list of columns
+			final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
+			filter.setStudyId(studyId);
+			filter.setDatasetIds(Arrays.asList(datasetId));
+			final Map<Integer, MeasurementVariable> genotypeVariablesMap =
+				this.sampleGenotypeService.getSampleGenotypeVariables(filter);
+			columns.addAll(genotypeVariablesMap.values());
+		}
+
+		return columns;
 	}
 
 	@Override
-	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset, final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
+	public Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(final Study study, final DatasetDTO dataset,
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
-		for(final Integer instanceDBID: selectedDatasetInstancesMap.keySet()) {
+		for (final Integer instanceDBID : selectedDatasetInstancesMap.keySet()) {
 			final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
 			searchDTO.setInstanceIds(Arrays.asList(selectedDatasetInstancesMap.get(instanceDBID).getInstanceId()));
 			final PageRequest pageRequest = new PageRequest(0, Integer.MAX_VALUE);
@@ -62,5 +85,25 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 			observationUnitRowMap.put(instanceDBID, observationUnitRows);
 		}
 		return observationUnitRowMap;
+	}
+
+	@Override
+	protected Map<Integer, List<SampleGenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotypeValues) {
+
+		if (includeSampleGenotypeValues) {
+			final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
+			sampleGenotypeSearchRequestDTO.setStudyId(study.getId());
+			final SampleGenotypeSearchRequestDTO.GenotypeFilter filter = new SampleGenotypeSearchRequestDTO.GenotypeFilter();
+			filter.setDatasetId(dataset.getDatasetId());
+			filter.setInstanceIds(
+				selectedDatasetInstancesMap.values().stream().map(StudyInstance::getInstanceId).collect(Collectors.toList()));
+			sampleGenotypeSearchRequestDTO.setFilter(filter);
+			return this.sampleGenotypeService.searchSampleGenotypes(sampleGenotypeSearchRequestDTO, null).stream()
+				.collect(groupingBy(SampleGenotypeDTO::getObservationUnitId));
+
+		}
+		return new HashMap<>();
+
 	}
 }

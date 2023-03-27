@@ -6,11 +6,13 @@ import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.StringUtil;
 import org.generationcp.commons.util.ZipUtil;
+import org.generationcp.middleware.api.genotype.SampleGenotypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -77,6 +79,9 @@ public abstract class AbstractDatasetExportService {
 	@Autowired
 	private TransactionService transactionService;
 
+	@Autowired
+	protected SampleGenotypeService sampleGenotypeService;
+
 	private ZipUtil zipUtil = new ZipUtil();
 
 	protected void validate(final int studyId, final int datasetId, final Set<Integer> instanceIds) {
@@ -87,15 +92,15 @@ public abstract class AbstractDatasetExportService {
 
 	File generate(
 		final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId,
-		final DatasetFileGenerator generator, final boolean singleFile, final String fileExtension) throws IOException {
+		final DatasetFileGenerator generator, final boolean singleFile, final String fileExtension, final boolean includeSampleGenotypeValues) throws IOException {
 
 		final Study study = this.studyDataManager.getStudy(studyId);
 		final DatasetDTO dataSet = this.datasetService.getDataset(datasetId);
 		final Integer plotDatasetId =
 			dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId()) ? //
-			dataSet.getDatasetId() : dataSet.getParentDatasetId();
+				dataSet.getDatasetId() : dataSet.getParentDatasetId();
 		// Get all variables for the dataset
-		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId());
+		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId(), includeSampleGenotypeValues);
 
 		final List<MeasurementVariable> descriptors = new ArrayList<>();
 		final List<MeasurementVariable> passports = new ArrayList<>();
@@ -122,17 +127,18 @@ public abstract class AbstractDatasetExportService {
 		if (entryDetails.containsKey(TermId.ENTRY_TYPE.getId())) {
 			sortedColumns.add(entryDetails.remove(TermId.ENTRY_TYPE.getId()));
 		}
-		sortedColumns.sort(Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
+		sortedColumns.sort(
+			Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
 
 		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.datasetService.getDatasetNameTypes(plotDatasetId);
 		germplasmNameTypeDTOs.sort(Comparator.comparing(GermplasmNameTypeDTO::getCode));
 		sortedColumns.addAll(germplasmNameTypeDTOs.stream().map(
-			germplasmNameTypeDTO -> //
-				new MeasurementVariable(germplasmNameTypeDTO.getCode(), //
-					germplasmNameTypeDTO.getDescription(), //
-					germplasmNameTypeDTO.getId(), null, //
-					germplasmNameTypeDTO.getCode(), true)) //
+				germplasmNameTypeDTO -> //
+					new MeasurementVariable(germplasmNameTypeDTO.getCode(), //
+						germplasmNameTypeDTO.getDescription(), //
+						germplasmNameTypeDTO.getId(), null, //
+						germplasmNameTypeDTO.getCode(), true)) //
 			.collect(Collectors.toSet()));
 
 		passports.sort(Comparator.comparing(MeasurementVariable::getName));
@@ -143,10 +149,10 @@ public abstract class AbstractDatasetExportService {
 		// Add Stock id column
 		if (dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
-			transactionsSearchDto.setTransactionStatus(Arrays.asList(0,1));
+			transactionsSearchDto.setTransactionStatus(Arrays.asList(0, 1));
 			transactionsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
 			if (this.transactionService.countSearchTransactions(transactionsSearchDto) > 0) {
-				sortedColumns.add(this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR,null, true));
+				sortedColumns.add(this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR, null, true));
 			}
 		}
 
@@ -160,17 +166,20 @@ public abstract class AbstractDatasetExportService {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap =
 			this.getObservationUnitRowMap(study, dataSet, selectedDatasetInstancesMap);
 
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap = this.getSampleGenotypeRowMap(study, dataSet, selectedDatasetInstancesMap, includeSampleGenotypeValues);
+
 		// Reorder
 		final DatasetCollectionOrderServiceImpl.CollectionOrder collectionOrder =
 			DatasetCollectionOrderServiceImpl.CollectionOrder.findById(collectionOrderId);
-		final int trialDatasetId = this.studyDataManager.getDataSetsByType(study.getId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
+		final int trialDatasetId =
+			this.studyDataManager.getDataSetsByType(study.getId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0).getId();
 		this.datasetCollectionOrderService.reorder(collectionOrder, trialDatasetId, selectedDatasetInstancesMap, observationUnitRowMap);
 
 		if (singleFile) {
-			return this.generateInSingleFile(study, dataSet, observationUnitRowMap, sortedColumns, generator, fileExtension);
+			return this.generateInSingleFile(study, dataSet, observationUnitRowMap, genotypeDTORowMap, sortedColumns, generator, fileExtension);
 		} else {
 			return this
-				.generateFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, sortedColumns, generator, fileExtension);
+				.generateFiles(study, dataSet, selectedDatasetInstancesMap, observationUnitRowMap, genotypeDTORowMap, sortedColumns, generator, fileExtension);
 		}
 
 	}
@@ -178,6 +187,7 @@ public abstract class AbstractDatasetExportService {
 	File generateInSingleFile(
 		final Study study,
 		final DatasetDTO dataSet, final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final List<MeasurementVariable> columns,
 		final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
@@ -185,22 +195,26 @@ public abstract class AbstractDatasetExportService {
 		final File temporaryFolder = Files.createTempDir();
 		final String dataSetName =
 			DatasetTypeEnum.PLOT_DATA.getId() == dataSet.getDatasetTypeId() ? DatasetServiceImpl.PLOT_DATASET_NAME : dataSet.getName();
-		final String fileName = FileNameGenerator.generateFileName(String.format("%s_%s", StringUtil.truncate(study.getName(), 45, true), StringUtil.truncate(dataSetName, 45, true)), fileExtension);
+		final String fileName = FileNameGenerator.generateFileName(
+			String.format("%s_%s", StringUtil.truncate(study.getName(), 45, true), StringUtil.truncate(dataSetName, 45, true)),
+			fileExtension);
 		final String sanitizedFileName = FileUtils.sanitizeFileName(fileName);
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
-		return generator.generateMultiInstanceFile(observationUnitRowMap, columns, fileNameFullPath);
+		return generator.generateMultiInstanceFile(observationUnitRowMap, genotypeDTORowMap, columns, fileNameFullPath);
 	}
 
 	File generateFiles(
 		final Study study, final DatasetDTO dataSetDto,
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
+		final List<MeasurementVariable> columns,
 		final DatasetFileGenerator generator, final String fileExtension)
 		throws IOException {
 		final File temporaryFolder = Files.createTempDir();
 		final List<File> files =
-			this.getInstanceFiles(study, dataSetDto, selectedDatasetInstancesMap, observationUnitRowMap, columns, generator, fileExtension,
+			this.getInstanceFiles(study, dataSetDto, selectedDatasetInstancesMap, observationUnitRowMap, genotypeDTORowMap, columns, generator, fileExtension,
 				temporaryFolder);
 		return this.getReturnFile(study, files);
 	}
@@ -215,7 +229,9 @@ public abstract class AbstractDatasetExportService {
 
 	List<File> getInstanceFiles(
 		final Study study, final DatasetDTO dataSetDto, final Map<Integer, StudyInstance> selectedDatasetInstancesMap,
-		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap, final List<MeasurementVariable> columns,
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
+		final List<MeasurementVariable> columns,
 		final DatasetFileGenerator generator, final String fileExtension, final File temporaryFolder) throws IOException {
 		final List<File> files = new ArrayList<>();
 
@@ -224,7 +240,8 @@ public abstract class AbstractDatasetExportService {
 			// Build the filename with the following format:
 			// study_name + TRIAL_INSTANCE number + location_abbr +  dataset_type + dataset_name
 			final String studyName = StringUtil.truncate(study.getName(), 30, true);
-			final String locationAbbr = StringUtil.truncate(selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(), 10, true);
+			final String locationAbbr =
+				StringUtil.truncate(selectedDatasetInstancesMap.get(instanceDBID).getLocationAbbreviation(), 10, true);
 			final String datasetTypeName = StringUtil.truncate(datasetTypeMap.get(dataSetDto.getDatasetTypeId()).getName(), 10, true);
 			final String datasetName = StringUtil.truncate(dataSetDto.getName(), 30, true);
 			String sanitizedFileName = null;
@@ -242,9 +259,10 @@ public abstract class AbstractDatasetExportService {
 						locationAbbr, datasetTypeName, datasetName));
 			}
 
-			final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedFileName, fileExtension);
+			final String fileNameFullPath =
+				temporaryFolder.getAbsolutePath() + File.separator + FileNameGenerator.generateFileName(sanitizedFileName, fileExtension);
 			files.add(
-				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID),
+				generator.generateSingleInstanceFile(study.getId(), dataSetDto, columns, observationUnitRowMap.get(instanceDBID), genotypeDTORowMap,
 					fileNameFullPath, selectedDatasetInstancesMap.get(instanceDBID)));
 		}
 		return files;
@@ -273,16 +291,20 @@ public abstract class AbstractDatasetExportService {
 		return columns;
 	}
 
-	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId);
+	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId, boolean includeSampleGenotypeValues);
 
 	protected abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(
 		Study study, DatasetDTO dataset, Map<Integer, StudyInstance> selectedDatasetInstancesMap);
+
+	protected abstract Map<Integer, List<SampleGenotypeDTO>> getSampleGenotypeRowMap(
+		Study study, DatasetDTO dataset, Map<Integer, StudyInstance> selectedDatasetInstancesMap, boolean includeSampleGenotypeValues);
 
 	void setZipUtil(final ZipUtil zipUtil) {
 		this.zipUtil = zipUtil;
 	}
 
-	private MeasurementVariable addTermIdColumn(final TermId TermId, final VariableType VariableType, final String name, final boolean factor) {
+	private MeasurementVariable addTermIdColumn(final TermId TermId, final VariableType VariableType, final String name,
+		final boolean factor) {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setName(StringUtils.isBlank(name) ? TermId.name() : name);
 		measurementVariable.setAlias(TermId.name());
