@@ -165,7 +165,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	}
 
 	@Override
-	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotpeValues) {
+	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotypeValues) {
 		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
 		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
 
@@ -208,7 +208,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 
 	@Override
 	protected Map<Integer, List<SampleGenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
-		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotpeValues) {
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotypeValues) {
 		return new HashMap<>();
 	}
 

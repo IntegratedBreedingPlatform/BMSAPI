@@ -679,7 +679,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.param("instanceIds", "1,2,3")
 				.param("collectionOrderId", String.valueOf(collectionOrderId))
 				.param("singleFile", String.valueOf(false))
-				.param("includeSampleGenotpeValues", String.valueOf(false))
+				.param("includeSampleGenotypeValues", String.valueOf(false))
 				.contentType(this.csvContentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
@@ -710,7 +710,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 				.param("instanceIds", "1,2,3")
 				.param("collectionOrderId", String.valueOf(collectionOrderId))
 				.param("singleFile", String.valueOf(false))
-				.param("includeSampleGenotpeValues", String.valueOf(false))
+				.param("includeSampleGenotypeValues", String.valueOf(false))
 				.contentType(this.xlsContentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());

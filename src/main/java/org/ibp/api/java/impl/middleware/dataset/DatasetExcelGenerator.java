@@ -105,7 +105,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 	@Resource
 	private SampleGenotypeService sampleGenotypeService;
 
-	private boolean includeSampleGenotpeValues;
+	private boolean includeSampleGenotypeValues;
 
 	@Override
 	public File generateSingleInstanceFile(
@@ -450,7 +450,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 		xlsSheet.createRow(currentRowNum++);
 
-		if (this.includeSampleGenotpeValues) {
+		if (this.includeSampleGenotypeValues) {
 			currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.genotype.markers",
 				this.getColorIndex(xlsBook, 51, 51, 153));
 			this.writeSection(
@@ -861,7 +861,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		this.messageSource = messageSource;
 	}
 
-	public void setIncludeSampleGenotpeValues(final boolean includeSampleGenotpeValues) {
-		this.includeSampleGenotpeValues = includeSampleGenotpeValues;
+	public void setIncludeSampleGenotypeValues(final boolean includeSampleGenotypeValues) {
+		this.includeSampleGenotypeValues = includeSampleGenotypeValues;
 	}
 }

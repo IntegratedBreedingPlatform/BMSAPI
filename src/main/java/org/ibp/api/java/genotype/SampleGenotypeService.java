@@ -15,8 +15,6 @@ public interface SampleGenotypeService {
 
 	List<SampleGenotypeDTO> searchSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO, Pageable pageable);
 
-	long countSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
-
 	long countFilteredSampleGenotypes(SampleGenotypeSearchRequestDTO searchRequestDTO);
 
 	List<MeasurementVariable> getSampleGenotypeColumns(Integer studyId, List<Integer> sampleListIds);

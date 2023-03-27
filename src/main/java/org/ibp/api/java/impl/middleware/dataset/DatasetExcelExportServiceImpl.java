@@ -38,15 +38,15 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 
 	@Override
 	public File export(final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId,
-		final boolean singleFile, final boolean includeSampleGenotpeValues) {
+		final boolean singleFile, final boolean includeSampleGenotypeValues) {
 
 		this.validate(studyId, datasetId, instanceIds);
 
 		try {
 			//TODO: use the singleFile boolean after implementing singleFile download for XLS option
-			this.datasetExcelGenerator.setIncludeSampleGenotpeValues(includeSampleGenotpeValues);
+			this.datasetExcelGenerator.setIncludeSampleGenotypeValues(includeSampleGenotypeValues);
 			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetExcelGenerator, false, XLS,
-				includeSampleGenotpeValues);
+					includeSampleGenotypeValues);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("cannot.exportAsXLS.dataset", "");
@@ -55,11 +55,11 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 	}
 
 	@Override
-	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotpeValues) {
+	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotypeValues) {
 
 		final List<MeasurementVariable> columns = this.studyDatasetService.getSubObservationSetVariables(studyId, datasetId);
 
-		if (includeSampleGenotpeValues) {
+		if (includeSampleGenotypeValues) {
 			// Add Genotype Marker variables to the list of columns
 			final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
 			filter.setStudyId(studyId);
@@ -89,9 +89,9 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 
 	@Override
 	protected Map<Integer, List<SampleGenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
-		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotpeValues) {
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotypeValues) {
 
-		if (includeSampleGenotpeValues) {
+		if (includeSampleGenotypeValues) {
 			final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
 			sampleGenotypeSearchRequestDTO.setStudyId(study.getId());
 			final SampleGenotypeSearchRequestDTO.GenotypeFilter filter = new SampleGenotypeSearchRequestDTO.GenotypeFilter();

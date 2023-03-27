@@ -295,7 +295,7 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setDatasetId(INSTANCE_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_ID);
 
-		this.datasetExcelGenerator.setIncludeSampleGenotpeValues(true);
+		this.datasetExcelGenerator.setIncludeSampleGenotypeValues(true);
 		final File
 			file = this.datasetExcelGenerator
 			.generateSingleInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, this.measurementVariables,

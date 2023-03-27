@@ -235,7 +235,7 @@ public class SampleListResource {
 
 	@ApiOperation(value = "Get sample lists associated to study", notes = "Get sample lists associated to study")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/sample-lists/{studyId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/sample-lists", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<List<SampleListDTO>> getSampleListsByStudy(
 		@PathVariable final String crop,

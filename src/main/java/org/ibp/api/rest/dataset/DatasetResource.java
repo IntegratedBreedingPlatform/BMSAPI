@@ -361,12 +361,12 @@ public class DatasetResource {
 		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds,
 		@RequestParam(value = "collectionOrderId") final Integer collectionOrderId,
 		@RequestParam(value = "singleFile") final boolean singleFile,
-		@RequestParam(value = "includeSampleGenotpeValues", required = false) final boolean includeSampleGenotpeValues) {
+		@RequestParam(value = "includeSampleGenotypeValues", required = false) final boolean includeSampleGenotypeValues) {
 
 		final DatasetExportService exportMethod = this.getExportFileStrategy(fileType);
 		if (exportMethod != null) {
 			final File file =
-				exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId, singleFile, includeSampleGenotpeValues);
+				exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId, singleFile, includeSampleGenotypeValues);
 			return this.getFileSystemResourceResponseEntity(file);
 		}
 

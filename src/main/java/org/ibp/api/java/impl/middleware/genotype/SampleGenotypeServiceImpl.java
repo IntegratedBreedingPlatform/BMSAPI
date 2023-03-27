@@ -39,11 +39,6 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	}
 
 	@Override
-	public long countSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
-		return this.sampleGenotypeServiceMW.countSampleGenotypes(searchRequestDTO);
-	}
-
-	@Override
 	public long countFilteredSampleGenotypes(final SampleGenotypeSearchRequestDTO searchRequestDTO) {
 		return this.sampleGenotypeServiceMW.countFilteredSampleGenotypes(searchRequestDTO);
 	}

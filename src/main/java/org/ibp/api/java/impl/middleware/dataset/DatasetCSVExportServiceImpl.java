@@ -40,12 +40,12 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	@Override
 	public File export(
 		final int studyId, final int datasetId, final Set<Integer> instanceIds, final int collectionOrderId, final boolean singleFile,
-		final boolean includeSampleGenotpeValues) {
+		final boolean includeSampleGenotypeValues) {
 
 		this.validate(studyId, datasetId, instanceIds);
 		try {
 			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetCSVGenerator, singleFile, CSV,
-				includeSampleGenotpeValues);
+					includeSampleGenotypeValues);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
 			errors.reject("cannot.exportAsCSV.dataset", "");
@@ -54,11 +54,11 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	}
 
 	@Override
-	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotpeValues) {
+	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotypeValues) {
 
 		final List<MeasurementVariable> allVariables = new ArrayList<>(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
 
-		if (includeSampleGenotpeValues) {
+		if (includeSampleGenotypeValues) {
 			// Add Genotype Marker variables to the list of columns
 			final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
 			filter.setStudyId(studyId);
@@ -80,8 +80,8 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 
 	@Override
 	protected Map<Integer, List<SampleGenotypeDTO>> getSampleGenotypeRowMap(final Study study, final DatasetDTO dataset,
-		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotpeValues) {
-		if (includeSampleGenotpeValues) {
+		final Map<Integer, StudyInstance> selectedDatasetInstancesMap, final boolean includeSampleGenotypeValues) {
+		if (includeSampleGenotypeValues) {
 			final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
 			sampleGenotypeSearchRequestDTO.setStudyId(study.getId());
 			final SampleGenotypeSearchRequestDTO.GenotypeFilter filter = new SampleGenotypeSearchRequestDTO.GenotypeFilter();
