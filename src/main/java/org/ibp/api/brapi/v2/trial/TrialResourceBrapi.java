@@ -10,6 +10,9 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.brapi.TrialServiceBrapi;
@@ -18,10 +21,12 @@ import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v1.trial.TrialSummary;
 import org.ibp.api.brapi.v1.trial.TrialSummaryMapper;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -51,6 +56,9 @@ import java.util.Map;
 @Api(value = "BrAPI v2 Trial Services")
 @Controller(value = "TrialResourceBrapiV2")
 public class TrialResourceBrapi {
+
+	@Autowired
+	private SearchRequestService searchRequestService;
 
 	@Autowired
 	private TrialServiceBrapi trialServiceBrapi;
@@ -174,6 +182,49 @@ public class TrialResourceBrapi {
 		final EntityListResponse<TrialSummary> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Search Trials", notes = "Submit a search request for Trials")
+	@RequestMapping(value = "/{crop}/brapi/v2/search/trials", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2_1.class)
+	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchTrials(
+		@PathVariable final String crop,
+		@RequestBody final TrialSearchRequestDTO trialSearchRequestDTO) {
+		final BrapiSearchDto searchDto =
+			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(trialSearchRequestDTO, TrialSearchRequestDTO.class)
+				.toString());
+		final SingleEntityResponse<BrapiSearchDto> singleGermplasmSearchResponse = new SingleEntityResponse<>(searchDto);
+
+		return new ResponseEntity<>(singleGermplasmSearchResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get search trials results", notes = "Get the results of a Trials search request")
+	@RequestMapping(value = "/{crop}/brapi/v2/search/trials/{searchResultsDbId}", method = RequestMethod.GET)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2_1.class)
+	public ResponseEntity<EntityListResponse<TrialSummary>> getSearchTrialsResults(
+		@PathVariable final String crop,
+		@PathVariable final String searchResultsDbId,
+		@RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize) {
+
+		final TrialSearchRequestDTO trialSearchRequestDTO;
+		try {
+			trialSearchRequestDTO =
+				(TrialSearchRequestDTO) this.searchRequestService
+					.getSearchRequest(Integer.valueOf(searchResultsDbId), TrialSearchRequestDTO.class);
+		} catch (final NumberFormatException | MiddlewareException e) {
+			return new ResponseEntity<>(
+				new EntityListResponse<TrialSummary>(new Result<>(new ArrayList<>())).withMessage("no search request found"),
+				HttpStatus.NOT_FOUND);
+		}
+
+		return new ResponseEntity<>(HttpStatus.OK);
+
 	}
 
 	private List<TrialSummary> translateResults(final List<StudySummary> studySummaries, final String crop) {
