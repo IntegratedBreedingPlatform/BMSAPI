@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -69,12 +70,12 @@ public class ObservationLevelFilterValidatorTest {
 		final ObservationLevelFilter filter = new ObservationLevelFilter(null, TRIAL_DBID, PROGRAM_DBID);
 
 		Mockito.when(this.programService.getProjectByUuidAndCrop(PROGRAM_DBID, CROP)).thenReturn(new Project());
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setTrialDbIds(Collections.singletonList(filter.getTrialDbId()));
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialDbIds(Collections.singletonList(filter.getTrialDbId()));
 		final StudySummary studySummary = new StudySummary();
 		studySummary.setTrialDbId(Integer.valueOf(TRIAL_DBID));
 		studySummary.setProgramDbId(PROGRAM_DBID);
-		Mockito.when(this.trialServiceBrapi.getStudies(studySearchFilter, null))
+		Mockito.when(this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null))
 			.thenReturn(Collections.singletonList(studySummary));
 		try {
 			this.validator.validate(filter, CROP);
@@ -139,9 +140,9 @@ public class ObservationLevelFilterValidatorTest {
 		final ObservationLevelFilter filter = new ObservationLevelFilter(null, TRIAL_DBID, PROGRAM_DBID);
 
 		Mockito.when(this.programService.getProjectByUuidAndCrop(PROGRAM_DBID, CROP)).thenReturn(new Project());
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setTrialDbIds(Collections.singletonList(filter.getTrialDbId()));
-		Mockito.when(this.trialServiceBrapi.getStudies(studySearchFilter, null))
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialDbIds(Collections.singletonList(filter.getTrialDbId()));
+		Mockito.when(this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null))
 			.thenReturn(null);
 		try {
 			this.validator.validate(filter, CROP);
@@ -156,12 +157,12 @@ public class ObservationLevelFilterValidatorTest {
 		final ObservationLevelFilter filter = new ObservationLevelFilter(null, TRIAL_DBID, PROGRAM_DBID);
 
 		Mockito.when(this.programService.getProjectByUuidAndCrop(PROGRAM_DBID, CROP)).thenReturn(new Project());
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setTrialDbIds(Collections.singletonList(filter.getTrialDbId()));
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialDbIds(Collections.singletonList(filter.getTrialDbId()));
 		final StudySummary studySummary = new StudySummary();
 		studySummary.setTrialDbId(Integer.valueOf(TRIAL_DBID));
 		studySummary.setProgramDbId(RandomStringUtils.randomAlphanumeric(15));
-		Mockito.when(this.trialServiceBrapi.getStudies(studySearchFilter, null))
+		Mockito.when(this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null))
 			.thenReturn(Collections.singletonList(studySummary));
 		try {
 			this.validator.validate(filter, CROP);

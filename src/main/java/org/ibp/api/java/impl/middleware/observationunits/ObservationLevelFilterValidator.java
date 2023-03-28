@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -60,9 +61,9 @@ public class ObservationLevelFilterValidator {
 				filter.setTrialDbId(instanceDto.getTrialDbId());
 			}
 		} else if (StringUtils.isNotEmpty(filter.getTrialDbId())) {
-			final StudySearchFilter studySearchFilter = new StudySearchFilter();
-			studySearchFilter.setTrialDbIds(Collections.singletonList(filter.getTrialDbId()));
-			final List<StudySummary> studySummaries = this.trialServiceBrapi.getStudies(studySearchFilter, null);
+			final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+			trialSearchRequestDTO.setTrialDbIds(Collections.singletonList(filter.getTrialDbId()));
+			final List<StudySummary> studySummaries = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null);
 			if (CollectionUtils.isEmpty(studySummaries)) {
 				errors.reject("observation.level.invalid.trialdbid", new String[] {}, "");
 				throw new ApiRequestValidationException(errors.getAllErrors());

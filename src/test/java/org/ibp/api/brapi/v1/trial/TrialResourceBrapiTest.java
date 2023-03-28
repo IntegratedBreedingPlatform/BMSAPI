@@ -72,8 +72,8 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		studySummary.setInstanceMetaData(Lists.newArrayList(instanceMetadata));
 
 		final List<StudySummary> mwStudySummary = Lists.newArrayList(studySummary);
-		Mockito.when(this.trialServiceBrapi.getStudies(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
-		Mockito.when(this.trialServiceBrapi.countStudies(ArgumentMatchers.any())).thenReturn(200L);
+		Mockito.when(this.trialServiceBrapi.searchTrials(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
+		Mockito.when(this.trialServiceBrapi.countSearchTrialsResult(ArgumentMatchers.any())).thenReturn(200L);
 
 		final int pageSize = 10;
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(TrialResourceBrapiTest.MAIZE_BRAPI_V1_TRIALS)
@@ -147,8 +147,8 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 
 		final List<StudySummary> mwStudySummary = Lists.newArrayList(studySummary);
 		final int count = 200;
-		Mockito.when(this.trialServiceBrapi.getStudies(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
-		Mockito.when(this.trialServiceBrapi.countStudies(ArgumentMatchers.any())).thenReturn(new Long(count));
+		Mockito.when(this.trialServiceBrapi.searchTrials(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
+		Mockito.when(this.trialServiceBrapi.countSearchTrialsResult(ArgumentMatchers.any())).thenReturn(new Long(count));
 
 		final int page = 1;
 		final int pageSize = 10;
@@ -323,8 +323,8 @@ public class TrialResourceBrapiTest extends ApiUnitTestBase {
 		studySummary.setInstanceMetaData(Lists.newArrayList(instanceMetadata));
 
 		final List<StudySummary> mwStudySummary = Lists.newArrayList(studySummary);
-		Mockito.when(this.trialServiceBrapi.getStudies(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
-		Mockito.when(this.trialServiceBrapi.countStudies(ArgumentMatchers.any())).thenReturn(200L);
+		Mockito.when(this.trialServiceBrapi.searchTrials(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(mwStudySummary);
+		Mockito.when(this.trialServiceBrapi.countSearchTrialsResult(ArgumentMatchers.any())).thenReturn(200L);
 
 		final int pageSize = 10;
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path(TrialResourceBrapiTest.MAIZE_BRAPI_V2_TRIALS)

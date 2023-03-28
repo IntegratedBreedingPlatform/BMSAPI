@@ -2,8 +2,8 @@ package org.ibp.api.java.impl.middleware.study.brapi;
 
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.TrialServiceBrapi;
 import org.ibp.api.brapi.v2.trial.TrialImportResponse;
@@ -32,14 +32,14 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 	private TrialImportRequestValidator trialImportRequestDtoValidator;
 
 	@Override
-	public List<org.generationcp.middleware.domain.dms.StudySummary> getStudies(final StudySearchFilter studySearchFilter,
+	public List<org.generationcp.middleware.domain.dms.StudySummary> searchTrials(final TrialSearchRequestDTO trialSearchRequestDTO,
 		final Pageable pageable) {
-		return this.middlewareTrialServiceBrapi.getStudies(studySearchFilter, pageable);
+		return this.middlewareTrialServiceBrapi.searchTrials(trialSearchRequestDTO, pageable);
 	}
 
 	@Override
-	public long countStudies(final StudySearchFilter studySearchFilter) {
-		return this.middlewareTrialServiceBrapi.countStudies(studySearchFilter);
+	public long countSearchTrialsResult(final TrialSearchRequestDTO trialSearchRequestDTO) {
+		return this.middlewareTrialServiceBrapi.countSearchTrials(trialSearchRequestDTO);
 	}
 
 	@Override

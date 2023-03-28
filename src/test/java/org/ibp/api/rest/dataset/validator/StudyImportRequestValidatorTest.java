@@ -8,8 +8,8 @@ import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.EnvironmentParameter;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.java.impl.middleware.study.validator.StudyImportRequestValidator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,11 +44,11 @@ public class StudyImportRequestValidatorTest {
 
 	@Before
 	public void setUp() {
-		final StudySearchFilter filter = new StudySearchFilter();
-		filter.setTrialDbIds(Collections.singletonList(TRIAL_DBID));
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialDbIds(Collections.singletonList(TRIAL_DBID));
 		final StudySummary studySummary = new StudySummary();
 		studySummary.setTrialDbId(Integer.valueOf(TRIAL_DBID));
-		Mockito.when(this.trialServiceBrapi.getStudies(ArgumentMatchers.eq(filter), ArgumentMatchers.eq(null)))
+		Mockito.when(this.trialServiceBrapi.searchTrials(ArgumentMatchers.eq(trialSearchRequestDTO), ArgumentMatchers.eq(null)))
 			.thenReturn(Collections.singletonList(studySummary));
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(LOCATION_DBID)));

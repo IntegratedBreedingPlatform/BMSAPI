@@ -9,8 +9,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.TrialServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -81,10 +82,10 @@ public class TrialResourceBrapi {
 			return new ResponseEntity<>(new EntityListResponse<>(metadata, new Result<>()), HttpStatus.NOT_FOUND);
 		}
 
-		final StudySearchFilter filter = new StudySearchFilter();
-		filter.setProgramDbId(programDbId);
-		filter.setLocationDbId(locationDbId);
-		filter.setActive(active);
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setProgramDbIds(Arrays.asList(programDbId));
+		trialSearchRequestDTO.setLocationDbIds(Arrays.asList(locationDbId));
+		trialSearchRequestDTO.setActive(active);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
@@ -100,12 +101,12 @@ public class TrialResourceBrapi {
 
 				@Override
 				public long getCount() {
-					return TrialResourceBrapi.this.trialServiceBrapi.countStudies(filter);
+					return TrialResourceBrapi.this.trialServiceBrapi.countSearchTrialsResult(trialSearchRequestDTO);
 				}
 
 				@Override
 				public List<StudySummary> getResults(final PagedResult<StudySummary> pagedResult) {
-					return TrialResourceBrapi.this.trialServiceBrapi.getStudies(filter, pageRequest);
+					return TrialResourceBrapi.this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, pageRequest);
 				}
 			});
 
