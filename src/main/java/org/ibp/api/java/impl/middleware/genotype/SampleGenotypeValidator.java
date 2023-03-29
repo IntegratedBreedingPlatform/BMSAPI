@@ -5,12 +5,13 @@ import org.generationcp.middleware.api.genotype.SampleGenotypeService;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.service.api.SampleService;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.domain.ontology.VariableFilter;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.ontology.VariableService;
-import org.ibp.api.rest.sample.SampleListValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
@@ -19,6 +20,7 @@ import org.springframework.validation.MapBindingResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,7 +31,7 @@ public class SampleGenotypeValidator {
 	private VariableService variableService;
 
 	@Autowired
-	private SampleListValidator sampleListValidator;
+	private SampleService sampleService;
 
 	@Autowired
 	private SampleGenotypeService sampleGenotypeServiceMiddleware;
@@ -41,10 +43,15 @@ public class SampleGenotypeValidator {
 		BaseValidator.checkNotEmpty(sampleGenotypeImportRequestDtoList, "genotype.import.request.null");
 		this.errors = new MapBindingResult(new HashMap<>(), StudyImportRequestDTO.class.getName());
 
-		final List<Integer> sampleIds = new ArrayList<>(sampleGenotypeImportRequestDtoList.stream()
-			.map(genotypeImportRequestDto -> Integer.valueOf(genotypeImportRequestDto.getSampleId())).collect(Collectors.toSet()));
-		this.sampleListValidator.verifySamplesExist(sampleIds);
+		final Set<String> sampleUID = sampleGenotypeImportRequestDtoList.stream()
+			.map(SampleGenotypeImportRequestDto::getSampleUID).collect(Collectors.toSet());
+		final Map<String, SampleDTO> sampleDTOMap =this.sampleService.getSamplesBySampleUID(sampleUID);
+		if (sampleUID.size() != sampleDTOMap.size()) {
+			this.errors.reject("sample.uids.not.exist", "Some sampleUIDs were not found in the system. Please check");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 		this.validateVariableIds(programUUID, sampleGenotypeImportRequestDtoList);
+		final List<Integer> sampleIds = sampleDTOMap.values().stream().map(SampleDTO::getSampleId).collect(Collectors.toList());
 		this.checkIfSamplesAlreadyHaveGenotypeData(studyId, sampleIds);
 	}
 
