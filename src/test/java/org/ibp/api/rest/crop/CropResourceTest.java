@@ -42,7 +42,7 @@ public class CropResourceTest extends ApiUnitTestBase {
 	@Test
 	public void listAvailableCrops() throws Exception {
 
-		final List<String> crops = Arrays.asList("Maize", "Wheat", "Cowpea", "pearlmillet");
+		final List<String> crops = Arrays.asList("wheat", "maize");
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
 		workbenchUser.setUserid(1);
 
@@ -53,10 +53,8 @@ public class CropResourceTest extends ApiUnitTestBase {
 			.andDo(MockMvcResultHandlers.print()) //
 			.andExpect(MockMvcResultMatchers.status().isOk()) //
 			.andExpect(MockMvcResultMatchers.jsonPath("$", IsCollectionWithSize.hasSize(crops.size())))
-			.andExpect(MockMvcResultMatchers.jsonPath("$[0]", Matchers.is("Maize")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$[1]", Matchers.is("Wheat")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$[2]", Matchers.is("Cowpea")))
-			.andExpect(MockMvcResultMatchers.jsonPath("$[3]", Matchers.is("pearlmillet")));
+			.andExpect(MockMvcResultMatchers.jsonPath("$[0]", Matchers.is("wheat")))
+			.andExpect(MockMvcResultMatchers.jsonPath("$[1]", Matchers.is("maize")));
 	}
 
 }
