@@ -1,7 +1,7 @@
 package org.ibp.api.java.impl.middleware.study.brapi;
 
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -32,7 +32,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 	private TrialImportRequestValidator trialImportRequestDtoValidator;
 
 	@Override
-	public List<org.generationcp.middleware.domain.dms.StudySummary> searchTrials(final TrialSearchRequestDTO trialSearchRequestDTO,
+	public List<TrialSummary> searchTrials(final TrialSearchRequestDTO trialSearchRequestDTO,
 		final Pageable pageable) {
 		return this.middlewareTrialServiceBrapi.searchTrials(trialSearchRequestDTO, pageable);
 	}
@@ -57,8 +57,8 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		if (!CollectionUtils.isEmpty(trialImportRequestDTOs)) {
 
 			final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-			final List<StudySummary> studySummaries =
-				this.middlewareTrialServiceBrapi.saveStudies(cropName, trialImportRequestDTOs, user.getUserid());
+			final List<TrialSummary> studySummaries =
+				this.middlewareTrialServiceBrapi.saveTrials(cropName, trialImportRequestDTOs, user.getUserid());
 			if (!CollectionUtils.isEmpty(studySummaries)) {
 				noOfCreatedTrials = studySummaries.size();
 			}

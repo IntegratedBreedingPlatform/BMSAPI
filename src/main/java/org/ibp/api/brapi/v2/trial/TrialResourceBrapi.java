@@ -9,7 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -21,7 +21,6 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
-import org.ibp.api.brapi.v1.trial.TrialSummary;
 import org.ibp.api.brapi.v1.trial.TrialSummaryMapper;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
@@ -64,13 +63,13 @@ public class TrialResourceBrapi {
 	private TrialServiceBrapi trialServiceBrapi;
 
 	@Autowired
-	private BrapiResponseMessageGenerator<StudySummary> responseMessageGenerator;
+	private BrapiResponseMessageGenerator<TrialSummary> responseMessageGenerator;
 
 	@ApiOperation(value = "Retrieve a filtered list of breeding Trials", notes = "Retrieve a filtered list of breeding Trials. A Trial is a collection of Studies")
 	@RequestMapping(value = "/{crop}/brapi/v2/trials", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<TrialSummary>> getTrials(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary>> getTrials(@PathVariable final String crop,
 		@ApiParam(value = "Filter active status true/false") @RequestParam(value = "active", required = false) final Boolean active,
 		@ApiParam(value = "Common name for the crop associated with trial") @RequestParam(value = "commonCropName", required = false)
 		final String commonCropName,
@@ -165,16 +164,18 @@ public class TrialResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/trials", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<TrialSummary>> createTrial(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary>> createTrial(@PathVariable final String crop,
 		@RequestBody final List<TrialImportRequestDTO> trialImportRequestDTOs) {
 		BaseValidator.checkNotNull(trialImportRequestDTOs, "trial.import.request.null");
 
 		final TrialImportResponse trialImportResponse = this.trialServiceBrapi.createTrials(crop, trialImportRequestDTOs);
-		final List<TrialSummary> trialSummaries = this.translateResults(trialImportResponse.getEntityList(), crop);
-		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaries);
+		final List<org.ibp.api.brapi.v1.trial.TrialSummary> trialSummaries =
+			this.translateResults(trialImportResponse.getEntityList(), crop);
+		final Result<org.ibp.api.brapi.v1.trial.TrialSummary> results =
+			new Result<org.ibp.api.brapi.v1.trial.TrialSummary>().withData(trialSummaries);
 
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(trialImportResponse));
-		final EntityListResponse<TrialSummary> entityListResponse = new EntityListResponse<>(metadata, results);
+		final EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
@@ -186,6 +187,7 @@ public class TrialResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchTrials(
 		@PathVariable final String crop,
 		@RequestBody final TrialSearchRequestDTO trialSearchRequestDTO) {
+
 		final BrapiSearchDto searchDto =
 			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(trialSearchRequestDTO, TrialSearchRequestDTO.class)
 				.toString());
@@ -198,7 +200,7 @@ public class TrialResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/search/trials/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2_1.class)
-	public ResponseEntity<EntityListResponse<TrialSummary>> getSearchTrialsResults(
+	public ResponseEntity<EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary>> getSearchTrialsResults(
 		@PathVariable final String crop,
 		@PathVariable final String searchResultsDbId,
 		@RequestParam(value = "page",
@@ -214,7 +216,8 @@ public class TrialResourceBrapi {
 					.getSearchRequest(Integer.valueOf(searchResultsDbId), TrialSearchRequestDTO.class);
 		} catch (final NumberFormatException | MiddlewareException e) {
 			return new ResponseEntity<>(
-				new EntityListResponse<TrialSummary>(new Result<>(new ArrayList<>())).withMessage("no search request found"),
+				new EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary>(new Result<>(new ArrayList<>())).withMessage(
+					"no search request found"),
 				HttpStatus.NOT_FOUND);
 		}
 
@@ -227,11 +230,11 @@ public class TrialResourceBrapi {
 
 	}
 
-	private ResponseEntity<EntityListResponse<TrialSummary>> getSearchTrialResponseEntity(
+	private ResponseEntity<EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary>> getSearchTrialResponseEntity(
 		@PathVariable final String crop, final TrialSearchRequestDTO trialSearchRequestDTO,
 		final int finalPageNumber, final int finalPageSize, final PageRequest pageRequest) {
-		final PagedResult<StudySummary> resultPage =
-			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<StudySummary>() {
+		final PagedResult<TrialSummary> resultPage =
+			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<TrialSummary>() {
 
 				@Override
 				public long getCount() {
@@ -239,13 +242,14 @@ public class TrialResourceBrapi {
 				}
 
 				@Override
-				public List<StudySummary> getResults(final PagedResult<StudySummary> pagedResult) {
+				public List<TrialSummary> getResults(final PagedResult<TrialSummary> pagedResult) {
 					return TrialResourceBrapi.this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, pageRequest);
 				}
 			});
 
-		final List<TrialSummary> trialSummaryList = this.translateResults(resultPage.getPageResults(), crop);
-		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaryList);
+		final List<org.ibp.api.brapi.v1.trial.TrialSummary> trialSummaryList = this.translateResults(resultPage.getPageResults(), crop);
+		final Result<org.ibp.api.brapi.v1.trial.TrialSummary> results =
+			new Result<org.ibp.api.brapi.v1.trial.TrialSummary>().withData(trialSummaryList);
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
@@ -253,12 +257,13 @@ public class TrialResourceBrapi {
 		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 	}
 
-	private List<TrialSummary> translateResults(final List<StudySummary> studySummaries, final String crop) {
+	private List<org.ibp.api.brapi.v1.trial.TrialSummary> translateResults(final List<TrialSummary> trialSummaries, final String crop) {
 		final ModelMapper modelMapper = TrialSummaryMapper.getInstance();
-		final List<TrialSummary> trialSummaryList = new ArrayList<>();
-		if (!CollectionUtils.isEmpty(studySummaries)) {
-			for (final StudySummary mwStudy : studySummaries) {
-				final TrialSummary trialSummaryDto = modelMapper.map(mwStudy, TrialSummary.class);
+		final List<org.ibp.api.brapi.v1.trial.TrialSummary> trialSummaryList = new ArrayList<>();
+		if (!CollectionUtils.isEmpty(trialSummaries)) {
+			for (final TrialSummary mwTrialSummary : trialSummaries) {
+				final org.ibp.api.brapi.v1.trial.TrialSummary
+					trialSummaryDto = modelMapper.map(mwTrialSummary, org.ibp.api.brapi.v1.trial.TrialSummary.class);
 				trialSummaryDto.setCommonCropName(crop);
 				trialSummaryList.add(trialSummaryDto);
 			}

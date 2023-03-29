@@ -5,7 +5,7 @@ import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class StudyImportRequestValidator {
 			.map(StudyImportRequestDTO::getTrialDbId).collect(Collectors.toList());
 		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
 		trialSearchRequestDTO.setTrialDbIds(trialDbIds);
-		final Map<String, StudySummary> trialsMap = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null).stream()
+		final Map<String, TrialSummary> trialsMap = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null).stream()
 			.collect(Collectors.toMap(s -> String.valueOf(s.getTrialDbId()), Function.identity()));
 
 		Integer index = 1;

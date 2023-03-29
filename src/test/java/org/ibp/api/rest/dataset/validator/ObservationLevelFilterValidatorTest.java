@@ -5,7 +5,7 @@ import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
@@ -72,11 +72,11 @@ public class ObservationLevelFilterValidatorTest {
 		Mockito.when(this.programService.getProjectByUuidAndCrop(PROGRAM_DBID, CROP)).thenReturn(new Project());
 		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
 		trialSearchRequestDTO.setTrialDbIds(Collections.singletonList(filter.getTrialDbId()));
-		final StudySummary studySummary = new StudySummary();
-		studySummary.setTrialDbId(Integer.valueOf(TRIAL_DBID));
-		studySummary.setProgramDbId(PROGRAM_DBID);
+		final TrialSummary trialSummary = new TrialSummary();
+		trialSummary.setTrialDbId(Integer.valueOf(TRIAL_DBID));
+		trialSummary.setProgramDbId(PROGRAM_DBID);
 		Mockito.when(this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null))
-			.thenReturn(Collections.singletonList(studySummary));
+			.thenReturn(Collections.singletonList(trialSummary));
 		try {
 			this.validator.validate(filter, CROP);
 		} catch (final ApiRequestValidationException e) {
@@ -159,11 +159,11 @@ public class ObservationLevelFilterValidatorTest {
 		Mockito.when(this.programService.getProjectByUuidAndCrop(PROGRAM_DBID, CROP)).thenReturn(new Project());
 		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
 		trialSearchRequestDTO.setTrialDbIds(Collections.singletonList(filter.getTrialDbId()));
-		final StudySummary studySummary = new StudySummary();
-		studySummary.setTrialDbId(Integer.valueOf(TRIAL_DBID));
-		studySummary.setProgramDbId(RandomStringUtils.randomAlphanumeric(15));
+		final TrialSummary trialSummary = new TrialSummary();
+		trialSummary.setTrialDbId(Integer.valueOf(TRIAL_DBID));
+		trialSummary.setProgramDbId(RandomStringUtils.randomAlphanumeric(15));
 		Mockito.when(this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null))
-			.thenReturn(Collections.singletonList(studySummary));
+			.thenReturn(Collections.singletonList(trialSummary));
 		try {
 			this.validator.validate(filter, CROP);
 		} catch (final ApiRequestValidationException e) {

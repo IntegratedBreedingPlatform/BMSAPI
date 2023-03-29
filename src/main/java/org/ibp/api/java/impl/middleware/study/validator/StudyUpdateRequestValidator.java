@@ -7,7 +7,7 @@ import org.generationcp.middleware.api.brapi.v2.study.StudyUpdateRequestDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
@@ -54,7 +54,7 @@ public class StudyUpdateRequestValidator {
 			// Find out if trialDbId is existing
 			final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
 			trialSearchRequestDTO.setTrialDbIds(Arrays.asList(studyUpdateRequestDTO.getTrialDbId()));
-			final Map<String, StudySummary> trialsMap = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null).stream()
+			final Map<String, TrialSummary> trialsMap = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null).stream()
 				.collect(Collectors.toMap(s -> String.valueOf(s.getTrialDbId()), Function.identity()));
 			if (!trialsMap.containsKey(studyUpdateRequestDTO.getTrialDbId())) {
 				this.errors.reject("study.update.trialDbId.invalid", "");
