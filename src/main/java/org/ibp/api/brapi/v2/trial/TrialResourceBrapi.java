@@ -9,7 +9,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
-import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.SearchRequestService;
@@ -21,14 +20,13 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
-import org.ibp.api.brapi.v1.trial.TrialSummaryMapper;
+import org.ibp.api.brapi.v1.trial.TrialSummary;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,7 +35,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -164,18 +161,16 @@ public class TrialResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/trials", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary>> createTrial(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<TrialSummary>> createTrial(@PathVariable final String crop,
 		@RequestBody final List<TrialImportRequestDTO> trialImportRequestDTOs) {
 		BaseValidator.checkNotNull(trialImportRequestDTOs, "trial.import.request.null");
 
 		final TrialImportResponse trialImportResponse = this.trialServiceBrapi.createTrials(crop, trialImportRequestDTOs);
-		final List<org.ibp.api.brapi.v1.trial.TrialSummary> trialSummaries =
-			this.translateResults(trialImportResponse.getEntityList(), crop);
-		final Result<org.ibp.api.brapi.v1.trial.TrialSummary> results =
-			new Result<org.ibp.api.brapi.v1.trial.TrialSummary>().withData(trialSummaries);
+		final Result<TrialSummary> results =
+			new Result<TrialSummary>().withData(trialImportResponse.getEntityList());
 
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(trialImportResponse));
-		final EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary> entityListResponse = new EntityListResponse<>(metadata, results);
+		final EntityListResponse<TrialSummary> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
@@ -200,7 +195,7 @@ public class TrialResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v2/search/trials/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2_1.class)
-	public ResponseEntity<EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary>> getSearchTrialsResults(
+	public ResponseEntity<EntityListResponse<TrialSummary>> getSearchTrialsResults(
 		@PathVariable final String crop,
 		@PathVariable final String searchResultsDbId,
 		@RequestParam(value = "page",
@@ -216,7 +211,7 @@ public class TrialResourceBrapi {
 					.getSearchRequest(Integer.valueOf(searchResultsDbId), TrialSearchRequestDTO.class);
 		} catch (final NumberFormatException | MiddlewareException e) {
 			return new ResponseEntity<>(
-				new EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary>(new Result<>(new ArrayList<>())).withMessage(
+				new EntityListResponse<TrialSummary>(new Result<>(new ArrayList<>())).withMessage(
 					"no search request found"),
 				HttpStatus.NOT_FOUND);
 		}
@@ -230,7 +225,7 @@ public class TrialResourceBrapi {
 
 	}
 
-	private ResponseEntity<EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary>> getSearchTrialResponseEntity(
+	private ResponseEntity<EntityListResponse<TrialSummary>> getSearchTrialResponseEntity(
 		@PathVariable final String crop, final TrialSearchRequestDTO trialSearchRequestDTO,
 		final int finalPageNumber, final int finalPageSize, final PageRequest pageRequest) {
 		final PagedResult<TrialSummary> resultPage =
@@ -243,32 +238,17 @@ public class TrialResourceBrapi {
 
 				@Override
 				public List<TrialSummary> getResults(final PagedResult<TrialSummary> pagedResult) {
-					return TrialResourceBrapi.this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, pageRequest);
+					return TrialResourceBrapi.this.trialServiceBrapi.searchTrials(crop, trialSearchRequestDTO, pageRequest);
 				}
 			});
 
-		final List<org.ibp.api.brapi.v1.trial.TrialSummary> trialSummaryList = this.translateResults(resultPage.getPageResults(), crop);
-		final Result<org.ibp.api.brapi.v1.trial.TrialSummary> results =
-			new Result<org.ibp.api.brapi.v1.trial.TrialSummary>().withData(trialSummaryList);
+		final Result<TrialSummary> results =
+			new Result<TrialSummary>().withData(resultPage.getPageResults());
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
-	}
-
-	private List<org.ibp.api.brapi.v1.trial.TrialSummary> translateResults(final List<TrialSummary> trialSummaries, final String crop) {
-		final ModelMapper modelMapper = TrialSummaryMapper.getInstance();
-		final List<org.ibp.api.brapi.v1.trial.TrialSummary> trialSummaryList = new ArrayList<>();
-		if (!CollectionUtils.isEmpty(trialSummaries)) {
-			for (final TrialSummary mwTrialSummary : trialSummaries) {
-				final org.ibp.api.brapi.v1.trial.TrialSummary
-					trialSummaryDto = modelMapper.map(mwTrialSummary, org.ibp.api.brapi.v1.trial.TrialSummary.class);
-				trialSummaryDto.setCommonCropName(crop);
-				trialSummaryList.add(trialSummaryDto);
-			}
-		}
-		return trialSummaryList;
 	}
 
 	private String parameterValidation(final String crop, final String commonCropName, final String sortBy,

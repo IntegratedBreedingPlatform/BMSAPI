@@ -8,7 +8,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
@@ -36,7 +35,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -59,7 +57,7 @@ public class TrialResourceBrapi {
 	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
-	public ResponseEntity<EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary>> listTrialSummaries(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<TrialSummary>> listTrialSummaries(@PathVariable final String crop,
 		@ApiParam(value = "Program filter to only return studies associated with given program id.") @RequestParam(value = "programDbId",
 			required = false) final String programDbId,
 		@ApiParam(value = "Location filter to only return studies associated with given location id.") @RequestParam(value = "locationDbId",
@@ -106,31 +104,18 @@ public class TrialResourceBrapi {
 
 				@Override
 				public List<TrialSummary> getResults(final PagedResult<TrialSummary> pagedResult) {
-					return TrialResourceBrapi.this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, pageRequest);
+					return TrialResourceBrapi.this.trialServiceBrapi.searchTrials(crop, trialSearchRequestDTO, pageRequest);
 				}
 			});
 
-		final List<org.ibp.api.brapi.v1.trial.TrialSummary> trialSummaryList = this.translateResults(resultPage);
-		final Result<org.ibp.api.brapi.v1.trial.TrialSummary> results =
-			new Result<org.ibp.api.brapi.v1.trial.TrialSummary>().withData(trialSummaryList);
+		final Result<TrialSummary> results =
+			new Result<TrialSummary>().withData(resultPage.getPageResults());
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 
-	}
-
-	private List<org.ibp.api.brapi.v1.trial.TrialSummary> translateResults(final PagedResult<TrialSummary> resultPage) {
-		final ModelMapper modelMapper = TrialSummaryMapper.getInstance();
-		final List<org.ibp.api.brapi.v1.trial.TrialSummary> trialSummaryList = new ArrayList<>();
-
-		for (final TrialSummary mwStudy : resultPage.getPageResults()) {
-			final org.ibp.api.brapi.v1.trial.TrialSummary
-				trialSummaryDto = modelMapper.map(mwStudy, org.ibp.api.brapi.v1.trial.TrialSummary.class);
-			trialSummaryList.add(trialSummaryDto);
-		}
-		return trialSummaryList;
 	}
 
 	private String parameterValidation(final String sortBy, final String sortOrder) {

@@ -1,9 +1,9 @@
 package org.ibp.api.brapi;
 
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
-import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.ibp.api.brapi.v1.trial.TrialSummary;
 import org.ibp.api.brapi.v2.trial.TrialImportResponse;
 import org.springframework.data.domain.Pageable;
 
@@ -20,7 +20,7 @@ public interface TrialServiceBrapi {
 	 */
 	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
 
-	List<TrialSummary> searchTrials(TrialSearchRequestDTO trialSearchRequestDTO, Pageable pageable);
+	List<TrialSummary> searchTrials(String cropName, TrialSearchRequestDTO trialSearchRequestDTO, Pageable pageable);
 
 	long countSearchTrialsResult(TrialSearchRequestDTO trialSearchRequestDTO);
 
