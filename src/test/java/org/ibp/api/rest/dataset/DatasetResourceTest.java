@@ -26,6 +26,7 @@ import org.ibp.api.java.impl.middleware.dataset.DatasetCollectionOrderServiceImp
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -75,7 +76,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private DatasetExportService datasetCSVExportService;
 
-	@Autowired
+	@Mock
 	private HttpServletRequest request;
 
 
