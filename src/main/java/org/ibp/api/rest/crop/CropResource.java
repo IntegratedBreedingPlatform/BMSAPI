@@ -34,7 +34,12 @@ public class CropResource {
 			+ " The results are typically used to supply the *cropname* path parameter in other BMSAPI calls.")
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	public ResponseEntity<List<String>> listAvailableCrops() {
+		System.out.println("Crop service");
+		System.out.println(cropService);
+		System.out.println("Security service");
+		System.out.println(securityService);
 
+		System.out.println(this.securityService.getCurrentlyLoggedInUser());
 		if (request.isUserInRole(PermissionsEnum.ADMIN.name())
 			|| request.isUserInRole(PermissionsEnum.ADMINISTRATION.name())
 			|| request.isUserInRole(PermissionsEnum.SITE_ADMIN.name())) {
@@ -45,12 +50,7 @@ public class CropResource {
 		} else {
 			System.out.println("Available crops");
 
-			System.out.println("Crop service");
-			System.out.println(cropService);
-			System.out.println("Security service");
-			System.out.println(securityService);
 
-			System.out.println(this.securityService.getCurrentlyLoggedInUser());
 			return new ResponseEntity<>(
 				this.cropService.getAvailableCropsForUser(this.securityService.getCurrentlyLoggedInUser().getUserid()), HttpStatus.OK);
 		}
