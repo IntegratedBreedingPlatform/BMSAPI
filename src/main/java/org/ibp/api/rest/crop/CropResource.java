@@ -2,6 +2,7 @@
 package org.ibp.api.rest.crop;
 
 import io.swagger.annotations.ApiOperation;
+import net.minidev.json.JSONUtil;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -37,9 +38,13 @@ public class CropResource {
 		if (request.isUserInRole(PermissionsEnum.ADMIN.name())
 			|| request.isUserInRole(PermissionsEnum.ADMINISTRATION.name())
 			|| request.isUserInRole(PermissionsEnum.SITE_ADMIN.name())) {
+			System.out.println("Installed crops");
+
 			return new ResponseEntity<>(
 				this.cropService.getInstalledCrops(), HttpStatus.OK);
 		} else {
+			System.out.println("Available crops");
+
 			return new ResponseEntity<>(
 				this.cropService.getAvailableCropsForUser(this.securityService.getCurrentlyLoggedInUser().getUserid()), HttpStatus.OK);
 		}
