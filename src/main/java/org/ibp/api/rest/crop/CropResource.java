@@ -45,6 +45,12 @@ public class CropResource {
 		} else {
 			System.out.println("Available crops");
 
+			System.out.println("Crop service");
+			System.out.println(cropService);
+			System.out.println("Security service");
+			System.out.println(securityService);
+
+			System.out.println(this.securityService.getCurrentlyLoggedInUser());
 			return new ResponseEntity<>(
 				this.cropService.getAvailableCropsForUser(this.securityService.getCurrentlyLoggedInUser().getUserid()), HttpStatus.OK);
 		}
