@@ -81,8 +81,12 @@ public class TrialResourceBrapi {
 		}
 
 		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
-		trialSearchRequestDTO.setProgramDbIds(Arrays.asList(programDbId));
-		trialSearchRequestDTO.setLocationDbIds(Arrays.asList(locationDbId));
+		if (StringUtils.isNotEmpty(programDbId)) {
+			trialSearchRequestDTO.setProgramDbIds(Arrays.asList(programDbId));
+		}
+		if (StringUtils.isNotEmpty(locationDbId)) {
+			trialSearchRequestDTO.setLocationDbIds(Arrays.asList(locationDbId));
+		}
 		trialSearchRequestDTO.setActive(active);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
