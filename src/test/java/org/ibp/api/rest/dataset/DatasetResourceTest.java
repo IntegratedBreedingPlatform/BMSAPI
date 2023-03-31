@@ -20,6 +20,7 @@ import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.DatasetCollectionOrderServiceImpl;
@@ -76,7 +77,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	private DatasetExportService datasetCSVExportService;
 
 	@Autowired
-	private HttpServletRequest request;
+	private HttpServletRequest httpServletRequest;
 
 
 	@Configuration
@@ -92,6 +93,12 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		@Primary
 		public DatasetExportService datasetCSVExportService() {
 			return Mockito.mock(DatasetExportService.class);
+		}
+
+		@Bean
+		@Primary
+			public HttpServletRequest httpServletRequest() {
+				return Mockito.mock(HttpServletRequest.class);
 		}
 	}
 
@@ -887,7 +894,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		paramDTO.setNewCategoricalValueId(12345);
 		searchDTO.setDatasetId(datasetId);
 		paramDTO.getObservationUnitsSearchDTO().getFilter().setVariableId(555);
-		Mockito.when(this.request.isUserInRole(PermissionsEnum.ADMIN.name())).thenReturn(true);
+		Mockito.when(this.httpServletRequest.isUserInRole(PermissionsEnum.ADMIN.name())).thenReturn(true);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -909,7 +916,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
 		searchDTO.setInstanceIds(Arrays.asList(instanceId));
 		searchDTO.setDatasetId(datasetId);
-		Mockito.when(this.request.isUserInRole(PermissionsEnum.ADMIN.name())).thenReturn(true);
+		Mockito.when(this.httpServletRequest.isUserInRole(PermissionsEnum.ADMIN.name())).thenReturn(true);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
