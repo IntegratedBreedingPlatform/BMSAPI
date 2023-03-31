@@ -94,12 +94,6 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		public DatasetExportService datasetCSVExportService() {
 			return Mockito.mock(DatasetExportService.class);
 		}
-
-		@Bean
-		@Primary
-			public HttpServletRequest httpServletRequest() {
-				return Mockito.mock(HttpServletRequest.class);
-		}
 	}
 
 	@Before

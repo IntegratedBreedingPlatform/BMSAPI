@@ -1,6 +1,7 @@
 package org.ibp.api.rest.crop;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.hamcrest.Matchers;
 import org.hibernate.mapping.Any;
@@ -29,6 +30,8 @@ public class CropResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private SecurityService securityService;
 
+	@Autowired
+	private HttpServletRequest request;
 
 	@Configuration
 	public static class TestConfiguration {
@@ -43,6 +46,10 @@ public class CropResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void listAvailableCrops() throws Exception {
+
+		Mockito.when(this.request.isUserInRole(PermissionsEnum.ADMIN.name())).thenReturn(false);
+		Mockito.when(this.request.isUserInRole(PermissionsEnum.ADMINISTRATION.name())).thenReturn(false);
+		Mockito.when(this.request.isUserInRole(PermissionsEnum.SITE_ADMIN.name())).thenReturn(false);
 
 		final List<String> crops = Arrays.asList("wheat", "maize");
 		final WorkbenchUser workbenchUser = new WorkbenchUser();
