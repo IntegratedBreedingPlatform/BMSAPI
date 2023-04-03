@@ -65,7 +65,7 @@ public class StudyImportRequestValidator {
 
 			if (StringUtils.isNotEmpty(s.getLocationDbId())) {
 				final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-				locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(s.getLocationDbId())));
+				locationSearchRequest.setLocationDbIds(Collections.singletonList(Integer.valueOf(s.getLocationDbId())));
 
 				if (CollectionUtils.isEmpty(this.locationService.searchLocations(locationSearchRequest, null, null))) {
 					this.errors.reject("study.import.locationDbId.invalid", new String[] {index.toString()}, "");

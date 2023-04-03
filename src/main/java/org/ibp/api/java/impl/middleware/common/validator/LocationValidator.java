@@ -331,7 +331,7 @@ public class LocationValidator {
 
 	private void validateLocationAbbrNotExists(final Integer locationId, final String locationAbbr) {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationAbbreviations(Arrays.asList(locationAbbr));
+		locationSearchRequest.setAbbreviations(Arrays.asList(locationAbbr));
 		final List<org.generationcp.middleware.api.location.Location> locationList =
 			this.locationService.getLocations(locationSearchRequest, null);
 
@@ -349,7 +349,7 @@ public class LocationValidator {
 
 	private void validateLocationAbbrNotExists(final String locationAbbr) {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationAbbreviations(Arrays.asList(locationAbbr));
+		locationSearchRequest.setAbbreviations(Arrays.asList(locationAbbr));
 		final List<org.generationcp.middleware.api.location.Location> locationList =
 			this.locationService.getLocations(locationSearchRequest, null);
 

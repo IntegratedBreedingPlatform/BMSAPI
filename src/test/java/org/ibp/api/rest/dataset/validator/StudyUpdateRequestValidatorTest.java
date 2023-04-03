@@ -67,7 +67,7 @@ public class StudyUpdateRequestValidatorTest {
 		Mockito.when(this.trialServiceBrapi.getStudies(ArgumentMatchers.eq(filter), ArgumentMatchers.eq(null)))
 			.thenReturn(Collections.singletonList(studySummary));
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(LOCATION_DBID)));
+		locationSearchRequest.setLocationDbIds(Collections.singletonList(Integer.valueOf(LOCATION_DBID)));
 		Mockito.when(this.locationService.searchLocations(locationSearchRequest, null, null))
 			.thenReturn(Collections.singletonList(new LocationDTO()));
 

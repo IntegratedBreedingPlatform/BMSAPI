@@ -261,7 +261,6 @@ public class StudyResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
 		@PathVariable final Integer studyDbId) {
 
-
 		final Optional<StudyDetailsDto> mwStudyDetailsOptional = this.studyServiceBrapi.getStudyDetailsByInstance(studyDbId);
 		if (!mwStudyDetailsOptional.isPresent()) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
@@ -282,7 +281,7 @@ public class StudyResourceBrapi {
 
 		if (mwStudyDetails.getMetadata().getLocationId() != null) {
 			final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-			locationSearchRequest.setLocationIds(Collections.singletonList(mwStudyDetails.getMetadata().getLocationId()));
+			locationSearchRequest.setLocationDbIds(Collections.singletonList(mwStudyDetails.getMetadata().getLocationId()));
 			final List<Location> locations = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
 			if (!locations.isEmpty()) {
 				result.setLocation(locations.get(0));
@@ -407,7 +406,7 @@ public class StudyResourceBrapi {
 				@Override
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					return StudyResourceBrapi.this.variableServiceBrapi
-							.getObservationVariables(crop, requestDTO, pageRequest);
+						.getObservationVariables(crop, requestDTO, pageRequest);
 				}
 			});
 
