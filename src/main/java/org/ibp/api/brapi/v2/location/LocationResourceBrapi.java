@@ -1,7 +1,6 @@
 package org.ibp.api.brapi.v2.location;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -43,7 +42,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Api(value = "BrAPI v2 Location Services")
 @Controller(value = "LocationResourceBrapiV2")
@@ -107,21 +105,13 @@ public class LocationResourceBrapi {
 				}
 			});
 
-		if (resultPage != null && resultPage.getTotalResults() > 0) {
+		final Result<Location> results = new Result<Location>().withData(resultPage.getPageResults());
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
-			final Result<Location> results = new Result<Location>().withData(resultPage.getPageResults());
-			final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+		final Metadata metadata = new Metadata().withPagination(pagination);
+		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 
-			final Metadata metadata = new Metadata().withPagination(pagination);
-			return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
-
-		} else {
-
-			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", "not found locations"));
-			final Metadata metadata = new Metadata(null, status);
-			return new ResponseEntity<>(new EntityListResponse().withMetadata(metadata), HttpStatus.NOT_FOUND);
-		}
 	}
 
 	@ApiOperation(value = "Get a location given an id", notes = "Get a location")
@@ -172,7 +162,7 @@ public class LocationResourceBrapi {
 		return new ResponseEntity<>(locationSearchResponse, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Get search samples results", notes = "Get the results of locations search request")
+	@ApiOperation(value = "Get search location results", notes = "Get the results of locations search request")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/locations/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
