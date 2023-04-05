@@ -97,7 +97,7 @@ public class LocationResourceBrapiTest extends ApiUnitTestBase {
 			"NZ", 156.2, 58.6, 5.2, null, null);
 		final Coordinate coordinates = new Coordinate();
 		final Geometry geometry = new Geometry();
-		geometry.setCoordinates(Arrays.asList(location.getLatitude(), location.getLongitude(), location.getAltitude()));
+		geometry.setCoordinates(Arrays.asList(location.getLongitude(), location.getLatitude(), location.getAltitude()));
 		coordinates.setGeometry(geometry);
 		location.setCoordinates(coordinates);
 
