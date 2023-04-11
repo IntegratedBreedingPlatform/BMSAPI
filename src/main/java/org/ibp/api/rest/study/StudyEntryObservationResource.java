@@ -62,7 +62,7 @@ public class StudyEntryObservationResource {
 	}
 
 	@ApiOperation(value = "Count study entry observations", notes = "Returns count of study entry observations given a set of variables")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_GERMPLASM_AND_CHECKS', 'MS_MODIFY_ENTRY_DETAILS_VALUES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_GERMPLASM_AND_CHECKS', 'MS_ADD_ENTRY_DETAILS_VARIABLES')")
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/observations", method = RequestMethod.HEAD)
 	public ResponseEntity<Void> countObservationsByVariables(
 		@PathVariable final String cropName,
