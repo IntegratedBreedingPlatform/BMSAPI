@@ -27,7 +27,7 @@ public class AdvanceResource {
 	private AdvanceService advanceService;
 
 	@ApiOperation(value = "Advance study Preview")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_ADVANCES', 'MS_ADVANCE_STUDY')")
 	@ResponseBody
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/advance/preview", method = RequestMethod.POST)
 	public ResponseEntity<List<AdvanceGermplasmPreview>> advanceStudyPreview(
@@ -41,7 +41,7 @@ public class AdvanceResource {
 	}
 
 	@ApiOperation(value = "Advance study")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_ADVANCES', 'MS_ADVANCE_STUDY')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_ADVANCES', 'MS_ADVANCE_STUDY')")
 	@ResponseBody
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/advance", method = RequestMethod.POST)
 	public ResponseEntity<List<Integer>> advanceStudy(
@@ -55,7 +55,7 @@ public class AdvanceResource {
 	}
 
 	@ApiOperation(value = "Advance sampled plants from plots")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_ADVANCES', 'MS_ADVANCE_STUDY_FOR_PLANTS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_ADVANCES', 'MS_ADVANCE_STUDY_FOR_PLANTS')")
 	@ResponseBody
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/advance/samples", method = RequestMethod.POST)
 	public ResponseEntity<List<Integer>> advanceSamples(
@@ -69,7 +69,7 @@ public class AdvanceResource {
 	}
 
 	@ApiOperation(value = "Advance Samples Preview")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_ADVANCES', 'MS_ADVANCE_STUDY_FOR_PLANTS')")
 	@ResponseBody
 	@RequestMapping(value = "/crops/{cropName}/programs/{programUUID}/studies/{studyId}/advance/samples/preview", method = RequestMethod.POST)
 	public ResponseEntity<List<AdvanceGermplasmPreview>> advanceSamplePreview(
