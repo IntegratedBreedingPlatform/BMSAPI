@@ -47,7 +47,7 @@ public class ObservationResourceBrapi {
 
 	@Autowired
 	private SearchRequestService searchRequestService;
-	
+
 	@Autowired
 	private ObservationServiceBrapi observationServiceBrapi;
 
@@ -129,10 +129,10 @@ public class ObservationResourceBrapi {
 		observationSearchRequestDto.setExternalReferenceSources(
 				StringUtils.isNotEmpty(externalReferenceSource) ? Arrays.asList(externalReferenceSource) : new ArrayList<>());
 
-		return getObservationResponseEntity(page, pageSize, observationSearchRequestDto);
+		return this.getObservationResponseEntity(page, pageSize, observationSearchRequestDto);
 	}
 
-	private ResponseEntity<EntityListResponse<ObservationDto>> getObservationResponseEntity(Integer page, Integer pageSize, ObservationSearchRequestDto observationSearchRequestDto) {
+	private ResponseEntity<EntityListResponse<ObservationDto>> getObservationResponseEntity(final Integer page, final Integer pageSize, final ObservationSearchRequestDto observationSearchRequestDto) {
 		final PagedResult<ObservationDto> resultPage =
 			new PaginatedSearch().executeBrapiSearch(page, pageSize, new SearchSpec<ObservationDto>() {
 
