@@ -637,7 +637,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Replace the entry (gid) for a set of observation units", notes = "Replace the entry (gid) for a set of observation units")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_MANAGE_OBSERVATION_UNITS', 'MS_CHANGE_PLOT_ENTRY')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/entries", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Void> updateObservationUnitsEntry(
@@ -650,7 +650,7 @@ public class DatasetResource {
 	}
 
 	@ApiOperation(value = "Get metadata for a set of observation units", notes = "Get metadata for a set of observation units")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_MANAGE_OBSERVATION_UNITS', 'MS_CHANGE_PLOT_ENTRY')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/observation-units/metadata", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<ObservationUnitsMetadata> getObservationUnitsMetadata(
