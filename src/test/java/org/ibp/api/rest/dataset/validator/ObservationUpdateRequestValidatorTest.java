@@ -57,7 +57,7 @@ public class ObservationUpdateRequestValidatorTest {
                 .thenReturn(Collections.singletonList(variableDTO));
 
         final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
-        observationSearchRequestDto.setObservationDbIds(Collections.singletonList(Integer.parseInt(OBSERVATION_DBID)));
+        observationSearchRequestDto.setObservationDbIds(Collections.singletonList(OBSERVATION_DBID));
         Mockito.when(this.observationServiceBrapi.searchObservations(observationSearchRequestDto, null)).thenReturn(this.createObservationDtoList());
     }
 

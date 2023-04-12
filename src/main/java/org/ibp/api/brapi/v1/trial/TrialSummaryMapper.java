@@ -1,7 +1,7 @@
 package org.ibp.api.brapi.v1.trial;
 
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.ibp.api.brapi.v1.study.Contact;
 import org.ibp.api.brapi.v1.study.StudySummaryDto;
@@ -70,7 +70,7 @@ public class TrialSummaryMapper {
 
 	private static void addTrialSummaryMapper(final ModelMapper mapper) {
 
-		mapper.addMappings(new PropertyMap<StudySummary, TrialSummary>() {
+		mapper.addMappings(new PropertyMap<TrialSummary, org.ibp.api.brapi.v1.trial.TrialSummary>() {
 
 			@Override
 			protected void configure() {

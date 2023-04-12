@@ -52,6 +52,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 	@Autowired
 	private StudyServiceBrapi studyServiceBrapi;
 
+
 	@Configuration
 	public static class TestConfiguration {
 
@@ -182,7 +183,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 
 		final StudyDetailsDto studyDetailsDto = StudyTestDataProvider.getStudyDetailsDto();
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationIds(Collections.singletonList(studyDetailsDto.getMetadata().getLocationId()));
+		locationSearchRequest.setLocationDbIds(Collections.singletonList(studyDetailsDto.getMetadata().getLocationId()));
 		final List<Location> locations = StudyTestDataProvider.getLocationList();
 		final Location location = locations.get(0);
 
@@ -198,7 +199,7 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		this.mockMvc.perform(MockMvcRequestBuilders.get(uriComponents.toUriString()).contentType(this.contentType))
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andDo(MockMvcResultHandlers.print()).andExpect(
-			jsonPath("$.result.studyDbId", is(studyDetailsDto.getMetadata().getStudyDbId().toString())))
+				jsonPath("$.result.studyDbId", is(studyDetailsDto.getMetadata().getStudyDbId().toString())))
 			.andExpect(jsonPath("$.result.studyName", is(studyDetailsDto.getMetadata().getStudyName())))
 			.andExpect(jsonPath("$.result.studyType", is(studyDetailsDto.getMetadata().getStudyType())))
 			.andExpect(jsonPath("$.result.seasons", IsCollectionWithSize.hasSize(studyDetailsDto.getMetadata().getSeasons().size())))

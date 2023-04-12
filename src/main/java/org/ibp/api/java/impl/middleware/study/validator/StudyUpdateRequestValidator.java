@@ -7,11 +7,11 @@ import org.generationcp.middleware.api.brapi.v2.study.StudyUpdateRequestDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -52,9 +52,9 @@ public class StudyUpdateRequestValidator {
 
 		if (StringUtils.isNotEmpty(studyUpdateRequestDTO.getTrialDbId())) {
 			// Find out if trialDbId is existing
-			final StudySearchFilter studySearchFilter = new StudySearchFilter();
-			studySearchFilter.setTrialDbIds(Arrays.asList(studyUpdateRequestDTO.getTrialDbId()));
-			final Map<String, StudySummary> trialsMap = this.trialServiceBrapi.getStudies(studySearchFilter, null).stream()
+			final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+			trialSearchRequestDTO.setTrialDbIds(Arrays.asList(studyUpdateRequestDTO.getTrialDbId()));
+			final Map<String, TrialSummary> trialsMap = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null).stream()
 				.collect(Collectors.toMap(s -> String.valueOf(s.getTrialDbId()), Function.identity()));
 			if (!trialsMap.containsKey(studyUpdateRequestDTO.getTrialDbId())) {
 				this.errors.reject("study.update.trialDbId.invalid", "");
@@ -67,7 +67,7 @@ public class StudyUpdateRequestValidator {
 
 		if (StringUtils.isNotEmpty(studyUpdateRequestDTO.getLocationDbId())) {
 			final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-			locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(studyUpdateRequestDTO.getLocationDbId())));
+			locationSearchRequest.setLocationDbIds(Collections.singletonList(Integer.valueOf(studyUpdateRequestDTO.getLocationDbId())));
 			// Find out if the specified locationDbId is existing
 			if (CollectionUtils.isEmpty(this.locationService.searchLocations(locationSearchRequest, null, null))) {
 				this.errors.reject("study.update.locationDbId.invalid", "");

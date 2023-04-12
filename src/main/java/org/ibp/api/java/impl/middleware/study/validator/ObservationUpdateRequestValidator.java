@@ -45,7 +45,7 @@ public class ObservationUpdateRequestValidator {
 
         final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
         observationSearchRequestDto.setObservationDbIds(observationDtos.stream().filter(obs -> NumberUtils.isNumber(obs.getObservationDbId()))
-                .map(obs -> Integer.valueOf(obs.getObservationDbId())).collect(Collectors.toList()));
+                .map(obs -> obs.getObservationDbId()).collect(Collectors.toList()));
         final Map<String, ObservationDto> existingObservations = this.observationServiceBrapi.searchObservations(observationSearchRequestDto, null)
                 .stream().collect(Collectors.toMap(ObservationDto::getObservationDbId, Function.identity()));
 

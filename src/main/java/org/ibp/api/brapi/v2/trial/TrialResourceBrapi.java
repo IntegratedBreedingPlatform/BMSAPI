@@ -9,23 +9,24 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.ibp.api.brapi.TrialServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v1.trial.TrialSummary;
-import org.ibp.api.brapi.v1.trial.TrialSummaryMapper;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -34,7 +35,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -53,16 +54,19 @@ import java.util.Map;
 public class TrialResourceBrapi {
 
 	@Autowired
+	private SearchRequestService searchRequestService;
+
+	@Autowired
 	private TrialServiceBrapi trialServiceBrapi;
 
 	@Autowired
-	private BrapiResponseMessageGenerator<StudySummary> responseMessageGenerator;
+	private BrapiResponseMessageGenerator<TrialSummary> responseMessageGenerator;
 
 	@ApiOperation(value = "Retrieve a filtered list of breeding Trials", notes = "Retrieve a filtered list of breeding Trials. A Trial is a collection of Studies")
 	@RequestMapping(value = "/{crop}/brapi/v2/trials", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
-	public ResponseEntity<EntityListResponse<TrialSummary>> getTrials(@PathVariable final String crop,
+	public ResponseEntity<EntityListResponse<org.ibp.api.brapi.v1.trial.TrialSummary>> getTrials(@PathVariable final String crop,
 		@ApiParam(value = "Filter active status true/false") @RequestParam(value = "active", required = false) final Boolean active,
 		@ApiParam(value = "Common name for the crop associated with trial") @RequestParam(value = "commonCropName", required = false)
 		final String commonCropName,
@@ -106,23 +110,38 @@ public class TrialResourceBrapi {
 			return new ResponseEntity<>(new EntityListResponse<>(metadata, new Result<>()), HttpStatus.BAD_REQUEST);
 		}
 
-		final StudySearchFilter filter = new StudySearchFilter();
-		filter.setProgramDbId(programDbId);
-		filter.setLocationDbId(locationDbId);
-		if (trialDbId != null) {
-			filter.setTrialDbIds(Collections.singletonList(trialDbId));
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+
+		if (StringUtils.isNotEmpty(programDbId)) {
+			trialSearchRequestDTO.setProgramDbIds(Arrays.asList(programDbId));
 		}
-		if (studyDbId != null) {
-			filter.setStudyDbIds(Collections.singletonList(studyDbId));
+		if (StringUtils.isNotEmpty(locationDbId)) {
+			trialSearchRequestDTO.setLocationDbIds(Arrays.asList(locationDbId));
 		}
-		filter.setTrialName(trialName);
-		filter.setTrialPUI(trialPUI);
-		filter.setContactDbId(contactDbId);
-		filter.setSearchDateRangeStart(searchDateRangeStart);
-		filter.setSearchDateRangeEnd(searchDateRangeEnd);
-		filter.setExternalReferenceID(externalReferenceId);
-		filter.setExternalReferenceSource(externalReferenceSource);
-		filter.setActive(active);
+		if (StringUtils.isNotEmpty(trialDbId)) {
+			trialSearchRequestDTO.setTrialDbIds(Collections.singletonList(trialDbId));
+		}
+		if (StringUtils.isNotEmpty(studyDbId)) {
+			trialSearchRequestDTO.setStudyDbIds(Collections.singletonList(studyDbId));
+		}
+		if (StringUtils.isNotEmpty(trialName)) {
+			trialSearchRequestDTO.setTrialNames(Arrays.asList(trialName));
+		}
+		if (StringUtils.isNotEmpty(trialPUI)) {
+			trialSearchRequestDTO.setTrialPUIs(Arrays.asList(trialPUI));
+		}
+		if (StringUtils.isNotEmpty(contactDbId)) {
+			trialSearchRequestDTO.setContactDbIds(Arrays.asList(contactDbId));
+		}
+		if (StringUtils.isNotEmpty(externalReferenceId)) {
+			trialSearchRequestDTO.setExternalReferenceIds(Arrays.asList(externalReferenceId));
+		}
+		if (StringUtils.isNotEmpty(externalReferenceSource)) {
+			trialSearchRequestDTO.setExternalReferenceSources(Arrays.asList(externalReferenceSource));
+		}
+		trialSearchRequestDTO.setSearchDateRangeStart(searchDateRangeStart);
+		trialSearchRequestDTO.setSearchDateRangeEnd(searchDateRangeEnd);
+		trialSearchRequestDTO.setActive(active);
 
 		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
@@ -133,27 +152,7 @@ public class TrialResourceBrapi {
 		} else {
 			pageRequest = new PageRequest(finalPageNumber, finalPageSize);
 		}
-		final PagedResult<StudySummary> resultPage =
-			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<StudySummary>() {
-
-				@Override
-				public long getCount() {
-					return TrialResourceBrapi.this.trialServiceBrapi.countStudies(filter);
-				}
-
-				@Override
-				public List<StudySummary> getResults(final PagedResult<StudySummary> pagedResult) {
-					return TrialResourceBrapi.this.trialServiceBrapi.getStudies(filter, pageRequest);
-				}
-			});
-
-		final List<TrialSummary> trialSummaryList = this.translateResults(resultPage.getPageResults(), crop);
-		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaryList);
-		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
-
-		final Metadata metadata = new Metadata().withPagination(pagination);
-		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
+		return this.getSearchTrialResponseEntity(crop, trialSearchRequestDTO, finalPageNumber, finalPageSize, pageRequest);
 
 	}
 
@@ -167,8 +166,8 @@ public class TrialResourceBrapi {
 		BaseValidator.checkNotNull(trialImportRequestDTOs, "trial.import.request.null");
 
 		final TrialImportResponse trialImportResponse = this.trialServiceBrapi.createTrials(crop, trialImportRequestDTOs);
-		final List<TrialSummary> trialSummaries = this.translateResults(trialImportResponse.getEntityList(), crop);
-		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaries);
+		final Result<TrialSummary> results =
+			new Result<TrialSummary>().withData(trialImportResponse.getEntityList());
 
 		final Metadata metadata = new Metadata().withStatus(this.responseMessageGenerator.getMessagesList(trialImportResponse));
 		final EntityListResponse<TrialSummary> entityListResponse = new EntityListResponse<>(metadata, results);
@@ -176,17 +175,80 @@ public class TrialResourceBrapi {
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
 	}
 
-	private List<TrialSummary> translateResults(final List<StudySummary> studySummaries, final String crop) {
-		final ModelMapper modelMapper = TrialSummaryMapper.getInstance();
-		final List<TrialSummary> trialSummaryList = new ArrayList<>();
-		if (!CollectionUtils.isEmpty(studySummaries)) {
-			for (final StudySummary mwStudy : studySummaries) {
-				final TrialSummary trialSummaryDto = modelMapper.map(mwStudy, TrialSummary.class);
-				trialSummaryDto.setCommonCropName(crop);
-				trialSummaryList.add(trialSummaryDto);
-			}
+	@ApiOperation(value = "Search Trials", notes = "Submit a search request for Trials")
+	@RequestMapping(value = "/{crop}/brapi/v2/search/trials", method = RequestMethod.POST)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2_1.class)
+	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchTrials(
+		@PathVariable final String crop,
+		@RequestBody final TrialSearchRequestDTO trialSearchRequestDTO) {
+
+		final BrapiSearchDto searchDto =
+			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(trialSearchRequestDTO, TrialSearchRequestDTO.class)
+				.toString());
+		final SingleEntityResponse<BrapiSearchDto> singleGermplasmSearchResponse = new SingleEntityResponse<>(searchDto);
+
+		return new ResponseEntity<>(singleGermplasmSearchResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get search trials results", notes = "Get the results of a Trials search request")
+	@RequestMapping(value = "/{crop}/brapi/v2/search/trials/{searchResultsDbId}", method = RequestMethod.GET)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2_1.class)
+	public ResponseEntity<EntityListResponse<TrialSummary>> getSearchTrialsResults(
+		@PathVariable final String crop,
+		@PathVariable final String searchResultsDbId,
+		@RequestParam(value = "page",
+			required = false) final Integer page,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+		@RequestParam(value = "pageSize",
+			required = false) final Integer pageSize) {
+
+		final TrialSearchRequestDTO trialSearchRequestDTO;
+		try {
+			trialSearchRequestDTO =
+				(TrialSearchRequestDTO) this.searchRequestService
+					.getSearchRequest(Integer.valueOf(searchResultsDbId), TrialSearchRequestDTO.class);
+		} catch (final NumberFormatException | MiddlewareException e) {
+			return new ResponseEntity<>(
+				new EntityListResponse<TrialSummary>(new Result<>(new ArrayList<>())).withMessage(
+					"no search request found"),
+				HttpStatus.NOT_FOUND);
 		}
-		return trialSummaryList;
+
+		final int finalPageNumber = page == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : page;
+		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
+
+		final PageRequest pageRequest = new PageRequest(finalPageNumber, finalPageSize);
+
+		return this.getSearchTrialResponseEntity(crop, trialSearchRequestDTO, finalPageNumber, finalPageSize, pageRequest);
+
+	}
+
+	private ResponseEntity<EntityListResponse<TrialSummary>> getSearchTrialResponseEntity(
+		@PathVariable final String crop, final TrialSearchRequestDTO trialSearchRequestDTO,
+		final int finalPageNumber, final int finalPageSize, final PageRequest pageRequest) {
+		final PagedResult<TrialSummary> resultPage =
+			new PaginatedSearch().executeBrapiSearch(finalPageNumber, finalPageSize, new SearchSpec<TrialSummary>() {
+
+				@Override
+				public long getCount() {
+					return TrialResourceBrapi.this.trialServiceBrapi.countSearchTrialsResult(trialSearchRequestDTO);
+				}
+
+				@Override
+				public List<TrialSummary> getResults(final PagedResult<TrialSummary> pagedResult) {
+					return TrialResourceBrapi.this.trialServiceBrapi.searchTrials(crop, trialSearchRequestDTO, pageRequest);
+				}
+			});
+
+		final Result<TrialSummary> results =
+			new Result<TrialSummary>().withData(resultPage.getPageResults());
+		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
+			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+
+		final Metadata metadata = new Metadata().withPagination(pagination);
+		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 	}
 
 	private String parameterValidation(final String crop, final String commonCropName, final String sortBy,

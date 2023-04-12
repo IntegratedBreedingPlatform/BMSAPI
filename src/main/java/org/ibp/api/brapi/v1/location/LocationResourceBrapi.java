@@ -10,6 +10,7 @@ import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.service.api.BrapiView;
+import org.generationcp.middleware.util.StringUtil;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
 import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,6 @@ import java.util.Map;
  * BMS implementation of the <a href="http://docs.brapi.apiary.io/">BrAPI</a> Location services.
  *
  * @author Naymesh Mistry
- *
  */
 @Api(value = "BrAPI Location Services")
 @Controller
@@ -51,16 +52,19 @@ public class LocationResourceBrapi {
 	@JsonView(BrapiView.BrapiV1_3.class)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<Location>> listLocations(@PathVariable final String crop,
-			@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
-					required = false) final Integer currentPage,
-			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
-					required = false) final Integer pageSize,
-			@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
-					required = false) final String locationType) {
+		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION, required = false) @RequestParam(value = "page",
+			required = false) final Integer currentPage,
+		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
+			required = false) final Integer pageSize,
+		@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
+			required = false) final String locationType) {
 
 		PagedResult<Location> resultPage = null;
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationTypeName(locationType);
+
+		if (!StringUtil.isEmpty(locationType)) {
+			locationSearchRequest.setLocationTypes(Arrays.asList(locationType));
+		}
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
@@ -68,6 +72,7 @@ public class LocationResourceBrapi {
 		final PageRequest pageRequest = new PageRequest(finalPageNumber, finalPageSize);
 
 		resultPage = new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<Location>() {
+
 			@Override
 			public long getCount() {
 				return LocationResourceBrapi.this.locationService.countFilteredLocations(locationSearchRequest, null);
@@ -80,12 +85,11 @@ public class LocationResourceBrapi {
 			}
 		});
 
-
 		if (resultPage != null && resultPage.getTotalResults() > 0) {
 
 			final Result<Location> results = new Result<Location>().withData(resultPage.getPageResults());
 			final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
-					.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
+				.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 			final Metadata metadata = new Metadata().withPagination(pagination);
 			return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);

@@ -8,9 +8,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.ibp.api.brapi.TrialServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -36,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -81,10 +80,14 @@ public class TrialResourceBrapi {
 			return new ResponseEntity<>(new EntityListResponse<>(metadata, new Result<>()), HttpStatus.NOT_FOUND);
 		}
 
-		final StudySearchFilter filter = new StudySearchFilter();
-		filter.setProgramDbId(programDbId);
-		filter.setLocationDbId(locationDbId);
-		filter.setActive(active);
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		if (StringUtils.isNotEmpty(programDbId)) {
+			trialSearchRequestDTO.setProgramDbIds(Arrays.asList(programDbId));
+		}
+		if (StringUtils.isNotEmpty(locationDbId)) {
+			trialSearchRequestDTO.setLocationDbIds(Arrays.asList(locationDbId));
+		}
+		trialSearchRequestDTO.setActive(active);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
@@ -95,39 +98,28 @@ public class TrialResourceBrapi {
 		} else {
 			pageRequest = new PageRequest(finalPageNumber, finalPageSize);
 		}
-		final PagedResult<StudySummary> resultPage =
-			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<StudySummary>() {
+		final PagedResult<TrialSummary> resultPage =
+			new PaginatedSearch().executeBrapiSearch(currentPage, pageSize, new SearchSpec<TrialSummary>() {
 
 				@Override
 				public long getCount() {
-					return TrialResourceBrapi.this.trialServiceBrapi.countStudies(filter);
+					return TrialResourceBrapi.this.trialServiceBrapi.countSearchTrialsResult(trialSearchRequestDTO);
 				}
 
 				@Override
-				public List<StudySummary> getResults(final PagedResult<StudySummary> pagedResult) {
-					return TrialResourceBrapi.this.trialServiceBrapi.getStudies(filter, pageRequest);
+				public List<TrialSummary> getResults(final PagedResult<TrialSummary> pagedResult) {
+					return TrialResourceBrapi.this.trialServiceBrapi.searchTrials(crop, trialSearchRequestDTO, pageRequest);
 				}
 			});
 
-		final List<TrialSummary> trialSummaryList = this.translateResults(resultPage);
-		final Result<TrialSummary> results = new Result<TrialSummary>().withData(trialSummaryList);
+		final Result<TrialSummary> results =
+			new Result<TrialSummary>().withData(resultPage.getPageResults());
 		final Pagination pagination = new Pagination().withPageNumber(resultPage.getPageNumber()).withPageSize(resultPage.getPageSize())
 			.withTotalCount(resultPage.getTotalResults()).withTotalPages(resultPage.getTotalPages());
 
 		final Metadata metadata = new Metadata().withPagination(pagination);
 		return new ResponseEntity<>(new EntityListResponse<>(metadata, results), HttpStatus.OK);
 
-	}
-
-	private List<TrialSummary> translateResults(final PagedResult<StudySummary> resultPage) {
-		final ModelMapper modelMapper = TrialSummaryMapper.getInstance();
-		final List<TrialSummary> trialSummaryList = new ArrayList<>();
-
-		for (final StudySummary mwStudy : resultPage.getPageResults()) {
-			final TrialSummary trialSummaryDto = modelMapper.map(mwStudy, TrialSummary.class);
-			trialSummaryList.add(trialSummaryDto);
-		}
-		return trialSummaryList;
 	}
 
 	private String parameterValidation(final String sortBy, final String sortOrder) {

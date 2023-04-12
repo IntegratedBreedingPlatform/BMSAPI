@@ -5,8 +5,8 @@ import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
+import org.generationcp.middleware.domain.dms.TrialSummary;
+import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,9 +43,9 @@ public class StudyImportRequestValidator {
 
 		final List<String> trialDbIds = studyImportRequestDTOS.stream().filter(s -> StringUtils.isNotEmpty(s.getTrialDbId()))
 			.map(StudyImportRequestDTO::getTrialDbId).collect(Collectors.toList());
-		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setTrialDbIds(trialDbIds);
-		final Map<String, StudySummary> trialsMap = this.trialServiceBrapi.getStudies(studySearchFilter, null).stream()
+		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
+		trialSearchRequestDTO.setTrialDbIds(trialDbIds);
+		final Map<String, TrialSummary> trialsMap = this.trialServiceBrapi.searchTrials(trialSearchRequestDTO, null).stream()
 			.collect(Collectors.toMap(s -> String.valueOf(s.getTrialDbId()), Function.identity()));
 
 		Integer index = 1;
@@ -65,7 +65,7 @@ public class StudyImportRequestValidator {
 
 			if (StringUtils.isNotEmpty(s.getLocationDbId())) {
 				final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-				locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(s.getLocationDbId())));
+				locationSearchRequest.setLocationDbIds(Collections.singletonList(Integer.valueOf(s.getLocationDbId())));
 
 				if (CollectionUtils.isEmpty(this.locationService.searchLocations(locationSearchRequest, null, null))) {
 					this.errors.reject("study.import.locationDbId.invalid", new String[] {index.toString()}, "");
