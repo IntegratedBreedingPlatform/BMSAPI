@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.location;
 
+import org.generationcp.middleware.api.location.Location;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationRequestDto;
 import org.generationcp.middleware.api.location.LocationTypeDTO;
@@ -24,6 +25,7 @@ public class LocationServiceImpl implements LocationService {
 
 	public static final List<Integer> RESTRICTED_LOCATION_TYPES = Arrays.asList(401, 405, 406);
 
+
 	private enum DEFAULT_LOCATION_TYPE {
 		BREEDING_LOCATION("BREEDING_LOCATION"), STORAGE_LOCATION("STORAGE_LOCATION");
 		private final String name;
@@ -36,6 +38,7 @@ public class LocationServiceImpl implements LocationService {
 			return this.name;
 		}
 	}
+
 
 	@Autowired
 	private org.generationcp.middleware.api.location.LocationService locationMiddlewareService;
@@ -106,14 +109,24 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
+	public long countFilteredLocations(final LocationSearchRequest locationSearchRequest, final String programUUID) {
+		return this.locationMiddlewareService.countFilteredLocations(locationSearchRequest, programUUID);
+	}
+
+	@Override
+	public List<Location> getLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
+		return this.locationMiddlewareService.getLocations(locationSearchRequest, pageable);
+	}
+
+	@Override
 	public LocationDTO getDefaultLocation(final String programUUID, final String defaultLocationType) {
-		if(DEFAULT_LOCATION_TYPE.BREEDING_LOCATION.getName().equalsIgnoreCase(defaultLocationType)) {
+		if (DEFAULT_LOCATION_TYPE.BREEDING_LOCATION.getName().equalsIgnoreCase(defaultLocationType)) {
 			return this.locationMiddlewareService.getDefaultBreedingLocation(programUUID);
 		} else if (DEFAULT_LOCATION_TYPE.STORAGE_LOCATION.getName().equalsIgnoreCase(defaultLocationType)) {
 			return this.locationMiddlewareService.getDefaultStorageLocation(programUUID);
 		} else {
 			final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
-			final List<String > defaultLocationTypes =
+			final List<String> defaultLocationTypes =
 				Arrays.stream(DEFAULT_LOCATION_TYPE.values()).map(DEFAULT_LOCATION_TYPE::getName).collect(Collectors.toList());
 			errors.reject("location.invalid.default.location.type",
 				new String[] {String.join(", ", defaultLocationTypes)}, "");

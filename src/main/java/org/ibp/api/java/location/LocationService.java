@@ -29,4 +29,15 @@ public interface LocationService {
 	boolean updateLocation(Integer locationId, LocationRequestDto locationRequestDto);
 
 	List<LocationDTO> getCountries();
+
+	/**
+	 * Returns the count of Location records filtered by LocationSearchRequest parameter.
+	 *
+	 * @param locationSearchRequest - filter parameters
+	 * @param programUUID
+	 * @return
+	 */
+	long countFilteredLocations(LocationSearchRequest locationSearchRequest, String programUUID);
+
+	List<org.generationcp.middleware.api.location.Location> getLocations(LocationSearchRequest locationSearchRequest, Pageable pageable);
 }

@@ -67,7 +67,7 @@ public class StudyUpdateRequestValidator {
 
 		if (StringUtils.isNotEmpty(studyUpdateRequestDTO.getLocationDbId())) {
 			final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-			locationSearchRequest.setLocationIds(Collections.singletonList(Integer.valueOf(studyUpdateRequestDTO.getLocationDbId())));
+			locationSearchRequest.setLocationDbIds(Collections.singletonList(Integer.valueOf(studyUpdateRequestDTO.getLocationDbId())));
 			// Find out if the specified locationDbId is existing
 			if (CollectionUtils.isEmpty(this.locationService.searchLocations(locationSearchRequest, null, null))) {
 				this.errors.reject("study.update.locationDbId.invalid", "");

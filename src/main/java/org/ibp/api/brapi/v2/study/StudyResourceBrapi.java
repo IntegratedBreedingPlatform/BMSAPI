@@ -88,7 +88,7 @@ public class StudyResourceBrapi {
 		final StudyDetailsData result = studyMapper.map(mwStudyDetails, StudyDetailsData.class);
 		if (mwStudyDetails.getMetadata().getLocationId() != null) {
 			final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-			locationSearchRequest.setLocationIds(Collections.singletonList(mwStudyDetails.getMetadata().getLocationId()));
+			locationSearchRequest.setLocationDbIds(Collections.singletonList(mwStudyDetails.getMetadata().getLocationId()));
 			final List<Location> locations = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
 			if (!locations.isEmpty()) {
 				result.setLocationDbId(locations.get(0).getLocationDbId());
