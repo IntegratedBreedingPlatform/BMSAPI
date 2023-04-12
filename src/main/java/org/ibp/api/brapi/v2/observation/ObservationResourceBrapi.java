@@ -5,8 +5,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.ibp.api.brapi.ObservationServiceBrapi;
 import org.ibp.api.brapi.v1.common.BrapiPagedResult;
@@ -14,8 +18,10 @@ import org.ibp.api.brapi.v1.common.EntityListResponse;
 import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +46,9 @@ import java.util.Map;
 public class ObservationResourceBrapi {
 
 	@Autowired
+	private SearchRequestService searchRequestService;
+
+	@Autowired
 	private ObservationServiceBrapi observationServiceBrapi;
 
 	@Autowired
@@ -48,6 +57,7 @@ public class ObservationResourceBrapi {
 	@ApiOperation(value = "Retrieve observations", notes = "Retrieve all observations where there are measurements for the given observation variables.")
 	@RequestMapping(value = "/{crop}/brapi/v2/observations", method = RequestMethod.GET)
 	@ResponseBody
+	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<ObservationDto>> getObservations(
 		@PathVariable final String crop,
 		@ApiParam(value = "The unique ID of an Observation")
@@ -89,7 +99,7 @@ public class ObservationResourceBrapi {
 
 		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
 		observationSearchRequestDto.setObservationDbIds(
-			StringUtils.isNotEmpty(observationDbId) ? Arrays.asList(Integer.valueOf(observationDbId)) : new ArrayList<>());
+			StringUtils.isNotEmpty(observationDbId) ? Arrays.asList(observationDbId) : new ArrayList<>());
 		observationSearchRequestDto.setObservationUnitDbIds(
 			StringUtils.isNotEmpty(observationUnitDbId) ? Arrays.asList(observationUnitDbId) : new ArrayList<>());
 		observationSearchRequestDto.setGermplasmDbIds(
@@ -97,22 +107,32 @@ public class ObservationResourceBrapi {
 		observationSearchRequestDto.setObservationVariableDbIds(
 			StringUtils.isNotEmpty(observationVariableDbId) ? Arrays.asList(observationVariableDbId) : new ArrayList<>());
 		observationSearchRequestDto.setStudyDbIds(
-			StringUtils.isNotEmpty(studyDbId) ? Arrays.asList(Integer.valueOf(studyDbId)) : new ArrayList<>());
+			StringUtils.isNotEmpty(studyDbId) ? Arrays.asList(studyDbId) : new ArrayList<>());
 		observationSearchRequestDto.setLocationDbIds(
-			StringUtils.isNotEmpty(locationDbId) ? Arrays.asList(Integer.valueOf(locationDbId)) : new ArrayList<>());
+			StringUtils.isNotEmpty(locationDbId) ? Arrays.asList(locationDbId) : new ArrayList<>());
 		observationSearchRequestDto.setTrialDbIds(
-			StringUtils.isNotEmpty(trialDbId) ? Arrays.asList(Integer.valueOf(trialDbId)) : new ArrayList<>());
+			StringUtils.isNotEmpty(trialDbId) ? Arrays.asList(trialDbId) : new ArrayList<>());
 		observationSearchRequestDto.setProgramDbIds(
 			StringUtils.isNotEmpty(programDbId) ? Arrays.asList(programDbId) : new ArrayList<>());
-		observationSearchRequestDto.setSeasonDbId(seasonDbId);
-		observationSearchRequestDto.setObservationUnitLevelName(observationUnitLevelName);
-		observationSearchRequestDto.setObservationUnitLevelCode(observationUnitLevelCode);
-		observationSearchRequestDto.setObservationUnitLevelOrder(observationUnitLevelOrder);
+		observationSearchRequestDto.setSeasonDbIds(
+				StringUtils.isNotEmpty(seasonDbId) ? Arrays.asList(seasonDbId) : new ArrayList<>());
+		final ObservationLevelRelationship observationLevelRelationship =  new ObservationLevelRelationship();
+		observationLevelRelationship.setLevelName(observationUnitLevelName);
+		observationLevelRelationship.setLevelCode(observationUnitLevelCode);
+		final Integer order = NumberUtils.isNumber(observationUnitLevelOrder) ? NumberUtils.createInteger(observationUnitLevelOrder) : null;
+		observationLevelRelationship.setLevelOrder(order);
+		observationSearchRequestDto.setObservationLevelRelationships(Arrays.asList(observationLevelRelationship));
 		observationSearchRequestDto.setObservationTimeStampRangeStart(observationTimeStampRangeStart);
 		observationSearchRequestDto.setObservationTimeStampRangeEnd(observationTimeStampRangeEnd);
-		observationSearchRequestDto.setExternalReferenceID(externalReferenceID);
-		observationSearchRequestDto.setExternalReferenceSource(externalReferenceSource);
+		observationSearchRequestDto.setExternalReferenceIds(
+				StringUtils.isNotEmpty(externalReferenceID) ? Arrays.asList(externalReferenceID) : new ArrayList<>());
+		observationSearchRequestDto.setExternalReferenceSources(
+				StringUtils.isNotEmpty(externalReferenceSource) ? Arrays.asList(externalReferenceSource) : new ArrayList<>());
 
+		return this.getObservationResponseEntity(page, pageSize, observationSearchRequestDto);
+	}
+
+	private ResponseEntity<EntityListResponse<ObservationDto>> getObservationResponseEntity(final Integer page, final Integer pageSize, final ObservationSearchRequestDto observationSearchRequestDto) {
 		final PagedResult<ObservationDto> resultPage =
 			new PaginatedSearch().executeBrapiSearch(page, pageSize, new SearchSpec<ObservationDto>() {
 
@@ -177,5 +197,49 @@ public class ObservationResourceBrapi {
 		final EntityListResponse<ObservationDto> entityListResponse = new EntityListResponse<>(metadata, results);
 
 		return new ResponseEntity<>(entityListResponse, HttpStatus.OK);
+	}
+
+
+	@ApiOperation(value = "Submit a search request for Observations", notes = "Submit a search request for Observations")
+	@RequestMapping(value = "/{crop}/brapi/v2/search/observations", method = RequestMethod.POST)
+	@JsonView(BrapiView.BrapiV2_1.class)
+	@ResponseBody
+	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchObservations(@PathVariable final String crop,
+															@RequestBody final ObservationSearchRequestDto observationSearchRequestDto) {
+
+		final BrapiSearchDto searchDto =
+				new BrapiSearchDto(this.searchRequestService.saveSearchRequest(observationSearchRequestDto, ObservationSearchRequestDto.class)
+						.toString());
+		final SingleEntityResponse<BrapiSearchDto> observationSearchResponse = new SingleEntityResponse<>(searchDto);
+
+		return new ResponseEntity<>(observationSearchResponse, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Get search Observations results", notes = "Get the results of Observations search request")
+	@RequestMapping(value = "/{crop}/brapi/v2/search/observations/{searchResultsDbId}", method = RequestMethod.GET)
+	@ResponseBody
+	@JsonView(BrapiView.BrapiV2_1.class)
+	public ResponseEntity<EntityListResponse<ObservationDto>> getObservationsSearchResults(
+			@PathVariable final String crop,
+			@PathVariable final String searchResultsDbId,
+			@RequestParam(value = "page",
+					required = false) final Integer currentPage,
+			@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
+			@RequestParam(value = "pageSize",
+					required = false) final Integer pageSize) {
+
+		final ObservationSearchRequestDto searchRequestDto;
+		try {
+			searchRequestDto =
+					(ObservationSearchRequestDto) this.searchRequestService
+							.getSearchRequest(Integer.valueOf(searchResultsDbId), ObservationSearchRequestDto.class);
+		} catch (final NumberFormatException | MiddlewareException e) {
+			return new ResponseEntity<>(
+					new EntityListResponse<ObservationDto>(new Result<>(new ArrayList<>())).withMessage("no search request found"),
+					HttpStatus.NOT_FOUND);
+		}
+
+		return this.getObservationResponseEntity(currentPage, pageSize, searchRequestDto);
+
 	}
 }
