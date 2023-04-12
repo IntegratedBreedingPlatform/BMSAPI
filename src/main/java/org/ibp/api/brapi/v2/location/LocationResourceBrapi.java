@@ -23,6 +23,7 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.location.LocationService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -153,9 +154,12 @@ public class LocationResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchLocations(
 		@PathVariable final String crop,
-		@RequestBody final LocationSearchRequest locationSearchRequest) {
+		@RequestBody final LocationSearchRequestDto locationSearchRequest) {
+		final ModelMapper modelMapper = LocationMapper.getInstance();
+		final LocationSearchRequest mappedLocation = modelMapper.map(locationSearchRequest, LocationSearchRequest.class);
+
 		final BrapiSearchDto searchDto =
-			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(locationSearchRequest, LocationSearchRequest.class)
+			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(mappedLocation, LocationSearchRequest.class)
 				.toString());
 		final SingleEntityResponse<BrapiSearchDto> locationSearchResponse = new SingleEntityResponse<>(searchDto);
 
