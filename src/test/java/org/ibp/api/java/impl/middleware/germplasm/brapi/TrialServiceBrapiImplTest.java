@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.TrialSummary;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.ibp.api.brapi.v2.trial.TrialImportResponse;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -72,14 +72,14 @@ public class TrialServiceBrapiImplTest {
 		request2.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		importList.add(request1);
 		importList.add(request2);
-		final StudySummary trial1 = new StudySummary();
+		final TrialSummary trial1 = new TrialSummary();
 		trial1.setName(request1.getTrialName());
 		trial1.setTrialDbId(new Random().nextInt());
-		final StudySummary trial2 = new StudySummary();
+		final TrialSummary trial2 = new TrialSummary();
 		trial2.setName(request2.getTrialName());
 		trial2.setTrialDbId(new Random().nextInt());
-		final List<StudySummary> trialList = Arrays.asList(trial1, trial2);
-		Mockito.doReturn(trialList).when(this.middlewareTrialServiceBrapi).saveStudies(crop, importList, this.testUser.getUserid());
+		final List<TrialSummary> trialList = Arrays.asList(trial1, trial2);
+		Mockito.doReturn(trialList).when(this.middlewareTrialServiceBrapi).saveTrials(crop, importList, this.testUser.getUserid());
 
 		final TrialImportResponse importResponse = this.trialServiceBrapi.createTrials(crop, importList);
 		final int size = trialList.size();
@@ -105,11 +105,11 @@ public class TrialServiceBrapiImplTest {
 		request2.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		importList.add(request1);
 		importList.add(request2);
-		final StudySummary trial1 = new StudySummary();
+		final TrialSummary trial1 = new TrialSummary();
 		trial1.setName(request1.getTrialName());
 		trial1.setTrialDbId(new Random().nextInt());
-		final List<StudySummary> trialList = Collections.singletonList(trial1);
-		Mockito.doReturn(trialList).when(this.middlewareTrialServiceBrapi).saveStudies(crop, importList, this.testUser.getUserid());
+		final List<TrialSummary> trialList = Collections.singletonList(trial1);
+		Mockito.doReturn(trialList).when(this.middlewareTrialServiceBrapi).saveTrials(crop, importList, this.testUser.getUserid());
 
 		final TrialImportResponse importResponse = this.trialServiceBrapi.createTrials(crop, importList);
 		final int size = trialList.size();

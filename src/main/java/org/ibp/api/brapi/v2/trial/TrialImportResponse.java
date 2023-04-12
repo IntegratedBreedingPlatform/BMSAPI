@@ -1,9 +1,9 @@
 package org.ibp.api.brapi.v2.trial;
 
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.ibp.api.brapi.v1.trial.TrialSummary;
 import org.ibp.api.brapi.v2.BrapiImportResponse;
 
-public class TrialImportResponse extends BrapiImportResponse<StudySummary> {
+public class TrialImportResponse extends BrapiImportResponse<TrialSummary> {
 
 	@Override
 	public String getEntity() {

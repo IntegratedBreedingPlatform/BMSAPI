@@ -24,13 +24,13 @@ public class TrialSummary {
 
 	private String trialName;
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private String trialDescription;
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private String trialPUI;
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private String commonCropName;
 
 	private String programDbId;
@@ -52,19 +52,19 @@ public class TrialSummary {
 
 	private Map<String, String> additionalInfo = new HashMap<String, String>();
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private List<Contact> contacts = new ArrayList<>();
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private String documentationURL = StringUtils.EMPTY;
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private List<ExternalReferenceDTO> externalReferences = new ArrayList<>();
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private List<String> publications = new ArrayList<>();
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private List<String> datasetAuthorships = new ArrayList<>();
 
 	public TrialSummary() {
