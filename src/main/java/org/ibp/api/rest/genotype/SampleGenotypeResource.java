@@ -37,7 +37,7 @@ public class SampleGenotypeResource {
 	private SampleGenotypeService sampleGenotypeService;
 
 	@ApiOperation(value = "Import sample genotypes into study", notes = "Import sample genotypes into study")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_SAMPLE_LISTS', 'MS_IMPORT_GENOTYPES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_SAMPLE_LISTS', 'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/samples/genotypes", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<Integer>> importSampleGenotypes(final @PathVariable String crop,
