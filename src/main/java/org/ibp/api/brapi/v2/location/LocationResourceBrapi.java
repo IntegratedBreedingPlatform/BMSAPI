@@ -156,10 +156,10 @@ public class LocationResourceBrapi {
 		@PathVariable final String crop,
 		@RequestBody final LocationSearchRequestDto locationSearchRequest) {
 		final ModelMapper modelMapper = LocationMapper.getInstance();
-		final LocationSearchRequest mappedLocation = modelMapper.map(locationSearchRequest, LocationSearchRequest.class);
+		final LocationSearchRequest mappedLocationRequest = modelMapper.map(locationSearchRequest, LocationSearchRequest.class);
 
 		final BrapiSearchDto searchDto =
-			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(mappedLocation, LocationSearchRequest.class)
+			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(mappedLocationRequest, LocationSearchRequest.class)
 				.toString());
 		final SingleEntityResponse<BrapiSearchDto> locationSearchResponse = new SingleEntityResponse<>(searchDto);
 
