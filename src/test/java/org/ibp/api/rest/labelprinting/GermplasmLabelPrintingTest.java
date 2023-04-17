@@ -8,7 +8,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
@@ -87,9 +86,6 @@ public class GermplasmLabelPrintingTest {
 	private SearchRequestService searchRequestService;
 
 	@Mock
-	private GermplasmSearchService germplasmSearchService;
-
-	@Mock
 	private ResourceBundleMessageSource messageSource;
 
 	@Mock
@@ -144,9 +140,6 @@ public class GermplasmLabelPrintingTest {
 	@Test
 	public void testGetAvailableLabelTypes() {
 		this.germplasmLabelPrinting.initStaticFields();
-		Mockito.when(this.germplasmSearchService.searchGermplasm(this.germplasmSearchRequest, null, PROGRAM_UUID))
-			.thenReturn(new ArrayList<>());
-
 		final List<LabelType> labelTypes = this.germplasmLabelPrinting.getAvailableLabelTypes(this.labelsInfoInput, PROGRAM_UUID);
 
 		final Map<String, LabelType> labelTypeMap = labelTypes.stream().collect(Collectors.toMap(LabelType::getKey, Function.identity()));
