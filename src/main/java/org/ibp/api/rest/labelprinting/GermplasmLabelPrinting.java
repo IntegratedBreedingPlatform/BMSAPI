@@ -9,7 +9,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
@@ -101,9 +100,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	private SearchRequestService searchRequestService;
 
 	@Autowired
-	GermplasmSearchService germplasmSearchService;
-
-	@Autowired
 	GermplasmNameTypeService germplasmNameTypeService;
 
 	@Autowired
@@ -176,7 +172,7 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final GermplasmSearchRequest germplasmSearchRequest = (GermplasmSearchRequest) this.searchRequestService
 			.getSearchRequest(labelsInfoInput.getSearchRequestId(), GermplasmSearchRequest.class);
 		final List<GermplasmSearchResponse> germplasmSearchResponses =
-			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, null, programUUID);
+			this.germplasmService.searchGermplasm(germplasmSearchRequest, null, programUUID);
 
 		// Germplasm Details labels
 		final String germplasmPropValue = this.getMessage("label.printing.germplasm.details");

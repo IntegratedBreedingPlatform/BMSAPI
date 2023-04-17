@@ -123,7 +123,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		germplasmSearchRequest.setGermplasmListIds(Collections.singletonList(labelsInfoInput.getListId()));
 		final PageRequest pageRequest = new PageRequest(0, this.maxTotalResults, null);
 		final List<GermplasmSearchResponse> germplasmSearchResponseList =
-			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageRequest, programUUID);
+			this.germplasmService.searchGermplasm(germplasmSearchRequest, pageRequest, programUUID);
 
 		// Germplasm Details labels
 		final String germplasmPropValue = this.getMessage("label.printing.germplasm.details");
@@ -152,7 +152,7 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		this.setAddedColumnsToSearchRequest(labelsGeneratorInput, germplasmSearchRequest);
 		final PageRequest pageRequest = new PageRequest(0, this.maxTotalResults, null);
 		final List<GermplasmSearchResponse> germplasmSearchResponseList =
-			this.germplasmSearchService.searchGermplasm(germplasmSearchRequest, pageRequest, programUUID);
+			this.germplasmService.searchGermplasm(germplasmSearchRequest, pageRequest, programUUID);
 
 		//Get Germplasm names, attributes, entry details data
 		final List<Integer> germplasmFieldIds = new ArrayList<>();
