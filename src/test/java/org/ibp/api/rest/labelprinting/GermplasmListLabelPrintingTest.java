@@ -6,7 +6,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmNameService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
@@ -100,9 +99,6 @@ public class GermplasmListLabelPrintingTest {
 
 	@Mock
 	private ResourceBundleMessageSource messageSource;
-
-	@Mock
-	private GermplasmSearchService germplasmSearchService;
 
 	@Mock
 	private GermplasmService germplasmService;
@@ -199,7 +195,7 @@ public class GermplasmListLabelPrintingTest {
 		germplasmFields.addAll(this.labelPrinting.defaultPedigreeDetailsFields);
 
 		final List<LabelType> labelTypes = this.labelPrinting.getAvailableLabelTypes(this.labelsInfoInput, PROGRAM_UUID);
-		Mockito.verify(this.germplasmSearchService).searchGermplasm(ArgumentMatchers.any(GermplasmSearchRequest.class),
+		Mockito.verify(this.germplasmService).searchGermplasm(ArgumentMatchers.any(GermplasmSearchRequest.class),
 			ArgumentMatchers.notNull(null), ArgumentMatchers.eq(PROGRAM_UUID));
 		Mockito.verify(this.germplasmAttributeService, Mockito.never())
 			.getGermplasmAttributeVariables(Collections.singletonList(GID), PROGRAM_UUID);
@@ -219,7 +215,7 @@ public class GermplasmListLabelPrintingTest {
 		labelsGeneratorInput.setFields(new ArrayList<>());
 		final PageRequest pageRequest = new PageRequest(0, 3000, null);
 		final LabelsData labelsData = this.labelPrinting.getLabelsData(labelsGeneratorInput, PROGRAM_UUID);
-		Mockito.verify(this.germplasmSearchService).searchGermplasm(this.germplasmSearchRequest, pageRequest, PROGRAM_UUID);
+		Mockito.verify(this.germplasmService).searchGermplasm(this.germplasmSearchRequest, pageRequest, PROGRAM_UUID);
 		Mockito.verify(this.germplasmAttributeService, Mockito.never())
 			.getGermplasmAttributeVariables(ArgumentMatchers.anyList(), ArgumentMatchers.anyString());
 		Mockito.verify(this.germplasmNameService, Mockito.never()).getGermplasmNamesByGids(ArgumentMatchers.anyList());
