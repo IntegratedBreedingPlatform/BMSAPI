@@ -87,8 +87,7 @@ public class DatasetValidator {
 		}
 	}
 
-	public StandardVariable validateDatasetVariable(
-		final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable, final Boolean shouldBeDatasetVariable) {
+	public StandardVariable validateDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable, final Boolean shouldBeDatasetVariable, final VariableType variableType) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		this.validateDataset(studyId, datasetId);
@@ -98,8 +97,12 @@ public class DatasetValidator {
 		// Validate if variable exists and of supported variable type for given dataset type
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
 		final boolean studyHasExperimentDesign = dataSet.getInstances().stream().anyMatch(i -> i.isHasExperimentalDesign() == Boolean.TRUE);
-		final VariableType variableType =
-			this.validateDatasetVariableType(datasetType, datasetVariable.getVariableTypeId(), studyHasExperimentDesign);
+
+		if (datasetVariable.getVariableTypeId() != variableType.getId()) {
+			this.errors.reject("variable.not.of.given.variable.type", "");
+		}
+		
+		this.validateDatasetVariableType(datasetType, datasetVariable.getVariableTypeId(), studyHasExperimentDesign);
 		final Integer variableId = datasetVariable.getVariableId();
 		final StandardVariable standardVariable =
 			this.ontologyDataManager.getStandardVariable(variableId, ContextHolder.getCurrentProgram());

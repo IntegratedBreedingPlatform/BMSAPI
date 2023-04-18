@@ -78,7 +78,7 @@ public class CropParameterResource {
 
 	@ApiOperation(value = "Get crop parameter by group", notes = "")
 	@RequestMapping(value = "/crop-parameters/{groupName}/group", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS', 'STUDIES', 'MANAGE_STUDIES', 'MS_SAMPLE_LISTS', 'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE')") // TODO: FIXME IBP-5924 Implement Import Sample Genotypes permission to get the parameteres
 	public ResponseEntity<List<CropParameterDTO>> getCropParametersByGroup(@PathVariable final String cropName,
 		@PathVariable final String groupName) {
 		final List<CropParameterDTO> parameter = this.cropParameterService.getCropParametersByGroupName(groupName);
@@ -87,7 +87,7 @@ public class CropParameterResource {
 
 	@ApiOperation(value = "Generate token", notes = "Get the token using the credentials in Crop Genotype Parameter configuration")
 	@RequestMapping(value = "/crop-parameters/genotyping/{groupName}/token", method = RequestMethod.GET)
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS', 'STUDIES', 'MANAGE_STUDIES', 'MS_SAMPLE_LISTS', 'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE')") // TODO: FIXME IBP-5924 Implement Import Sample Genotypes permission to get the token
 	public ResponseEntity<String> getToken(@PathVariable final String cropName,
 		@PathVariable final String groupName) {
 		return new ResponseEntity<>(this.cropParameterService.getGenotypingToken(groupName), HttpStatus.OK);

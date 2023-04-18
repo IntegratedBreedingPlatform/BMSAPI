@@ -139,7 +139,7 @@ public class DatasetValidatorTest {
 		this.createDataset(studyId, datasetId, Optional.absent(), Optional.absent());
 
 		final DatasetVariable datasetVariable = new DatasetVariable(ran.nextInt(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, ran.nextBoolean());
+		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, ran.nextBoolean(), VariableType.TRAIT);
 	}
 
 	@Test(expected = NotSupportedException.class)
@@ -154,7 +154,7 @@ public class DatasetValidatorTest {
 		this.createDataset(studyId, datasetId, Optional.absent(), Optional.absent());
 
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.ANALYSIS.getId(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, ran.nextBoolean());
+		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, ran.nextBoolean(), VariableType.ANALYSIS);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -176,7 +176,7 @@ public class DatasetValidatorTest {
 		when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
 
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
+		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false, VariableType.SELECTION_METHOD);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -196,7 +196,7 @@ public class DatasetValidatorTest {
 		this.createDataset(studyId, datasetId, Optional.of(variableId), Optional.of(VariableType.GERMPLASM_DESCRIPTOR));
 		when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.GERMPLASM_DESCRIPTOR.getId(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
+		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false, VariableType.GERMPLASM_DESCRIPTOR);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -266,7 +266,7 @@ public class DatasetValidatorTest {
 		when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
 
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
+		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, false, VariableType.SELECTION_METHOD);
 	}
 
 	@Test
@@ -283,7 +283,7 @@ public class DatasetValidatorTest {
 		when(this.ontologyDataManager.getStandardVariable(variableId, this.PROGRAM_UUID)).thenReturn(standardVariable);
 
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), variableId, "");
-		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, true);
+		this.datasetValidator.validateDatasetVariable(studyId, datasetId, datasetVariable, true, VariableType.SELECTION_METHOD);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)

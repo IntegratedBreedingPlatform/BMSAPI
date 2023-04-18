@@ -23,7 +23,7 @@ public class ExperimentalDesignResource {
 	private ExperimentalDesignService experimentalDesignService;
 
 	@ApiOperation(value = "Generate experimental design for study", notes = "Generate experimental design for study")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_EXPERIMENTAL_DESIGN', 'MS_GENERATE_EXPERIMENTAL_DESIGN')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/experimental-designs/generation", method = RequestMethod.POST)
 	public ResponseEntity generateStudyExperimentDesign(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
@@ -36,7 +36,7 @@ public class ExperimentalDesignResource {
 
 
 	@ApiOperation(value = "Delete experimental design of study", notes = "Delete experimental design of study")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'MS_EXPERIMENTAL_DESIGN', 'MS_DELETE_EXPERIMENTAL_DESIGN')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/experimental-designs", method = RequestMethod.DELETE)
 	public ResponseEntity deleteStudyExperimentDesign(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {

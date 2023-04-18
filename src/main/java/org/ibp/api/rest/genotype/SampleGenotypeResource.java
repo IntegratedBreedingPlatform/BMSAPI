@@ -37,7 +37,7 @@ public class SampleGenotypeResource {
 	private SampleGenotypeService sampleGenotypeService;
 
 	@ApiOperation(value = "Import sample genotypes into study", notes = "Import sample genotypes into study")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_SAMPLE_LISTS', 'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/samples/genotypes", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<Integer>> importSampleGenotypes(final @PathVariable String crop,
@@ -49,7 +49,7 @@ public class SampleGenotypeResource {
 
 	@ApiOperation(value = "It will retrieve all genotypes of the study",
 		notes = "It will retrieve all genotypes of the study")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES', 'MS_SAMPLE_GENOTYPES', 'MS_VIEW_SAMPLE_GENOTYPES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/samples/genotypes/table", method = RequestMethod.POST)
 	@ResponseBody
 	@ApiImplicitParams({
@@ -73,7 +73,7 @@ public class SampleGenotypeResource {
 	@ApiOperation(value = "Get Sample Genotype Columns", notes =
 		"Retrieves ALL MeasurementVariables (columns) associated to the Sample Genotypes, "
 			+ "that will be shown in the Sample Genotypes Table")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES' , 'MS_SAMPLE_GENOTYPES', 'MS_VIEW_SAMPLE_GENOTYPES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/samples/genotypes/table/columns", method = RequestMethod.GET)
 	public ResponseEntity<List<MeasurementVariable>> getSampleGenotypeColumns(@PathVariable final String crop,
 		@PathVariable final String programUUID,

@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
@@ -19,6 +20,7 @@ import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.PreconditionFailedException;
 import org.ibp.api.exception.ResourceNotFoundException;
+import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.DatasetCollectionOrderServiceImpl;
@@ -39,6 +41,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -72,6 +75,9 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 
 	@Autowired
 	private DatasetExportService datasetCSVExportService;
+
+	@Autowired
+	private HttpServletRequest httpServletRequest;
 
 
 	@Configuration
@@ -126,7 +132,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testAddDatasetVariable() throws Exception {
+	public void testAddDatasetSelectionVariable() throws Exception {
 		final Random random = new Random();
 		final int studyId = random.nextInt(10000);
 		final int datasetId = random.nextInt(10000);
@@ -134,11 +140,12 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final String alias = RandomStringUtils.randomAlphabetic(20);
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		final DatasetVariable datasetVariable = new DatasetVariable(VariableType.SELECTION_METHOD.getId(), traitId, alias);
-		doReturn(measurementVariable).when(this.studyDatasetService).addDatasetVariable(studyId, datasetId, datasetVariable);
+		doReturn(measurementVariable).when(this.studyDatasetService)
+			.addDatasetVariable(studyId, datasetId, datasetVariable, VariableType.SELECTION_METHOD);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.put("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", this.cropName,
+				.put("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/selections", this.cropName,
 					this.programUuid, studyId, datasetId)
 				.contentType(this.contentType).content(this.convertObjectToByte(datasetVariable)))
 			.andDo(MockMvcResultHandlers.print())
@@ -146,17 +153,17 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testRemoveVariables() throws Exception {
+	public void testRemoveTraitVariables() throws Exception {
 		final int studyId = 100;
 		final int datasetId = 102;
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.delete("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/variables", this.cropName,
+				.delete("/crops/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/traits", this.cropName,
 					this.programUuid, studyId, datasetId)
 				.param("variableIds", "1,2,3").contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());
-		Mockito.verify(this.studyDatasetService).removeDatasetVariables(studyId, datasetId, Arrays.asList(1, 2, 3));
+		Mockito.verify(this.studyDatasetService).removeDatasetVariables(studyId, datasetId, Arrays.asList(1, 2, 3), VariableType.TRAIT);
 	}
 
 	@Test
@@ -881,6 +888,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		paramDTO.setNewCategoricalValueId(12345);
 		searchDTO.setDatasetId(datasetId);
 		paramDTO.getObservationUnitsSearchDTO().getFilter().setVariableId(555);
+		Mockito.when(this.httpServletRequest.isUserInRole(PermissionsEnum.ADMIN.name())).thenReturn(true);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
@@ -902,6 +910,7 @@ public class DatasetResourceTest extends ApiUnitTestBase {
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
 		searchDTO.setInstanceIds(Arrays.asList(instanceId));
 		searchDTO.setDatasetId(datasetId);
+		Mockito.when(this.httpServletRequest.isUserInRole(PermissionsEnum.ADMIN.name())).thenReturn(true);
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders

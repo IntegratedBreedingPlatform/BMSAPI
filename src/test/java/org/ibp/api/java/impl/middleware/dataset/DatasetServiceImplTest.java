@@ -183,12 +183,12 @@ public class DatasetServiceImplTest {
 		final String alias = RandomStringUtils.randomAlphabetic(20);
 		final DatasetVariable datasetVariable = new DatasetVariable(variableTypeId, variableId, alias);
 		Mockito.doReturn(this.standardVariable).when(this.datasetValidator)
-			.validateDatasetVariable(studyId, datasetId, datasetVariable, false);
+			.validateDatasetVariable(studyId, datasetId, datasetVariable, false, VariableType.SELECTION_METHOD);
 		Mockito.doReturn(this.variable).when(this.measurementVariableTransformer).transform(this.standardVariable, false);
 
-		this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable);
+		this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable, VariableType.SELECTION_METHOD);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDatasetVariable(studyId, datasetId, datasetVariable, false);
+		Mockito.verify(this.datasetValidator).validateDatasetVariable(studyId, datasetId, datasetVariable, false, VariableType.SELECTION_METHOD);
 		Mockito.verify(this.middlewareDatasetService).addDatasetVariable(datasetId, variableId, variableType, alias);
 		Mockito.verify(this.measurementVariableTransformer).transform(this.standardVariable, false);
 		Mockito.verify(this.variable).setName(alias);
@@ -202,7 +202,7 @@ public class DatasetServiceImplTest {
 		final int studyId = random.nextInt();
 		final int datasetId = random.nextInt();
 		final List<Integer> variableIds = Arrays.asList(random.nextInt(), random.nextInt(), random.nextInt());
-		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, variableIds);
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, variableIds, VariableType.TRAIT);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateExistingDatasetVariables(studyId, datasetId, variableIds);
 		Mockito.verify(this.middlewareDatasetService).removeDatasetVariables(studyId, datasetId, variableIds);

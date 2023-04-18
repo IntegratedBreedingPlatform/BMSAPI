@@ -98,9 +98,11 @@ public class FileMetadataResource {
 		//Check if only one of the parameters has value
 		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1) + ((lotId == null)? 0 : 1)) == 1;
 		BaseValidator.checkArgument(valid, "file.upload.detach.parameters.invalid");
-		if (datasetId != null || instanceId != null) {
-			FileResource.verifyHasAuthorityStudy(this.request);
-		}  else if(lotId != null) {
+		if (instanceId != null) {
+			FileResource.verifyHasAuthorityStudyEnvironment(this.request);
+		} else if (datasetId != null) {
+			FileResource.verifyHasAuthorityStudyObservation(this.request);
+		} else if (lotId != null) {
 			FileResource.verifyHasAuthorityLots(this.request);
 		} else {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
@@ -124,11 +126,13 @@ public class FileMetadataResource {
 		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1) + ((lotId == null)? 0 : 1)) == 1;
 		BaseValidator.checkArgument(valid, "file.upload.detach.parameters.invalid");
 		this.validateFileStorage();
-		if (datasetId != null || instanceId != null) {
-			FileResource.verifyHasAuthorityStudy(this.request);
+		if (instanceId != null) {
+			FileResource.verifyHasAuthorityStudyEnvironment(this.request);
+		} else if (datasetId != null) {
+			FileResource.verifyHasAuthorityStudyObservation(this.request);
 		} else if (lotId != null) {
 			FileResource.verifyHasAuthorityLots(this.request);
-		}  else {
+		} else {
 			FileResource.verifyHasAuthorityGermplasm(this.request);
 		}
 

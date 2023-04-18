@@ -63,7 +63,7 @@ public class StudyResource {
 	@ApiOperation(value = "Partially modifies a study",
 		notes = "As of now, it only allows to update the status")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}", method = RequestMethod.PATCH)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES','LOCK_STUDY')")
 	@ResponseBody
 	public ResponseEntity<Void> patchStudy(final @PathVariable String cropName, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId, @RequestBody final Study study) {
@@ -113,7 +113,7 @@ public class StudyResource {
 
 	@ApiOperation(value = "Delete a study", notes = "Delete a study")
 	@RequestMapping(value = "/{cropName}/programs/{programUUID}/studies/{studyId}", method = RequestMethod.DELETE)
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES','DELETE_STUDY')")
 	@ResponseBody
 	public ResponseEntity<Void> deleteStudy(final @PathVariable String cropName, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId) {

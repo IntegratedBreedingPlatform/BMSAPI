@@ -33,7 +33,7 @@ public class DerivedVariableResource {
 	private DerivedVariableService derivedVariableService;
 
 	@ApiOperation(value = "Execute Derived Variable", notes = "Execute the formula of a derived variable for each observation of specified instances.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_EXECUTE_CALCULATED_VARIABLES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/derived-variables/calculation", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> calculate(
 		@PathVariable final String crop,

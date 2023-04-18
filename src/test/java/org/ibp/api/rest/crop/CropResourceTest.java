@@ -1,8 +1,10 @@
 package org.ibp.api.rest.crop;
 
 import com.jayway.jsonassert.impl.matcher.IsCollectionWithSize;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.hamcrest.Matchers;
+import org.hibernate.mapping.Any;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.java.crop.CropService;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
@@ -16,6 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +30,8 @@ public class CropResourceTest extends ApiUnitTestBase {
 	@Autowired
 	private SecurityService securityService;
 
+	@Autowired
+	private HttpServletRequest request;
 
 	@Configuration
 	public static class TestConfiguration {
@@ -41,6 +46,10 @@ public class CropResourceTest extends ApiUnitTestBase {
 
 	@Test
 	public void listAvailableCrops() throws Exception {
+
+		Mockito.when(this.request.isUserInRole(PermissionsEnum.ADMIN.name())).thenReturn(false);
+		Mockito.when(this.request.isUserInRole(PermissionsEnum.ADMINISTRATION.name())).thenReturn(false);
+		Mockito.when(this.request.isUserInRole(PermissionsEnum.SITE_ADMIN.name())).thenReturn(false);
 
 		final List<String> crops = Arrays.asList("wheat", "maize");
 		final WorkbenchUser workbenchUser = new WorkbenchUser();

@@ -15,15 +15,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Api(value = "Variable Cache Controller")
 @RestController
-@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES','MANAGE_STUDIES', 'CROP_MANAGEMENT', 'MANAGE_ONTOLOGIES')")
 public class VariableCacheController {
 
 	@Autowired
 	private VariableService variableService;
 
+	@ApiIgnore
 	@ResponseBody
 	@ApiOperation(value = "Delete Variables from VariableCache", notes = "Remove Variables from VariableCache by Ids")
 	@RequestMapping(value = "crops/{cropName}/variable-cache/{variablesIds}", method = RequestMethod.DELETE)

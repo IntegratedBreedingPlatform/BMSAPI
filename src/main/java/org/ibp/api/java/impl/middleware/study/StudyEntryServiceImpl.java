@@ -357,7 +357,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		if (!org.fest.util.Collections.isEmpty(studyEntryDetailsImportRequest.getNewVariables())) {
 			final Integer datasetId = this.datasetService.getDatasets(
 				studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())).get(0).getDatasetId();
-			this.datasetService.addDatasetVariables(studyId, datasetId, studyEntryDetailsImportRequest.getNewVariables());
+			this.datasetService.addDatasetVariables(studyId, datasetId, studyEntryDetailsImportRequest.getNewVariables(), VariableType.ENTRY_DETAIL);
 		}
 
 		this.studyValidator.validate(studyId, true);
