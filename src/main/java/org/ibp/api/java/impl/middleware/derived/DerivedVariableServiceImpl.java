@@ -42,6 +42,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.ibp.api.java.impl.middleware.dataset.DatasetServiceImpl.MISSING_VALUE;
+
 @Service
 @Transactional
 public class DerivedVariableServiceImpl implements DerivedVariableService {
@@ -49,9 +51,11 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 	private static final Logger LOG = LoggerFactory.getLogger(DerivedVariableServiceImpl.class);
 	public static final String HAS_DATA_OVERWRITE_RESULT_KEY = "hasDataOverwrite";
 	static final String INPUT_MISSING_DATA_RESULT_KEY = "inputMissingData";
+	static final String INPUT_DATA_ARITHMETIC_WARNING_KEY = "inputDataArithmeticWarning";
 	public static final String STUDY_EXECUTE_CALCULATION_PARSING_EXCEPTION = "study.execute.calculation.parsing.exception";
 	static final String STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION = "study.execute.calculation.engine.exception";
 	static final String STUDY_EXECUTE_CALCULATION_MISSING_DATA = "study.execute.calculation.missing.data";
+	static final String STUDY_EXECUTE_CALCULATION_ARITHMETIC_EXCEPTION = "study.execute.calculation.arithmetic.exception";
 	private static final String STUDY_EXECUTE_CALCULATION_HAS_EXISTING_DATA = "study.execute.calculation.has.existing.data";
 
 	@Resource
@@ -171,9 +175,21 @@ public class DerivedVariableServiceImpl implements DerivedVariableService {
 					final String executableFormula = DerivedVariableUtils.replaceDelimiters(formula.getDefinition());
 					value = this.processor.evaluateFormula(executableFormula, rowParameters);
 				} catch (final Exception e) {
-					LOG.error("Error evaluating formula " + formula + " with inputs " + rowParameters, e);
-					errors.reject(STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION);
-					throw new ApiRequestValidationException(errors.getAllErrors());
+					if (e.getCause() instanceof ArithmeticException) {
+						// If formula cannot be evaluated due to arithmetic error (e.g. dividing number by zero), ignore the error and set the value as missing.
+						LOG.error("Error evaluating formula due to arithmetic error " + formula + " with inputs " + rowParameters, e);
+						value = MISSING_VALUE;
+						// Just warn the user that there are some input data that cannot be evaluated due to arithmetic error.
+						results.put(
+							INPUT_DATA_ARITHMETIC_WARNING_KEY, this.resourceBundleMessageSource
+								.getMessage(STUDY_EXECUTE_CALCULATION_ARITHMETIC_EXCEPTION,
+									new String[] {},
+									Locale.getDefault()));
+					} else {
+						LOG.error("Error evaluating formula " + formula + " with inputs " + rowParameters, e);
+						errors.reject(STUDY_EXECUTE_CALCULATION_ENGINE_EXCEPTION);
+						throw new ApiRequestValidationException(errors.getAllErrors());
+					}
 				}
 
 				if (StringUtils.isBlank(value)) {
