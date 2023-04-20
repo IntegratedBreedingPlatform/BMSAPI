@@ -7,9 +7,14 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
@@ -28,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -45,6 +51,12 @@ public class DatasetValidator {
 
 	@Autowired
 	private DatasetService middlewareDatasetService;
+
+	@Autowired
+	protected OntologyVariableDataManager ontologyVariableDataManager;
+
+	@Autowired
+	protected TermDataManager termDataManager;
 
 	@Resource
 	private DatasetTypeService datasetTypeService;
@@ -87,7 +99,8 @@ public class DatasetValidator {
 		}
 	}
 
-	public StandardVariable validateDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable, final Boolean shouldBeDatasetVariable, final VariableType variableType) {
+	public StandardVariable validateDatasetVariable(final Integer studyId, final Integer datasetId, final DatasetVariable datasetVariable,
+		final Boolean shouldBeDatasetVariable, final VariableType variableType) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		this.validateDataset(studyId, datasetId);
@@ -101,11 +114,12 @@ public class DatasetValidator {
 		if (datasetVariable.getVariableTypeId() != variableType.getId()) {
 			this.errors.reject("variable.not.of.given.variable.type", "");
 		}
-		
+
 		this.validateDatasetVariableType(datasetType, datasetVariable.getVariableTypeId(), studyHasExperimentDesign);
 		final Integer variableId = datasetVariable.getVariableId();
+		final String programUuid = ContextHolder.getCurrentProgram();
 		final StandardVariable standardVariable =
-			this.ontologyDataManager.getStandardVariable(variableId, ContextHolder.getCurrentProgram());
+			this.ontologyDataManager.getStandardVariable(variableId, programUuid);
 
 		final Map<Integer, MeasurementVariable> measurementVariableMap =
 			dataSet.getVariables().stream().collect(Collectors.toMap(MeasurementVariable::getTermId, Function.identity()));
@@ -114,7 +128,34 @@ public class DatasetValidator {
 		this.validateIfDatasetVariableAlreadyExists(variableId, shouldBeDatasetVariable, measurementVariableMap, datasetType);
 		this.validateNotAddingSystemEntryDetailsToAlreadyGeneratedExperiment(standardVariable, studyHasExperimentDesign);
 
+		final String alias = datasetVariable.getStudyAlias();
+		if (StringUtils.isNotEmpty(alias)) {
+			this.validateVariableStudyAlias(alias, programUuid, variableId);
+		}
+
 		return standardVariable;
+	}
+
+	private void validateVariableStudyAlias(final String alias, final String programUuid, final Integer varId) {
+		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+		// check if alias is already used by other variables as name
+		final Term term = this.termDataManager.getTermByNameAndCvId(alias, CvId.VARIABLES.getId());
+
+		if (term != null && !Objects.equals(varId, term.getId())) {
+			this.errors.reject("name.or.alias.already.exist", new Object[] {"Alias", "a Name"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		// check if alias is already used by other variables as alias
+		final List<VariableOverridesDto> variableOverridesList =
+			this.ontologyVariableDataManager.getVariableOverridesByAliasAndProgram(alias, programUuid);
+
+		if (!variableOverridesList.isEmpty() &&
+			(variableOverridesList.size() != 1 || varId == null || !variableOverridesList.get(0).getVariableId().equals(varId))) {
+			this.errors.reject("name.or.alias.already.exist", new Object[] {"Alias", "an Alias"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
 	}
 
 	public void validateExistingDatasetVariables(
@@ -265,7 +306,7 @@ public class DatasetValidator {
 				.map(StandardVariable::getName)
 				.collect(Collectors.joining(", "));
 			if (!StringUtils.isEmpty(systemVariableNames)) {
-				this.errors.reject("system-variable.cannot.remove", new String[] {String.valueOf(systemVariableNames)},  "");
+				this.errors.reject("system-variable.cannot.remove", new String[] {systemVariableNames}, "");
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		}
@@ -274,7 +315,7 @@ public class DatasetValidator {
 	private void validateNotAddingSystemEntryDetailsToAlreadyGeneratedExperiment(final StandardVariable variable,
 		final boolean studyHasExperimentDesign) {
 		if (studyHasExperimentDesign && variable.getVariableTypes().contains(VariableType.ENTRY_DETAIL) && variable.isSystem()) {
-			this.errors.reject("system-variable.cannot.add", new String[] {String.valueOf(variable.getName())},  "");
+			this.errors.reject("system-variable.cannot.add", new String[] {String.valueOf(variable.getName())}, "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 	}
