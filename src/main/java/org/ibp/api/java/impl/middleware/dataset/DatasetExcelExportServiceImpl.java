@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearchFilter;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -56,8 +57,15 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotypeValues) {
+		final DatasetDTO dataSet = this.datasetService.getDataset(datasetId);
+		List<MeasurementVariable> columns;
+		if (DatasetTypeEnum.SUMMARY_DATA.getId() == dataSet.getDatasetTypeId() || DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId() == dataSet.getDatasetTypeId()) {
+			columns = this.studyDatasetService.getObservationSetColumns(studyId, datasetId, false);
+		} else {
+			columns = this.studyDatasetService.getSubObservationSetVariables(studyId, datasetId);
+		}
 
-		final List<MeasurementVariable> columns = this.studyDatasetService.getSubObservationSetVariables(studyId, datasetId);
+
 
 		if (includeSampleGenotypeValues) {
 			// Add Genotype Marker variables to the list of columns

@@ -310,7 +310,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 		final List<MeasurementVariable> datasetVariables = this.datasetService
 			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists
-				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId(), VariableType.ANALYSIS_SUMMARY.getId()));
 
 		final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
 		filter.setStudyId(studyId);
@@ -447,6 +447,17 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			xlsSheet,
 			filterByVariableType(datasetVariables, VariableType.SELECTION_METHOD),
 			datasetType.getName());
+
+		xlsSheet.createRow(currentRowNum++);
+
+		currentRowNum = this.createHeader(currentRowNum, xlsBook, xlsSheet, "export.study.description.column.analysis.summary",
+				this.getColorIndex(xlsBook, 51, 51, 153));
+		currentRowNum = this.writeSection(
+				currentRowNum,
+				xlsBook,
+				xlsSheet,
+				filterByVariableType(datasetVariables, VariableType.ANALYSIS_SUMMARY),
+				datasetType.getName());
 
 		xlsSheet.createRow(currentRowNum++);
 

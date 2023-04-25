@@ -123,7 +123,9 @@ public abstract class AbstractDatasetExportService {
 			}
 		});
 
-		sortedColumns.add(entryDetails.remove(TermId.ENTRY_NO.getId()));
+		if (entryDetails.containsKey(TermId.ENTRY_NO.getId())) {
+			sortedColumns.add(entryDetails.remove(TermId.ENTRY_NO.getId()));
+		}
 		if (entryDetails.containsKey(TermId.ENTRY_TYPE.getId())) {
 			sortedColumns.add(entryDetails.remove(TermId.ENTRY_TYPE.getId()));
 		}
