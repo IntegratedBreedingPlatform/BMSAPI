@@ -192,9 +192,14 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final HSSFRow row = xlsSheet.createRow(currentRowNum);
 		int currentColNum = 0;
 
-		for (final MeasurementVariable column : columns) {
-			final ObservationUnitData observationUnitData = Util.getObservationUnitData(dataRow.getVariables(), column);
 
+		for (final MeasurementVariable column : columns) {
+			ObservationUnitData observationUnitData = Util.getObservationUnitData(dataRow.getVariables(), column);
+			if	(Util.isNullOrEmpty(observationUnitData)
+				&& (VariableType.ENVIRONMENT_DETAIL.getId().equals(column.getVariableType().getId())
+					|| VariableType.ENVIRONMENT_CONDITION.getId().equals(column.getVariableType().getId()))) {
+				observationUnitData = Util.getObservationUnitData(dataRow.getEnvironmentVariables(), column);
+			}
 			if (!Util.isNullOrEmpty(observationUnitData)) {
 				final String dataCell = observationUnitData.getValue();
 				final HSSFCell cell = row.createCell(currentColNum++);
