@@ -204,7 +204,7 @@ public class DatasetCSVExportServiceImplTest {
 		instanceObservationUnitRowsMap.put(1, new ArrayList<ObservationUnitRow>());
 		instanceObservationUnitRowsMap.put(2, new ArrayList<ObservationUnitRow>());
 
-		when(this.datasetCSVGenerator.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), Mockito.anyMap(),
+		when(this.datasetCSVGenerator.generateMultiInstanceFile(eq(study.getId()), eq(this.dataSetDTO), eq(instanceObservationUnitRowsMap), Mockito.anyMap(),
 			eq(measurementVariables), anyString()))
 			.thenReturn(csvFile);
 
@@ -214,7 +214,7 @@ public class DatasetCSVExportServiceImplTest {
 				new HashMap<>(), measurementVariables, this.datasetCSVGenerator, AbstractDatasetExportService.CSV);
 
 		verify(this.datasetCSVGenerator)
-			.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), anyMap(), eq(measurementVariables), anyString());
+			.generateMultiInstanceFile(eq(study.getId()), eq(this.dataSetDTO), eq(instanceObservationUnitRowsMap), anyMap(), eq(measurementVariables), anyString());
 		assertSame(result, csvFile);
 	}
 

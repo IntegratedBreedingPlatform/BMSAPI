@@ -18,7 +18,7 @@ public interface DatasetFileGenerator {
 		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		String fileNamePath, StudyInstance studyInstance) throws IOException;
 
-	File generateMultiInstanceFile(Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+	File generateMultiInstanceFile(final Integer studyId, final DatasetDTO datasetDTO, final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
 		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		List<MeasurementVariable> columns,
 		String fileNameFullPath) throws IOException;

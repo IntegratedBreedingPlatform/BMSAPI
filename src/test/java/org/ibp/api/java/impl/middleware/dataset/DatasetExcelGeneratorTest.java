@@ -40,12 +40,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -272,8 +267,8 @@ public class DatasetExcelGeneratorTest {
 		Mockito.verify(this.studyDataManager).getPhenotypeByVariableId(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
-	public void testGenerateMultiInstanceFile() {
+	@Test
+	public void testGenerateMultiInstanceFile() throws IOException{
 		final String filename = "filename";
 		final StudyInstance studyInstance = new StudyInstance();
 		studyInstance.setInstanceId(INSTANCE_ID);
@@ -281,8 +276,12 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
 		datasetDTO.setDatasetId(INSTANCE_ID);
 		datasetDTO.setParentDatasetId(INSTANCE_ID);
+		final StudyInstance instance = new StudyInstance();
+		instance.setInstanceNumber(INSTANCE_ID);
+		instance.setInstanceId(INSTANCE_ID);
+		datasetDTO.setInstances(Collections.singletonList(instance));
 		this.datasetExcelGenerator
-			.generateMultiInstanceFile(new HashMap<>(), new HashMap<>(), new ArrayList<>(), filename);
+			.generateMultiInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, new HashMap<>(), new HashMap<>(), new ArrayList<>(), filename);
 	}
 
 	@Test

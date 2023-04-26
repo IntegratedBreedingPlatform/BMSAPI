@@ -203,7 +203,7 @@ public abstract class AbstractDatasetExportService {
 		final String sanitizedFileName = FileUtils.sanitizeFileName(fileName);
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
-		return generator.generateMultiInstanceFile(observationUnitRowMap, genotypeDTORowMap, columns, fileNameFullPath);
+		return generator.generateMultiInstanceFile(study.getId(), dataSet, observationUnitRowMap, genotypeDTORowMap, columns, fileNameFullPath);
 	}
 
 	File generateFiles(

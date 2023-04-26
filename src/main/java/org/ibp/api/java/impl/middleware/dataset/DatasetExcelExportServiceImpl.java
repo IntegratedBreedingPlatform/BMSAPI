@@ -50,7 +50,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		try {
 			//TODO: use the singleFile boolean after implementing singleFile download for XLS option
 			this.datasetExcelGenerator.setIncludeSampleGenotypeValues(includeSampleGenotypeValues);
-			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetExcelGenerator, false, XLS,
+			return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetExcelGenerator, singleFile, XLS,
 					includeSampleGenotypeValues);
 		} catch (final IOException e) {
 			final BindingResult errors = new MapBindingResult(new HashMap<>(), Integer.class.getName());
