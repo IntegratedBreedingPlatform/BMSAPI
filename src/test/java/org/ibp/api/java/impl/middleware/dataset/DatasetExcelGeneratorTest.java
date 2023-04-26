@@ -63,6 +63,8 @@ public class DatasetExcelGeneratorTest {
 	private static final String OBSERVATION_UNIT_TEST = "ObservationUnitTest";
 	private static final String TRAITS_TEST = "TraitsTest";
 	private static final String SELECTION_TEST = "SelectionTest";
+
+	private static final String ANALYSIS_SUMMARY_TEST = "AnalysisSummaryTest";
 	private static final String GENOTYPE_MARKER_TEST = "GenotypeMarkerTest";
 	private static final String VARIABLE_NAME_1 = "VARIABLE_NAME_1";
 	private static final String VARIABLE_NAME_2 = "VARIABLE_NAME_2";
@@ -157,6 +159,11 @@ public class DatasetExcelGeneratorTest {
 		selectionVariable.setValue(SELECTION_TEST);
 		selectionVariable.setVariableType(VariableType.SELECTION_METHOD);
 
+		final MeasurementVariable analysisSummary = new MeasurementVariable();
+		analysisSummary.setDataTypeId(VariableType.ANALYSIS_SUMMARY.getId());
+		analysisSummary.setValue(ANALYSIS_SUMMARY_TEST);
+		analysisSummary.setVariableType(VariableType.ANALYSIS_SUMMARY);
+
 		final MeasurementVariable genotypeMarkerVariable = new MeasurementVariable();
 		genotypeMarkerVariable.setTermId(1);
 		genotypeMarkerVariable.setDataTypeId(VariableType.GENOTYPE_MARKER.getId());
@@ -168,7 +175,7 @@ public class DatasetExcelGeneratorTest {
 			Lists.newArrayList(environmentDetailsVariable, experimentalDesignVariable, environmentConditionsVariable);
 		final List<MeasurementVariable> plotVariables = Lists.newArrayList(germplasmDescriptorVariable, germplasmPassportsVariable,
 			germplasmAttributesVariable);
-		final List<MeasurementVariable> datasetVariables = Lists.newArrayList(observationUnitVariable, traitsVariable, selectionVariable);
+		final List<MeasurementVariable> datasetVariables = Lists.newArrayList(observationUnitVariable, traitsVariable, selectionVariable, analysisSummary);
 
 		this.messageSource = new ResourceBundleMessageSource();
 		this.messageSource.setUseCodeAsDefaultMessage(true);
@@ -219,7 +226,7 @@ public class DatasetExcelGeneratorTest {
 
 		when(this.datasetService
 			.getMeasurementVariables(dataSet.getId(), Lists
-				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId())))
+				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId(), VariableType.ANALYSIS_SUMMARY.getId())))
 			.thenReturn(datasetVariables);
 
 		final Map<Integer, MeasurementVariable> sampleGenotypeVariablesMap = new HashedMap();
@@ -263,7 +270,7 @@ public class DatasetExcelGeneratorTest {
 				VariableType.GERMPLASM_PASSPORT.getId()));
 		Mockito.verify(this.datasetService)
 			.getMeasurementVariables(INSTANCE_ID, Lists
-				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+				.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId(), VariableType.ANALYSIS_SUMMARY.getId()));
 		Mockito.verify(this.studyDataManager).getPhenotypeByVariableId(ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
 	}
 
@@ -314,7 +321,8 @@ public class DatasetExcelGeneratorTest {
 		assertEquals(OBSERVATION_UNIT_TEST, descriptionSheet.getRow(33).getCell(valueIndex).getStringCellValue());
 		assertEquals(TRAITS_TEST, descriptionSheet.getRow(36).getCell(valueIndex).getStringCellValue());
 		assertEquals(SELECTION_TEST, descriptionSheet.getRow(39).getCell(valueIndex).getStringCellValue());
-		assertEquals(GENOTYPE_MARKER_TEST, descriptionSheet.getRow(42).getCell(valueIndex).getStringCellValue());
+		assertEquals(ANALYSIS_SUMMARY_TEST, descriptionSheet.getRow(42).getCell(valueIndex).getStringCellValue());
+		assertEquals(GENOTYPE_MARKER_TEST, descriptionSheet.getRow(45).getCell(valueIndex).getStringCellValue());
 		assertEquals(VARIABLE_ALIAS_1, observationSheet.getRow(0).getCell(0).getStringCellValue());
 		assertEquals(VARIABLE_ALIAS_2, observationSheet.getRow(0).getCell(1).getStringCellValue());
 		assertEquals(VARIABLE_VALUE_1, observationSheet.getRow(1).getCell(0).getStringCellValue());
