@@ -81,8 +81,7 @@ public class GermplasmListResource {
 
 	@ApiOperation(value = "Create a new Germplasm list")
 	@RequestMapping(value = "/crops/{crop}/germplasm-lists", method = RequestMethod.POST)
-	// TODO add specific permission to create list from germplasm manager? IBP-5387
-	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'IMPORT_GERMPLASM', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'CREATE_LIST', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS
 		+ ", 'IMPORT_GERMPLASM_LISTS')")
 	@ResponseBody
 	public ResponseEntity<GermplasmListGeneratorDTO> create(
