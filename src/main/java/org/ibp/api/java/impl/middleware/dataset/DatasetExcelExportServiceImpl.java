@@ -62,7 +62,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotypeValues) {
 		final DatasetDTO dataSet = this.datasetService.getDataset(datasetId);
-		List<MeasurementVariable> columns;
+		final List<MeasurementVariable> columns;
 		if (DatasetTypeEnum.SUMMARY_DATA.getId() == dataSet.getDatasetTypeId() || DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId() == dataSet.getDatasetTypeId()) {
 			columns = this.studyDatasetService.getObservationSetColumns(studyId, datasetId, false);
 		} else {
@@ -100,8 +100,8 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		return observationUnitRowMap;
 	}
 
-	private void updateSearchDTOForSummaryData(DatasetDTO dataset, List<MeasurementVariableDto> environmentDetails,
-		List<MeasurementVariableDto> environmentConditions, ObservationUnitsSearchDTO searchDTO) {
+	private void updateSearchDTOForSummaryData(final DatasetDTO dataset, final List<MeasurementVariableDto> environmentDetails,
+											   final List<MeasurementVariableDto> environmentConditions, final ObservationUnitsSearchDTO searchDTO) {
 		if (DatasetTypeEnum.SUMMARY_DATA.getId() == dataset.getDatasetTypeId()) {
 			final List<MeasurementVariable> environmentVariables = this.studyDatasetService.getMeasurementVariables(
 					dataset.getDatasetId(), Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.ENVIRONMENT_CONDITION.getId()));

@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearchFilter;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -40,7 +41,13 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -289,6 +296,15 @@ public class DatasetExcelGeneratorTest {
 		datasetDTO.setInstances(Collections.singletonList(instance));
 		this.datasetExcelGenerator
 			.generateMultiInstanceFile(DatasetExcelGeneratorTest.STUDY_ID, datasetDTO, new HashMap<>(), new HashMap<>(), new ArrayList<>(), filename);
+		Mockito.verify(this.datasetTypeService).getDatasetTypeById(datasetDTO.getDatasetTypeId());
+		Mockito.verify(this.studyDataManager).getStudyDetails(DatasetExcelGeneratorTest.STUDY_ID);
+		Mockito.verify(this.datasetService).getMeasurementVariables(DatasetExcelGeneratorTest.STUDY_ID, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
+		Mockito.verify(this.studyDataManager).getDataSetsByType(DatasetExcelGeneratorTest.STUDY_ID, DatasetTypeEnum.SUMMARY_DATA.getId());
+		Mockito.verify(this.datasetService)
+				.getMeasurementVariables(INSTANCE_ID, Lists
+						.newArrayList(VariableType.OBSERVATION_UNIT.getId(), VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId(), VariableType.ANALYSIS_SUMMARY.getId()));
+		Mockito.verify(this.sampleGenotypeService).getSampleGenotypeVariables(ArgumentMatchers.any(SampleGenotypeVariablesSearchFilter.class));
+		Mockito.verify(this.datasetServiceMiddleService).getDatasetNameTypes(ArgumentMatchers.anyInt());
 	}
 
 	@Test
