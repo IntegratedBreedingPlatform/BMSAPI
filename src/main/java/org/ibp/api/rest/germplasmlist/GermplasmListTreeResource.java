@@ -52,8 +52,7 @@ public class GermplasmListTreeResource {
 	}
 
 	@ApiOperation(value = "Create germplasm list folder", notes = "Create sample list folder.")
-	// TODO add specific permission to create list from germplasm manager? IBP-5387
-	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'IMPORT_GERMPLASM', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'CREATE_LIST', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity createGermplasmListFolder(
@@ -67,8 +66,7 @@ public class GermplasmListTreeResource {
 	}
 
 	@ApiOperation(value = "Update germplasm list folder", notes = "Update germplasm list folder.")
-	// TODO add specific permission to create list from germplasm manager? IBP-5387
-	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'IMPORT_GERMPLASM', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'CREATE_LIST', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity updateGermplasmListFolderName(
@@ -83,8 +81,7 @@ public class GermplasmListTreeResource {
 	}
 
 	@ApiOperation(value = "Move germplasm list folder.", notes = "Move germplasm list folder.")
-	// TODO add specific permission to create list from germplasm manager? IBP-5387
-	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'IMPORT_GERMPLASM', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'CREATE_LIST', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}/move", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<TreeNode> moveGermplasmList(
@@ -98,8 +95,7 @@ public class GermplasmListTreeResource {
 	}
 
 	@ApiOperation(value = "Delete germplasm list folder", notes = "Delete germplasm list folder.")
-	// TODO add specific permission to create list from germplasm manager? IBP-5387
-	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'IMPORT_GERMPLASM', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
+	@PreAuthorize("hasAnyAuthority('ADMIN', " + MANAGE_GERMPLASM_PERMISSIONS + ", 'CREATE_LIST', " + MANAGE_GERMPLASM_LISTS_PERMISSIONS + ")")
 	@RequestMapping(value = "/crops/{crop}/germplasm-list-folders/{folderId}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public ResponseEntity deleteGermplasmListFolder(
