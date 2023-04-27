@@ -271,14 +271,18 @@ public class DatasetCSVExportServiceImplTest {
 
 	@Test
 	public void testGetColumns_includeSampleGenotypeValuesTrue() {
-		this.datasetExportService.getColumns(1, 1, true);
+		final DatasetDTO datasetDTO = new DatasetDTO();
+		datasetDTO.setDatasetId(1);
+		this.datasetExportService.getColumns(1, datasetDTO, true);
 		Mockito.verify(this.studyDatasetService).getAllDatasetVariables(1, 1);
 		Mockito.verify(this.sampleGenotypeService).getSampleGenotypeVariables(any());
 	}
 
 	@Test
 	public void testGetColumns_includeSampleGenotypeValuesFalse() {
-		this.datasetExportService.getColumns(1, 1, false);
+		final DatasetDTO datasetDTO = new DatasetDTO();
+		datasetDTO.setDatasetId(1);
+		this.datasetExportService.getColumns(1, datasetDTO, false);
 		Mockito.verify(this.studyDatasetService).getAllDatasetVariables(1, 1);
 		Mockito.verify(this.sampleGenotypeService, times(0)).getSampleGenotypeVariables(any());
 	}

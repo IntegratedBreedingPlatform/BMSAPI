@@ -213,7 +213,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 
 		for (final MeasurementVariable column : columns) {
 			ObservationUnitData observationUnitData = Util.getObservationUnitData(dataRow.getVariables(), column);
-			if	(Util.isNullOrEmpty(observationUnitData)
+			if (Util.isNullOrEmpty(observationUnitData)
 				&& (VariableType.ENVIRONMENT_DETAIL.getId().equals(column.getVariableType().getId())
 					|| VariableType.ENVIRONMENT_CONDITION.getId().equals(column.getVariableType().getId()))) {
 				observationUnitData = Util.getObservationUnitData(dataRow.getEnvironmentVariables(), column);

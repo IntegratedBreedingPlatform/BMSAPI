@@ -165,8 +165,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 	}
 
 	@Override
-	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotypeValues) {
-		final DatasetDTO dataSetDTO = this.datasetService.getDataset(datasetId);
+	public List<MeasurementVariable> getColumns(final int studyId, final DatasetDTO dataSetDTO, final boolean includeSampleGenotypeValues) {
 		final List<Integer> subObsDatasetTypeIds = this.datasetTypeService.getSubObservationDatasetTypeIds();
 
 		final int plotDatasetId;
@@ -189,7 +188,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 		if (Arrays.stream(subObsDatasetTypeIds.toArray()).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
 			final List<MeasurementVariable> subObservationSetColumns =
 				this.datasetService
-					.getObservationSetVariables(datasetId, Lists.newArrayList(
+					.getObservationSetVariables(dataSetDTO.getDatasetId(), Lists.newArrayList(
 						VariableType.GERMPLASM_DESCRIPTOR.getId(),
 						VariableType.OBSERVATION_UNIT.getId(),
 						VariableType.GERMPLASM_ATTRIBUTE.getId(),

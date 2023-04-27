@@ -54,15 +54,15 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	}
 
 	@Override
-	public List<MeasurementVariable> getColumns(final int studyId, final int datasetId, final boolean includeSampleGenotypeValues) {
+	public List<MeasurementVariable> getColumns(final int studyId, final DatasetDTO datasetDTO, final boolean includeSampleGenotypeValues) {
 
-		final List<MeasurementVariable> allVariables = new ArrayList<>(this.studyDatasetService.getAllDatasetVariables(studyId, datasetId));
+		final List<MeasurementVariable> allVariables = new ArrayList<>(this.studyDatasetService.getAllDatasetVariables(studyId, datasetDTO.getDatasetId()));
 
 		if (includeSampleGenotypeValues) {
 			// Add Genotype Marker variables to the list of columns
 			final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
 			filter.setStudyId(studyId);
-			filter.setDatasetIds(Arrays.asList(datasetId));
+			filter.setDatasetIds(Arrays.asList(datasetDTO.getDatasetId()));
 			allVariables.addAll(this.sampleGenotypeService.getSampleGenotypeVariables(filter).values());
 		}
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.TRIAL_INSTANCE_FACTOR.getId());

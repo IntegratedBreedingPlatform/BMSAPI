@@ -100,7 +100,7 @@ public abstract class AbstractDatasetExportService {
 			dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId()) ? //
 				dataSet.getDatasetId() : dataSet.getParentDatasetId();
 		// Get all variables for the dataset
-		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId(), includeSampleGenotypeValues);
+		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet, includeSampleGenotypeValues);
 
 		final List<MeasurementVariable> descriptors = new ArrayList<>();
 		final List<MeasurementVariable> passports = new ArrayList<>();
@@ -293,7 +293,7 @@ public abstract class AbstractDatasetExportService {
 		return columns;
 	}
 
-	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId, boolean includeSampleGenotypeValues);
+	protected abstract List<MeasurementVariable> getColumns(int studyId, DatasetDTO datasetDTO, boolean includeSampleGenotypeValues);
 
 	protected abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(
 		Study study, DatasetDTO dataset, Map<Integer, StudyInstance> selectedDatasetInstancesMap);
