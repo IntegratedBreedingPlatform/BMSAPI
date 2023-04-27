@@ -100,7 +100,7 @@ public abstract class AbstractDatasetExportService {
 			dataSet.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId()) ? //
 				dataSet.getDatasetId() : dataSet.getParentDatasetId();
 		// Get all variables for the dataset
-		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet.getDatasetId(), includeSampleGenotypeValues);
+		final List<MeasurementVariable> columns = this.getColumns(study.getId(), dataSet, includeSampleGenotypeValues);
 
 		final List<MeasurementVariable> descriptors = new ArrayList<>();
 		final List<MeasurementVariable> passports = new ArrayList<>();
@@ -123,7 +123,9 @@ public abstract class AbstractDatasetExportService {
 			}
 		});
 
-		sortedColumns.add(entryDetails.remove(TermId.ENTRY_NO.getId()));
+		if (entryDetails.containsKey(TermId.ENTRY_NO.getId())) {
+			sortedColumns.add(entryDetails.remove(TermId.ENTRY_NO.getId()));
+		}
 		if (entryDetails.containsKey(TermId.ENTRY_TYPE.getId())) {
 			sortedColumns.add(entryDetails.remove(TermId.ENTRY_TYPE.getId()));
 		}
@@ -201,7 +203,7 @@ public abstract class AbstractDatasetExportService {
 		final String sanitizedFileName = FileUtils.sanitizeFileName(fileName);
 		final String fileNameFullPath = temporaryFolder.getAbsolutePath() + File.separator + sanitizedFileName;
 
-		return generator.generateMultiInstanceFile(observationUnitRowMap, genotypeDTORowMap, columns, fileNameFullPath);
+		return generator.generateMultiInstanceFile(study.getId(), dataSet, observationUnitRowMap, genotypeDTORowMap, columns, fileNameFullPath);
 	}
 
 	File generateFiles(
@@ -291,7 +293,7 @@ public abstract class AbstractDatasetExportService {
 		return columns;
 	}
 
-	protected abstract List<MeasurementVariable> getColumns(int studyId, int datasetId, boolean includeSampleGenotypeValues);
+	protected abstract List<MeasurementVariable> getColumns(int studyId, DatasetDTO datasetDTO, boolean includeSampleGenotypeValues);
 
 	protected abstract Map<Integer, List<ObservationUnitRow>> getObservationUnitRowMap(
 		Study study, DatasetDTO dataset, Map<Integer, StudyInstance> selectedDatasetInstancesMap);
