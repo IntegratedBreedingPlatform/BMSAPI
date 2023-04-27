@@ -86,7 +86,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		final Map<Integer, StudyInstance> selectedDatasetInstancesMap) {
 		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap = new HashMap<>();
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
-		this.updateSearchDTOForSummaryData(dataset, searchDTO);
+		this.populateSearchDTOForSummaryDataset(dataset, searchDTO);
 		for (final Integer instanceDBID : selectedDatasetInstancesMap.keySet()) {
 			searchDTO.setInstanceIds(Arrays.asList(selectedDatasetInstancesMap.get(instanceDBID).getInstanceId()));
 			final PageRequest pageRequest = new PageRequest(0, Integer.MAX_VALUE);
@@ -97,7 +97,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		return observationUnitRowMap;
 	}
 
-	private void updateSearchDTOForSummaryData(final DatasetDTO dataset, final ObservationUnitsSearchDTO searchDTO) {
+	private void populateSearchDTOForSummaryDataset(final DatasetDTO dataset, final ObservationUnitsSearchDTO searchDTO) {
 		if (DatasetTypeEnum.SUMMARY_DATA.getId() == dataset.getDatasetTypeId()) {
 			final List<MeasurementVariableDto> environmentDetails = new ArrayList<>();
 			final List<MeasurementVariableDto> environmentConditions = new ArrayList<>();
