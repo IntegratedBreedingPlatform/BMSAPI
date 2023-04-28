@@ -240,7 +240,8 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 				}
 			}
 
-			if (column.getVariableType().equals(VariableType.GENOTYPE_MARKER)) {
+			if (this.includeSampleGenotypeValues && column.getVariableType() != null &&
+				column.getVariableType().equals(VariableType.GENOTYPE_MARKER)) {
 				final HSSFCell cell = row.createCell(currentColNum++);
 				cell.setCellType(CellType.STRING);
 				if (CollectionUtils.isNotEmpty(sampleGenotypeDtoList)) {
