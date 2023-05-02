@@ -49,8 +49,8 @@ public class ObservationAuditResourceTest extends ApiUnitTestBase {
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
 				.get(
-					"/crops/{crop}/observationUnits/{observationUnitId}/variable/{variableId}/changes",
-					this.cropName, observationUnitId, variableId, pageable)
+					"/crops/{crop}/programs/{programUUID}/observationUnits/{observationUnitId}/variable/{variableId}/changes",
+					this.cropName, this.programUuid, observationUnitId, variableId, pageable)
 				.contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk());

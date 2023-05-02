@@ -25,10 +25,12 @@ public class ObservationAuditResource {
 	private ObservationAuditService observationAuditService;
 
 	@ApiOperation(value = "Get Observation Audit", notes = "Get Observation Audit")
-	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
-	@RequestMapping(value = "/{crop}/observationUnits/{observationUnitId}/variable/{variableId}/changes", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/observationUnits/{observationUnitId}/variable/{variableId}/changes", method = RequestMethod.GET)
 	public ResponseEntity<List<ObservationAuditDTO>> getPhenotypeAudit(
-		@PathVariable final String crop, @PathVariable final String observationUnitId, @PathVariable final Integer variableId,
+		@PathVariable final String crop,
+		@PathVariable final String programUUID,
+		@PathVariable final String observationUnitId, @PathVariable final Integer variableId,
 		final Pageable pageable) {
 
 		final List<ObservationAuditDTO> phenotypeAuditList =
