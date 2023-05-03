@@ -203,7 +203,7 @@ public class DatasetExcelExportServiceImplTest {
 		instanceObservationUnitRowsMap.put(2, new ArrayList<>());
 
 		when(
-			this.datasetExcelGenerator.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), anyMap(),
+			this.datasetExcelGenerator.generateMultiInstanceFile(eq(study.getId()), eq(this.dataSetDTO), eq(instanceObservationUnitRowsMap), anyMap(),
 				eq(measurementVariables), anyString()))
 			.thenReturn(excelFile);
 
@@ -213,7 +213,7 @@ public class DatasetExcelExportServiceImplTest {
 				new HashMap<>(), measurementVariables, this.datasetExcelGenerator, AbstractDatasetExportService.XLS);
 
 		verify(this.datasetExcelGenerator)
-			.generateMultiInstanceFile(eq(instanceObservationUnitRowsMap), anyMap(), eq(measurementVariables), anyString());
+			.generateMultiInstanceFile(eq(study.getId()), eq(this.dataSetDTO), eq(instanceObservationUnitRowsMap), anyMap(), eq(measurementVariables), anyString());
 		assertSame(result, excelFile);
 	}
 

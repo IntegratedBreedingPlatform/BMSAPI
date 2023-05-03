@@ -169,7 +169,7 @@ public class DatasetCSVGeneratorTest {
 	public void testGenerateMultiInstanceFile() throws IOException {
 		final String filename = "filename";
 		final File file = this.datasetCSVGenerator
-			.generateMultiInstanceFile(new HashMap<>(), new HashMap<>(), new ArrayList<>(), filename);
+			.generateMultiInstanceFile(null, null, new HashMap<>(), new HashMap<>(), new ArrayList<>(), filename);
 		Assert.assertEquals(filename, file.getName());
 	}
 

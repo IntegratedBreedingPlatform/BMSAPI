@@ -69,7 +69,8 @@ public class DatasetCSVGenerator implements DatasetFileGenerator {
 	}
 
 	@Override
-	public File generateMultiInstanceFile(final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
+	public File generateMultiInstanceFile(final Integer studyId, final DatasetDTO datasetDTO,
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowMap,
 		final Map<Integer, List<SampleGenotypeDTO>> genotypeDTORowMap,
 		final List<MeasurementVariable> columns,
 		final String fileNameFullPath) throws IOException {
