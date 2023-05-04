@@ -136,7 +136,7 @@ public class DatasetValidator {
 		return standardVariable;
 	}
 
-	private void validateVariableStudyAlias(final String alias, final String programUuid, final Integer varId) {
+	public void validateVariableStudyAlias(final String alias, final String programUuid, final Integer varId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 		// check if alias is already used by other variables as name
 		final Term term = this.termDataManager.getTermByNameAndCvId(alias, CvId.VARIABLES.getId());
