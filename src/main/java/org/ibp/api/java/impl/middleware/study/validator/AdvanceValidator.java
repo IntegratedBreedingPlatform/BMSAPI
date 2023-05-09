@@ -342,30 +342,31 @@ public class AdvanceValidator {
 	void validateReplicationNumberSelection(final Integer studyId, final List<Integer> selectedReplications,
 		final List<MeasurementVariable> plotDatasetVariables) {
 		final Optional<MeasurementVariable> replicationNumberVariable = this.findVariableById(plotDatasetVariables, TermId.REP_NO.getId());
-		if (replicationNumberVariable.isPresent()) {
-			if (CollectionUtils.isEmpty(selectedReplications)) {
-				throw new ApiRequestValidationException("advance.replication-number.selection.required", new Object[] {});
-			}
+		final List<DatasetDTO> datasetsWithVariables =
+			this.datasetService.getDatasetsWithVariables(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
+		final Optional<MeasurementVariable> nrepVariable;
 
-			final List<DatasetDTO> datasetsWithVariables =
-				this.datasetService.getDatasetsWithVariables(studyId, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
-			if (!CollectionUtils.isEmpty(datasetsWithVariables)) {
-				this.findVariableById(datasetsWithVariables.get(0).getVariables(), TermId.NUMBER_OF_REPLICATES.getId())
-					.ifPresent(measurementVariable -> {
-						Collections.sort(selectedReplications);
+		if (!CollectionUtils.isEmpty(datasetsWithVariables)) {
+			nrepVariable = this.findVariableById(datasetsWithVariables.get(0).getVariables(), TermId.NUMBER_OF_REPLICATES.getId());
 
-						final Integer greaterReplicationNumberSelected = selectedReplications.get(selectedReplications.size() - 1);
-						final int replicationsNumber = Integer.parseInt(measurementVariable.getValue());
-						if (selectedReplications.get(0) <= 0 || greaterReplicationNumberSelected > replicationsNumber) {
-							final Set<String> invalidReplicationNumbers = selectedReplications.stream()
-								.filter(integer -> integer <= 0 || integer > replicationsNumber)
-								.sorted()
-								.map(Objects::toString)
-								.collect(Collectors.toCollection(LinkedHashSet::new));
-							throw new ApiRequestValidationException("advance.replication-number.invalid",
-								new Object[] {String.join(", ", invalidReplicationNumbers)});
-						}
-					});
+			if (replicationNumberVariable.isPresent() && nrepVariable.isPresent()) {
+				if (CollectionUtils.isEmpty(selectedReplications)) {
+					throw new ApiRequestValidationException("advance.replication-number.selection.required", new Object[] {});
+				}
+
+				Collections.sort(selectedReplications);
+
+				final Integer greaterReplicationNumberSelected = selectedReplications.get(selectedReplications.size() - 1);
+				final int replicationsNumber = Integer.parseInt(nrepVariable.get().getValue());
+				if (selectedReplications.get(0) <= 0 || greaterReplicationNumberSelected > replicationsNumber) {
+					final Set<String> invalidReplicationNumbers = selectedReplications.stream()
+						.filter(integer -> integer <= 0 || integer > replicationsNumber)
+						.sorted()
+						.map(Objects::toString)
+						.collect(Collectors.toCollection(LinkedHashSet::new));
+					throw new ApiRequestValidationException("advance.replication-number.invalid",
+						new Object[] {String.join(", ", invalidReplicationNumbers)});
+				}
 			}
 		}
 	}
