@@ -59,8 +59,6 @@ public class SampleGenotypeValidator {
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 		this.validateVariableIds(programUUID, sampleGenotypeImportRequestDtoList);
-		final List<Integer> sampleIds = sampleDTOMap.values().stream().map(SampleDTO::getSampleId).collect(Collectors.toList());
-		this.checkIfSamplesAlreadyHaveGenotypeData(studyId, sampleIds);
 	}
 
 	public void validateVariableIds(final String programUUID,
@@ -137,17 +135,4 @@ public class SampleGenotypeValidator {
 		return true;
 	}
 
-	private void checkIfSamplesAlreadyHaveGenotypeData(final Integer studyId, final List<Integer> sampleIds) {
-		final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
-		sampleGenotypeSearchRequestDTO.setStudyId(studyId);
-		final SampleGenotypeSearchRequestDTO.GenotypeFilter filter = new SampleGenotypeSearchRequestDTO.GenotypeFilter();
-		filter.setSampleIds(sampleIds);
-		sampleGenotypeSearchRequestDTO.setFilter(filter);
-		final long sampleWithGenotypesCount =
-			this.sampleGenotypeServiceMiddleware.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO);
-		if (sampleWithGenotypesCount > 0) {
-			this.errors.reject("genotype.import.samples.already.have.genotype.data", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-	}
 }
