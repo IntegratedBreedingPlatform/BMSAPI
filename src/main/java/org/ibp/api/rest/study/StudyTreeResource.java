@@ -60,9 +60,9 @@ public class StudyTreeResource {
 	public ResponseEntity<Void> deleteStudyFolder(
 		@PathVariable final String crop,
 		@PathVariable final String programUUID,
-		@PathVariable final Integer parentId) {
+		@PathVariable final Integer folderId) {
 
-		this.studyTreeService.deleteStudyFolder(crop, programUUID, parentId);
+		this.studyTreeService.deleteStudyFolder(crop, programUUID, folderId);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
