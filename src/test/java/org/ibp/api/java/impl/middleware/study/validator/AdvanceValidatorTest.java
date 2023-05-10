@@ -1177,6 +1177,9 @@ public class AdvanceValidatorTest {
 	@Test
 	public void validateReplicationNumberSelection_FAIL_selectionRequired() {
 		final MeasurementVariable variable = this.mockMeasurementVariable(TermId.REP_NO.getId());
+		final MeasurementVariable replicationNumberVariable = this.mockMeasurementVariable(TermId.NUMBER_OF_REPLICATES.getId(), "5");
+
+		this.mockGetEnvironmentDatasetWithVariables(Arrays.asList(replicationNumberVariable));
 
 		try {
 			this.advanceValidator.validateReplicationNumberSelection(STUDY_ID, new ArrayList<>(), Arrays.asList(variable));
@@ -1186,7 +1189,7 @@ public class AdvanceValidatorTest {
 			assertThat(exception.getErrors().get(0).getCode(), is("advance.replication-number.selection.required"));
 		}
 
-		Mockito.verify(this.datasetService, Mockito.never()).getDatasetsWithVariables(ArgumentMatchers.anyInt(), ArgumentMatchers.anySet());
+		Mockito.verify(this.datasetService).getDatasetsWithVariables(STUDY_ID, Collections.singleton(DatasetTypeEnum.SUMMARY_DATA.getId()));
 	}
 
 	@Test
