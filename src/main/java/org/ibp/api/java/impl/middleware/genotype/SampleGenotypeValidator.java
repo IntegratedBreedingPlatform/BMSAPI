@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 @Component
 public class SampleGenotypeValidator {
 
+	// Maximum number of genotype marker variables per sample list
 	public static final int MAX_NUMBER_OF_VARIABLES_PER_SAMPLE_LIST = 20;
 
 	@Autowired
@@ -51,6 +52,7 @@ public class SampleGenotypeValidator {
 
 	protected BindingResult errors;
 
+	// Validate the import request
 	public void validateImport(final String programUUID, final Integer studyId, final Integer sampleListId,
 		final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtoList) {
 		BaseValidator.checkNotEmpty(sampleGenotypeImportRequestDtoList, "genotype.import.request.null");
@@ -66,6 +68,7 @@ public class SampleGenotypeValidator {
 		this.validateVariableIds(studyId, sampleListId, programUUID, sampleGenotypeImportRequestDtoList);
 	}
 
+	// Validate the variable ids in the import request
 	public void validateVariableIds(final Integer studyId, final Integer sampleListId, final String programUUID,
 		final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtoList) {
 		final Set<Integer> variableIds = sampleGenotypeImportRequestDtoList.stream()
@@ -78,6 +81,7 @@ public class SampleGenotypeValidator {
 			.collect(Collectors.toMap(VariableDetails::getId, Function.identity()));
 
 		// Check if the variables in specified in the request are existing
+		// If not, throw an error
 		if (variables.size() != variableIds.size()) {
 			this.errors.reject("genotype.import.variable.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
@@ -100,6 +104,7 @@ public class SampleGenotypeValidator {
 		// If the import request has new variables that are not yet existing in the sample list,
 		// we have to make sure that the new variables that will be added + number of existing variables will not exceed the
 		// maximum number of genotype variables allowed per sample list.
+		// Otherwise, we will throw an error.
 		if (variableIdsFromTheSampleList.size() + uncommonVariableIds.size() > MAX_NUMBER_OF_VARIABLES_PER_SAMPLE_LIST) {
 			this.errors.reject("genotype.import.variables.exceed.maximum.limit.per.sample.list",
 				new Object[] {MAX_NUMBER_OF_VARIABLES_PER_SAMPLE_LIST}, "");
@@ -116,6 +121,7 @@ public class SampleGenotypeValidator {
 
 	}
 
+	// Validate the genotype value based on the scale type of the variable.
 	private boolean isDataValid(final SampleGenotypeImportRequestDto importData, final VariableDetails variable) {
 		if (StringUtils.isEmpty(importData.getValue())) {
 			return true;
