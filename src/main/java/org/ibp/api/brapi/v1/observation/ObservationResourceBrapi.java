@@ -15,6 +15,7 @@ import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,6 +33,7 @@ public class ObservationResourceBrapi {
 	private DatasetTypeService datasetTypeService;
 
 	@ApiOperation(value = "Get observation levels", notes = "Returns a list of supported observation levels")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/observationlevels", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<String>> getObservationLevels(

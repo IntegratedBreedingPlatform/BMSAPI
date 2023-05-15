@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,6 +56,7 @@ public class ObservationResourceBrapi {
 	private BrapiResponseMessageGenerator<ObservationDto> responseMessageGenerator;
 
 	@ApiOperation(value = "Retrieve observations", notes = "Retrieve all observations where there are measurements for the given observation variables.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observations", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -166,6 +168,7 @@ public class ObservationResourceBrapi {
 	}
 
 	@ApiOperation(value = "Add new Observation entities", notes = "Add new Observation entities")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_MANAGE_CONFIRMED_OBSERVATIONS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observations", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -183,6 +186,7 @@ public class ObservationResourceBrapi {
 	}
 
 	@ApiOperation(value = "Update multiple Observation entities", notes = "Update multiple Observation entities")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_MANAGE_CONFIRMED_OBSERVATIONS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observations", method = RequestMethod.PUT)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -201,6 +205,7 @@ public class ObservationResourceBrapi {
 
 
 	@ApiOperation(value = "Submit a search request for Observations", notes = "Submit a search request for Observations")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/observations", method = RequestMethod.POST)
 	@JsonView(BrapiView.BrapiV2_1.class)
 	@ResponseBody
@@ -216,6 +221,7 @@ public class ObservationResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get search Observations results", notes = "Get the results of Observations search request")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/observations/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2_1.class)

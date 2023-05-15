@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +49,8 @@ public class SampleResourceBrapi {
 	private SearchRequestService searchRequestService;
 
 	@ApiOperation(value = "Get samples", notes = "Get samples")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_VIEW_OBSERVATIONS', 'MS_SAMPLE_LISTS', "
+		+ "'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/samples", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV2.class)
 	@ResponseBody
@@ -78,6 +81,8 @@ public class SampleResourceBrapi {
 	}
 
 	@ApiOperation(value = "Search samples", notes = "Submit a search request for samples")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_VIEW_OBSERVATIONS', 'MS_SAMPLE_LISTS', "
+		+ "'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/samples", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -93,6 +98,8 @@ public class SampleResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get search samples results", notes = "Get the results of samples search request")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_VIEW_OBSERVATIONS', 'MS_SAMPLE_LISTS', "
+		+ "'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/samples/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -160,6 +167,8 @@ public class SampleResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get a sample by sampleDbId", notes = "Get the details of a specific Sample")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_VIEW_OBSERVATIONS', 'MS_SAMPLE_LISTS', "
+		+ "'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/samples/{sampleDbId}", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV2.class)
 	@ResponseBody

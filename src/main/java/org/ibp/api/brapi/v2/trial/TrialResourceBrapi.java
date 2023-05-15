@@ -63,6 +63,7 @@ public class TrialResourceBrapi {
 	private BrapiResponseMessageGenerator<TrialSummary> responseMessageGenerator;
 
 	@ApiOperation(value = "Retrieve a filtered list of breeding Trials", notes = "Retrieve a filtered list of breeding Trials. A Trial is a collection of Studies")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/trials", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -176,6 +177,7 @@ public class TrialResourceBrapi {
 	}
 
 	@ApiOperation(value = "Search Trials", notes = "Submit a search request for Trials")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/trials", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2_1.class)
@@ -192,6 +194,7 @@ public class TrialResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get search trials results", notes = "Get the results of a Trials search request")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/trials/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2_1.class)

@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -58,6 +59,7 @@ public class LocationResourceBrapi {
 	private SearchRequestService searchRequestService;
 
 	@ApiOperation(value = "Get a filtered list of Locations", notes = "Get a list of locations.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/locations", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -116,6 +118,7 @@ public class LocationResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get a location given an id", notes = "Get a location")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/locations/{locationDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -149,6 +152,7 @@ public class LocationResourceBrapi {
 	}
 
 	@ApiOperation(value = "Search locations", notes = "Submit a search request for locations")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/locations", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -167,6 +171,7 @@ public class LocationResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get search location results", notes = "Get the results of locations search request")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/locations/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)

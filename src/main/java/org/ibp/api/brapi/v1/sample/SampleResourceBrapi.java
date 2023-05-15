@@ -11,6 +11,7 @@ import org.ibp.api.brapi.SampleServiceBrapi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +30,8 @@ public class SampleResourceBrapi {
 	private SampleServiceBrapi sampleServiceBrapi;
 
 	@ApiOperation(value = "Get a sample by sampleDbId", notes = "Get a sample by sampleDbId")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_VIEW_OBSERVATIONS', 'MS_SAMPLE_LISTS', "
+		+ "'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/brapi/v1/samples/{sampleDbId}", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV1_3.class)
 	@ResponseBody

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,7 @@ public class BreedingMethodResourceBrapi {
 	private BreedingMethodService breedingMethodService;
 
 	@ApiOperation(value = "Get the Breeding Methods", notes = "Get the list of germplasm breeding methods available in a system.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/breedingmethods", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<BreedingMethod>> getAllBreedingMethods(@PathVariable final String crop, @ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION)
@@ -78,6 +80,7 @@ public class BreedingMethodResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get the details of a specific Breeding Method used to produce Germplasm", notes = "Get the details of a specific Breeding Method")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/breedingmethods/{breedingMethodDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<BreedingMethod>> getBreedingMethodById(
