@@ -56,8 +56,8 @@ public class GermplasmResourceTest extends ApiUnitTestBase {
 
 		this.mockMvc
 			.perform(MockMvcRequestBuilders
-				.delete("/crops/{cropName}/germplasm", this.cropName)
-				.param("gids", "1,2,3").contentType(this.contentType))
+				.post("/crops/{cropName}/germplasm/batch-delete", this.cropName)
+				.content(this.convertObjectToByte(gids)).contentType(this.contentType))
 			.andDo(MockMvcResultHandlers.print())
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(jsonPath("$.deletedGermplasm", Matchers.containsInAnyOrder(2, 3)))

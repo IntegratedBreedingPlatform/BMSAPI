@@ -295,12 +295,12 @@ public class GermplasmResource {
 		return new ResponseEntity<>(pageResults, headers, HttpStatus.OK);
 	}
 
-	@ApiOperation(value = "Delete germplasm")
+	@ApiOperation(value = "Batch delete germplasm")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM', 'DELETE_GERMPLASM')")
-	@RequestMapping(value = "/crops/{cropName}/germplasm", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/crops/{cropName}/germplasm/batch-delete", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<GermplasmDeleteResponse> deleteGermplasm(@PathVariable final String cropName,
-		@RequestParam final List<Integer> gids) {
+	public ResponseEntity<GermplasmDeleteResponse> deleteGermplasms(@PathVariable final String cropName,
+		@RequestBody final List<Integer> gids) {
 		return new ResponseEntity<>(this.germplasmService.deleteGermplasm(gids), HttpStatus.OK);
 	}
 
