@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -48,6 +50,9 @@ public class DatasetValidator {
 
 	@Autowired
 	private DatasetService middlewareDatasetService;
+
+	@Autowired
+	private StudyDataManager studyDataManager;
 
 	@Resource
 	private DatasetTypeService datasetTypeService;
@@ -124,14 +129,23 @@ public class DatasetValidator {
 
 		final String alias = datasetVariable.getStudyAlias();
 		if (StringUtils.isNotEmpty(alias)) {
-			this.validateVariableStudyAlias(alias, programUuid, variableId);
+			this.validateVariableStudyAlias(alias, programUuid, variableId, studyId);
 		}
 
 		return standardVariable;
 	}
 
-	private void validateVariableStudyAlias(final String alias, final String programUuid, final Integer varId) {
+	public void validateVariableStudyAlias(final String alias, final String programUuid, final Integer varId, final Integer studyId) {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
+
+		final Optional<String> studyAliases =
+			this.studyDataManager.getAliasesForStudy(studyId).stream()
+				.filter(studyAlias -> StringUtils.equalsIgnoreCase(alias, studyAlias)).findFirst();
+
+		if (studyAliases.isPresent()) {
+			this.errors.reject("name.or.alias.already.exist", new Object[] {"Alias", "a Name or an Alias"}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.setProgramUuid(programUuid);
