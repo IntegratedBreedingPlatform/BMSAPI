@@ -24,9 +24,11 @@ import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.dataset.DatasetVariable;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.domain.study.StudyInstance;
+import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.DatasetLock;
+import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -94,6 +96,9 @@ public class DatasetResource {
 
 	@Autowired
 	private HttpServletRequest request;
+
+	@Autowired
+	private DatasetValidator datasetValidator;
 
 	@ApiOperation(value = "Get Dataset Columns", notes = "Retrieves ALL MeasurementVariables (columns) associated to the dataset, "
 		+ "that will be shown in the Observation Table")
@@ -251,7 +256,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 
-		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds),VariableType.ENTRY_DETAIL);
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds), VariableType.ENTRY_DETAIL);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -262,7 +267,7 @@ public class DatasetResource {
 		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
 		@PathVariable final Integer datasetId, @RequestParam(value = "variableIds", required = true) final Integer[] variableIds) {
 
-		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds),VariableType.ENVIRONMENT_CONDITION);
+		this.studyDatasetService.removeDatasetVariables(studyId, datasetId, Arrays.asList(variableIds), VariableType.ENVIRONMENT_CONDITION);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -697,6 +702,22 @@ public class DatasetResource {
 		@RequestParam final List<Integer> variableTypeIds) {
 		final List<MeasurementVariable> variables = this.studyDatasetService.getVariablesByVariableTypes(studyId, variableTypeIds);
 		return new ResponseEntity<>(variables, HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Validate Alias input for a Dataset Variable", notes = "Validate Alias input for a Dataset Variable")
+	@PreAuthorize("hasAnyAuthority('ADMIN','STUDIES', 'MANAGE_STUDIES')")
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/variable/{variableId}/validate-alias", method = RequestMethod.POST)
+	public ResponseEntity<Boolean> validateVariableAlias(
+		@PathVariable final String crop, @PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final Integer variableId, @RequestParam(value = "alias") final String alias) {
+
+		try {
+			this.datasetValidator.validateVariableStudyAlias(alias, programUUID, variableId, studyId);
+		} catch (final ApiRequestValidationException e) {
+			return new ResponseEntity<>(false, HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(true, HttpStatus.OK);
 	}
 
 	public ResourceBundleMessageSource getMessageSource() {
