@@ -1,7 +1,7 @@
 
 package org.ibp;
 
-import org.generationcp.commons.hibernate.HTTPRequestAwareServletFilter;
+import org.generationcp.middleware.util.Constants;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.Filter;
@@ -23,7 +23,8 @@ import java.io.IOException;
 public class BmsApiFilter implements Filter {
 
 	@Override
-	public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain) throws IOException, ServletException {
+	public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
+		throws IOException, ServletException {
 		final HttpServletResponse response = (HttpServletResponse) res;
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		response.setHeader("Access-Control-Allow-Methods", "POST, PUT, PATCH, GET, OPTIONS, DELETE");
@@ -33,7 +34,7 @@ public class BmsApiFilter implements Filter {
 		response.setHeader("X-Content-Type-Options", "nosniff");
 		response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
 		response.setHeader("Feature-Policy", "self");
-		response.setHeader("Content-Security-Policy", HTTPRequestAwareServletFilter.CSP_CONFIG);
+		response.setHeader("Content-Security-Policy", Constants.CSP_CONFIG);
 
 		// Specific Cache control setting. An issue is caused by caching in IE9 and IE10. The GET requests to retrieve the variables,
 		// properties, methods or scales after one has been added are not executed again. IE will only execute the GET request again after

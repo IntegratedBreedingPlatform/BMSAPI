@@ -6,6 +6,7 @@ import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDt
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.ibp.api.java.genotype.SampleGenotypeService;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
+import org.ibp.api.rest.sample.SampleListValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,12 +25,17 @@ public class SampleGenotypeServiceImpl implements SampleGenotypeService {
 	private StudyValidator studyValidator;
 
 	@Autowired
+	private SampleListValidator sampleListValidator;
+
+	@Autowired
 	private org.generationcp.middleware.api.genotype.SampleGenotypeService sampleGenotypeServiceMW;
 
 	@Override
-	public List<Integer> importSampleGenotypes(final String programUUID, final Integer studyId,
+	public List<Integer> importSampleGenotypes(final String programUUID, final Integer studyId, final Integer sampleListId,
 		final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtos) {
-		this.sampleGenotypeValidator.validateImport(programUUID, studyId, sampleGenotypeImportRequestDtos);
+		this.studyValidator.validate(studyId, false);
+		this.sampleListValidator.validateSampleList(sampleListId);
+		this.sampleGenotypeValidator.validateImport(programUUID, studyId, sampleListId, sampleGenotypeImportRequestDtos);
 		return this.sampleGenotypeServiceMW.importSampleGenotypes(sampleGenotypeImportRequestDtos);
 	}
 

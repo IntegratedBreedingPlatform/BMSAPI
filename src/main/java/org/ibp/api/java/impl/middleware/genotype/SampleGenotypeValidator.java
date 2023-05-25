@@ -4,8 +4,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.genotype.SampleGenotypeService;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeImportRequestDto;
-import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
+import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearchFilter;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sample.SampleDTO;
@@ -24,7 +25,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,6 +37,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class SampleGenotypeValidator {
+
+	// Maximum number of genotype marker variables per sample list
+	public static final int MAX_NUMBER_OF_VARIABLES_PER_SAMPLE_LIST = 20;
 
 	@Autowired
 	private VariableService variableService;
@@ -46,7 +52,8 @@ public class SampleGenotypeValidator {
 
 	protected BindingResult errors;
 
-	public void validateImport(final String programUUID, final Integer studyId,
+	// Validate the import request
+	public void validateImport(final String programUUID, final Integer studyId, final Integer sampleListId,
 		final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtoList) {
 		BaseValidator.checkNotEmpty(sampleGenotypeImportRequestDtoList, "genotype.import.request.null");
 		this.errors = new MapBindingResult(new HashMap<>(), StudyImportRequestDTO.class.getName());
@@ -58,12 +65,11 @@ public class SampleGenotypeValidator {
 			this.errors.reject("sample.uids.not.exist", "Some sampleUIDs were not found in the system. Please check");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
-		this.validateVariableIds(programUUID, sampleGenotypeImportRequestDtoList);
-		final List<Integer> sampleIds = sampleDTOMap.values().stream().map(SampleDTO::getSampleId).collect(Collectors.toList());
-		this.checkIfSamplesAlreadyHaveGenotypeData(studyId, sampleIds);
+		this.validateVariableIds(studyId, sampleListId, programUUID, sampleGenotypeImportRequestDtoList);
 	}
 
-	public void validateVariableIds(final String programUUID,
+	// Validate the variable ids in the import request
+	public void validateVariableIds(final Integer studyId, final Integer sampleListId, final String programUUID,
 		final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtoList) {
 		final Set<Integer> variableIds = sampleGenotypeImportRequestDtoList.stream()
 			.map(genotypeImportRequestDto -> Integer.valueOf(genotypeImportRequestDto.getVariableId())).collect(Collectors.toSet());
@@ -73,20 +79,49 @@ public class SampleGenotypeValidator {
 		variableFilter.setProgramUuid(programUUID);
 		final Map<String, VariableDetails> variables = this.variableService.getVariablesByFilter(variableFilter).stream()
 			.collect(Collectors.toMap(VariableDetails::getId, Function.identity()));
+
+		// Check if the variables in specified in the request are existing
+		// If not, throw an error
 		if (variables.size() != variableIds.size()) {
 			this.errors.reject("genotype.import.variable.id.invalid", "");
 			throw new ApiRequestValidationException(this.errors.getAllErrors());
 		}
 
-		// Validate the values
+		// Get the existing genotype marker variables in the sample list
+		final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
+		filter.setStudyId(studyId);
+		filter.setSampleListIds(Arrays.asList(sampleListId));
+		final Map<Integer, MeasurementVariable> existingGenotypeVariablesInSampleList =
+			this.sampleGenotypeServiceMiddleware.getSampleGenotypeVariables(filter);
+
+		final Set<Integer> variablesIdsFromRequest =
+			variables.keySet().stream().map(Integer::parseInt).collect(Collectors.toSet());
+		final Set<Integer> variableIdsFromTheSampleList = new HashSet<>(existingGenotypeVariablesInSampleList.keySet());
+
+		final Set<Integer> uncommonVariableIds = new HashSet<>(variablesIdsFromRequest);
+		uncommonVariableIds.removeAll(variableIdsFromTheSampleList);
+
+		// If the import request has new variables that are not yet existing in the sample list,
+		// we have to make sure that the new variables that will be added + number of existing variables will not exceed the
+		// maximum number of genotype variables allowed per sample list.
+		// Otherwise, we will throw an error.
+		if (variableIdsFromTheSampleList.size() + uncommonVariableIds.size() > MAX_NUMBER_OF_VARIABLES_PER_SAMPLE_LIST) {
+			this.errors.reject("genotype.import.variables.exceed.maximum.limit.per.sample.list",
+				new Object[] {MAX_NUMBER_OF_VARIABLES_PER_SAMPLE_LIST}, "");
+			throw new ApiRequestValidationException(this.errors.getAllErrors());
+		}
+
+		// Validate the genotype value based on the scale type of the variable.
 		for (final SampleGenotypeImportRequestDto importData : sampleGenotypeImportRequestDtoList) {
 			final VariableDetails variable = variables.get(importData.getVariableId());
 			if (!this.isDataValid(importData, variable)) {
 				throw new ApiRequestValidationException(this.errors.getAllErrors());
 			}
 		}
+
 	}
 
+	// Validate the genotype value based on the scale type of the variable.
 	private boolean isDataValid(final SampleGenotypeImportRequestDto importData, final VariableDetails variable) {
 		if (StringUtils.isEmpty(importData.getValue())) {
 			return true;
@@ -137,17 +172,4 @@ public class SampleGenotypeValidator {
 		return true;
 	}
 
-	private void checkIfSamplesAlreadyHaveGenotypeData(final Integer studyId, final List<Integer> sampleIds) {
-		final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO = new SampleGenotypeSearchRequestDTO();
-		sampleGenotypeSearchRequestDTO.setStudyId(studyId);
-		final SampleGenotypeSearchRequestDTO.GenotypeFilter filter = new SampleGenotypeSearchRequestDTO.GenotypeFilter();
-		filter.setSampleIds(sampleIds);
-		sampleGenotypeSearchRequestDTO.setFilter(filter);
-		final long sampleWithGenotypesCount =
-			this.sampleGenotypeServiceMiddleware.countFilteredSampleGenotypes(sampleGenotypeSearchRequestDTO);
-		if (sampleWithGenotypesCount > 0) {
-			this.errors.reject("genotype.import.samples.already.have.genotype.data", "");
-			throw new ApiRequestValidationException(this.errors.getAllErrors());
-		}
-	}
 }

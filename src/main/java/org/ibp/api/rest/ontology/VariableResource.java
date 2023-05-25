@@ -4,6 +4,7 @@ package org.ibp.api.rest.ontology;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
 import org.generationcp.middleware.api.ontology.VariableSearchRequest;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -249,6 +250,9 @@ public class VariableResource {
 		}
 		if (!CollectionUtils.isEmpty(request.getVariableTypeIds())) {
 			VariableType.getByIds(request.getVariableTypeIds()).forEach(filter::addVariableType);
+		}
+		if (StringUtils.isNotEmpty(request.getNameOrAlias())) {
+			filter.setNameOrAlias(request.getNameOrAlias());
 		}
 
 		final List<Variable> results = this.variableService.searchVariables(filter);

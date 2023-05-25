@@ -38,12 +38,13 @@ public class SampleGenotypeResource {
 
 	@ApiOperation(value = "Import sample genotypes into study", notes = "Import sample genotypes into study")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_SAMPLE_LISTS', 'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE')")
-	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/samples/genotypes", method = RequestMethod.POST)
+	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/samples/genotypes/{sampleListId}", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<List<Integer>> importSampleGenotypes(final @PathVariable String crop,
-		@PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@PathVariable final String programUUID, @PathVariable final Integer studyId, @PathVariable final Integer sampleListId,
 		@RequestBody final List<SampleGenotypeImportRequestDto> sampleGenotypeImportRequestDtos) {
-		return new ResponseEntity<>(this.sampleGenotypeService.importSampleGenotypes(programUUID, studyId, sampleGenotypeImportRequestDtos),
+		return new ResponseEntity<>(
+			this.sampleGenotypeService.importSampleGenotypes(programUUID, studyId, sampleListId, sampleGenotypeImportRequestDtos),
 			HttpStatus.OK);
 	}
 
@@ -61,7 +62,8 @@ public class SampleGenotypeResource {
 			value = "Sorting criteria in the format: property,asc|desc. ")
 	})
 	public ResponseEntity<List<SampleGenotypeDTO>> getGenotypesTable(final @PathVariable String crop,
-		@PathVariable final String programUUID, @PathVariable final Integer studyId, @RequestBody final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO,
+		@PathVariable final String programUUID, @PathVariable final Integer studyId,
+		@RequestBody final SampleGenotypeSearchRequestDTO sampleGenotypeSearchRequestDTO,
 		final @ApiIgnore @PageableDefault(page = 0, size = PagedResult.DEFAULT_PAGE_SIZE) Pageable pageable) {
 		return new PaginatedSearch()
 			.getPagedResult(() -> this.sampleGenotypeService.countFilteredSampleGenotypes(new SampleGenotypeSearchRequestDTO(studyId)),

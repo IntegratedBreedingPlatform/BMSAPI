@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.design.type;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -80,7 +81,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 		experimentalDesignInput.setNumberOfBlocks(experimentalDesignInput.getReplicationsCount());
 
 		// Generate experiment design parameter input to design runner
-		final Map<BreedingViewVariableParameter, String> map = getBreedingViewVariablesMap(standardVariablesMap);
+		final Map<BreedingViewVariableParameter, String> map = this.getBreedingViewVariablesMap(standardVariablesMap);
 		final MainDesign mainDesign = this.experimentDesignGenerator
 			.generate(experimentalDesignInput, map, null, null, this.getListItemsMap(treatmentFactors, treatmentLevels, entryNumberName));
 
@@ -88,7 +89,7 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
 		return this.experimentalDesignProcessor
 			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables,
-					studyEntryDtoList, mainDesign, entryNumberName,
+				studyEntryDtoList, mainDesign, entryNumberName,
 				treatmentFactorValues, new HashMap<>());
 	}
 
@@ -135,12 +136,16 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 		final Map treatmentFactorsData = experimentalDesignInput.getTreatmentFactorsData();
 		if (treatmentFactorsData != null) {
 			final Map<Integer, Integer> treatmentFactorLevelToLabelIdMap = new HashMap<>();
+			final Map<Integer, String> treatmentFactorLevelAliasMap = new HashMap<>();
 
 			final Iterator keySetIter = treatmentFactorsData.keySet().iterator();
 			while (keySetIter.hasNext()) {
 				final String key = (String) keySetIter.next();
 				final Map treatmentData = (Map) treatmentFactorsData.get(key);
 				treatmentFactorLevelToLabelIdMap.put(Integer.valueOf(key), (Integer) treatmentData.get("variableId"));
+				if (treatmentData.containsKey("alias") && StringUtils.isNotEmpty((String) treatmentData.get("alias"))) {
+					treatmentFactorLevelAliasMap.put(Integer.valueOf(key), (String) treatmentData.get("alias"));
+				}
 			}
 
 			final List<Integer> treatmentFactorIds = new ArrayList<>(treatmentFactorLevelToLabelIdMap.values());
@@ -156,6 +161,9 @@ public class RandomizeCompleteBlockDesignTypeServiceImpl implements Experimental
 					.transform(standardVariableMap.get(treatmentFactorLevelId), true, VariableType.TREATMENT_FACTOR);
 				treatmentFactorLevelVariable.setTreatmentLabel(treatmentFactorLevelVariable.getName());
 				treatmentFactorLevelVariable.setValue(treatmentFactorLevelVariable.getName());
+				if (treatmentFactorLevelAliasMap.containsKey(treatmentFactorLevelId)) {
+					treatmentFactorLevelVariable.setAlias(treatmentFactorLevelAliasMap.get(treatmentFactorLevelId));
+				}
 				measurementVariables.add(treatmentFactorLevelVariable);
 
 				final Integer treatmentFactorLabelId = treatmentFactorLevelToLabelIdMap.get(treatmentFactorLevelId);
