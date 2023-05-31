@@ -13,6 +13,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.permission.PermissionService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.ibp.api.java.crop.CropService;
+import org.ibp.api.java.impl.middleware.common.ContextResolutionException;
 import org.ibp.api.java.impl.middleware.common.ContextResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,8 +24,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,7 +70,7 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 				final WorkbenchUser workbenchUser = matchingUsers.get(0);
 				// FIXME Populate flags for accountNonExpired, credentialsNonExpired, accountNonLocked properly, all true for now.
 				return new BMSUser(workbenchUser.getUserid(), workbenchUser.getName(), workbenchUser.getPassword(),
-						this.getAuthorities(workbenchUser));
+					this.getAuthorities(workbenchUser));
 			}
 			throw new UsernameNotFoundException("Invalid username/password.");
 		} catch (final MiddlewareQueryException e) {
@@ -80,28 +85,29 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 
 		final String programUUID = this.contextResolver.resolveProgramUuidFromRequest();
 		final Integer programId = StringUtils.isEmpty(programUUID) ? null : this.getProgramId(programUUID);
+		final Boolean isBrapi = this.isBrapi();
 
 		final List<PermissionDto> permissions = this.permissionService.getPermissions( //
 			workbenchUser.getUserid(), //
 			StringUtils.isEmpty(cropName) ? null : cropName, //
-			programId);
+			programId, isBrapi);
 
 		// Skip crop authorization checking if the user has Site Admin Permission
-		if(!StringUtils.isEmpty(cropName) && !hasSiteAdminPermissions(permissions)) {
+		if (!StringUtils.isEmpty(cropName) && !hasSiteAdminPermissions(permissions)) {
 			final List<String> crops = this.cropService.getAvailableCropsForUser(workbenchUser.getUserid());
 			crops.replaceAll(String::toUpperCase);
-			if(!crops.contains(cropName.trim().toUpperCase())) {
+			if (!crops.contains(cropName.trim().toUpperCase())) {
 				throw new AccessDeniedException("User is not authorized for crop.");
 			}
 		}
 
 		//Required because not all our REST services that receives programUUID has a PreAuthorize control
-		if (programId != null && !workbenchUser.hasAccessToAGivenProgram(cropName, Long.valueOf(programId))) {
+		if (!isBrapi && programId != null && !workbenchUser.hasAccessToAGivenProgram(cropName, Long.valueOf(programId))) {
 			throw new AccessDeniedException("User is not authorized for the program.");
 		}
 
 		return permissions.stream().map(permissionDto -> new SimpleGrantedAuthority(permissionDto.getName())).collect(
-				Collectors.toCollection(ArrayList::new));
+			Collectors.toCollection(ArrayList::new));
 	}
 
 	private boolean hasSiteAdminPermissions(final List<PermissionDto> permissions) {
@@ -112,6 +118,19 @@ public class WorkbenchUserDetailsService implements UserDetailsService {
 	private Integer getProgramId(final String programUUID) {
 		final Project project = this.programService.getProjectByUuid(programUUID);
 		return project != null ? project.getProjectId().intValue() : null;
+	}
+
+	private boolean isBrapi() {
+		final HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		if (request == null) {
+			throw new ContextResolutionException("Request is null");
+		}
+
+		final String path = request.getRequestURI().substring(request.getContextPath().length());
+		final String[] parts = path.trim().toLowerCase().split("/");
+		final int brapiTokenIndex = Arrays.asList(parts).indexOf("brapi");
+
+		return brapiTokenIndex != -1;
 	}
 
 }
