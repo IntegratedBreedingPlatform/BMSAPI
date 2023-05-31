@@ -16,9 +16,9 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ObservationsTableValidatorTest {
+public class StudyBookTableValidatorTest {
 
-	private final ObservationsTableValidator observationsTableValidator = new ObservationsTableValidator();
+	private final StudyBookTableValidator studyBookTableValidator = new StudyBookTableValidator();
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testValidateListFailsWhenDataHasLessThan2Elements() {
@@ -26,7 +26,7 @@ public class ObservationsTableValidatorTest {
 		final List<String> headers = Arrays.asList("A", "B");
 		data.add(headers);
 		try {
-			observationsTableValidator.validateList(data);
+			studyBookTableValidator.validateList(data);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("table.should.have.at.least.two.rows"));
 			throw e;
@@ -41,7 +41,7 @@ public class ObservationsTableValidatorTest {
 		data.add(headers);
 		data.add(rows);
 		try {
-			observationsTableValidator.validateList(data);
+			studyBookTableValidator.validateList(data);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("table.format.inconsistency"));
 			throw e;
@@ -55,7 +55,7 @@ public class ObservationsTableValidatorTest {
 		final List<String> rows = Arrays.asList("A", "B");
 		data.add(headers);
 		data.add(rows);
-		observationsTableValidator.validateList(data);
+		studyBookTableValidator.validateList(data);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -69,7 +69,7 @@ public class ObservationsTableValidatorTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
 		try {
-			observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
+			studyBookTableValidator.validateStudyBookValuesDataTypes(data, measurementVariables, false);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalid.cell.numeric.value"));
 			throw e;
@@ -86,7 +86,7 @@ public class ObservationsTableValidatorTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
 		try {
-			observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
+			studyBookTableValidator.validateStudyBookValuesDataTypes(data, measurementVariables, false);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalid.cell.numeric.value"));
 			throw e;
@@ -102,7 +102,7 @@ public class ObservationsTableValidatorTest {
 		measurementVariable.setDataType("Numeric");
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
-		observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
+		studyBookTableValidator.validateStudyBookValuesDataTypes(data, measurementVariables, false);
 	}
 
 	@Test
@@ -114,7 +114,7 @@ public class ObservationsTableValidatorTest {
 		measurementVariable.setDataType("Numeric");
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
-		observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
+		studyBookTableValidator.validateStudyBookValuesDataTypes(data, measurementVariables, false);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -127,7 +127,7 @@ public class ObservationsTableValidatorTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
 		try {
-			observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
+			studyBookTableValidator.validateStudyBookValuesDataTypes(data, measurementVariables, false);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalid.cell.date.value"));
 			throw e;
@@ -143,7 +143,7 @@ public class ObservationsTableValidatorTest {
 		measurementVariable.setDataTypeId(TermId.DATE_VARIABLE.getId());
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
-		observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
+		studyBookTableValidator.validateStudyBookValuesDataTypes(data, measurementVariables, false);
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
@@ -156,7 +156,7 @@ public class ObservationsTableValidatorTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
 		try {
-			observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
+			studyBookTableValidator.validateStudyBookValuesDataTypes(data, measurementVariables, false);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalidCategoricalValue"));
 			throw e;
@@ -173,7 +173,7 @@ public class ObservationsTableValidatorTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(measurementVariable);
 		try {
-			observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
+			studyBookTableValidator.validateStudyBookValuesDataTypes(data, measurementVariables, false);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("warning.import.save.invalidCategoricalValue"));
 			throw e;
@@ -192,7 +192,7 @@ public class ObservationsTableValidatorTest {
 		final List<ValueReference> possibleValue = new ArrayList<>();
 		possibleValue.add(new ValueReference("c", "category1"));
 		measurementVariable.setPossibleValues(possibleValue);
-		observationsTableValidator.validateObservationsValuesDataTypes(data, measurementVariables);
+		studyBookTableValidator.validateStudyBookValuesDataTypes(data, measurementVariables, false);
 	}
 
 }

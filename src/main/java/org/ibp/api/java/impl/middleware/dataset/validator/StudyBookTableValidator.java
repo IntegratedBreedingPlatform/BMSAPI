@@ -1,6 +1,5 @@
 package org.ibp.api.java.impl.middleware.dataset.validator;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -9,6 +8,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
+import org.ibp.api.java.impl.middleware.dataset.StudyBookTableBuilder;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -18,9 +18,10 @@ import org.springframework.validation.MapBindingResult;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
-public class ObservationsTableValidator {
+public class StudyBookTableValidator {
 
 	private static final String DATA_TYPE_NUMERIC = "Numeric";
 
@@ -47,9 +48,8 @@ public class ObservationsTableValidator {
 
 	}
 
-	public void validateObservationsValuesDataTypes(final Table<String, String, String> inputData,
-			final List<MeasurementVariable> measurementVariables) throws ApiRequestValidationException {
-
+	public void validateStudyBookValuesDataTypes(final Table<String, String, String> inputData,
+												 final List<MeasurementVariable> measurementVariables, final boolean validateCategoricalValues) throws ApiRequestValidationException {
 		final Map<String, MeasurementVariable> mappedVariables = new HashMap<>();
 		measurementVariables.forEach(measurementVariable -> {
 			mappedVariables.putIfAbsent(measurementVariable.getName(), measurementVariable);
@@ -57,19 +57,37 @@ public class ObservationsTableValidator {
 		});
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
+		final Map<String, List<String>> validValuesMap = this.createValidValuesMap(validateCategoricalValues, measurementVariables);
+
 		for (final String observationUnitId : inputData.rowKeySet()) {
 			for (final String variableName : inputData.columnKeySet()) {
 				if (!validateCategoricalVariableHasAPossibleValue(mappedVariables.get(variableName))) {
 					errors.reject("warning.import.save.invalidCategoricalValue", new String[] {variableName}, "");
 					throw new ApiRequestValidationException(errors.getAllErrors());
-				} else if (!validateValue(mappedVariables.get(variableName), inputData.get(observationUnitId, variableName), errors)) {
+				} else if (!validateValue(mappedVariables.get(variableName), inputData.get(observationUnitId, variableName),
+						validateCategoricalValues, validValuesMap, errors)) {
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 			}
 		}
 	}
 
-	private static boolean validateValue(final MeasurementVariable var, final String value, final BindingResult errors) {
+	private static Map<String, List<String>> createValidValuesMap(final boolean validateCategoricalValues, final List<MeasurementVariable> measurementVariables) {
+		final Map<String, List<String>> validValuesMap = new HashMap<>();
+		if (validateCategoricalValues) {
+			for(MeasurementVariable var: measurementVariables) {
+				if (var.getDataTypeId() != null && var.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+					final List<String> validValues = var.getPossibleValues().stream().map(ref -> ref.getName().toUpperCase()).collect(Collectors.toList());
+					validValuesMap.putIfAbsent(var.getName(), validValues);
+					validValuesMap.putIfAbsent(var.getAlias(), validValues);
+				}
+			}
+		}
+		return validValuesMap;
+	}
+
+	private static boolean validateValue(final MeasurementVariable var, final String value, final boolean validateCategoricalValues,
+										 final Map<String, List<String>> validValuesMap, final BindingResult errors) {
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
@@ -79,8 +97,16 @@ public class ObservationsTableValidator {
 		} else if (isInvalidDate(var, value)) {
 			errors.reject("warning.import.save.invalid.cell.date.value", new String[] {var.getAlias(), value}, "");
 			return false;
+		} else if (validateCategoricalValues && isInvalidCategoricalValue(var, value, validValuesMap)) {
+			errors.reject("warning.import.save.invalid.cell.categorical.value", new String[] {var.getAlias(), value}, "");
+			return false;
 		}
 		return true;
+	}
+
+	private static boolean isInvalidCategoricalValue(final MeasurementVariable var, final String value, final Map<String, List<String>> validValuesMap) {
+		return var.getDataTypeId() != null && var.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId() &&
+				!validValuesMap.get(var.getName()).contains(value.toUpperCase());
 	}
 
 	private static boolean isInvalidDate(final MeasurementVariable var, final String value) {

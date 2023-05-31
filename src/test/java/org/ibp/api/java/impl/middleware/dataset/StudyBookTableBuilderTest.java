@@ -17,9 +17,9 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 
 
-public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
+public class StudyBookTableBuilderTest extends ApiUnitTestBase {
 
-	private final ObservationUnitsTableBuilder observationUnitsTableBuilder = new ObservationUnitsTableBuilder();
+	private final StudyBookTableBuilder studyBookTableBuilder = new StudyBookTableBuilder();
 
 	@Test(expected = ApiRequestValidationException.class)
 	public void testBuildFailsWhenHeaderDoesNotContainsObsUnitId() throws Exception {
@@ -29,7 +29,7 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		data.add(headers);
 		data.add(row);
 		try {
-			this.observationUnitsTableBuilder.build(data, null);
+			this.studyBookTableBuilder.buildObservationsTable(data, null);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("required.header.obs.unit.id"));
 			throw e;
@@ -45,7 +45,7 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		data.add(row);
 		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList("A");
 		try {
-			this.observationUnitsTableBuilder.build(data, measurementVariables);
+			this.studyBookTableBuilder.buildObservationsTable(data, measurementVariables);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("duplicated.measurement.variables.not.allowed"));
 			throw e;
@@ -70,7 +70,7 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		data.add(row);
 		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList("B");
 		try {
-			this.observationUnitsTableBuilder.build(data, measurementVariables);
+			this.studyBookTableBuilder.buildObservationsTable(data, measurementVariables);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("no.measurement.variables.input"));
 			throw e;
@@ -86,7 +86,7 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		data.add(row);
 		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList("A");
 		try {
-			this.observationUnitsTableBuilder.build(data, measurementVariables);
+			this.studyBookTableBuilder.buildObservationsTable(data, measurementVariables);
 		} catch (final ApiRequestValidationException e) {
 			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("empty.observation.unit.id"));
 			throw e;
@@ -105,12 +105,12 @@ public class ObservationUnitsTableBuilderTest extends ApiUnitTestBase {
 		data.add(row2);
 		data.add(row3);
 		final List<MeasurementVariable> measurementVariables = this.createMeasurementVariableList("A");
-		final Table<String, String, String> table = this.observationUnitsTableBuilder.build(data, measurementVariables);
+		final Table<String, String, String> table = this.studyBookTableBuilder.buildObservationsTable(data, measurementVariables);
 		assertThat(table.columnKeySet(), hasSize(1));
 		assertThat(table.rowKeySet(), hasSize(2));
 		assertThat(table.columnKeySet(), contains("A"));
 		assertThat(table.rowKeySet(), contains("Obs1", "Obs2"));
-		assertThat(this.observationUnitsTableBuilder.getDuplicatedFoundNumber(), is(1));
+		assertThat(this.studyBookTableBuilder.getDuplicatedFoundNumber(), is(1));
 		assertThat(table.get("Obs2", "A"), is("A2"));
 	}
 

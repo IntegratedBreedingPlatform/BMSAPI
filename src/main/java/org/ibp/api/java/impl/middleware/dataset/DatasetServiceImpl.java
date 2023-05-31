@@ -45,7 +45,7 @@ import org.ibp.api.java.impl.middleware.dataset.validator.DatasetGeneratorInputV
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
-import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.StudyBookTableValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
@@ -54,6 +54,7 @@ import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
+import org.ibp.api.rest.dataset.EnvironmentVariableValuesPutRequestInput;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
@@ -126,7 +127,7 @@ public class DatasetServiceImpl implements DatasetService {
 	private StudyDataManager studyDataManager;
 
 	@Autowired
-	private ObservationsTableValidator observationsTableValidator;
+	private StudyBookTableValidator studyBookTableValidator;
 
 	@Autowired
 	private DatasetTypeService datasetTypeService;
@@ -493,7 +494,7 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
 
-		this.observationsTableValidator.validateList(input.getData());
+		this.studyBookTableValidator.validateList(input.getData());
 
 		final List<MeasurementVariable> datasetMeasurementVariables =
 			this.middlewareDatasetService.getDatasetMeasurementVariables(datasetId);
@@ -503,8 +504,8 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final ObservationUnitsTableBuilder observationUnitsTableBuilder = new ObservationUnitsTableBuilder();
-		final Table<String, String, String> table = observationUnitsTableBuilder.build(input.getData(), datasetMeasurementVariables);
+		final StudyBookTableBuilder studyBookTableBuilder = new StudyBookTableBuilder();
+		final Table<String, String, String> table = studyBookTableBuilder.buildObservationsTable(input.getData(), datasetMeasurementVariables);
 
 		// Get Map<OBS_UNIT_ID, Observations>
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = this.middlewareDatasetService
@@ -529,15 +530,64 @@ public class DatasetServiceImpl implements DatasetService {
 		this.correctKSUDateFormatIfNecessary(table, datasetMeasurementVariables);
 
 		// Check for data issues
-		this.observationsTableValidator.validateObservationsValuesDataTypes(table, datasetMeasurementVariables);
+		this.studyBookTableValidator.validateStudyBookValuesDataTypes(table, datasetMeasurementVariables, false);
 
 		// Processing warnings
 		if (input.isProcessWarnings()) {
 			errors = this.processObservationsDataWarningsAsErrors(table, storedData, rowsNotBelongingToDataset,
-				observationUnitsTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
+				studyBookTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
 		}
 		if (!errors.hasErrors()) {
 			this.middlewareDatasetService.importDataset(datasetId, table, input.isDraftMode(), false);
+		} else {
+			throw new PreconditionFailedException(errors.getAllErrors());
+		}
+
+	}
+
+	@Override
+	public void importEnvironmentVariableValues(final Integer studyId, final Integer datasetId, final EnvironmentVariableValuesPutRequestInput input) {
+		BindingResult errors = new MapBindingResult(new HashMap<>(), EnvironmentVariableValuesPutRequestInput.class.getName());
+
+		this.studyValidator.validate(studyId, true);
+		this.datasetValidator.validateDataset(studyId, datasetId);
+
+		this.studyBookTableValidator.validateList(input.getData());
+
+		final List<MeasurementVariable> datasetMeasurementVariables =
+				this.middlewareDatasetService.getDatasetMeasurementVariablesByVariableType(datasetId,
+						Arrays.asList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.ENVIRONMENT_CONDITION.getId()));
+
+		if (datasetMeasurementVariables.isEmpty()) {
+			errors.reject("no.variables.dataset", null, "");
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
+
+		final StudyBookTableBuilder studyBookTableBuilder = new StudyBookTableBuilder();
+		final Table<String, String, String> table = studyBookTableBuilder.buildEnvironmentVariablesTable(input.getData(), datasetMeasurementVariables);
+
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> trialInstanceMap =
+				this.getEnvironmentObservationUnitRows(datasetMeasurementVariables, studyId, datasetId);
+		// remove elements that does not belong to the dataset
+		final List<String> trialInstanceNumberList = new ArrayList<>(table.rowKeySet());
+		trialInstanceNumberList.removeAll(trialInstanceMap.keySet());
+		for (final String trialInstanceNumber : trialInstanceNumberList) {
+			table.row(trialInstanceNumber).clear();
+		}
+
+		// Check for data issues
+		this.studyBookTableValidator.validateStudyBookValuesDataTypes(table, datasetMeasurementVariables, true);
+
+		if (studyBookTableBuilder.getDuplicatedFoundNumber() > 0) {
+			errors.reject("duplicated.trial.instance.number", null, "");
+		}
+
+		if (trialInstanceNumberList.size() > 0) {
+			errors.reject("some.trial.instance.number.invalid",null, "");
+		}
+
+		if (!errors.hasErrors()) {
+			// call saving of environment variable values
 		} else {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
@@ -569,10 +619,10 @@ public class DatasetServiceImpl implements DatasetService {
 		// transform BrAPI format to DatasetService format
 		final ObservationsPutRequestInput input = transformObservations(observations, datasetMeasurementVariables);
 
-		this.observationsTableValidator.validateList(input.getData());
+		this.studyBookTableValidator.validateList(input.getData());
 
-		final ObservationUnitsTableBuilder observationUnitsTableBuilder = new ObservationUnitsTableBuilder();
-		final Table<String, String, String> table = observationUnitsTableBuilder.build(input.getData(), datasetMeasurementVariables);
+		final StudyBookTableBuilder studyBookTableBuilder = new StudyBookTableBuilder();
+		final Table<String, String, String> table = studyBookTableBuilder.buildObservationsTable(input.getData(), datasetMeasurementVariables);
 
 		// Get Map<OBS_UNIT_ID, Observations>
 		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> storedData = this.middlewareDatasetService
@@ -595,12 +645,12 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		// Check for data issues
-		this.observationsTableValidator.validateObservationsValuesDataTypes(table, datasetMeasurementVariables);
+		this.studyBookTableValidator.validateStudyBookValuesDataTypes(table, datasetMeasurementVariables, false);
 
 		// Processing warnings
 		if (input.isProcessWarnings()) {
 			errors = this.processObservationsDataWarningsAsErrors(table, storedData, rowsNotBelongingToDataset,
-				observationUnitsTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
+				studyBookTableBuilder.getDuplicatedFoundNumber(), input.isDraftMode());
 		}
 		if (!errors.hasErrors()) {
 			final Table<String, Integer, Integer> observationDbIdsTable =
@@ -612,6 +662,27 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
 
+	}
+
+	private Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> getEnvironmentObservationUnitRows(
+			final List<MeasurementVariable> environmentVariables, final Integer studyId, final Integer datasetId) {
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		final List<MeasurementVariableDto> environmentDetails = new ArrayList<>();
+		final List<MeasurementVariableDto> environmentConditions = new ArrayList<>();
+		for (final MeasurementVariable variable: environmentVariables) {
+			if (VariableType.ENVIRONMENT_DETAIL.getId().equals(variable.getVariableType().getId())) {
+				environmentDetails.add(new MeasurementVariableDto(variable.getTermId(), variable.getName()));
+			} else if (VariableType.ENVIRONMENT_CONDITION.getId().equals(variable.getVariableType().getId())) {
+				environmentConditions.add(new MeasurementVariableDto(variable.getTermId(), variable.getName()));
+			}
+		}
+		searchDTO.setEnvironmentDetails(environmentDetails);
+		searchDTO.setEnvironmentConditions(environmentConditions);
+		searchDTO.setEnvironmentDatasetId(datasetId);
+		final PageRequest pageRequest = new PageRequest(0, Integer.MAX_VALUE);
+		final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> rows = this.middlewareDatasetService
+			.getObservationUnitRows(studyId, datasetId, searchDTO, pageRequest);
+		return rows.stream().collect(Collectors.toMap(row -> String.valueOf(row.getTrialInstance()), Function.identity()));
 	}
 
 	static ObservationsPutRequestInput transformObservations(
