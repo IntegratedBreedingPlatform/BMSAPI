@@ -529,9 +529,10 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> acceptDraftData(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId) {
+		@PathVariable final Integer datasetId,
+		@RequestParam(value = "instanceIds", required = false) final Set<Integer> instanceIds) {
 
-		this.studyDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
+		this.studyDatasetService.acceptDatasetDraftData(studyId, datasetId, instanceIds);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -541,9 +542,10 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> rejectDraftData(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId) {
+		@PathVariable final Integer datasetId,
+		@RequestParam(value = "instanceIds", required = false) final Set<Integer> instanceIds) {
 
-		this.studyDatasetService.rejectDatasetDraftData(studyId, datasetId);
+		this.studyDatasetService.rejectDatasetDraftData(studyId, datasetId, instanceIds);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -568,9 +570,10 @@ public class DatasetResource {
 	@ResponseBody
 	public ResponseEntity<Void> setValuesToMissing(@PathVariable final String crop, @PathVariable final String programUUID,
 		@PathVariable final Integer studyId,
-		@PathVariable final Integer datasetId) {
+		@PathVariable final Integer datasetId,
+		@RequestParam(value = "instanceIds", required = false) final Set<Integer> instanceIds) {
 
-		this.studyDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
+		this.studyDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId, instanceIds);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 

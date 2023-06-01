@@ -78,7 +78,7 @@ public interface DatasetService {
 	 * @param studyId         Id of the study
 	 * @param datasetId       Id of the dataset
 	 * @param datasetVariable Variable to be added
-	 * @param variableType Type of variable
+	 * @param variableType    Type of variable
 	 * @return A measurement variable.
 	 */
 	MeasurementVariable addDatasetVariable(Integer studyId, Integer datasetId, DatasetVariable datasetVariable, VariableType variableType);
@@ -109,9 +109,9 @@ public interface DatasetService {
 	/**
 	 * Given a dataset and a list of variables, it will de-associated them from the dataset
 	 *
-	 * @param studyId     Id of the study
-	 * @param datasetId   Id of the dataset
-	 * @param variableIds List of variables
+	 * @param studyId      Id of the study
+	 * @param datasetId    Id of the dataset
+	 * @param variableIds  List of variables
 	 * @param variableType Type of variable
 	 */
 	void removeDatasetVariables(Integer studyId, Integer datasetId, List<Integer> variableIds, VariableType variableType);
@@ -183,7 +183,7 @@ public interface DatasetService {
 	 * @param studyId   Id of the study
 	 * @param datasetId Id of the dataset
 	 * @param searchDTO Search DTO
-	 * @param pageable Pagination parameters
+	 * @param pageable  Pagination parameters
 	 * @return List of ObservationUnitRow
 	 */
 	//TODO ObservationUnitsSearchDTO exposes a set of attributes that can not be used by the user to configure the search.
@@ -240,7 +240,7 @@ public interface DatasetService {
 	/**
 	 * Imports a list of observations for the environment
 	 *
-	 * @param studyDbId   Id of the study/environment
+	 * @param studyDbId Id of the study/environment
 	 * @param input     ObservationsPutRequestInput
 	 */
 	void importObservations(Integer studyDbId, List<ObservationDTO> input);
@@ -260,9 +260,9 @@ public interface DatasetService {
 	 * Count all observation units for a dataset (draftMode = FALSE to count all of them, draftMode = TRUE to count only observation
 	 * units with at least one draft observation)
 	 *
-	 * @param datasetId  Id of the dataset
+	 * @param datasetId   Id of the dataset
 	 * @param instanceIds Id of the instance
-	 * @param draftMode  Indicates to count all observation units  or draft observations
+	 * @param draftMode   Indicates to count all observation units  or draft observations
 	 * @return Number of observations units that matches the dataset id and draftMode
 	 */
 	Integer countAllObservationUnitsForDataset(Integer datasetId, List<Integer> instanceIds, Boolean draftMode);
@@ -272,10 +272,10 @@ public interface DatasetService {
 	 * (draftMode = FALSE to count all of them, draftMode = TRUE to count only observation
 	 * units with at least one draft observation)
 	 *
-	 * @param datasetId  Id of the dataset
+	 * @param datasetId   Id of the dataset
 	 * @param instanceIds Id of the instance
-	 * @param draftMode  draftMode
-	 * @param filter     Filyer
+	 * @param draftMode   draftMode
+	 * @param filter      Filyer
 	 * @return Number of observation units that matches the datasetId, draftMode and filter
 	 */
 	long countFilteredObservationUnitsForDataset(
@@ -284,26 +284,29 @@ public interface DatasetService {
 	/**
 	 * It will accept all the draft data even when there are out of bounds values for numerical types.
 	 *
-	 * @param studyId   Id of the study
-	 * @param datasetId Id of the dataset
+	 * @param studyId     Id of the study
+	 * @param datasetId   Id of the dataset
+	 * @param instanceIds Id of the instance
 	 */
-	void acceptAllDatasetDraftData(Integer studyId, Integer datasetId);
+	void acceptDatasetDraftData(Integer studyId, Integer datasetId, Set<Integer> instanceIds);
 
 	/**
 	 * Accepts the in bounds values for the draft data and set as missing the out of bounds values
 	 *
-	 * @param studyId   Id of the study
-	 * @param datasetId Id of the dataset
+	 * @param studyId     Id of the study
+	 * @param datasetId   Id of the dataset
+	 * @param instanceIds Id of the instance
 	 */
-	void acceptDraftDataAndSetOutOfBoundsToMissing(Integer studyId, Integer datasetId);
+	void acceptDraftDataAndSetOutOfBoundsToMissing(Integer studyId, Integer datasetId, Set<Integer> instanceIds);
 
 	/**
 	 * It will reject all the draft data for a dataset
 	 *
-	 * @param studyId   Id of the study
-	 * @param datasetId Id of the dataset
+	 * @param studyId     Id of the study
+	 * @param datasetId   Id of the dataset
+	 * @param instanceIds Id of the instance
 	 */
-	void rejectDatasetDraftData(Integer studyId, Integer datasetId);
+	void rejectDatasetDraftData(Integer studyId, Integer datasetId, Set<Integer> instanceIds);
 
 	/**
 	 * @param studyId   Id of the study
@@ -345,7 +348,8 @@ public interface DatasetService {
 
 	void replaceObservationUnitsEntry(int studyId, int datasetId, ObservationUnitEntryReplaceRequest request);
 
-	ObservationUnitsMetadata getObservationUnitsMetadata(int studyId, int datasetId, SearchCompositeDto<ObservationUnitsSearchDTO, Integer> request);
+	ObservationUnitsMetadata getObservationUnitsMetadata(int studyId, int datasetId,
+		SearchCompositeDto<ObservationUnitsSearchDTO, Integer> request);
 
 	Long countObservationUnits(Integer dataSetId);
 
