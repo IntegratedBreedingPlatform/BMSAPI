@@ -118,7 +118,7 @@ public class LocationResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get a location given an id", notes = "Get a location")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS', 'MS_ANALYZE_WITH_STA_BRAPP', 'MS_ANALYZE_WITH_DECISION_SUPPORT')")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS', 'STUDIES', 'MANAGE_STUDIES', 'MS_STUDY_ACTIONS', 'MS_ANALYZE_WITH_STA_BRAPP', 'MS_ANALYZE_WITH_DECISION_SUPPORT')")
 	@RequestMapping(value = "/{crop}/brapi/v2/locations/{locationDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
