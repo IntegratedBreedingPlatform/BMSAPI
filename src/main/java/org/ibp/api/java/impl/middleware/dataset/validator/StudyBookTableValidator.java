@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import com.google.common.collect.Table;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -13,8 +12,6 @@ import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.dataset.StudyBookTableBuilder;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -29,6 +26,11 @@ import java.util.stream.Collectors;
 
 @Component
 public class StudyBookTableValidator {
+
+	@Autowired
+	private LocationService locationService;
+
+	private static final String LOCATION_ID = "LOCATION_ID";
 
 	private static final String DATA_TYPE_NUMERIC = "Numeric";
 	private static final String LOCATION_NAME = "LOCATION_NAME";
@@ -86,7 +88,7 @@ public class StudyBookTableValidator {
 				if (!validateCategoricalVariableHasAPossibleValue(mappedVariables.get(variableName))) {
 					errors.reject("warning.import.save.invalidCategoricalValue", new String[] {variableName}, "");
 					throw new ApiRequestValidationException(errors.getAllErrors());
-				} else if (!validateValue(mappedVariables.get(variableName), inputData.get(observationUnitId, variableName),
+				} else if (!LOCATION_ID.equalsIgnoreCase(variableName) && !validateValue(mappedVariables.get(variableName), inputData.get(observationUnitId, variableName),
 						validateCategoricalValues, validValuesMap, errors, validLocationNames)) {
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}

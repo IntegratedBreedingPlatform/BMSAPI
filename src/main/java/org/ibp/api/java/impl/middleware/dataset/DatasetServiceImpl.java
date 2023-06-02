@@ -587,7 +587,7 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		if (!errors.hasErrors()) {
-			// call saving of environment variable values
+			this.middlewareDatasetService.importEnvironmentVariableValues(studyId, datasetId, table);
 		} else {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
