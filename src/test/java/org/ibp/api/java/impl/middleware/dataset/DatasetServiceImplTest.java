@@ -188,7 +188,8 @@ public class DatasetServiceImplTest {
 
 		this.studyDatasetService.addDatasetVariable(studyId, datasetId, datasetVariable, VariableType.SELECTION_METHOD);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
-		Mockito.verify(this.datasetValidator).validateDatasetVariable(studyId, datasetId, datasetVariable, false, VariableType.SELECTION_METHOD);
+		Mockito.verify(this.datasetValidator)
+			.validateDatasetVariable(studyId, datasetId, datasetVariable, false, VariableType.SELECTION_METHOD);
 		Mockito.verify(this.middlewareDatasetService).addDatasetVariable(datasetId, variableId, variableType, alias);
 		Mockito.verify(this.measurementVariableTransformer).transform(this.standardVariable, false);
 		Mockito.verify(this.variable).setName(alias);
@@ -821,7 +822,8 @@ public class DatasetServiceImplTest {
 		final Random random = new Random();
 		final int studyId = random.nextInt();
 		final int datasetId = random.nextInt();
-		this.studyDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId);
+		final Set<Integer> instanceIds = Sets.newHashSet(random.nextInt());
+		this.studyDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId, instanceIds);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
 	}
@@ -831,7 +833,8 @@ public class DatasetServiceImplTest {
 		final Random random = new Random();
 		final int studyId = random.nextInt();
 		final int datasetId = random.nextInt();
-		this.studyDatasetService.acceptAllDatasetDraftData(studyId, datasetId);
+		final Set<Integer> instanceIds = Sets.newHashSet(random.nextInt());
+		this.studyDatasetService.acceptDatasetDraftData(studyId, datasetId, instanceIds);
 		Mockito.verify(this.studyValidator).validate(studyId, true);
 		Mockito.verify(this.datasetValidator).validateDataset(studyId, datasetId);
 	}
