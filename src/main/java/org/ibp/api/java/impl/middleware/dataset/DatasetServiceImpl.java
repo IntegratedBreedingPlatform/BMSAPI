@@ -698,6 +698,9 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
 		this.datasetValidator.validateObservationDatasetType(datasetId);
+		if (!CollectionUtils.isEmpty(instanceIds)) {
+			this.instanceValidator.validate(datasetId, instanceIds);
+		}
 		this.middlewareDatasetService.acceptDraftDataAndSetOutOfBoundsToMissing(studyId, datasetId, instanceIds);
 	}
 
@@ -742,6 +745,9 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
 		this.datasetValidator.validateObservationDatasetType(datasetId);
+		if (!CollectionUtils.isEmpty(instanceIds)) {
+			this.instanceValidator.validate(datasetId, instanceIds);
+		}
 		this.middlewareDatasetService.acceptDatasetDraftData(studyId, datasetId, instanceIds);
 	}
 
@@ -750,6 +756,9 @@ public class DatasetServiceImpl implements DatasetService {
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
 		this.datasetValidator.validateObservationDatasetType(datasetId);
+		if (!CollectionUtils.isEmpty(instanceIds)) {
+			this.instanceValidator.validate(datasetId, instanceIds);
+		}
 		this.middlewareDatasetService.rejectDatasetDraftData(datasetId, instanceIds);
 	}
 
