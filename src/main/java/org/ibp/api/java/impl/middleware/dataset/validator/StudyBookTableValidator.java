@@ -3,6 +3,9 @@ package org.ibp.api.java.impl.middleware.dataset.validator;
 import com.google.common.collect.Table;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -10,11 +13,15 @@ import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.dataset.StudyBookTableBuilder;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +31,7 @@ import java.util.stream.Collectors;
 public class StudyBookTableValidator {
 
 	private static final String DATA_TYPE_NUMERIC = "Numeric";
+	private static final String LOCATION_NAME = "LOCATION_NAME";
 
 	public void validateList(final List<List<String>> inputData) throws ApiRequestValidationException {
 
@@ -58,6 +66,20 @@ public class StudyBookTableValidator {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
 		final Map<String, List<String>> validValuesMap = this.createValidValuesMap(validateCategoricalValues, measurementVariables);
+		final List<String> locationNames = new ArrayList<>();
+		List<String> validLocationNames = new ArrayList<>();
+		if (inputData.columnKeySet().contains(LOCATION_NAME)) {
+			for (final String observationUnitId : inputData.rowKeySet()) {
+				locationNames.add(inputData.get(observationUnitId, LOCATION_NAME));
+			}
+			if (!CollectionUtils.isEmpty(locationNames)) {
+				final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
+				locationSearchRequest.setLocationNames(locationNames);
+				validLocationNames = this.locationService.searchLocations(locationSearchRequest, null, null)
+						.stream().map(loc -> loc.getName().toUpperCase()).collect(Collectors.toList());
+			}
+		}
+
 
 		for (final String observationUnitId : inputData.rowKeySet()) {
 			for (final String variableName : inputData.columnKeySet()) {
@@ -65,7 +87,7 @@ public class StudyBookTableValidator {
 					errors.reject("warning.import.save.invalidCategoricalValue", new String[] {variableName}, "");
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				} else if (!validateValue(mappedVariables.get(variableName), inputData.get(observationUnitId, variableName),
-						validateCategoricalValues, validValuesMap, errors)) {
+						validateCategoricalValues, validValuesMap, errors, validLocationNames)) {
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 			}
@@ -87,7 +109,8 @@ public class StudyBookTableValidator {
 	}
 
 	private static boolean validateValue(final MeasurementVariable var, final String value, final boolean validateCategoricalValues,
-										 final Map<String, List<String>> validValuesMap, final BindingResult errors) {
+										 final Map<String, List<String>> validValuesMap, final BindingResult errors,
+										 final List<String> validLocationNames) {
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
@@ -100,8 +123,15 @@ public class StudyBookTableValidator {
 		} else if (validateCategoricalValues && isInvalidCategoricalValue(var, value, validValuesMap)) {
 			errors.reject("warning.import.save.invalid.cell.categorical.value", new String[] {var.getAlias(), value}, "");
 			return false;
+		} else if (validateCategoricalValues && isInvalidLocationName(var, value, validLocationNames)) {
+			errors.reject("warning.import.save.invalid.cell.location.value", new String[] {value}, "");
+			return false;
 		}
 		return true;
+	}
+
+	private static boolean isInvalidLocationName(final MeasurementVariable var, final String value, final List<String> validLocationNames) {
+		return var.getTermId() == TermId.LOCATION_ID.getId() && !validLocationNames.contains(value.toUpperCase());
 	}
 
 	private static boolean isInvalidCategoricalValue(final MeasurementVariable var, final String value, final Map<String, List<String>> validValuesMap) {
