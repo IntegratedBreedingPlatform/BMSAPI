@@ -3,8 +3,14 @@ package org.ibp.api.java.impl.middleware.common;
 
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.ibp.api.java.crop.CropService;
+import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.java.program.ProgramService;
+import org.ibp.api.java.study.StudyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +36,15 @@ public class ContextResolverImpl implements ContextResolver {
 	@Autowired
 	@Lazy
 	private ProgramService programService;
+
+	@Autowired
+	private StudyService studyService;
+
+	@Autowired
+	private ObservationUnitService observationUnitService;
+
+	@Autowired
+	private StudyDataManager studyDataManager;
 
 	@Override
 	public String resolveDatabaseFromUrl() throws ContextResolutionException {
@@ -90,6 +105,10 @@ public class ContextResolverImpl implements ContextResolver {
 		return cropName;
 	}
 
+	/**
+	 * This need to be post construct because the study service is not available on object creation.
+	 * @throws Exception
+	 */
 	@Override
 	public String resolveProgramUuidFromRequest() throws ContextResolutionException {
 		final HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -108,8 +127,15 @@ public class ContextResolverImpl implements ContextResolver {
 		// If not found in URL path, search in request parameters for "programUUID"
 		} else {
 			final String programUuidRequestParam = request.getParameter("programUUID");
+			final int brapiTokenIndex = Arrays.asList(parts).indexOf("brapi");
+
 			if (!StringUtils.isEmpty(programUuidRequestParam)) {
 				programUUID =  programUuidRequestParam;
+			}
+
+			// attempt to extract from other parameters in the URL if BRAPI
+			else if (brapiTokenIndex != -1) {
+				programUUID = extractProgramFromOtherParameters(request, parts);
 			}
 		}
 
@@ -131,6 +157,42 @@ public class ContextResolverImpl implements ContextResolver {
 
 		return programUUID;
 
+	}
+
+	private String extractProgramFromOtherParameters(final HttpServletRequest request, final String[] parts) {
+		final int studyTokenIndex = Arrays.asList(parts).indexOf("studies");
+		final int trialTokenIndex = Arrays.asList(parts).indexOf("trials");
+
+		Integer trialDbId = null;
+		if (trialTokenIndex != -1 && (trialTokenIndex < parts.length - 1)) {
+			trialDbId = Integer.valueOf(parts[trialTokenIndex+1]);
+		} else if (studyTokenIndex != -1 && (studyTokenIndex < parts.length - 1)) {
+			final String studyDbId = parts[studyTokenIndex + 1];
+			trialDbId = this.studyDataManager.getProjectIdByStudyDbId(Integer.valueOf(studyDbId));
+		}
+
+		if(trialDbId != null) {
+			final DmsProject dmsProject = this.studyService.getDmSProjectByStudyId(Integer.valueOf(trialDbId));
+
+			if(dmsProject != null) {
+				return dmsProject.getProgramUUID();
+			}
+		}
+
+		final int observationUnitIndex = Arrays.asList(parts).indexOf("observationunits");
+		if (observationUnitIndex != -1 && (observationUnitIndex < parts.length - 1)) {
+			final String obsUnitId = parts[observationUnitIndex+1];
+
+			final ObservationUnitSearchRequestDTO obsRequestDto = new ObservationUnitSearchRequestDTO();
+			obsRequestDto.setObservationUnitDbIds(Arrays.asList(obsUnitId));
+			final List<ObservationUnitDto> observationList = this.observationUnitService
+				.searchObservationUnits(null, null, obsRequestDto);
+			if(!observationList.isEmpty()) {
+				return observationList.get(0).getProgramDbId();
+			}
+		}
+
+		return org.apache.commons.lang3.StringUtils.EMPTY;
 	}
 
 	void setCropService(final CropService cropService) {
