@@ -57,6 +57,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
@@ -124,6 +125,7 @@ public class StudyResourceBrapi {
 
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<EntityListResponse<StudyInstanceDto>> listStudies(@PathVariable final String crop,
@@ -202,6 +204,7 @@ public class StudyResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get study observation details as table", notes = "Get study observation details as table")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<StudyObservationTable>> getStudyObservationsAsTable(final HttpServletResponse response,
@@ -256,6 +259,7 @@ public class StudyResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get study details", notes = "Get study details")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<SingleEntityResponse<StudyDetailsData>> getStudyDetails(@PathVariable final String crop,
@@ -293,7 +297,7 @@ public class StudyResourceBrapi {
 
 	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table/csv", method = RequestMethod.GET)
-	private ResponseEntity<FileSystemResource> streamCSV(@PathVariable final String crop, @PathVariable final Integer studyDbId)
+	public ResponseEntity<FileSystemResource> streamCSV(@PathVariable final String crop, @PathVariable final Integer studyDbId)
 		throws Exception {
 
 		final File file = this.createDownloadFile(this.getStudyObservations(studyDbId).getResult(), ',', "studyObservations.csv");
@@ -302,7 +306,7 @@ public class StudyResourceBrapi {
 
 	@ApiOperation(value = "", hidden = true)
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/table/tsv", method = RequestMethod.GET)
-	private ResponseEntity<FileSystemResource> streamTSV(@PathVariable final String crop, @PathVariable final Integer studyDbId)
+	public ResponseEntity<FileSystemResource> streamTSV(@PathVariable final String crop, @PathVariable final Integer studyDbId)
 		throws Exception {
 		final File file = this.createDownloadFile(this.getStudyObservations(studyDbId).getResult(), '\t', "studyObservations.tsv");
 
@@ -369,6 +373,7 @@ public class StudyResourceBrapi {
 
 	@JsonView(BrapiView.BrapiV1_3.class)
 	@ApiOperation(value = "Get studies observation variables by studyDbId", notes = "Get studies observation variables by studyDbId")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/observationvariables", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<VariableDTO>> getObservationVariables(final HttpServletResponse response,
@@ -429,6 +434,7 @@ public class StudyResourceBrapi {
 
 	@JsonView(BrapiView.BrapiV1_3.class)
 	@ApiOperation(value = "Get observation units by studyDbId")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/observationunits", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<ObservationUnitDto>> listObservationUnitsByStudy(
@@ -476,6 +482,7 @@ public class StudyResourceBrapi {
 	}
 
 	@ApiOperation(value = "Put Observations", notes = "Put Observations")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(
 		value = "/{crop}/brapi/v1/studies/{studyDbId}/observations",
 		method = RequestMethod.PUT)

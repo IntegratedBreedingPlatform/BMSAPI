@@ -20,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +38,7 @@ public class PhenotypeSearchResource {
 	private ObservationUnitService observationUnitService;
 
 	@ApiOperation(value = "Phenotype search", notes = "Returns a list of observationUnit with the observed Phenotypes")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS', 'GRAPHICAL_QUERIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/phenotypes-search", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_2.class)

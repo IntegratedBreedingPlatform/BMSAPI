@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.ibp.api.exception.ApiRuntime2Exception;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
@@ -140,4 +141,8 @@ public class StudyServiceImpl implements StudyService {
 		return this.middlewareStudyService.getStudyDetails(programUUID, studyId);
 	}
 
+	@Override
+	public DmsProject getDmSProjectByStudyId(final Integer studyId) {
+		return this.middlewareStudyService.getDmSProjectByStudyId(studyId);
+	}
 }

@@ -13,6 +13,7 @@ import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,7 @@ public class ImageResourceBrapi {
 	private ImageValidator imageValidator;
 
 	@ApiOperation("Create a new image meta data object")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/images", method = RequestMethod.POST)
 	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<SingleEntityResponse<Image>> createImage(
@@ -50,6 +52,7 @@ public class ImageResourceBrapi {
 	}
 
 	@ApiOperation("Update an image meta data")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/images/{imageDbId}", method = RequestMethod.PUT)
 	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<SingleEntityResponse<Image>> updateImage(
@@ -67,6 +70,7 @@ public class ImageResourceBrapi {
 	}
 
 	@ApiOperation("Update an image with the image file content")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/images/{imageDbId}/imagecontent",
 		produces = {"application/json"},
 		consumes = {"image/*"},

@@ -8,6 +8,7 @@ import org.generationcp.middleware.api.study.StudySearchResponse;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -38,4 +39,5 @@ public interface StudyService {
 
 	StudyDetailsDTO getStudyDetails(String programUUID, Integer studyId);
 
+	DmsProject getDmSProjectByStudyId(Integer studyIdentifier);
 }

@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +47,7 @@ public class AttributeResourceBrapi {
 	private AttributeServiceBrapi attributeServiceBrapi;
 
 	@ApiOperation(value = "Submit a search request for Germplasm `Attributes`", notes = "Submit a search request for Germplasm `Attributes`")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/attributes", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -61,6 +63,7 @@ public class AttributeResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get the results of a Germplasm `Attributes` search request", notes = "Get the results of a Germplasm `Attributes` search request")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/attribute/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)

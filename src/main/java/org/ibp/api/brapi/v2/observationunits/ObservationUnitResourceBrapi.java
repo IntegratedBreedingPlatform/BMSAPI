@@ -33,6 +33,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,6 +62,7 @@ public class ObservationUnitResourceBrapi {
 	private BrapiResponseMessageGenerator<ObservationUnitDto> responseMessageGenerator;
 
 	@ApiOperation(value = "Post observation units search", notes = "Post observation units search")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchObservationUnits(
@@ -79,6 +81,7 @@ public class ObservationUnitResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get Observation Unit search", notes = "Get the results of a Observation Unit search request")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -119,6 +122,7 @@ public class ObservationUnitResourceBrapi {
 	}
 
 	@ApiOperation(value = "Add new Observation Units", notes = "Add new Observation Units")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observationunits", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -161,6 +165,7 @@ public class ObservationUnitResourceBrapi {
 
 	// TODO complete PUT see plantbreeding/API/issues/411
 	@ApiOperation(value = "Patch Observation Unit", notes = "Modified some fields from an Observation Unit <p><strong>Note:</strong> non-standard BrAPI call</p>")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS', 'MS_EDIT_GEOREFERENCE')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observationunits/{observationUnitDbId}", method = RequestMethod.PATCH)
 	public ResponseEntity<SingleEntityResponse<ObservationUnitPatchRequestDTO>> patchObservationUnit(
 		@PathVariable final String crop,
@@ -176,6 +181,7 @@ public class ObservationUnitResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get the Observation Levels", notes = "Get the Observation Levels")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observationlevels", method = RequestMethod.GET)
 	public ResponseEntity<EntityListResponse<ObservationLevel>> getObservationLevels(
 		@PathVariable final String crop,
@@ -203,6 +209,7 @@ public class ObservationUnitResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get a filtered set of Observation Units", notes = "Get a filtered set of Observation Units")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observationunits", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)

@@ -28,6 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,6 +55,7 @@ public class TrialResourceBrapi {
 	private static final String ORDER_BY_DESCENDING = "desc";
 
 	@ApiOperation(value = "List of trial summaries", notes = "Get a list of trial summaries.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
@@ -139,6 +141,7 @@ public class TrialResourceBrapi {
 
 	@ApiOperation(value = "Get trial observation details as table", notes = "Get trial observation details as table "
 		+ "<p><strong>Note: </strong> non-standard BrAPI call</p>")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/trials/{trialDbId}/table", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<org.ibp.api.brapi.v1.trial.TrialObservationTable>> getTrialObservationsAsTable(
