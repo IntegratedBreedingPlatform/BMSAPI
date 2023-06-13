@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,6 +50,7 @@ public class ProgramResourceBrapi {
 	private CropValidator cropValidator;
 
 	@ApiOperation(value = "Get filtered list of breeding Programs", notes = "Get a filtered list of breeding Programs. This list can be filtered by common crop name to narrow results to a specific crop.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	@RequestMapping(value = "/{cropName}/brapi/v2/programs", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)

@@ -68,6 +68,7 @@ public class StudyResourceBrapi {
 	private BrapiResponseMessageGenerator<StudyInstanceDto> responseMessageGenerator;
 
 	@ApiOperation(value = "Get the details for a specific Study", notes = "Get the details for a specific Study")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/studies/{studyDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -101,6 +102,7 @@ public class StudyResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get a filtered list of Studies", notes = "Get a filtered list of Studies")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/studies", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)

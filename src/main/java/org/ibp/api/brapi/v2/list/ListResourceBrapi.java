@@ -55,6 +55,7 @@ public class ListResourceBrapi {
 	private ResourceBundleMessageSource messageSource;
 
 	@ApiOperation(value = "Get filtered set of generic lists", notes = "Get filtered set of generic lists")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/lists", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV2.class)
 	@ResponseBody

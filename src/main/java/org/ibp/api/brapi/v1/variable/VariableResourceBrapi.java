@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +44,7 @@ public class VariableResourceBrapi {
 	private VariableServiceBrapi variableServiceBrapi;
 
 	@ApiOperation(value = "Call to retrieve a list of observation variables available in the system.")
+	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/variables", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV1_3.class)
 	@ResponseBody

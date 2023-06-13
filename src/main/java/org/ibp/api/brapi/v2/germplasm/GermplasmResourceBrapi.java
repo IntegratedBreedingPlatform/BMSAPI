@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,6 +59,7 @@ public class GermplasmResourceBrapi {
 	private BrapiResponseMessageGenerator<GermplasmDTO> responseMessageGenerator;
 
 	@ApiOperation(value = "Get a filtered list of Germplasm", notes = "Get a filtered list of Germplasm")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM','SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v2/germplasm", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -115,6 +117,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Create new Germplasm entities on this server", notes = "Create new Germplasm entities on this server")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v2/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -133,6 +136,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Update the details of an existing germplasm", notes = "Update the details of an existing germplasm")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v2/germplasm/{germplasmDbId}", method = RequestMethod.PUT)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -150,6 +154,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Search germplasm", notes = "Submit a search request for germplasm")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM','SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -165,6 +170,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get search germplasm results", notes = "Get the results of germplasm search request")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM','SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/germplasm/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)

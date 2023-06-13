@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -114,6 +115,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Search germplasms", notes = "Replacement for germplasm-search in v1.3")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM','SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
@@ -166,6 +168,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Germplasm search by germplasmDbId", notes = "Germplasm search by germplasmDbId")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM','SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
@@ -188,6 +191,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Germplasm pedigree by id", notes = "")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/pedigree", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<PedigreeDTO>> getPedigree(
@@ -214,6 +218,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Germplasm progeny by id", notes = "")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/progeny", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<ProgenyDTO>> getProgeny(
@@ -231,6 +236,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Post germplasm search", notes = "Post germplasm search")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM','SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasm(
@@ -251,6 +257,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get germplasm search", notes = "Get the results of a Germplasm search request")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM','SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v1/search/germplasm/{searchResultsDbid}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
@@ -313,6 +320,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Search germplasms by study", notes = "Search germplasms by study")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM','SEARCH_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies/{studyDbId}/germplasm", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
@@ -364,6 +372,7 @@ public class GermplasmResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get germplasm attributes", notes = "Get the attributes of a Germplasm")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v1/germplasm/{germplasmDbId}/attributes", method = RequestMethod.GET)
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<GermplasmAttributes>> getAttributesByGid(

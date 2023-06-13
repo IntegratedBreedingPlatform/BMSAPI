@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,6 +53,7 @@ public class VariableResourceBrapi {
 	private SearchRequestService searchRequestService;
 
 	@ApiOperation(value = "Search Observation 'Variables'", notes = "Submit a search request for Observation 'Variables'")
+	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/variables", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -67,6 +69,7 @@ public class VariableResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get the results of a Observation variables search request", notes = "Get the results of a Observation 'variables' search request")
+	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/variables/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -94,6 +97,7 @@ public class VariableResourceBrapi {
 	}
 
 	@ApiOperation(value = "Call to retrieve a list of observationVariables available in the system.", notes = "Get the Observation Variables")
+	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/variables", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV2.class)
 	@ResponseBody
@@ -132,6 +136,7 @@ public class VariableResourceBrapi {
 	}
 
 	@ApiOperation(value = "Update an existing Observation Variable", notes = "Update an existing Observation Variable")
+	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/variables/{observationVariableDbId}", method = RequestMethod.PUT)
 	@JsonView(BrapiView.BrapiV2_1.class)
 	@ResponseBody
@@ -184,6 +189,7 @@ public class VariableResourceBrapi {
 	}
 
 	@ApiOperation(value = "Add new Observation Variables", notes = "Add new Observation Variables to the system.")
+	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/variables", method = RequestMethod.POST)
 	@JsonView(BrapiView.BrapiV2.class)
 	@ResponseBody

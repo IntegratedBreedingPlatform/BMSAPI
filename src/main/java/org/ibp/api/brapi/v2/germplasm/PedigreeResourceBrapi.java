@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,6 +55,7 @@ public class PedigreeResourceBrapi {
 	private BrapiResponseMessageGenerator<PedigreeNodeDTO> responseMessageGenerator;
 
 	@ApiOperation(value = "Send a list of pedigree nodes to update existing information on a server", notes = "Send a list of pedigree nodes to update existing information on a server")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v2/pedigree", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<PedigreeNodeDTO>> updatePedigreeNodes(@PathVariable final String crop,
@@ -69,6 +71,7 @@ public class PedigreeResourceBrapi {
 	}
 
 	@ApiOperation(value = "Submit a search request for Pedigree", notes = "Submit a search request for Pedigree")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/pedigree", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -87,6 +90,7 @@ public class PedigreeResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get the results of a Pedigree search request ", notes = "Get the results of a Pedigree search request ")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/pedigree/{searchResultsDbId}", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
