@@ -10,7 +10,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Util;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.impl.middleware.dataset.StudyBookTableBuilder;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -99,7 +98,7 @@ public class StudyBookTableValidator {
 	private static Map<String, List<String>> createValidValuesMap(final boolean isEnvironmentsImport, final List<MeasurementVariable> measurementVariables) {
 		final Map<String, List<String>> validValuesMap = new HashMap<>();
 		if (isEnvironmentsImport) {
-			for(MeasurementVariable var: measurementVariables) {
+			for(final MeasurementVariable var: measurementVariables) {
 				if (var.getDataTypeId() != null && var.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 					final List<String> validValues = var.getPossibleValues().stream().map(ref -> ref.getName().toUpperCase()).collect(Collectors.toList());
 					validValuesMap.putIfAbsent(var.getName(), validValues);

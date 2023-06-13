@@ -16,13 +16,12 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
 
-
 public class StudyBookTableBuilderTest extends ApiUnitTestBase {
 
 	private final StudyBookTableBuilder studyBookTableBuilder = new StudyBookTableBuilder();
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testBuildFailsWhenHeaderDoesNotContainsObsUnitId() throws Exception {
+	public void testBuildFailsWhenHeaderDoesNotContainsObsUnitId() {
 		final List<List<String>> data = new ArrayList<>();
 		final List<String> headers = Arrays.asList("A", "B");
 		final List<String> row = Arrays.asList("1", "2");
@@ -37,7 +36,7 @@ public class StudyBookTableBuilderTest extends ApiUnitTestBase {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testBuildFailsWhenHeadersContainsDuplicatedvariables() throws Exception {
+	public void testBuildFailsWhenHeadersContainsDuplicatedvariables() {
 		final List<List<String>> data = new ArrayList<>();
 		final List<String> headers = Arrays.asList("OBS_UNIT_ID", "A", "A");
 		final List<String> row = Arrays.asList("1", "2", "3");
@@ -62,7 +61,7 @@ public class StudyBookTableBuilderTest extends ApiUnitTestBase {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testBuildFailsWhenHeadersContainsNoMeasurementVariables() throws Exception {
+	public void testBuildFailsWhenHeadersContainsNoMeasurementVariables() {
 		final List<List<String>> data = new ArrayList<>();
 		final List<String> headers = Arrays.asList("OBS_UNIT_ID", "A");
 		final List<String> row = Arrays.asList("1", "2");
@@ -78,7 +77,7 @@ public class StudyBookTableBuilderTest extends ApiUnitTestBase {
 	}
 
 	@Test(expected = ApiRequestValidationException.class)
-	public void testBuildFailsWhenDataContainsEmptyObsUnitId() throws Exception {
+	public void testBuildFailsWhenDataContainsEmptyObsUnitId() {
 		final List<List<String>> data = new ArrayList<>();
 		final List<String> headers = Arrays.asList("OBS_UNIT_ID", "A");
 		final List<String> row = Arrays.asList("", "2");
@@ -94,7 +93,7 @@ public class StudyBookTableBuilderTest extends ApiUnitTestBase {
 	}
 
 	@Test
-	public void testBuildOk() throws Exception {
+	public void testBuildOk() {
 		final List<List<String>> data = new ArrayList<>();
 		final List<String> headers = Arrays.asList("OBS_UNIT_ID", "A", "B");
 		final List<String> row1 = Arrays.asList("Obs1", "A1", "B1");

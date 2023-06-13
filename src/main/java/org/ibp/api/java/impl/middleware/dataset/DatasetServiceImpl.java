@@ -207,7 +207,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void addDatasetVariables(final Integer studyId, final Integer datasetId,
-		final List<DatasetVariable> datasetVariables, VariableType variableType) {
+									final List<DatasetVariable> datasetVariables, final VariableType variableType) {
 		this.studyValidator.validate(studyId, true);
 
 		datasetVariables.forEach(datasetVariable -> {
@@ -549,7 +549,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void importEnvironmentVariableValues(final Integer studyId, final Integer datasetId, final EnvironmentVariableValuesPutRequestInput input) {
-		BindingResult errors = new MapBindingResult(new HashMap<>(), EnvironmentVariableValuesPutRequestInput.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), EnvironmentVariableValuesPutRequestInput.class.getName());
 
 		this.studyValidator.validate(studyId, true);
 		this.datasetValidator.validateDataset(studyId, datasetId);
