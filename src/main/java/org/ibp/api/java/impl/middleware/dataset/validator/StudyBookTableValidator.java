@@ -59,7 +59,7 @@ public class StudyBookTableValidator {
 	}
 
 	public void validateStudyBookValuesDataTypes(final Table<String, String, String> inputData,
-												 final List<MeasurementVariable> measurementVariables, final boolean validateCategoricalValues) throws ApiRequestValidationException {
+												 final List<MeasurementVariable> measurementVariables, final boolean isEnvironmentsImport) throws ApiRequestValidationException {
 		final Map<String, MeasurementVariable> mappedVariables = new HashMap<>();
 		measurementVariables.forEach(measurementVariable -> {
 			mappedVariables.putIfAbsent(measurementVariable.getName(), measurementVariable);
@@ -67,7 +67,7 @@ public class StudyBookTableValidator {
 		});
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
 
-		final Map<String, List<String>> validValuesMap = this.createValidValuesMap(validateCategoricalValues, measurementVariables);
+		final Map<String, List<String>> validValuesMap = this.createValidValuesMap(isEnvironmentsImport, measurementVariables);
 		final List<String> locationNames = new ArrayList<>();
 		List<String> validLocationNames = new ArrayList<>();
 		if (inputData.columnKeySet().contains(LOCATION_NAME)) {
@@ -89,16 +89,16 @@ public class StudyBookTableValidator {
 					errors.reject("warning.import.save.invalidCategoricalValue", new String[] {variableName}, "");
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				} else if (!LOCATION_ID.equalsIgnoreCase(variableName) && !validateValue(mappedVariables.get(variableName), inputData.get(observationUnitId, variableName),
-						validateCategoricalValues, validValuesMap, errors, validLocationNames)) {
+						isEnvironmentsImport, validValuesMap, errors, validLocationNames)) {
 					throw new ApiRequestValidationException(errors.getAllErrors());
 				}
 			}
 		}
 	}
 
-	private static Map<String, List<String>> createValidValuesMap(final boolean validateCategoricalValues, final List<MeasurementVariable> measurementVariables) {
+	private static Map<String, List<String>> createValidValuesMap(final boolean isEnvironmentsImport, final List<MeasurementVariable> measurementVariables) {
 		final Map<String, List<String>> validValuesMap = new HashMap<>();
-		if (validateCategoricalValues) {
+		if (isEnvironmentsImport) {
 			for(MeasurementVariable var: measurementVariables) {
 				if (var.getDataTypeId() != null && var.getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 					final List<String> validValues = var.getPossibleValues().stream().map(ref -> ref.getName().toUpperCase()).collect(Collectors.toList());
@@ -110,22 +110,26 @@ public class StudyBookTableValidator {
 		return validValuesMap;
 	}
 
-	private static boolean validateValue(final MeasurementVariable var, final String value, final boolean validateCategoricalValues,
+	private static boolean validateValue(final MeasurementVariable var, final String value, final boolean isEnvironmentsImport,
 										 final Map<String, List<String>> validValuesMap, final BindingResult errors,
 										 final List<String> validLocationNames) {
 		if (StringUtils.isBlank(value)) {
 			return true;
 		}
-		if (isInvalidNumber(var, value)) {
+		if (isInvalidNumber(var, value, isEnvironmentsImport)) {
 			errors.reject("warning.import.save.invalid.cell.numeric.value", new String[] {var.getAlias(), value}, "");
+			return false;
+		} else if (isEnvironmentsImport && isNumberOutOfRange(var, value)) {
+			errors.reject("warning.import.save.invalid.cell.out.of.range", new String[] {var.getAlias(), value,
+					String.valueOf(var.getMinRange()), String.valueOf(var.getMaxRange())}, "");
 			return false;
 		} else if (isInvalidDate(var, value)) {
 			errors.reject("warning.import.save.invalid.cell.date.value", new String[] {var.getAlias(), value}, "");
 			return false;
-		} else if (validateCategoricalValues && isInvalidCategoricalValue(var, value, validValuesMap)) {
+		} else if (isEnvironmentsImport && isInvalidCategoricalValue(var, value, validValuesMap)) {
 			errors.reject("warning.import.save.invalid.cell.categorical.value", new String[] {var.getAlias(), value}, "");
 			return false;
-		} else if (validateCategoricalValues && isInvalidLocationName(var, value, validLocationNames)) {
+		} else if (isEnvironmentsImport && isInvalidLocationName(var, value, validLocationNames)) {
 			errors.reject("warning.import.save.invalid.cell.location.value", new String[] {value}, "");
 			return false;
 		}
@@ -145,16 +149,27 @@ public class StudyBookTableValidator {
 		return var.getDataTypeId() != null && var.getDataTypeId() == TermId.DATE_VARIABLE.getId() && !Util.isValidDate(value);
 	}
 
-	private static boolean isInvalidNumber(final MeasurementVariable var, final String value) {
-		if ((var.getMinRange() != null && var.getMaxRange() != null)
-			|| (StringUtils.isNotBlank(var.getDataType()) && var.getDataType().equalsIgnoreCase(DATA_TYPE_NUMERIC))) {
-			return !isValueMissingOrNumber(value.trim());
+	private static boolean isNumberOutOfRange(final MeasurementVariable var, final String value) {
+		if (StringUtils.isNotBlank(var.getDataType()) && var.getDataType().equalsIgnoreCase(DATA_TYPE_NUMERIC)
+			&& var.getMinRange() != null && var.getMaxRange() != null) {
+			final Double intValue = Double.valueOf(value);
+			if (intValue < var.getMinRange() || intValue > var.getMaxRange()) {
+				return true;
+			}
 		}
 		return false;
 	}
 
-	private static boolean isValueMissingOrNumber(final String value) {
-		if (MeasurementData.MISSING_VALUE.equals(value.trim())) {
+	private static boolean isInvalidNumber(final MeasurementVariable var, final String value, final boolean isEnvironmentsImport) {
+		if ((var.getMinRange() != null && var.getMaxRange() != null)
+			|| (StringUtils.isNotBlank(var.getDataType()) && var.getDataType().equalsIgnoreCase(DATA_TYPE_NUMERIC))) {
+			return !isValueMissingOrNumber(value.trim(), isEnvironmentsImport);
+		}
+		return false;
+	}
+
+	private static boolean isValueMissingOrNumber(final String value, final boolean isEnvironmentsImport) {
+		if (!isEnvironmentsImport && MeasurementData.MISSING_VALUE.equals(value.trim())) {
 			return true;
 		}
 		return NumberUtils.isNumber(value);
