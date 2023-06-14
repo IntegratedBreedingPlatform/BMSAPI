@@ -17,6 +17,7 @@ import org.ibp.api.domain.study.StudyInstance;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
 import org.ibp.api.rest.dataset.DatasetDTO;
 import org.ibp.api.rest.dataset.DatasetGeneratorInput;
+import org.ibp.api.rest.dataset.EnvironmentVariableValuesPutRequestInput;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.ibp.api.rest.dataset.ObservationsPutRequestInput;
 import org.springframework.data.domain.Pageable;
@@ -236,6 +237,16 @@ public interface DatasetService {
 	 * @param input     ObservationsPutRequestInput
 	 */
 	void importObservations(Integer studyId, Integer datasetId, ObservationsPutRequestInput input);
+
+	/**
+	 * It will import a list of environment variable values presented as a List<List<String>>.
+	 * Environment variables are either Environment Details or Environment Condition
+	 *
+	 * @param studyId   Id of the study
+	 * @param datasetId Id of the dataset
+	 * @param input     EnvironmentVariableValuesPutRequestInput
+	 */
+	void importEnvironmentVariableValues(Integer studyId, Integer datasetId, EnvironmentVariableValuesPutRequestInput input);
 
 	/**
 	 * Imports a list of observations for the environment

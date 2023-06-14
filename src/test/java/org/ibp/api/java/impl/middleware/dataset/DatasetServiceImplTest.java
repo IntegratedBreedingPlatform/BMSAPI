@@ -30,7 +30,7 @@ import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValid
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.ObservationValidator;
-import org.ibp.api.java.impl.middleware.dataset.validator.ObservationsTableValidator;
+import org.ibp.api.java.impl.middleware.dataset.validator.StudyBookTableValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
@@ -107,7 +107,7 @@ public class DatasetServiceImplTest {
 	private ObservationValidator observationValidator;
 
 	@Spy
-	private ObservationsTableValidator observationsTableValidator;
+	private StudyBookTableValidator studyBookTableValidator;
 
 	@Mock
 	private SearchCompositeDtoValidator searchCompositeDtoValidator;

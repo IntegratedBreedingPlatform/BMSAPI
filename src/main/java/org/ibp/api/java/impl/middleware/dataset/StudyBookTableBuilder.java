@@ -14,25 +14,38 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 
-public class ObservationUnitsTableBuilder {
+public class StudyBookTableBuilder {
 
 	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
+	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 
 	private Integer duplicatedFoundNumber;
 
-	public Table<String, String, String> build(final List<List<String>> data, final List<MeasurementVariable> datasetMeasurementVariables) throws ApiRequestValidationException {
-
-		this.duplicatedFoundNumber = 0;
-
+	public Table<String, String, String> buildObservationsTable(final List<List<String>> data, final List<MeasurementVariable> datasetMeasurementVariables) throws ApiRequestValidationException {
 		final BindingResult
 				errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
+		return this.createTable(data, datasetMeasurementVariables, errors, OBS_UNIT_ID, "required.header.obs.unit.id", "empty.observation.unit.id");
+	}
+
+	Integer getDuplicatedFoundNumber() {
+		return this.duplicatedFoundNumber;
+	}
+
+	public Table<String, String, String> buildEnvironmentVariablesTable(final List<List<String>> data, final List<MeasurementVariable> datasetMeasurementVariables) throws ApiRequestValidationException {
+		final BindingResult
+				errors = new MapBindingResult(new HashMap<String, String>(), ObservationsPutRequestInput.class.getName());
+		return this.createTable(data, datasetMeasurementVariables, errors, TRIAL_INSTANCE, "required.header.trial.instance", "empty.trial.instance");
+	}
+
+	private Table<String, String, String> createTable(final List<List<String>> data, final List<MeasurementVariable> datasetMeasurementVariables,
+			final BindingResult	errors, final String requiredHeader, final String missingRequiredHeaderError, final String requiredHeaderNoValueError) {
+		this.duplicatedFoundNumber = 0;
 
 		final List<String> headers = data.get(0);
 		final List<List<String>> values = data.subList(1, data.size());
 
-		// check that headers contains OBS_UNIT_ID
-		if (!headers.contains(OBS_UNIT_ID)) {
-			errors.reject("required.header.obs.unit.id", null , "");
+		if (!headers.contains(requiredHeader)) {
+			errors.reject(missingRequiredHeaderError, null , "");
 			throw new ApiRequestValidationException (errors.getAllErrors());
 		}
 
@@ -58,31 +71,28 @@ public class ObservationUnitsTableBuilder {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final int obsUnitIdIndex = headers.indexOf(OBS_UNIT_ID);
+		final int requiredHeaderIndex = headers.indexOf(requiredHeader);
 
 		// Start table building, Table<row, column, value>
 		final Table<String, String, String> table = HashBasedTable.create();
 		for (final List<String> row: values) {
-			final String observationUnitId = row.get(obsUnitIdIndex);
+			final String requiredHeaderValue = row.get(requiredHeaderIndex);
 
-			if (observationUnitId.isEmpty()) {
-				errors.reject("empty.observation.unit.id", null, "");
+			if (requiredHeaderValue.isEmpty()) {
+				errors.reject(requiredHeaderNoValueError, null, "");
 				throw new ApiRequestValidationException (errors.getAllErrors());
 			}
 
-			if (!table.containsRow(row.get(obsUnitIdIndex))) {
+			if (!table.containsRow(row.get(requiredHeaderIndex))) {
 				for (final Integer index : importMeasurementVariablesIndex) {
-					table.put(observationUnitId, headers.get(index), row.get(index));
+					table.put(requiredHeaderValue, headers.get(index), row.get(index));
 				}
 			} else {
 				this.duplicatedFoundNumber++;
 			}
 		}
-		return table;
-	}
 
-	Integer getDuplicatedFoundNumber() {
-		return this.duplicatedFoundNumber;
+		return table;
 	}
 
 }

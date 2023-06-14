@@ -469,6 +469,19 @@ public class DatasetResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
+	@ApiOperation(value = "Put Environment Detail/Condition values in the Dataset",
+			notes = "Put Environment Detail/Condition values in the Dataset")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_ENVIRONMENT')")
+	@RequestMapping(
+			value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/environment-variables/values",
+			method = RequestMethod.PUT)
+	public ResponseEntity<Void> postEnvironmentVariableValues(@PathVariable final String crop, @PathVariable final String programUUID,
+													 @PathVariable final Integer studyId,
+													 @PathVariable final Integer datasetId, @RequestBody final EnvironmentVariableValuesPutRequestInput input) {
+		this.studyDatasetService.importEnvironmentVariableValues(studyId, datasetId, input);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@ApiOperation(value = "Retrieves all instances associated to the dataset", notes = "Retrieves all instances associated to the dataset")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/programs/{programUUID}/studies/{studyId}/datasets/{datasetId}/instances", method = RequestMethod.GET)
