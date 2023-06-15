@@ -39,12 +39,14 @@ public class ContextResolverImpl implements ContextResolver {
 	private ProgramService programService;
 
 	@Autowired
+	@Lazy
 	private StudyService studyService;
 
 	@Autowired
 	private ObservationUnitService observationUnitService;
 
 	@Autowired
+	@Lazy
 	private StudyDataManager studyDataManager;
 
 	@Override
