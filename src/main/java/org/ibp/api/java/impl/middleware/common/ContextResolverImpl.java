@@ -43,6 +43,7 @@ public class ContextResolverImpl implements ContextResolver {
 	private StudyService studyService;
 
 	@Autowired
+	@Lazy
 	private ObservationUnitService observationUnitService;
 
 	@Autowired
