@@ -67,17 +67,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		} else {
 			columns = this.studyDatasetService.getSubObservationSetVariables(studyId, dataSet.getDatasetId());
 		}
-
-		if (includeSampleGenotypeValues) {
-			// Add Genotype Marker variables to the list of columns
-			final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
-			filter.setStudyId(studyId);
-			filter.setDatasetIds(Arrays.asList(dataSet.getDatasetId()));
-			final Map<Integer, MeasurementVariable> genotypeVariablesMap =
-				this.sampleGenotypeService.getSampleGenotypeVariables(filter);
-			columns.addAll(genotypeVariablesMap.values());
-		}
-
+		this.includeSampleGenotypeValues(studyId, dataSet, includeSampleGenotypeValues, columns);
 		return columns;
 	}
 
@@ -95,6 +85,18 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 			observationUnitRowMap.put(instanceDBID, observationUnitRows);
 		}
 		return observationUnitRowMap;
+	}
+
+	void includeSampleGenotypeValues(final int studyId, final DatasetDTO dataSet, final boolean includeSampleGenotypeValues, final List<MeasurementVariable> columns) {
+		if (includeSampleGenotypeValues) {
+			// Add Genotype Marker variables to the list of columns
+			final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
+			filter.setStudyId(studyId);
+			filter.setDatasetIds(Arrays.asList(dataSet.getDatasetId()));
+			final Map<Integer, MeasurementVariable> genotypeVariablesMap =
+					this.sampleGenotypeService.getSampleGenotypeVariables(filter);
+			columns.addAll(genotypeVariablesMap.values());
+		}
 	}
 
 	private void populateSearchDTOForSummaryDataset(final DatasetDTO dataset, final ObservationUnitsSearchDTO searchDTO) {

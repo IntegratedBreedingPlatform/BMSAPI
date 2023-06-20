@@ -218,48 +218,57 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 					|| VariableType.ENVIRONMENT_CONDITION.getId().equals(column.getVariableType().getId()))) {
 				observationUnitData = Util.getObservationUnitData(dataRow.getEnvironmentVariables(), column);
 			}
-			if (!Util.isNullOrEmpty(observationUnitData)) {
-				final String dataCell = observationUnitData.getValue();
-				final HSSFCell cell = row.createCell(currentColNum++);
-				if (dataCell != null) {
-					if (column.getPossibleValues() != null && !column.getPossibleValues()
-						.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
-						&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
-						.equals(DatasetExcelGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
-						cell.setCellValue(DatasetExcelGenerator.getCategoricalCellValue(dataCell, column.getPossibleValues()));
-					} else if (DatasetExcelGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
-						if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
-							cell.setCellType(CellType.BLANK);
-							cell.setCellType(CellType.NUMERIC);
-							cell.setCellValue(Double.valueOf(dataCell));
-						}
-					} else {
-						cell.setCellType(CellType.STRING);
-						cell.setCellValue(dataCell);
-					}
-				}
+			currentColNum = this.writeObservationUnitDataCell(row, currentColNum, column, observationUnitData);
+			currentColNum = this.writeSampleGenotypeDataCell(sampleGenotypeDtoList, row, currentColNum, column);
+		}
+	}
+
+	int writeSampleGenotypeDataCell(final List<SampleGenotypeDTO> sampleGenotypeDtoList, final HSSFRow row, int currentColNum, final MeasurementVariable column) {
+		if (this.includeSampleGenotypeValues && column.getVariableType() != null &&
+			column.getVariableType().equals(VariableType.GENOTYPE_MARKER)) {
+			final HSSFCell cell = row.createCell(currentColNum++);
+			cell.setCellType(CellType.STRING);
+			if (CollectionUtils.isNotEmpty(sampleGenotypeDtoList)) {
+				// If the observation unit has multiple samples associated to it,
+				// Concatenate the sample genotype values of the samples (delimited by ";")
+				final String genotypeValue =
+					sampleGenotypeDtoList.stream()
+						.map(genotypeDTO -> genotypeDTO.getGenotypeDataMap().getOrDefault(column.getName(), new SampleGenotypeData())
+							.getValue())
+						.filter(
+							Objects::nonNull).collect(Collectors.joining(";"));
+
+				cell.setCellValue(genotypeValue);
+			} else {
+				cell.setCellValue(StringUtils.EMPTY);
 			}
+		}
+		return currentColNum;
+	}
 
-			if (this.includeSampleGenotypeValues && column.getVariableType() != null &&
-				column.getVariableType().equals(VariableType.GENOTYPE_MARKER)) {
-				final HSSFCell cell = row.createCell(currentColNum++);
-				cell.setCellType(CellType.STRING);
-				if (CollectionUtils.isNotEmpty(sampleGenotypeDtoList)) {
-					// If the observation unit has multiple samples associated to it,
-					// Concatenate the sample genotype values of the samples (delimited by ";")
-					final String genotypeValue =
-						sampleGenotypeDtoList.stream()
-							.map(genotypeDTO -> genotypeDTO.getGenotypeDataMap().getOrDefault(column.getName(), new SampleGenotypeData())
-								.getValue())
-							.filter(
-								Objects::nonNull).collect(Collectors.joining(";"));
-
-					cell.setCellValue(genotypeValue);
+	int writeObservationUnitDataCell(final HSSFRow row, int currentColNum, final MeasurementVariable column, final ObservationUnitData observationUnitData) {
+		if (!Util.isNullOrEmpty(observationUnitData)) {
+			final String dataCell = observationUnitData.getValue();
+			final HSSFCell cell = row.createCell(currentColNum++);
+			if (dataCell != null) {
+				if (column.getPossibleValues() != null && !column.getPossibleValues()
+					.isEmpty() && column.getTermId() != TermId.BREEDING_METHOD_VARIATE.getId()
+					&& column.getTermId() != TermId.BREEDING_METHOD_VARIATE_CODE.getId() && !column.getProperty()
+					.equals(DatasetExcelGenerator.BREEDING_METHOD_PROPERTY_NAME)) {
+					cell.setCellValue(DatasetExcelGenerator.getCategoricalCellValue(dataCell, column.getPossibleValues()));
+				} else if (DatasetExcelGenerator.NUMERIC_DATA_TYPE.equalsIgnoreCase(column.getDataType())) {
+					if (!dataCell.isEmpty() && NumberUtils.isNumber(dataCell)) {
+						cell.setCellType(CellType.BLANK);
+						cell.setCellType(CellType.NUMERIC);
+						cell.setCellValue(Double.valueOf(dataCell));
+					}
 				} else {
-					cell.setCellValue(StringUtils.EMPTY);
+					cell.setCellType(CellType.STRING);
+					cell.setCellValue(dataCell);
 				}
 			}
 		}
+		return currentColNum;
 	}
 
 	private void writeObservationHeader(
@@ -276,7 +285,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		}
 	}
 
-	private CellStyle getObservationHeaderStyle(final boolean isFactor, final HSSFWorkbook xlsBook) {
+	CellStyle getObservationHeaderStyle(final boolean isFactor, final HSSFWorkbook xlsBook) {
 		final CellStyle style;
 		if (isFactor) {
 			style = this.getHeaderStyle(xlsBook, this.getColorIndex(xlsBook, 51, 153, 102));
@@ -298,7 +307,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		return cellStyle;
 	}
 
-	private void writeDescriptionSheet(
+	void writeDescriptionSheet(
 		final HSSFWorkbook xlsBook, final Integer studyId, final DatasetDTO dataSetDto, final StudyInstance studyInstance,
 		final boolean excludeVariableValues) {
 		final Locale locale = LocaleContextHolder.getLocale();
