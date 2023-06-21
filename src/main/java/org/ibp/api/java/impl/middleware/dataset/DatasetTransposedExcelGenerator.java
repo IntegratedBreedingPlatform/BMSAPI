@@ -43,7 +43,7 @@ public class DatasetTransposedExcelGenerator extends DatasetExcelGenerator {
             final String fileNamePath, final StudyInstance studyInstance) throws IOException {
         final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
-        final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
+        final List<MeasurementVariable> orderedColumns = this.orderColumns(columns, TermId.TRIAL_INSTANCE_FACTOR.getId());
         this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, studyInstance, false);
         final Locale locale = LocaleContextHolder.getLocale();
         this.writeObservationSheet(

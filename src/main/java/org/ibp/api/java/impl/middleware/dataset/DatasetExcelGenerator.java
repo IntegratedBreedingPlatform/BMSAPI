@@ -116,7 +116,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final String fileNamePath, final StudyInstance studyInstance) throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
-		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
+		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns, TermId.OBS_UNIT_ID.getId());
 		this.writeDescriptionSheet(xlsBook, studyId, dataSetDto, studyInstance, false);
 		final Locale locale = LocaleContextHolder.getLocale();
 		this.writeObservationSheet(
@@ -140,7 +140,7 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		final String fileNameFullPath) throws IOException {
 		final HSSFWorkbook xlsBook = new HSSFWorkbook();
 
-		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns);
+		final List<MeasurementVariable> orderedColumns = this.orderColumns(columns, TermId.OBS_UNIT_ID.getId());
 		this.writeDescriptionSheet(xlsBook, studyId, datasetDTO, datasetDTO.getInstances().get(0), true);
 		final Locale locale = LocaleContextHolder.getLocale();
 		final List<ObservationUnitRow> allObservationUnitRows = observationUnitRowMap.values().stream()
@@ -164,13 +164,18 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		throw new UnsupportedOperationException();
 	}
 
-	List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns) {
+	List<MeasurementVariable> orderColumns(final List<MeasurementVariable> columns, final int firstColumnVariableId) {
 		final List<MeasurementVariable> orderedColumns = new ArrayList<>();
 		final List<MeasurementVariable> trait = new ArrayList<>();
 		final List<MeasurementVariable> selection = new ArrayList<>();
+		final List<MeasurementVariable> genotypeMarkers = new ArrayList<>();
 
+		MeasurementVariable observationUnitVariable = null;
 		for (final MeasurementVariable measurementVariable : columns) {
-			if (TermId.OBS_UNIT_ID.getId() == measurementVariable.getTermId()) {
+			if (measurementVariable.getVariableType() != null && VariableType.OBSERVATION_UNIT.getId()
+					.equals(measurementVariable.getVariableType().getId())) {
+				observationUnitVariable = measurementVariable;
+			} else if (firstColumnVariableId == measurementVariable.getTermId()) {
 				orderedColumns.add(0, measurementVariable);
 			} else if (measurementVariable.getVariableType() != null && VariableType.TRAIT.getId()
 				.equals(measurementVariable.getVariableType().getId())) {
@@ -178,13 +183,20 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			} else if (measurementVariable.getVariableType() != null && VariableType.SELECTION_METHOD.getId()
 				.equals(measurementVariable.getVariableType().getId())) {
 				selection.add(measurementVariable);
+			} else if (measurementVariable.getVariableType() != null && VariableType.GENOTYPE_MARKER.getId()
+					.equals(measurementVariable.getVariableType().getId())) {
+				genotypeMarkers.add(measurementVariable);
 			} else {
 				orderedColumns.add(measurementVariable);
 			}
 		}
-
+		if (observationUnitVariable != null) {
+			// Add observation unit variable before traits, selections, and genotype markers
+			orderedColumns.add(observationUnitVariable);
+		}
 		orderedColumns.addAll(trait);
 		orderedColumns.addAll(selection);
+		orderedColumns.addAll(genotypeMarkers);
 		return orderedColumns;
 	}
 

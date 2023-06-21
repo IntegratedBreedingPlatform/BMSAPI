@@ -3,6 +3,7 @@ package org.ibp.api.java.impl.middleware.dataset;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetExportService;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,12 @@ public class DatasetTransposedExcelExportServiceImpl extends DatasetExcelExportS
         // remove OBS_UNIT_ID column for Transposed Excel
         columns = columns.stream().filter(variable -> variable.getTermId() != TermId.OBS_UNIT_ID.getId())
                 .collect(Collectors.toList());
+        final MeasurementVariable trialInstanceVariable = new MeasurementVariable();
+        trialInstanceVariable.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
+        trialInstanceVariable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
+        trialInstanceVariable.setFactor(true);
+        trialInstanceVariable.setName("TRIAL_INSTANCE");
+        columns.add(0, trialInstanceVariable);
         this.includeSampleGenotypeValues(studyId, dataSet, includeSampleGenotypeValues, columns);
 
         return columns;
