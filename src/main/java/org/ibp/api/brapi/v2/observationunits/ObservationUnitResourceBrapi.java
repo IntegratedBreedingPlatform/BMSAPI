@@ -26,6 +26,7 @@ import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -60,6 +61,9 @@ public class ObservationUnitResourceBrapi {
 
 	@Autowired
 	private BrapiResponseMessageGenerator<ObservationUnitDto> responseMessageGenerator;
+
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
 
 	@ApiOperation(value = "Post observation units search", notes = "Post observation units search")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
@@ -181,7 +185,6 @@ public class ObservationUnitResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get the Observation Levels", notes = "Get the Observation Levels")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observationlevels", method = RequestMethod.GET)
 	public ResponseEntity<EntityListResponse<ObservationLevel>> getObservationLevels(
 		@PathVariable final String crop,
@@ -197,6 +200,14 @@ public class ObservationUnitResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
+
+		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES");
+		if(StringUtils.isNotEmpty(programDbId)) {
+			this.permissionValidator.validateProgramByStudyDbId(crop, programDbId);
+		}
+		if (StringUtils.isNotEmpty(studyDbId)) { // no validation if parameter is not present
+			this.permissionValidator.validateProgramByStudyDbId(crop, studyDbId);
+		}
 
 		final ObservationLevelFilter observationLevelFilter = new ObservationLevelFilter(studyDbId, trialDbId, programDbId);
 

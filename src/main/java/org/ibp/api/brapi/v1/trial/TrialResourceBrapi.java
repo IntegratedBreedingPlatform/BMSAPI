@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
 import org.generationcp.middleware.service.api.BrapiView;
@@ -19,6 +20,7 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -54,8 +56,10 @@ public class TrialResourceBrapi {
 	private static final String ORDER_BY_ASCENDING = "asc";
 	private static final String ORDER_BY_DESCENDING = "desc";
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "List of trial summaries", notes = "Get a list of trial summaries.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
@@ -74,6 +78,7 @@ public class TrialResourceBrapi {
 			required = false) final String sortBy,
 		@ApiParam(value = "Sort order direction. asc/desc.") @RequestParam(value = "sortOrder",
 			required = false) final String sortOrder) {
+		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES","VIEW_STUDIES");
 
 		final String validationError = this.parameterValidation(sortBy, sortOrder);
 		if (!StringUtils.isBlank(validationError)) {
@@ -83,9 +88,11 @@ public class TrialResourceBrapi {
 		}
 
 		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
-		if (StringUtils.isNotEmpty(programDbId)) {
-			trialSearchRequestDTO.setProgramDbIds(Arrays.asList(programDbId));
+		final List<String> validPrograms = this.permissionValidator.validateProgramByProgramDbId(crop, programDbId);
+		if (CollectionUtils.isNotEmpty(validPrograms)) {
+			trialSearchRequestDTO.setProgramDbIds(validPrograms);
 		}
+
 		if (StringUtils.isNotEmpty(locationDbId)) {
 			trialSearchRequestDTO.setLocationDbIds(Arrays.asList(locationDbId));
 		}

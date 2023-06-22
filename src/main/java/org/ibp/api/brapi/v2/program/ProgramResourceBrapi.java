@@ -16,6 +16,7 @@ import org.ibp.api.brapi.v1.program.Program;
 import org.ibp.api.brapi.v1.program.ProgramEntityResponseBuilder;
 import org.ibp.api.brapi.v2.validation.CropValidator;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -24,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,8 +49,10 @@ public class ProgramResourceBrapi {
 	@Autowired
 	private CropValidator cropValidator;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "Get filtered list of breeding Programs", notes = "Get a filtered list of breeding Programs. This list can be filtered by common crop name to narrow results to a specific crop.")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_PROGRAMS', 'MANAGE_PROGRAM_SETTINGS')")
 	@RequestMapping(value = "/{cropName}/brapi/v2/programs", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -71,6 +73,8 @@ public class ProgramResourceBrapi {
 			required = false) final Integer pageSize) {
 
 		this.cropValidator.validateCrop(commonCropName);
+		this.permissionValidator.validatePermissions(commonCropName, "ADMIN", "CROP_MANAGEMENT", "MANAGE_PROGRAMS",
+			"MANAGE_PROGRAM_SETTINGS");
 
 		if (!StringUtils.isBlank(abbreviation)) {
 			final List<Map<String, String>> status =

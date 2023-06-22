@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
@@ -25,6 +26,7 @@ import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +64,10 @@ public class TrialResourceBrapi {
 	@Autowired
 	private BrapiResponseMessageGenerator<TrialSummary> responseMessageGenerator;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "Retrieve a filtered list of breeding Trials", notes = "Retrieve a filtered list of breeding Trials. A Trial is a collection of Studies")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/trials", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -101,6 +105,7 @@ public class TrialResourceBrapi {
 		@RequestParam(value = "externalReferenceId", required = false) final String externalReferenceId,
 		@ApiParam(value = "An identifier for the source system or database of an external reference (use with externalReferenceID parameter")
 		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSource) {
+		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES","VIEW_STUDIES");
 		final boolean isSortOrderValid =
 			"ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
 		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");
@@ -113,8 +118,9 @@ public class TrialResourceBrapi {
 
 		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
 
-		if (StringUtils.isNotEmpty(programDbId)) {
-			trialSearchRequestDTO.setProgramDbIds(Arrays.asList(programDbId));
+		final List<String> validPrograms = this.permissionValidator.validateProgramByProgramDbId(crop, programDbId);
+		if (CollectionUtils.isNotEmpty(validPrograms)) {
+			trialSearchRequestDTO.setProgramDbIds(validPrograms);
 		}
 		if (StringUtils.isNotEmpty(locationDbId)) {
 			trialSearchRequestDTO.setLocationDbIds(Arrays.asList(locationDbId));

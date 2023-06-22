@@ -20,6 +20,7 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,9 @@ public class VariableResourceBrapi {
 
 	@Autowired
 	private SearchRequestService searchRequestService;
+
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
 
 	@ApiOperation(value = "Search Observation 'Variables'", notes = "Submit a search request for Observation 'Variables'")
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
@@ -116,6 +120,11 @@ public class VariableResourceBrapi {
 		@RequestParam(value = "page", required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
+
+		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES");
+
+		this.permissionValidator.validateProgramByStudyDbId(crop, studyDbId);
+
 		final VariableSearchRequestDTO requestDTO = new VariableSearchRequestDTO();
 		if (!StringUtils.isEmpty(observationVariableDbId)) {
 			requestDTO.setObservationVariableDbIds(Collections.singletonList(observationVariableDbId));

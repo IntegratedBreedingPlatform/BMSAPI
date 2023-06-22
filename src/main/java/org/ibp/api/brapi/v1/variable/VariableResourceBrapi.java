@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -15,15 +14,13 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
-import org.ibp.api.java.ontology.VariableService;
-import org.ibp.api.java.study.StudyService;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,8 +29,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Api(value = "BrAPI Variable Services")
@@ -43,8 +38,10 @@ public class VariableResourceBrapi {
 	@Autowired
 	private VariableServiceBrapi variableServiceBrapi;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "Call to retrieve a list of observation variables available in the system.")
-	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/variables", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV1_3.class)
 	@ResponseBody
@@ -56,6 +53,7 @@ public class VariableResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
+		this.permissionValidator.validatePermissions(crop, "ADMIN","CROP_MANAGEMENT","MANAGE_ONTOLOGIES");
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;

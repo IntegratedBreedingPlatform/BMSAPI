@@ -22,6 +22,7 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,9 @@ public class ObservationResourceBrapi {
 
 	@Autowired
 	private BrapiResponseMessageGenerator<ObservationDto> responseMessageGenerator;
+
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
 
 	@ApiOperation(value = "Retrieve observations", notes = "Retrieve all observations where there are measurements for the given observation variables.")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
@@ -168,12 +172,12 @@ public class ObservationResourceBrapi {
 	}
 
 	@ApiOperation(value = "Add new Observation entities", notes = "Add new Observation entities")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_MANAGE_CONFIRMED_OBSERVATIONS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observations", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<ObservationDto>> createObservations(@PathVariable final String crop,
 		@RequestBody final List<ObservationDto> observations) {
+		this.permissionValidator.validatePermissions(crop, "ADMIN","STUDIES","MANAGE_STUDIES", "MS_OBSERVATIONS", "MS_MANAGE_CONFIRMED_OBSERVATIONS");
 
 		final ObservationImportResponse observationImportResponse = this.observationServiceBrapi.createObservations(observations);
 		final Result<ObservationDto> results =
