@@ -1,5 +1,6 @@
 package org.ibp.api.rest.germplasm;
 
+import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -37,7 +38,7 @@ public class GermplasmAttributeResource {
 		@RequestParam(required = false) final Integer variableTypeId,
 		@RequestParam(required = false) final String programUUID) {
 		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
-		germplasmAttributeSearchRequest.setGids(Arrays.asList(gid));
+		germplasmAttributeSearchRequest.setGids(Sets.newHashSet(gid));
 		return new ResponseEntity<>(this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest),
 			HttpStatus.OK);
 	}

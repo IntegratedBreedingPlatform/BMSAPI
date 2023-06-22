@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -47,7 +48,7 @@ public class GermplasmAttributeServiceImplTest {
 	@Test
 	public void testGetGermplasmAttributeDtos() {
 		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
-		germplasmAttributeSearchRequest.setGids(Arrays.asList(GID));
+		germplasmAttributeSearchRequest.setGids(Sets.newHashSet(GID));
 		germplasmAttributeSearchRequest.setVariableTypeId(GERMPLASM_ATTRIBUTE_TYPE_ID);
 		this.germplasmAttributeServiceImpl.getGermplasmAttributeDtos(germplasmAttributeSearchRequest);
 		Mockito.verify(this.germplasmAttributeValidator).validateAttributeType(ArgumentMatchers.any(BindingResult.class),
