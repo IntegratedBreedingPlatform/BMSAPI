@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	@Override
 	public List<AttributeDto> getGermplasmAttributeDtos(final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.germplasmValidator.validateGids(errors, germplasmAttributeSearchRequest.getGids());
+		this.germplasmValidator.validateGids(errors, new ArrayList<>(germplasmAttributeSearchRequest.getGids()));
 		if (germplasmAttributeSearchRequest.getVariableTypeId() != null) {
 			this.germplasmAttributeValidator.validateAttributeType(errors, germplasmAttributeSearchRequest.getVariableTypeId());
 		}
