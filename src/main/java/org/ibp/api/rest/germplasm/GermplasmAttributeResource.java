@@ -3,6 +3,7 @@ package org.ibp.api.rest.germplasm;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
 import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Api(value = "Germplasm Attribute Services")
@@ -34,14 +36,18 @@ public class GermplasmAttributeResource {
 		@PathVariable final Integer gid,
 		@RequestParam(required = false) final Integer variableTypeId,
 		@RequestParam(required = false) final String programUUID) {
-		return new ResponseEntity<>(this.germplasmAttributeService.getGermplasmAttributeDtos(gid, variableTypeId, programUUID), HttpStatus.OK);
+		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
+		germplasmAttributeSearchRequest.setGids(Arrays.asList(gid));
+		return new ResponseEntity<>(this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest),
+			HttpStatus.OK);
 	}
 
 	@ApiOperation(value = "Create attribute for specified germplasm", notes = "Create attribute for specified germplasm")
 	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_ATTRIBUTES')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<AttributeRequestDto> createGermplasmAttribute(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
+	public ResponseEntity<AttributeRequestDto> createGermplasmAttribute(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @RequestBody final AttributeRequestDto requestDto) {
 		return new ResponseEntity<>(this.germplasmAttributeService.createGermplasmAttribute(gid, requestDto, programUUID),
 			HttpStatus.OK);
@@ -51,9 +57,11 @@ public class GermplasmAttributeResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_ATTRIBUTES')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes/{attributeId}", method = RequestMethod.PATCH)
 	@ResponseBody
-	public ResponseEntity<AttributeRequestDto> updateGermplasmAttribute(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
+	public ResponseEntity<AttributeRequestDto> updateGermplasmAttribute(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @PathVariable final Integer attributeId,
-		@ApiParam("Only the following fields can be updated: value, date, and locationId") @RequestBody final AttributeRequestDto requestDto) {
+		@ApiParam("Only the following fields can be updated: value, date, and locationId") @RequestBody
+		final AttributeRequestDto requestDto) {
 		return new ResponseEntity<>(
 			this.germplasmAttributeService.updateGermplasmAttribute(gid, attributeId, requestDto, programUUID),
 			HttpStatus.OK);
@@ -63,7 +71,8 @@ public class GermplasmAttributeResource {
 	@PreAuthorize("hasAnyAuthority('ADMIN','GERMPLASM', 'MANAGE_GERMPLASM', 'EDIT_GERMPLASM', 'MODIFY_ATTRIBUTES')")
 	@RequestMapping(value = "/crops/{cropName}/germplasm/{gid}/attributes/{attributeId}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public ResponseEntity<Void> deleteGermplasmAttribute(@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
+	public ResponseEntity<Void> deleteGermplasmAttribute(@PathVariable final String cropName,
+		@RequestParam(required = false) final String programUUID,
 		@PathVariable final Integer gid, @PathVariable final Integer attributeId) {
 		this.germplasmAttributeService.deleteGermplasmAttribute(gid, attributeId);
 		return new ResponseEntity<>(HttpStatus.OK);

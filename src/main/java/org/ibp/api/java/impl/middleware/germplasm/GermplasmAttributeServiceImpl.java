@@ -1,6 +1,7 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
 import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.ibp.api.exception.ResourceNotFoundException;
@@ -38,13 +39,13 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	private BindingResult errors;
 
 	@Override
-	public List<AttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId, final String programUUID) {
+	public List<AttributeDto> getGermplasmAttributeDtos(final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
-		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
-		if (variableTypeId != null) {
-			this.germplasmAttributeValidator.validateAttributeType(errors, variableTypeId);
+		this.germplasmValidator.validateGids(errors, germplasmAttributeSearchRequest.getGids());
+		if (germplasmAttributeSearchRequest.getVariableTypeId() != null) {
+			this.germplasmAttributeValidator.validateAttributeType(errors, germplasmAttributeSearchRequest.getVariableTypeId());
 		}
-		return this.germplasmAttributeService.getGermplasmAttributeDtos(gid, variableTypeId, programUUID);
+		return this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest);
 	}
 
 	@Override
@@ -59,7 +60,8 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public AttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId, final AttributeRequestDto dto, final String programUUID) {
+	public AttributeRequestDto updateGermplasmAttribute(final Integer gid, final Integer attributeId, final AttributeRequestDto dto,
+		final String programUUID) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, Collections.singletonList(gid));
 		this.germplasmAttributeValidator.validateAttribute(errors, gid, dto, attributeId);
