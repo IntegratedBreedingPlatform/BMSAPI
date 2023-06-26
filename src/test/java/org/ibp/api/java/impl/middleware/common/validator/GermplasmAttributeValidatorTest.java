@@ -4,6 +4,7 @@ package org.ibp.api.java.impl.middleware.common.validator;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.shared.AttributeDto;
@@ -122,7 +123,7 @@ public class GermplasmAttributeValidatorTest {
 		try {
 			final AttributeRequestDto germplasmAttributeRequestDto = this.createGermplasmAttributeRequestDto();
 			germplasmAttributeRequestDto.setVariableId(VARIABLE_ID);
-			final AttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
+			final GermplasmAttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
 			germplasmAttributeDto.setVariableName("Var");
 			germplasmAttributeDto.setVariableId(VARIABLE_ID);
 			Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(ArgumentMatchers.any()))
@@ -137,7 +138,7 @@ public class GermplasmAttributeValidatorTest {
 
 	@Test
 	public void testValidateGermplasmAttributeExists_WhenGermplasmAttributeIsExisting() {
-		final AttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
+		final GermplasmAttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
 		Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(ArgumentMatchers.any()))
 			.thenReturn(Collections.singletonList(germplasmAttributeDto));
 		this.germplasmAttributeValidator.validateGermplasmAttributeExists(this.errors, GID, ATTRIBUTE_ID);
@@ -158,7 +159,7 @@ public class GermplasmAttributeValidatorTest {
 
 	@Test
 	public void testValidateGermplasmAttributeForUpdate_WhenGermplasmAttributeIsValid() {
-		final AttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
+		final GermplasmAttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
 		germplasmAttributeDto.setId(ATTRIBUTE_ID);
 		germplasmAttributeDto.setVariableId(VARIABLE_ID);
 		Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(ArgumentMatchers.any()))
@@ -174,7 +175,7 @@ public class GermplasmAttributeValidatorTest {
 	public void testValidateGermplasmAttribute_ThrowsException_WhenAttributeIdIsNotExisting() {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		try {
-			final AttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
+			final GermplasmAttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
 			germplasmAttributeDto.setId(2);
 			Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(ArgumentMatchers.any()))
 				.thenReturn(Collections.singletonList(germplasmAttributeDto));
@@ -191,7 +192,7 @@ public class GermplasmAttributeValidatorTest {
 	public void testValidateGermplasmAttribute_ThrowsException_WhenAttributeCodeIsInvalid() {
 		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), String.class.getName());
 		try {
-			final AttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
+			final GermplasmAttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
 			germplasmAttributeDto.setVariableName("ATTRIBUTE");
 			germplasmAttributeDto.setId(ATTRIBUTE_ID);
 			germplasmAttributeDto.setVariableId(2);
@@ -211,7 +212,7 @@ public class GermplasmAttributeValidatorTest {
 	public void testValidateAttribute_ForUpdateScenario_WhenGermplasmAttributeIsValid() {
 
 		//Validate for update success
-		final AttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
+		final GermplasmAttributeDto germplasmAttributeDto = this.createGermplasmAttributeDto();
 		germplasmAttributeDto.setVariableId(VARIABLE_ID);
 		Mockito.when(this.germplasmAttributeService.getGermplasmAttributeDtos(ArgumentMatchers.any()))
 			.thenReturn(Collections.singletonList(germplasmAttributeDto));
@@ -317,8 +318,8 @@ public class GermplasmAttributeValidatorTest {
 		return germplasmAttributeRequestDto;
 	}
 
-	private AttributeDto createGermplasmAttributeDto() {
-		final AttributeDto germplasmAttributeDto = new AttributeDto();
+	private GermplasmAttributeDto createGermplasmAttributeDto() {
+		final GermplasmAttributeDto germplasmAttributeDto = new GermplasmAttributeDto();
 		germplasmAttributeDto.setVariableName(VARIABLE_NAME);
 		germplasmAttributeDto.setId(ATTRIBUTE_ID);
 		return germplasmAttributeDto;

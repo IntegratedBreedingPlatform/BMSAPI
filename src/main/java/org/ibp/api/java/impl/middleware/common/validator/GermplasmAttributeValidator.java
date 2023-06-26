@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.shared.AttributeDto;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,7 +62,7 @@ public class GermplasmAttributeValidator extends AttributeValidator {
 	void validateGermplasmAttributeShouldNotExist(final BindingResult errors, final Integer gid, final AttributeRequestDto dto) {
 		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
 		germplasmAttributeSearchRequest.setGids(Sets.newHashSet(gid));
-		final List<AttributeDto> germplasmAttributeDtos =
+		final List<GermplasmAttributeDto> germplasmAttributeDtos =
 			this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest);
 		final List<AttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getVariableId().equals(dto.getVariableId())).collect(Collectors.toList());
@@ -76,7 +76,7 @@ public class GermplasmAttributeValidator extends AttributeValidator {
 	public void validateGermplasmAttributeExists(final BindingResult errors, final Integer gid, final Integer attributeId) {
 		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
 		germplasmAttributeSearchRequest.setGids(Sets.newHashSet(gid));
-		final List<AttributeDto> germplasmAttributeDtos =
+		final List<GermplasmAttributeDto> germplasmAttributeDtos =
 			this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest);
 		final List<AttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
@@ -90,11 +90,11 @@ public class GermplasmAttributeValidator extends AttributeValidator {
 		final Integer attributeId) {
 		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
 		germplasmAttributeSearchRequest.setGids(Sets.newHashSet(gid));
-		final List<AttributeDto> germplasmAttributeDtos =
+		final List<GermplasmAttributeDto> germplasmAttributeDtos =
 			this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest);
 
 		// Filter by germplasm attribute id
-		List<AttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
+		List<GermplasmAttributeDto> existingGermplasmAttributes = germplasmAttributeDtos.stream()
 			.filter(existing -> existing.getId().equals(attributeId)).collect(Collectors.toList());
 		if (existingGermplasmAttributes.isEmpty()) {
 			errors.reject("attribute.id.invalid.not.existing", new String[] {"Germplasm", String.valueOf(attributeId)}, "");
