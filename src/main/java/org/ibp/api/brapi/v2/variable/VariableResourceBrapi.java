@@ -101,7 +101,6 @@ public class VariableResourceBrapi {
 	}
 
 	@ApiOperation(value = "Call to retrieve a list of observationVariables available in the system.", notes = "Get the Observation Variables")
-	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_ONTOLOGIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/variables", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV2.class)
 	@ResponseBody

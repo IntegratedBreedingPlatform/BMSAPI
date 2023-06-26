@@ -7,8 +7,11 @@ import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.ibp.api.java.impl.middleware.security.SecurityService;
+import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.java.permission.PermissionService;
 import org.ibp.api.java.program.ProgramService;
 import org.ibp.api.java.study.StudyService;
@@ -38,6 +41,9 @@ public class BrapiPermissionValidator {
 
 	@Autowired
 	private StudyService studyService;
+
+	@Autowired
+	private ObservationUnitService observationUnitService;
 
 	public void validatePermissions(final String cropName, final String... permissions) {
 		final Integer userId = this.securityService.getCurrentlyLoggedInUser().getUserid();
@@ -99,6 +105,24 @@ public class BrapiPermissionValidator {
 				if (dmsProject != null) {
 					return this.getAllValidProgramsForUser(cropName, dmsProject.getProgramUUID(), user.getUserid());
 				}
+			}
+		}
+		return Collections.EMPTY_LIST;
+	}
+
+	public List<String> validateProgramByObservationUnitDbId(final String cropName, final String observationUnitDbId) {
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		if (user.hasOnlyProgramRoles(cropName)) {
+			if (StringUtils.isEmpty(observationUnitDbId)) {
+				throw new AccessDeniedException("");
+			}
+
+			final ObservationUnitSearchRequestDTO obsRequestDto = new ObservationUnitSearchRequestDTO();
+			obsRequestDto.setObservationUnitDbIds(Arrays.asList(observationUnitDbId));
+			final List<ObservationUnitDto> observationList = this.observationUnitService
+				.searchObservationUnits(null, null, obsRequestDto);
+			if (!CollectionUtils.isEmpty(observationList)) {
+				return this.getAllValidProgramsForUser(cropName, observationList.get(0).getProgramDbId(), user.getUserid());
 			}
 		}
 		return Collections.EMPTY_LIST;

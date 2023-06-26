@@ -10,6 +10,7 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.impl.middleware.common.validator.ImageValidator;
 import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,14 +34,19 @@ public class ImageResourceBrapi {
 	@Autowired
 	private ImageValidator imageValidator;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation("Create a new image meta data object")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/images", method = RequestMethod.POST)
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<SingleEntityResponse<Image>> createImage(
 		@PathVariable final String crop,
 		@RequestBody final ImageNewRequest body
 	) {
+		this.permissionValidator.validatePermissions(crop, "ADMIN","STUDIES","MANAGE_STUDIES");
+		this.permissionValidator.validateProgramByObservationUnitDbId(crop, body.getObservationUnitDbId());
+
 		this.fileValidator.validateFileStorage();
 		this.imageValidator.validateImage(body);
 
