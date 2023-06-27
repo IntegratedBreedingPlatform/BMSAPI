@@ -80,6 +80,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.TreeSet;
@@ -505,7 +506,7 @@ public class DatasetServiceImpl implements DatasetService {
 			errors.reject("no.variables.dataset", null, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-
+		this.addObsUnitIdColumnnAndValuesIfNecessary(errors, studyId, datasetId, input);
 		final StudyBookTableBuilder studyBookTableBuilder = new StudyBookTableBuilder();
 		final Table<String, String, String> table = studyBookTableBuilder.buildObservationsTable(input.getData(), datasetMeasurementVariables);
 
@@ -664,6 +665,70 @@ public class DatasetServiceImpl implements DatasetService {
 			throw new PreconditionFailedException(errors.getAllErrors());
 		}
 
+	}
+
+	private void addObsUnitIdColumnnAndValuesIfNecessary(final BindingResult errors, final Integer studyId, final Integer datasetId, final ObservationsPutRequestInput input) {
+		final org.generationcp.middleware.domain.dms.DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
+		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
+		// Check if the dataset where the data will be imported is SubObservationType.
+		// Imported data with no OBS_UNIT_ID column means that the data is imported from a transposed file
+		if (datasetType.isSubObservationType()) {
+			final List<List<String>> data = input.getData();
+			final List<String> headers = data.get(0);
+			if (!headers.contains(StudyBookTableBuilder.OBS_UNIT_ID)) {
+				if(!headers.contains(StudyBookTableBuilder.TRIAL_INSTANCE)) {
+					errors.reject("required.header.trial.instance", null, "");
+					throw new ApiRequestValidationException(errors.getAllErrors());
+				}
+				if(!headers.contains(StudyBookTableBuilder.PLOT_NO)) {
+					errors.reject("required.header.plot.no", null, "");
+					throw new ApiRequestValidationException(errors.getAllErrors());
+				}
+				final int trialInstanceIndex = headers.indexOf(StudyBookTableBuilder.TRIAL_INSTANCE);
+				final Set<Integer> instanceNumbers = new HashSet<>();
+				final List<List<String>> values = data.subList(1, data.size());
+				for(final List<String> row: values) {
+					final String trialInstanceValue = row.get(trialInstanceIndex);
+					if (StringUtils.isEmpty(trialInstanceValue)) {
+						errors.reject("empty.trial.instance", null, "");
+						throw new ApiRequestValidationException(errors.getAllErrors());
+					}
+					instanceNumbers.add(Integer.valueOf(trialInstanceValue));
+				};
+				// Retrieve OBS_UNIT_ID values using TRIAL_INSTANCE, PLOT_NO, and OBSERVATION_UNIT variable value
+				final List<Integer> instanceIds = dataSet.getInstances().stream().filter(instance -> instanceNumbers.contains(instance.getInstanceNumber()))
+						.map(org.generationcp.middleware.service.impl.study.StudyInstance::getInstanceId).collect(Collectors.toList());
+				final Map<Integer, List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow>> observationUnitRowsMap =
+						this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, instanceIds);
+
+				// <TRIAL_INSTANCE, <PLOT_NO, <OBSERVATION_UNIT variable value, OBS_UNIT_ID>>> MAP
+				final Map<String, Map<String, Map<String, String>>> obsUnitIdMap = new HashMap<>();
+				final Optional<MeasurementVariable> observationUnitVariable = this.getObservationUnitVariable(dataSet.getVariables());
+				final String observationUnitVariableName = observationUnitVariable.get().getName();
+				for (final Integer instanceId: observationUnitRowsMap.keySet()) {
+					final List<org.generationcp.middleware.service.api.dataset.ObservationUnitRow> rows = observationUnitRowsMap.get(instanceId);
+					for (final org.generationcp.middleware.service.api.dataset.ObservationUnitRow row: rows) {
+						final String instanceNumber = row.getTrialInstance().toString();
+						obsUnitIdMap.putIfAbsent(instanceNumber, new HashMap<>());
+						final String plotNo = row.getVariableValueByVariableId(TermId.PLOT_NO.getId());
+						obsUnitIdMap.get(instanceNumber).putIfAbsent(plotNo, new HashMap<>());
+						final String observationUnitVariableValue = row.getVariables().get(observationUnitVariableName).getValue();
+						obsUnitIdMap.get(instanceNumber).get(plotNo).put(observationUnitVariableValue, row.getObsUnitId());
+					}
+				}
+
+				final int plotNoIndex = headers.indexOf(StudyBookTableBuilder.PLOT_NO);
+				final int observationUnitVariableIndex = headers.indexOf(observationUnitVariableName);
+				headers.add(StudyBookTableBuilder.OBS_UNIT_ID);
+
+				for(final List<String> row: values) {
+					final String trialInstanceValue = row.get(trialInstanceIndex);
+					final String plotNo = row.get(plotNoIndex);
+					final String observationUnitVariableValue = row.get(observationUnitVariableIndex);
+					row.add(obsUnitIdMap.get(trialInstanceValue).get(plotNo).get(observationUnitVariableValue));
+				}
+			}
+		}
 	}
 
 	private Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitRow> getEnvironmentObservationUnitRows(
@@ -1174,5 +1239,11 @@ public class DatasetServiceImpl implements DatasetService {
 				}
 			}
 		}
+	}
+
+	private Optional<MeasurementVariable> getObservationUnitVariable(final List<MeasurementVariable> columns) {
+		final Optional<MeasurementVariable> obsUnitVariable = columns.stream().filter(variable -> variable.getVariableType().getId() == TermId.OBSERVATION_UNIT.getId())
+				.findFirst();
+		return obsUnitVariable;
 	}
 }
