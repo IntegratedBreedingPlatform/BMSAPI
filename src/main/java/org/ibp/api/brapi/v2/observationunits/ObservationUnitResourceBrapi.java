@@ -220,7 +220,6 @@ public class ObservationUnitResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get a filtered set of Observation Units", notes = "Get a filtered set of Observation Units")
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observationunits", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -260,6 +259,10 @@ public class ObservationUnitResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
+
+		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES");
+
+		this.permissionValidator.validateProgramByStudyDbId(crop, studyDbId);
 
 		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO = this.getObservationUnitSearchRequestDTO(germplasmDbId,
 			observationUnitDbId, studyDbId, locationDbId, trialDbId, programDbId, seasonDbId, observationUnitLevelName,
