@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
@@ -178,6 +179,10 @@ public class ObservationResourceBrapi {
 	public ResponseEntity<EntityListResponse<ObservationDto>> createObservations(@PathVariable final String crop,
 		@RequestBody final List<ObservationDto> observations) {
 		this.permissionValidator.validatePermissions(crop, "ADMIN","STUDIES","MANAGE_STUDIES", "MS_OBSERVATIONS", "MS_MANAGE_CONFIRMED_OBSERVATIONS");
+		if (CollectionUtils.isNotEmpty(observations)) {
+			// empty study db id not allowed if user has program only role
+			this.permissionValidator.validateProgramByStudyDbId(crop, observations.get(0).getStudyDbId());
+		}
 
 		final ObservationImportResponse observationImportResponse = this.observationServiceBrapi.createObservations(observations);
 		final Result<ObservationDto> results =
