@@ -105,7 +105,7 @@ public class TrialResourceBrapi {
 		@RequestParam(value = "externalReferenceId", required = false) final String externalReferenceId,
 		@ApiParam(value = "An identifier for the source system or database of an external reference (use with externalReferenceID parameter")
 		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSource) {
-		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES","VIEW_STUDIES");
+		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES", "VIEW_STUDIES");
 		final boolean isSortOrderValid =
 			"ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
 		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");

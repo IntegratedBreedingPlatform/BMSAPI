@@ -202,7 +202,7 @@ public class ObservationUnitResourceBrapi {
 			required = false) final Integer pageSize) {
 
 		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES");
-		if(StringUtils.isNotEmpty(programDbId)) {
+		if (StringUtils.isNotEmpty(programDbId)) {
 			this.permissionValidator.validateProgramByStudyDbId(crop, programDbId);
 		}
 		if (StringUtils.isNotEmpty(studyDbId)) { // no validation if parameter is not present
@@ -311,7 +311,8 @@ public class ObservationUnitResourceBrapi {
 		if (!StringUtils.isEmpty(observationUnitLevelName)
 			|| !StringUtils.isEmpty(observationUnitLevelOrder)
 			|| !StringUtils.isEmpty(observationUnitLevelCode)) {
-			final Integer order = NumberUtils.isNumber(observationUnitLevelOrder) ? NumberUtils.createInteger(observationUnitLevelOrder) : null;
+			final Integer order =
+				NumberUtils.isNumber(observationUnitLevelOrder) ? NumberUtils.createInteger(observationUnitLevelOrder) : null;
 			observationUnitSearchRequestDTO.setObservationLevels(
 				Lists.newArrayList(new ObservationLevelRelationship(
 					null, observationUnitLevelCode, observationUnitLevelName, order)));

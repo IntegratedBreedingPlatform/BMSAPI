@@ -78,7 +78,7 @@ public class TrialResourceBrapi {
 			required = false) final String sortBy,
 		@ApiParam(value = "Sort order direction. asc/desc.") @RequestParam(value = "sortOrder",
 			required = false) final String sortOrder) {
-		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES","VIEW_STUDIES");
+		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES", "VIEW_STUDIES");
 
 		final String validationError = this.parameterValidation(sortBy, sortOrder);
 		if (!StringUtils.isBlank(validationError)) {

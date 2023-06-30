@@ -53,7 +53,7 @@ public class VariableResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
-		this.permissionValidator.validatePermissions(crop, "ADMIN","CROP_MANAGEMENT","MANAGE_ONTOLOGIES");
+		this.permissionValidator.validatePermissions(crop, "ADMIN", "CROP_MANAGEMENT", "MANAGE_ONTOLOGIES");
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;
@@ -72,7 +72,7 @@ public class VariableResourceBrapi {
 				@Override
 				public List<VariableDTO> getResults(final PagedResult<VariableDTO> pagedResult) {
 					return VariableResourceBrapi.this.variableServiceBrapi
-							.getObservationVariables(crop, requestDTO, pageRequest);
+						.getObservationVariables(crop, requestDTO, pageRequest);
 				}
 			});
 

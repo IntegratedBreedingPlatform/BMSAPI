@@ -44,7 +44,7 @@ public class ImageResourceBrapi {
 		@PathVariable final String cropName,
 		@RequestBody final ImageNewRequest body
 	) {
-		this.permissionValidator.validatePermissions(cropName, "ADMIN","STUDIES","MANAGE_STUDIES");
+		this.permissionValidator.validatePermissions(cropName, "ADMIN", "STUDIES", "MANAGE_STUDIES");
 		this.permissionValidator.validateProgramByObservationUnitDbId(cropName, body.getObservationUnitDbId());
 
 		this.fileValidator.validateFileStorage();
@@ -64,7 +64,7 @@ public class ImageResourceBrapi {
 		@PathVariable("imageDbId") final String imageDbId,
 		@RequestBody final ImageNewRequest body
 	) {
-		this.permissionValidator.validatePermissions(cropName, "ADMIN","STUDIES","MANAGE_STUDIES");
+		this.permissionValidator.validatePermissions(cropName, "ADMIN", "STUDIES", "MANAGE_STUDIES");
 		this.permissionValidator.validateProgramByObservationUnitDbId(cropName, body.getObservationUnitDbId());
 
 		this.fileValidator.validateFileStorage();
@@ -87,7 +87,7 @@ public class ImageResourceBrapi {
 		@PathVariable("imageDbId") final String imageDbId,
 		@RequestBody final byte[] imageContent
 	) {
-		this.permissionValidator.validatePermissions(cropName, "ADMIN","STUDIES","MANAGE_STUDIES");
+		this.permissionValidator.validatePermissions(cropName, "ADMIN", "STUDIES", "MANAGE_STUDIES");
 		this.fileValidator.validateFileStorage();
 
 		final Image result = this.fileMetadataService.updateImageContent(imageDbId, imageContent);

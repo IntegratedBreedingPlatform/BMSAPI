@@ -14,7 +14,6 @@ import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionVali
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,7 +43,7 @@ public class ImageResourceBrapi {
 		@PathVariable final String crop,
 		@RequestBody final ImageNewRequest body
 	) {
-		this.permissionValidator.validatePermissions(crop, "ADMIN","STUDIES","MANAGE_STUDIES");
+		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES");
 		this.permissionValidator.validateProgramByObservationUnitDbId(crop, body.getObservationUnitDbId());
 
 		this.fileValidator.validateFileStorage();
