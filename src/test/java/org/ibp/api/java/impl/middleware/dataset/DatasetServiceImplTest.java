@@ -150,6 +150,12 @@ public class DatasetServiceImplTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
+		final DatasetDTO datasetDTO = new DatasetDTO();
+		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
+		Mockito.when(this.middlewareDatasetService.getDataset(ArgumentMatchers.anyInt())).thenReturn(datasetDTO);
+		final DatasetTypeDTO datasetTypeDTO = new DatasetTypeDTO();
+		datasetTypeDTO.setSubObservationType(false);
+		Mockito.when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(datasetTypeDTO);
 	}
 
 	@Test
