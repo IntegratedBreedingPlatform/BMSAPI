@@ -66,7 +66,7 @@ public class BrapiPermissionValidator {
 			return Arrays.asList(programDbId);
 		}
 
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	private List<String> getAllValidProgramsForUser(final String cropName, final String programDbId, final Integer userId) {
@@ -80,7 +80,7 @@ public class BrapiPermissionValidator {
 		if (CollectionUtils.isNotEmpty(userPrograms)) {
 			if (StringUtils.isNotEmpty(programDbId)) {
 				if (!userPrograms.contains(programDbId)) {
-					throw new AccessDeniedException("User is not authorized for the program.");
+					throw new AccessDeniedException("");
 				}
 				return Arrays.asList(programDbId);
 			}
@@ -107,7 +107,7 @@ public class BrapiPermissionValidator {
 				}
 			}
 		}
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 
 	public List<String> validateProgramByObservationUnitDbId(final String cropName, final String observationUnitDbId) {
@@ -125,6 +125,6 @@ public class BrapiPermissionValidator {
 				return this.getAllValidProgramsForUser(cropName, observationList.get(0).getProgramDbId(), user.getUserid());
 			}
 		}
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 }
