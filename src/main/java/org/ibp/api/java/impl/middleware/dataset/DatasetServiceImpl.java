@@ -506,7 +506,7 @@ public class DatasetServiceImpl implements DatasetService {
 			errors.reject("no.variables.dataset", null, "");
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
-		this.addObsUnitIdColumnnAndValuesIfNecessary(errors, studyId, datasetId, input);
+		this.addObsUnitIdColumnAndValuesIfNecessary(errors, studyId, datasetId, input);
 		final StudyBookTableBuilder studyBookTableBuilder = new StudyBookTableBuilder();
 		final Table<String, String, String> table = studyBookTableBuilder.buildObservationsTable(input.getData(), datasetMeasurementVariables);
 
@@ -667,7 +667,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	}
 
-	private void addObsUnitIdColumnnAndValuesIfNecessary(final BindingResult errors, final Integer studyId, final Integer datasetId, final ObservationsPutRequestInput input) {
+	void addObsUnitIdColumnAndValuesIfNecessary(final BindingResult errors, final Integer studyId, final Integer datasetId, final ObservationsPutRequestInput input) {
 		final org.generationcp.middleware.domain.dms.DatasetDTO dataSet = this.middlewareDatasetService.getDataset(datasetId);
 		final DatasetTypeDTO datasetType = this.datasetTypeService.getDatasetTypeById(dataSet.getDatasetTypeId());
 		// Check if the dataset where the data will be imported is SubObservationType.
@@ -694,7 +694,7 @@ public class DatasetServiceImpl implements DatasetService {
 						throw new ApiRequestValidationException(errors.getAllErrors());
 					}
 					instanceNumbers.add(Integer.valueOf(trialInstanceValue));
-				};
+				}
 				// Retrieve OBS_UNIT_ID values using TRIAL_INSTANCE, PLOT_NO, and OBSERVATION_UNIT variable value
 				final List<Integer> instanceIds = dataSet.getInstances().stream().filter(instance -> instanceNumbers.contains(instance.getInstanceNumber()))
 						.map(org.generationcp.middleware.service.impl.study.StudyInstance::getInstanceId).collect(Collectors.toList());
@@ -1242,8 +1242,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private Optional<MeasurementVariable> getObservationUnitVariable(final List<MeasurementVariable> columns) {
-		final Optional<MeasurementVariable> obsUnitVariable = columns.stream().filter(variable -> variable.getVariableType().getId() == TermId.OBSERVATION_UNIT.getId())
+		return columns.stream().filter(variable -> variable.getVariableType().getId() == TermId.OBSERVATION_UNIT.getId())
 				.findFirst();
-		return obsUnitVariable;
 	}
 }
