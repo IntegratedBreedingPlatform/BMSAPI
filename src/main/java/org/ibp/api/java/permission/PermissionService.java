@@ -8,5 +8,5 @@ public interface PermissionService {
 
 	PermissionDto getPermissionTree(Integer roleTypeId);
 
-	List<PermissionDto> getPermissions(Integer userId, String cropName, Integer programId, Boolean isBrapi);
+	List<PermissionDto> getPermissions(Integer userId, String cropName, Integer programId, Boolean skipProgramValidation);
 }

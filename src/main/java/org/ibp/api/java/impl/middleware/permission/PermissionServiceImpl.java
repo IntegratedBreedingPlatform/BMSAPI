@@ -47,7 +47,7 @@ public class PermissionServiceImpl implements PermissionService {
 	}
 
 	@Override
-	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId, final Boolean isBrapi) {
-		return this.permissionService.getPermissions(userId, cropName, programId, isBrapi);
+	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId, final Boolean skipProgramValidation) {
+		return this.permissionService.getPermissions(userId, cropName, programId, skipProgramValidation);
 	}
 }
