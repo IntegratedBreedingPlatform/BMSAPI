@@ -34,6 +34,7 @@ public class DatasetTransposedExcelExportServiceImpl extends DatasetExcelExportS
 
         try {
             this.datasetTransposedExcelGenerator.setIncludeSampleGenotypeValues(includeSampleGenotypeValues);
+            // Single File Export for Transposed Excel is not implemented, so it's always set to false
             return this.generate(studyId, datasetId, instanceIds, collectionOrderId, this.datasetTransposedExcelGenerator, false, XLS,
                     includeSampleGenotypeValues);
         } catch (final IOException e) {
@@ -44,7 +45,7 @@ public class DatasetTransposedExcelExportServiceImpl extends DatasetExcelExportS
     }
 
     @Override
-    public List<MeasurementVariable> getColumns(final int studyId, final DatasetDTO dataSet, final boolean includeSampleGenotypeValues) {
+    public List<MeasurementVariable> getColumns(final int studyId, final DatasetDTO dataSet, final boolean isIncludeSampleGenotypeValues) {
         List<MeasurementVariable> columns = this.studyDatasetService.getSubObservationSetVariables(studyId, dataSet.getDatasetId());
         // remove OBS_UNIT_ID column for Transposed Excel
         columns = columns.stream().filter(variable -> variable.getTermId() != TermId.OBS_UNIT_ID.getId())
@@ -55,7 +56,7 @@ public class DatasetTransposedExcelExportServiceImpl extends DatasetExcelExportS
         trialInstanceVariable.setFactor(true);
         trialInstanceVariable.setName("TRIAL_INSTANCE");
         columns.add(0, trialInstanceVariable);
-        this.includeSampleGenotypeValues(studyId, dataSet, includeSampleGenotypeValues, columns);
+        this.includeSampleGenotypeValues(studyId, dataSet, isIncludeSampleGenotypeValues, columns);
 
         return columns;
     }

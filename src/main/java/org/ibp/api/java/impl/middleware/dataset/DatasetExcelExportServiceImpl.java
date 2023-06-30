@@ -24,8 +24,8 @@ import org.springframework.validation.MapBindingResult;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,14 +60,14 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 	}
 
 	@Override
-	public List<MeasurementVariable> getColumns(final int studyId, final DatasetDTO dataSet, final boolean includeSampleGenotypeValues) {
+	public List<MeasurementVariable> getColumns(final int studyId, final DatasetDTO dataSet, final boolean isIncludeSampleGenotypeValues) {
 		final List<MeasurementVariable> columns;
 		if (DatasetTypeEnum.SUMMARY_DATA.getId() == dataSet.getDatasetTypeId() || DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId() == dataSet.getDatasetTypeId()) {
 			columns = this.studyDatasetService.getObservationSetColumns(studyId, dataSet.getDatasetId(), false);
 		} else {
 			columns = this.studyDatasetService.getSubObservationSetVariables(studyId, dataSet.getDatasetId());
 		}
-		this.includeSampleGenotypeValues(studyId, dataSet, includeSampleGenotypeValues, columns);
+		this.includeSampleGenotypeValues(studyId, dataSet, isIncludeSampleGenotypeValues, columns);
 		return columns;
 	}
 
@@ -78,7 +78,7 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
 		this.populateSearchDTOForSummaryDataset(dataset, searchDTO);
 		for (final Integer instanceDBID : selectedDatasetInstancesMap.keySet()) {
-			searchDTO.setInstanceIds(Arrays.asList(selectedDatasetInstancesMap.get(instanceDBID).getInstanceId()));
+			searchDTO.setInstanceIds(Collections.singletonList(selectedDatasetInstancesMap.get(instanceDBID).getInstanceId()));
 			final PageRequest pageRequest = new PageRequest(0, Integer.MAX_VALUE);
 			final List<ObservationUnitRow> observationUnitRows = this.studyDatasetService
 				.getObservationUnitRows(study.getId(), dataset.getDatasetId(), searchDTO, pageRequest);
@@ -87,12 +87,12 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 		return observationUnitRowMap;
 	}
 
-	void includeSampleGenotypeValues(final int studyId, final DatasetDTO dataSet, final boolean includeSampleGenotypeValues, final List<MeasurementVariable> columns) {
-		if (includeSampleGenotypeValues) {
+	void includeSampleGenotypeValues(final int studyId, final DatasetDTO dataSet, final boolean isIncludeSampleGenotypeValues, final List<MeasurementVariable> columns) {
+		if (isIncludeSampleGenotypeValues) {
 			// Add Genotype Marker variables to the list of columns
 			final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();
 			filter.setStudyId(studyId);
-			filter.setDatasetIds(Arrays.asList(dataSet.getDatasetId()));
+			filter.setDatasetIds(Collections.singletonList(dataSet.getDatasetId()));
 			final Map<Integer, MeasurementVariable> genotypeVariablesMap =
 					this.sampleGenotypeService.getSampleGenotypeVariables(filter);
 			columns.addAll(genotypeVariablesMap.values());
@@ -135,6 +135,5 @@ public class DatasetExcelExportServiceImpl extends AbstractDatasetExportService 
 
 		}
 		return new HashMap<>();
-
 	}
 }

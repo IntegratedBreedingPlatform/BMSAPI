@@ -177,9 +177,8 @@ public class DatasetTransposedExcelGenerator extends DatasetExcelGenerator {
     }
 
     private static Optional<MeasurementVariable> getObservationUnitVariable(final List<MeasurementVariable> columns) {
-        final Optional<MeasurementVariable> obsUnitVariable = columns.stream().filter(variable -> variable.getVariableType().getId() == TermId.OBSERVATION_UNIT.getId())
+        return columns.stream().filter(variable -> variable.getVariableType().getId() == TermId.OBSERVATION_UNIT.getId())
                 .findFirst();
-        return obsUnitVariable;
     }
 
     private void writeObservationHeader(

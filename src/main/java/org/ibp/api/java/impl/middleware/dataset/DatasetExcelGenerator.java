@@ -175,8 +175,6 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 			if (measurementVariable.getVariableType() != null && VariableType.OBSERVATION_UNIT.getId()
 					.equals(measurementVariable.getVariableType().getId())) {
 				observationUnitVariable = measurementVariable;
-			} else if (firstColumnVariableId == measurementVariable.getTermId()) {
-				orderedColumns.add(0, measurementVariable);
 			} else if (measurementVariable.getVariableType() != null && VariableType.TRAIT.getId()
 				.equals(measurementVariable.getVariableType().getId())) {
 				trait.add(measurementVariable);
@@ -197,6 +195,15 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 		orderedColumns.addAll(trait);
 		orderedColumns.addAll(selection);
 		orderedColumns.addAll(genotypeMarkers);
+
+		// Move the column(MeasurementVariable) with the specified termId(firstColumnVariableId)
+		// at the start of the list for better visualization of data
+		orderedColumns.stream().filter(column -> column.getTermId() == firstColumnVariableId)
+				.findFirst()
+				.ifPresent(column -> {
+					orderedColumns.remove(column);
+					orderedColumns.add(0, column);
+				});
 		return orderedColumns;
 	}
 
