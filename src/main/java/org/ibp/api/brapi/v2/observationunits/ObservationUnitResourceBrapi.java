@@ -185,6 +185,7 @@ public class ObservationUnitResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get the Observation Levels", notes = "Get the Observation Levels")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observationlevels", method = RequestMethod.GET)
 	public ResponseEntity<EntityListResponse<ObservationLevel>> getObservationLevels(
 		@PathVariable final String crop,
@@ -201,7 +202,6 @@ public class ObservationUnitResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
 
-		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES");
 		if (StringUtils.isNotEmpty(programDbId)) {
 			this.permissionValidator.validateProgramByStudyDbId(crop, programDbId);
 		}
@@ -220,6 +220,7 @@ public class ObservationUnitResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get a filtered set of Observation Units", notes = "Get a filtered set of Observation Units")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observationunits", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -259,8 +260,6 @@ public class ObservationUnitResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
-
-		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES");
 
 		this.permissionValidator.validateProgramByStudyDbId(crop, studyDbId);
 

@@ -68,6 +68,7 @@ public class TrialResourceBrapi {
 	private BrapiPermissionValidator permissionValidator;
 
 	@ApiOperation(value = "Retrieve a filtered list of breeding Trials", notes = "Retrieve a filtered list of breeding Trials. A Trial is a collection of Studies")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/trials", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -105,7 +106,6 @@ public class TrialResourceBrapi {
 		@RequestParam(value = "externalReferenceId", required = false) final String externalReferenceId,
 		@ApiParam(value = "An identifier for the source system or database of an external reference (use with externalReferenceID parameter")
 		@RequestParam(value = "externalReferenceSource", required = false) final String externalReferenceSource) {
-		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES", "VIEW_STUDIES");
 		final boolean isSortOrderValid =
 			"ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder) || StringUtils.isEmpty(sortOrder);
 		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");

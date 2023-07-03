@@ -1,9 +1,7 @@
 package org.ibp.api.java.impl.middleware.permission.validator;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.program.ProgramDTO;
-import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -80,26 +78,6 @@ public class BrapiPermissionValidatorTest {
 		final UserRole testUserRole = new UserRole(user, role);
 		testUserRole.setCropType(new CropType(CROP_NAME));
 		user.setRoles(Collections.singletonList(testUserRole));
-	}
-
-	@Test
-	public void testValidatePermissions() {
-		final PermissionDto permissionDto = new PermissionDto();
-		permissionDto.setName(PERMISSIONS);
-		final List<PermissionDto> permissions = Lists.newArrayList(permissionDto);
-		Mockito.when(this.permissionService.getPermissions(USER_ID, CROP_NAME, null, true)).thenReturn(
-			permissions);
-		this.brapiPermissionValidator.validatePermissions(CROP_NAME, PERMISSIONS);
-	}
-
-	@Test(expected = AccessDeniedException.class)
-	public void testValidatePermissions_error() {
-		final PermissionDto permissionDto = new PermissionDto();
-		permissionDto.setName("OTHER");
-		final List<PermissionDto> permissions = Lists.newArrayList(permissionDto);
-		Mockito.when(this.permissionService.getPermissions(USER_ID, CROP_NAME, null, true)).thenReturn(
-			permissions);
-		this.brapiPermissionValidator.validatePermissions(CROP_NAME, PERMISSIONS);
 	}
 
 	@Test

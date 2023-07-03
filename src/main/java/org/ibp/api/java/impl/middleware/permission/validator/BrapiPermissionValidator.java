@@ -3,7 +3,6 @@ package org.ibp.api.java.impl.middleware.permission.validator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.program.ProgramDTO;
-import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -45,12 +44,15 @@ public class BrapiPermissionValidator {
 	@Autowired
 	private ObservationUnitService observationUnitService;
 
-	public void validatePermissions(final String cropName, final String... permissions) {
-		final Integer userId = this.securityService.getCurrentlyLoggedInUser().getUserid();
-		final List<String> userPermissions = this.permissionService.getPermissions(userId, cropName, null, true)
-			.stream().map(PermissionDto::getName).collect(Collectors.toList());
-		if (CollectionUtils.isNotEmpty(userPermissions)
-			&& !CollectionUtils.containsAny(userPermissions, Arrays.asList(permissions))) {
+	/**
+	 * Used by brapi with no program ID param and at least crop level permission is required
+	 *
+	 * @param cropName
+	 */
+	public void validateUserHasAtLeastCropRoles(String cropName) {
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+
+		if (user.hasOnlyProgramRoles(cropName)) {
 			throw new AccessDeniedException("");
 		}
 	}

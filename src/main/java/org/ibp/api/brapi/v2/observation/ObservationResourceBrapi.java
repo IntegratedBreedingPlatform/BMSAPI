@@ -174,13 +174,12 @@ public class ObservationResourceBrapi {
 	}
 
 	@ApiOperation(value = "Add new Observation entities", notes = "Add new Observation entities")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_MANAGE_CONFIRMED_OBSERVATIONS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/observations", method = RequestMethod.POST)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<ObservationDto>> createObservations(@PathVariable final String crop,
 		@RequestBody final List<ObservationDto> observations) {
-		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES", "MS_OBSERVATIONS",
-			"MS_MANAGE_CONFIRMED_OBSERVATIONS");
 		if (CollectionUtils.isNotEmpty(observations)) {
 			// empty study db id not allowed if user has program only role
 			this.permissionValidator.validateProgramByStudyDbId(crop, observations.get(0).getStudyDbId());

@@ -60,6 +60,7 @@ public class TrialResourceBrapi {
 	private BrapiPermissionValidator permissionValidator;
 
 	@ApiOperation(value = "List of trial summaries", notes = "Get a list of trial summaries.")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/trials", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
@@ -78,8 +79,6 @@ public class TrialResourceBrapi {
 			required = false) final String sortBy,
 		@ApiParam(value = "Sort order direction. asc/desc.") @RequestParam(value = "sortOrder",
 			required = false) final String sortOrder) {
-		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES", "VIEW_STUDIES");
-
 		final String validationError = this.parameterValidation(sortBy, sortOrder);
 		if (!StringUtils.isBlank(validationError)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));

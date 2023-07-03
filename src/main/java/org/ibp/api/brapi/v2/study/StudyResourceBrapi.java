@@ -106,6 +106,7 @@ public class StudyResourceBrapi {
 	}
 
 	@ApiOperation(value = "Get a filtered list of Studies", notes = "Get a filtered list of Studies")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/studies", method = RequestMethod.GET)
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV2.class)
@@ -143,7 +144,6 @@ public class StudyResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.CURRENT_PAGE_DESCRIPTION) @RequestParam(value = "page", required = false) final Integer page,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION) @RequestParam(value = "pageSize", required = false) final Integer pageSize
 	) {
-		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES", "VIEW_STUDIES");
 		final String validationError = this.parameterValidation(crop, commonCropName, sortBy, sortOrder);
 		if (!StringUtils.isBlank(validationError)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message", validationError));

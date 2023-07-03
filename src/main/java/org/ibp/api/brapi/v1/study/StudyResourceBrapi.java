@@ -129,6 +129,7 @@ public class StudyResourceBrapi {
 
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
 	@ResponseBody
 	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<EntityListResponse<StudyInstanceDto>> listStudies(@PathVariable final String crop,
@@ -152,8 +153,6 @@ public class StudyResourceBrapi {
 			required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
-
-		this.permissionValidator.validatePermissions(crop, "ADMIN", "STUDIES", "MANAGE_STUDIES", "VIEW_STUDIES");
 
 		final boolean isSortOrderValid = "ASC".equals(sortOrder) || "DESC".equals(sortOrder) || StringUtils.isEmpty(sortOrder);
 		Preconditions.checkArgument(isSortOrderValid, "sortOrder should be either ASC or DESC");

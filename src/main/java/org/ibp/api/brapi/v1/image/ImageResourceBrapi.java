@@ -14,6 +14,7 @@ import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionVali
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,13 +39,13 @@ public class ImageResourceBrapi {
 	private BrapiPermissionValidator permissionValidator;
 
 	@ApiOperation("Create a new image meta data object")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/images", method = RequestMethod.POST)
 	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<SingleEntityResponse<Image>> createImage(
 		@PathVariable final String cropName,
 		@RequestBody final ImageNewRequest body
 	) {
-		this.permissionValidator.validatePermissions(cropName, "ADMIN", "STUDIES", "MANAGE_STUDIES");
 		this.permissionValidator.validateProgramByObservationUnitDbId(cropName, body.getObservationUnitDbId());
 
 		this.fileValidator.validateFileStorage();
@@ -57,6 +58,7 @@ public class ImageResourceBrapi {
 	}
 
 	@ApiOperation("Update an image meta data")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/images/{imageDbId}", method = RequestMethod.PUT)
 	@JsonView(BrapiView.BrapiV1_3.class)
 	public ResponseEntity<SingleEntityResponse<Image>> updateImage(
@@ -64,7 +66,6 @@ public class ImageResourceBrapi {
 		@PathVariable("imageDbId") final String imageDbId,
 		@RequestBody final ImageNewRequest body
 	) {
-		this.permissionValidator.validatePermissions(cropName, "ADMIN", "STUDIES", "MANAGE_STUDIES");
 		this.permissionValidator.validateProgramByObservationUnitDbId(cropName, body.getObservationUnitDbId());
 
 		this.fileValidator.validateFileStorage();
@@ -77,6 +78,7 @@ public class ImageResourceBrapi {
 	}
 
 	@ApiOperation("Update an image with the image file content")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/images/{imageDbId}/imagecontent",
 		produces = {"application/json"},
 		consumes = {"image/*"},
@@ -87,7 +89,6 @@ public class ImageResourceBrapi {
 		@PathVariable("imageDbId") final String imageDbId,
 		@RequestBody final byte[] imageContent
 	) {
-		this.permissionValidator.validatePermissions(cropName, "ADMIN", "STUDIES", "MANAGE_STUDIES");
 		this.fileValidator.validateFileStorage();
 
 		final Image result = this.fileMetadataService.updateImageContent(imageDbId, imageContent);
