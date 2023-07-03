@@ -490,7 +490,7 @@ public class DatasetExcelGeneratorTest {
 		observationUnitVariable.setName("OBS_UNIT");
 		columns.add(observationUnitVariable);
 
-		final List<MeasurementVariable> orderedColumns = this.datasetExcelGenerator.orderColumns(columns);
+		final List<MeasurementVariable> orderedColumns = this.datasetExcelGenerator.orderColumns(columns, TermId.OBS_UNIT_ID.getId());
 		assertEquals(observationUnitVariable, orderedColumns.get(0));
 		assertEquals(studyConditionVariable, orderedColumns.get(1));
 		assertEquals(traitVariable, orderedColumns.get(2));
