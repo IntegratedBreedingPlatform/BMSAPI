@@ -23,10 +23,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +65,10 @@ public class WorkbenchUserDetailsServiceTest {
 
 	@Before
 	public void setUp() {
+		final MockHttpServletRequest request = new MockHttpServletRequest();
+		request.setRequestURI("/");
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
 		Mockito.when(this.contextResolver.resolveCropNameFromUrl()).thenReturn(CROP_NAME);
 		Mockito.when(this.contextResolver.resolveProgramUuidFromRequest()).thenReturn(PROGRAM_UUID);
 
@@ -94,7 +101,7 @@ public class WorkbenchUserDetailsServiceTest {
 			final PermissionDto permissionDto = new PermissionDto();
 			permissionDto.setName("ADMIN");
 			final List<PermissionDto> permissions = Lists.newArrayList(permissionDto);
-			Mockito.when(this.permissionService.getPermissions(testUserWorkbench.getUserid(),CROP_NAME,1)).thenReturn(permissions);
+			Mockito.when(this.permissionService.getPermissions(testUserWorkbench.getUserid(),CROP_NAME,1, false)).thenReturn(permissions);
 
 			final UserDetails userDetails = this.service.loadUserByUsername(WorkbenchUserDetailsServiceTest.TEST_USER);
 			Assert.assertEquals(testUserWorkbench.getName(), userDetails.getUsername());
