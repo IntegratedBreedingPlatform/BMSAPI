@@ -17,6 +17,7 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ public class LocationResourceBrapi {
 	@Autowired
 	private LocationService locationService;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "List locations", notes = "Get a list of locations.")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
 	@RequestMapping(value = "/{crop}/brapi/v1/locations", method = RequestMethod.GET)
@@ -60,6 +64,7 @@ public class LocationResourceBrapi {
 			required = false) final Integer pageSize,
 		@ApiParam(value = "name of location type", required = false) @RequestParam(value = "locationType",
 			required = false) final String locationType) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		PagedResult<Location> resultPage = null;
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();

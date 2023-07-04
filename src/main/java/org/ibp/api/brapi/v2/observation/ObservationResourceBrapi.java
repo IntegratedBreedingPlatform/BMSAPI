@@ -202,6 +202,7 @@ public class ObservationResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<ObservationDto>> updateObservations(@PathVariable final String crop,
 		@RequestBody final Map<String, ObservationDto> observations) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final ObservationUpdateResponse observationUpdateResponse = this.observationServiceBrapi.updateObservations(observations);
 		final Result<ObservationDto> results =
@@ -220,6 +221,7 @@ public class ObservationResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchObservations(@PathVariable final String crop,
 		@RequestBody final ObservationSearchRequestDto observationSearchRequestDto) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final BrapiSearchDto searchDto =
 			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(observationSearchRequestDto, ObservationSearchRequestDto.class)
@@ -242,6 +244,7 @@ public class ObservationResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final ObservationSearchRequestDto searchRequestDto;
 		try {

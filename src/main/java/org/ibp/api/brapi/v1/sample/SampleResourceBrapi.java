@@ -6,8 +6,9 @@ import io.swagger.annotations.ApiOperation;
 import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRequestDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.sample.SampleObservationDto;
-import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.SampleServiceBrapi;
+import org.ibp.api.brapi.v1.common.SingleEntityResponse;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +30,18 @@ public class SampleResourceBrapi {
 	@Autowired
 	private SampleServiceBrapi sampleServiceBrapi;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "Get a sample by sampleDbId", notes = "Get a sample by sampleDbId")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_VIEW_OBSERVATIONS', 'MS_SAMPLE_LISTS', "
 		+ "'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE', 'LISTS', 'SAMPLES_LISTS')")
 	@RequestMapping(value = "/{crop}/brapi/v1/samples/{sampleDbId}", method = RequestMethod.GET)
 	@JsonView(BrapiView.BrapiV1_3.class)
 	@ResponseBody
-	public ResponseEntity<SingleEntityResponse<SampleObservationDto>> getSampleBySampleId(@PathVariable final String crop, final @PathVariable String sampleDbId) {
+	public ResponseEntity<SingleEntityResponse<SampleObservationDto>> getSampleBySampleId(@PathVariable final String crop,
+		final @PathVariable String sampleDbId) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
 		requestDTO.setSampleDbIds(Collections.singletonList(sampleDbId));
 		final List<SampleObservationDto> sampleObservationDtos = this.sampleServiceBrapi.getSampleObservations(requestDTO, null);
@@ -43,7 +49,8 @@ public class SampleResourceBrapi {
 		if (!CollectionUtils.isEmpty(sampleObservationDtos)) {
 			return new ResponseEntity<>(new SingleEntityResponse<>(sampleObservationDtos.get(0)), HttpStatus.OK);
 		} else {
-			return new ResponseEntity<>(new SingleEntityResponse<SampleObservationDto>().withMessage("not found sample"), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new SingleEntityResponse<SampleObservationDto>().withMessage("not found sample"),
+				HttpStatus.NOT_FOUND);
 		}
 	}
 }

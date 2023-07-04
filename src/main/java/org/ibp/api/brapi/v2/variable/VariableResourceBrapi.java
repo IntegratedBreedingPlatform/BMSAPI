@@ -150,6 +150,7 @@ public class VariableResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<VariableDTO>> putObservationVariables(@PathVariable final String crop,
 		@PathVariable final String observationVariableDbId,
 		@RequestBody final VariableDTO variable) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final VariableUpdateResponse variableUpdateResponse =
 			this.variableServiceBrapi.updateObservationVariable(observationVariableDbId, variable);

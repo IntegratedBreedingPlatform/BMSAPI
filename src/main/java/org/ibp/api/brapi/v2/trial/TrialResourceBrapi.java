@@ -170,6 +170,7 @@ public class TrialResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<TrialSummary>> createTrial(@PathVariable final String crop,
 		@RequestBody final List<TrialImportRequestDTO> trialImportRequestDTOs) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 		BaseValidator.checkNotNull(trialImportRequestDTOs, "trial.import.request.null");
 
 		final TrialImportResponse trialImportResponse = this.trialServiceBrapi.createTrials(crop, trialImportRequestDTOs);
@@ -190,6 +191,7 @@ public class TrialResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchTrials(
 		@PathVariable final String crop,
 		@RequestBody final TrialSearchRequestDTO trialSearchRequestDTO) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final BrapiSearchDto searchDto =
 			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(trialSearchRequestDTO, TrialSearchRequestDTO.class)
@@ -212,6 +214,7 @@ public class TrialResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final TrialSearchRequestDTO trialSearchRequestDTO;
 		try {

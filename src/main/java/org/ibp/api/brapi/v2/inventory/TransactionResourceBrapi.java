@@ -14,6 +14,7 @@ import org.ibp.api.brapi.v1.common.Metadata;
 import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.java.inventory.manager.TransactionService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -39,6 +40,9 @@ public class TransactionResourceBrapi {
 	@Autowired
 	private TransactionService transactionService;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "Get a filtered list of Seed Lot Transactions", notes = "Get a filtered list of Seed Lot Transactions")
 	@RequestMapping(value = "/{cropName}/brapi/v2/seedlots/transactions", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN','CROP_MANAGEMENT','MANAGE_INVENTORY', 'MANAGE_TRANSACTIONS', 'VIEW_TRANSACTIONS')")
@@ -56,6 +60,7 @@ public class TransactionResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false) @RequestParam(value = "pageSize",
 			required = false) final Integer pageSize
 	) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(cropName);
 		final TransactionsSearchDto searchDTO = this.getTransactionsSearchDto(transactionDbId, seedLotDbId, germplasmDbId);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;

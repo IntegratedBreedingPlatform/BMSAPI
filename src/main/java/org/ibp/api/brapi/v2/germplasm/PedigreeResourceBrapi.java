@@ -19,6 +19,7 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,12 +55,17 @@ public class PedigreeResourceBrapi {
 	@Autowired
 	private BrapiResponseMessageGenerator<PedigreeNodeDTO> responseMessageGenerator;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "Send a list of pedigree nodes to update existing information on a server", notes = "Send a list of pedigree nodes to update existing information on a server")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM')")
 	@RequestMapping(value = "/{crop}/brapi/v2/pedigree", method = RequestMethod.PUT)
 	@ResponseBody
 	public ResponseEntity<EntityListResponse<PedigreeNodeDTO>> updatePedigreeNodes(@PathVariable final String crop,
 		@RequestBody final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
+
 		final PedigreeNodesUpdateResponse pedigreeNodesUpdateResponse = this.pedigreeServiceBrapi.updatePedigreeNodes(pedigreeNodeDTOMap);
 		final Result<PedigreeNodeDTO> results = new Result<PedigreeNodeDTO>().withData(pedigreeNodesUpdateResponse.getEntityList());
 		final Pagination pagination = new Pagination().withPageNumber(BrapiPagedResult.DEFAULT_PAGE_NUMBER).withPageSize(1)

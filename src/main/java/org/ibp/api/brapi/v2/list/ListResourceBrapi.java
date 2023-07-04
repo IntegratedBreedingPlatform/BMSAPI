@@ -20,6 +20,7 @@ import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
 import org.ibp.api.java.impl.middleware.list.validator.GermplasmListImportRequestValidator;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,9 @@ public class ListResourceBrapi {
 	@Autowired
 	private ResourceBundleMessageSource messageSource;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "Get filtered set of generic lists", notes = "Get filtered set of generic lists")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'LISTS')")
 	@RequestMapping(value = "/{crop}/brapi/v2/lists", method = RequestMethod.GET)
@@ -76,6 +80,8 @@ public class ListResourceBrapi {
 		@RequestParam(value = "page", required = false) final Integer currentPage,
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
+
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		if(StringUtils.isNotEmpty(listType) && !GermplasmListImportRequestValidator.ALLOWED_LIST_TYPE.equalsIgnoreCase(listType)) {
 			final List<Map<String, String>> status = Collections.singletonList(ImmutableMap.of("message",
@@ -127,6 +133,9 @@ public class ListResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<GermplasmListDTO>> createLists(@PathVariable final String crop,
 		@RequestBody final List<GermplasmListImportRequestDTO> germplasmListImportRequestDTOS) {
+
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
+
 		BaseValidator.checkNotNull(germplasmListImportRequestDTOS, "list.import.request.null");
 		final GermplasmListImportResponse
 			germplasmListImportResponse = this.germplasmListServiceBrapi.createGermplasmLists(germplasmListImportRequestDTOS);
