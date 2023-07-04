@@ -99,11 +99,16 @@ public class DatasetTransposedExcelGenerator extends DatasetExcelGenerator {
                         final ObservationUnitData observationUnitData = Util.getObservationUnitData(dataRow.getVariables(), column);
                         currentColNum = this.writeObservationUnitDataCell(row, currentColNum, column, observationUnitData);
                         currentColNum = this.writeSampleGenotypeDataCell(sampleGenotypeDtoList, row, currentColNum, column);
-                        if (j == 0) {
-                            this.applyCellBorders(row.getCell(currentColNum-1), true, false, false);
-                        }
-                        if (j == (numberOfNonFactorColumns - 1)) {
-                            this.applyCellBorders(row.getCell(currentColNum-1), false, true, false);
+                        if (numberOfNonFactorColumns > 1) {
+                            if (j == 0) {
+                                this.applyCellBorders(row.getCell(currentColNum - 1), true, false, false);
+                            }
+                            if (j == (numberOfNonFactorColumns - 1)) {
+                                this.applyCellBorders(row.getCell(currentColNum - 1), false, true, false);
+                            }
+                        } else {
+                            // Add borders to both sides if there's only 1 nonfactor column
+                            this.applyCellBorders(row.getCell(currentColNum - 1), true, true, false);
                         }
                     }
                 }
@@ -213,9 +218,12 @@ public class DatasetTransposedExcelGenerator extends DatasetExcelGenerator {
                     cell.setCellStyle(this.getObservationHeaderStyle(true, xlsBook));
                     cell.getCellStyle().setAlignment(HorizontalAlignment.CENTER);
                     cell.setCellValue(String.valueOf(i));
-                    // Subtract 1 since current row occupies the first cell
-                    final int lastRow = currentColNum + numberOfNonFactors - 1;
-                    xlsSheet.addMergedRegion(new CellRangeAddress(0, 0, currentColNum, lastRow));
+                    //No need to merge cells if there's only 1 nonFactor variable
+                    if (numberOfNonFactors > 1) {
+                        // Subtract 1 since current col occupies the first cell
+                        final int lastCol = currentColNum + numberOfNonFactors - 1;
+                        xlsSheet.addMergedRegion(new CellRangeAddress(0, 0, currentColNum, lastCol));
+                    }
                     cell.getCellStyle().setBorderLeft(BorderStyle.THIN);
                     cell.getCellStyle().setBorderRight(BorderStyle.THIN);
                     final int numberOfNonFactorVariables = nonFactorVariables.size();
