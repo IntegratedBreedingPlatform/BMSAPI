@@ -83,7 +83,7 @@ public class BrapiPermissionValidatorTest {
 	@Test
 	public void testValidateProgramByProgramDbId() {
 		this.mockFilterPrograms();
-		List<String> validProgramIds = this.brapiPermissionValidator.validateProgramByProgramDbId(CROP_NAME, PROGRAM_UUID);
+		List<String> validProgramIds = this.brapiPermissionValidator.validateProgramByProgramDbIds(CROP_NAME, Arrays.asList(PROGRAM_UUID),true);
 		Assert.assertNotEquals(0, validProgramIds.size());
 		Assert.assertEquals(PROGRAM_UUID, validProgramIds.get(0));
 	}
@@ -111,7 +111,25 @@ public class BrapiPermissionValidatorTest {
 
 		Mockito.when(this.programService.getFilteredPrograms(null, programSearchRequest)).thenReturn(
 			Arrays.asList(otherProgramDTO));
-		List<String> validProgramIds = this.brapiPermissionValidator.validateProgramByProgramDbId(CROP_NAME, PROGRAM_UUID);
+		List<String> validProgramIds = this.brapiPermissionValidator.validateProgramByProgramDbIds(CROP_NAME,  Arrays.asList(PROGRAM_UUID),true);
+	}
+
+	@Test
+	public void testValidateProgramByProgramDbId_noErrorReturnValidProgramsAsFilter() {
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+		programSearchRequest.setLoggedInUserId(USER_ID);
+		programSearchRequest.setCommonCropName(CROP_NAME);
+
+		ProgramDTO otherProgramDTO = new ProgramDTO();
+		otherProgramDTO.setUniqueID(RandomStringUtils.randomAlphabetic(16));
+
+		Mockito.when(this.programService.getFilteredPrograms(null, programSearchRequest)).thenReturn(
+			Arrays.asList(otherProgramDTO));
+		List<String> validProgramIds = this.brapiPermissionValidator.validateProgramByProgramDbIds(CROP_NAME,
+			Arrays.asList(PROGRAM_UUID),false);
+
+		Assert.assertNotEquals(0, validProgramIds.size());
+		Assert.assertEquals(otherProgramDTO.getUniqueID(), validProgramIds.get(0));
 	}
 
 	@Test

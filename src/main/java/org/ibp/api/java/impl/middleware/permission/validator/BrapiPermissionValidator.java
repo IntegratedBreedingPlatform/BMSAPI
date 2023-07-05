@@ -102,8 +102,10 @@ public class BrapiPermissionValidator {
 				if(errorWhenInvalidIdExists) {
 					throw new AccessDeniedException("");
 				}
-				programDbIds.retainAll(userPrograms);
-				return programDbIds;
+				final List<String> programDbIdsArray = new ArrayList<>(programDbIds);
+				programDbIdsArray.retainAll(userPrograms);
+				if(CollectionUtils.isNotEmpty(programDbIdsArray))
+					return programDbIdsArray;
 			}
 
 			return userPrograms;
