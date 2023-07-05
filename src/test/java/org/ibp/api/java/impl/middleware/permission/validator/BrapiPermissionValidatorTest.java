@@ -140,9 +140,7 @@ public class BrapiPermissionValidatorTest {
 		DmsProject project = new DmsProject();
 		project.setProgramUUID(PROGRAM_UUID);
 		Mockito.when(this.studyService.getDmSProjectByStudyId(1)).thenReturn(project);
-		List<String> validProgramIds = this.brapiPermissionValidator.validateProgramByStudyDbId(CROP_NAME, DEFAULT_ID);
-		Assert.assertNotEquals(0, validProgramIds.size());
-		Assert.assertEquals(PROGRAM_UUID, validProgramIds.get(0));
+		this.brapiPermissionValidator.validateProgramByStudyDbId(CROP_NAME, DEFAULT_ID);
 	}
 
 	@Test
@@ -157,7 +155,7 @@ public class BrapiPermissionValidatorTest {
 		Mockito.when(this.observationUnitService.searchObservationUnits(null, null, obsRequestDto))
 			.thenReturn(Arrays.asList(observationUnitDto));
 
-		List<String> validProgramIds = this.brapiPermissionValidator.validateProgramByObservationUnitDbId(CROP_NAME, DEFAULT_ID);
+		List<String> validProgramIds = this.brapiPermissionValidator.validateProgramByObservationUnitDbId(CROP_NAME, Arrays.asList(DEFAULT_ID), true);
 		Assert.assertNotEquals(0, validProgramIds.size());
 		Assert.assertEquals(PROGRAM_UUID, validProgramIds.get(0));
 	}

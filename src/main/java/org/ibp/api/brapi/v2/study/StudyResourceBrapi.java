@@ -216,6 +216,8 @@ public class StudyResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<StudyInstanceDto>> createStudies(@PathVariable final String crop,
 		@RequestBody final List<StudyImportRequestDTO> studyImportRequestDTOS) {
+		studyImportRequestDTOS.stream().forEach(request -> this.permissionValidator.validateProgramByTrialDbId(crop, request.getTrialDbId()));
+
 		BaseValidator.checkNotNull(studyImportRequestDTOS, "study.import.request.null");
 		final StudyImportResponse
 			studyImportResponse = this.studyServiceBrapi.createStudies(crop, studyImportRequestDTOS);

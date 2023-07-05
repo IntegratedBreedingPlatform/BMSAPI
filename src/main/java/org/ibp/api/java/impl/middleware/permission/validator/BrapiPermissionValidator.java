@@ -59,6 +59,16 @@ public class BrapiPermissionValidator {
 		}
 	}
 
+	/**
+	 * if user has program only roles, perform program validation; else, return original programDbIds list
+	 * if programDbIds is empty, Returns all valid program for user
+	 * if not, Returns subList of programDbIds that are valid for user
+	 *
+	 * @param cropName
+	 * @param programDbIds
+	 * @param errorWhenInvalidIdExists - if true, throws error if a program filter is invalid; if false, remove invalid program ID from filter
+	 * @return
+	 */
 	public List<String> validateProgramByProgramDbIds(final String cropName, final List<String> programDbIds,
 		final boolean errorWhenInvalidIdExists) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
@@ -74,18 +84,7 @@ public class BrapiPermissionValidator {
 	}
 
 	public List<String> validateProgramByProgramDbId(final String cropName, final String programDbId) {
-		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
-
-		if (user.hasOnlyProgramRoles(cropName)) {
-			final List<String> validPrograms = this.getAllValidProgramsForUser(cropName,
-				Arrays.asList(programDbId), user.getUserid(), true);
-			if (validPrograms != null)
-				return validPrograms;
-		} else if (StringUtils.isNotEmpty(programDbId)) {
-			return Arrays.asList(programDbId);
-		}
-
-		return Collections.emptyList();
+		return this.validateProgramByProgramDbIds(cropName, Arrays.asList(programDbId), true);
 	}
 
 	private List<String> getAllValidProgramsForUser(final String cropName, final List<String> programDbIds, final Integer userId,
@@ -113,7 +112,7 @@ public class BrapiPermissionValidator {
 		return null;
 	}
 
-	public List<String> validateProgramByStudyDbId(final String cropName, final String studyDbId) {
+	public void validateProgramByStudyDbId(final String cropName, final String studyDbId) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		if (user.hasOnlyProgramRoles(cropName)) {
 			if (StringUtils.isEmpty(studyDbId)) {
@@ -126,23 +125,39 @@ public class BrapiPermissionValidator {
 				final DmsProject dmsProject = this.studyService.getDmSProjectByStudyId(trialDbId);
 
 				if (dmsProject != null) {
-					return this.getAllValidProgramsForUser(cropName, Arrays.asList(dmsProject.getProgramUUID()),
+					this.getAllValidProgramsForUser(cropName, Arrays.asList(dmsProject.getProgramUUID()),
 						user.getUserid(), true);
 				}
 			}
 		}
-		return Collections.emptyList();
 	}
 
-	public List<String> validateProgramByObservationUnitDbId(final String cropName, final String observationUnitDbId) {
+	public void validateProgramByTrialDbId(final String cropName, final String trialDbId) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 		if (user.hasOnlyProgramRoles(cropName)) {
-			if (StringUtils.isEmpty(observationUnitDbId)) {
+			if (StringUtils.isEmpty(trialDbId) || !StringUtils.isNumeric(trialDbId)) {
+				throw new AccessDeniedException("");
+			}
+
+			final DmsProject dmsProject = this.studyService.getDmSProjectByStudyId(Integer.parseInt(trialDbId));
+
+			if (dmsProject != null) {
+				this.getAllValidProgramsForUser(cropName, Arrays.asList(dmsProject.getProgramUUID()),
+					user.getUserid(), true);
+			}
+		}
+	}
+
+	public List<String> validateProgramByObservationUnitDbId(final String cropName, final List<String> observationUnitDbIds,
+		final boolean errorWhenInvalidIdExists) {
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+		if (user.hasOnlyProgramRoles(cropName)) {
+			if (errorWhenInvalidIdExists && CollectionUtils.isEmpty(observationUnitDbIds)) {
 				throw new AccessDeniedException("");
 			}
 
 			final ObservationUnitSearchRequestDTO obsRequestDto = new ObservationUnitSearchRequestDTO();
-			obsRequestDto.setObservationUnitDbIds(Arrays.asList(observationUnitDbId));
+			obsRequestDto.setObservationUnitDbIds(observationUnitDbIds);
 			final List<ObservationUnitDto> observationList = this.observationUnitService
 				.searchObservationUnits(null, null, obsRequestDto);
 			final Set<String> programs = observationList.stream()

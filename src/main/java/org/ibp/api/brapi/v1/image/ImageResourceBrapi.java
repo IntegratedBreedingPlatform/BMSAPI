@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
+
 @Api("BrAPI v1 Image services")
 @RestController()
 @RequestMapping("/{cropName}/brapi/v1")
@@ -46,7 +48,7 @@ public class ImageResourceBrapi {
 		@PathVariable final String cropName,
 		@RequestBody final ImageNewRequest body
 	) {
-		this.permissionValidator.validateProgramByObservationUnitDbId(cropName, body.getObservationUnitDbId());
+		this.permissionValidator.validateProgramByObservationUnitDbId(cropName, Arrays.asList(body.getObservationUnitDbId()), true);
 
 		this.fileValidator.validateFileStorage();
 		this.imageValidator.validateImage(body);
@@ -66,7 +68,7 @@ public class ImageResourceBrapi {
 		@PathVariable("imageDbId") final String imageDbId,
 		@RequestBody final ImageNewRequest body
 	) {
-		this.permissionValidator.validateProgramByObservationUnitDbId(cropName, body.getObservationUnitDbId());
+		this.permissionValidator.validateProgramByObservationUnitDbId(cropName, Arrays.asList(body.getObservationUnitDbId()), true);
 
 		this.fileValidator.validateFileStorage();
 		this.imageValidator.validateImage(body);

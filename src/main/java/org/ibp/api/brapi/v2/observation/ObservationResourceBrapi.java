@@ -105,6 +105,10 @@ public class ObservationResourceBrapi {
 		@RequestParam(required = false) final Integer pageSize) {
 
 		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
+		// validate and set programDbId, sets all valid program for user if request param is empty
+		observationSearchRequestDto.setProgramDbIds(
+			this.permissionValidator.validateProgramByProgramDbIds(crop, Arrays.asList(programDbId), false));
+
 		observationSearchRequestDto.setObservationDbIds(
 			StringUtils.isNotEmpty(observationDbId) ? Arrays.asList(observationDbId) : new ArrayList<>());
 		observationSearchRequestDto.setObservationUnitDbIds(
@@ -119,8 +123,6 @@ public class ObservationResourceBrapi {
 			StringUtils.isNotEmpty(locationDbId) ? Arrays.asList(locationDbId) : new ArrayList<>());
 		observationSearchRequestDto.setTrialDbIds(
 			StringUtils.isNotEmpty(trialDbId) ? Arrays.asList(trialDbId) : new ArrayList<>());
-		observationSearchRequestDto.setProgramDbIds(
-			StringUtils.isNotEmpty(programDbId) ? Arrays.asList(programDbId) : new ArrayList<>());
 		observationSearchRequestDto.setSeasonDbIds(
 			StringUtils.isNotEmpty(seasonDbId) ? Arrays.asList(seasonDbId) : new ArrayList<>());
 		final ObservationLevelRelationship observationLevelRelationship = new ObservationLevelRelationship();

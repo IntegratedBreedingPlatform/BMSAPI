@@ -45,6 +45,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Api(value = "BrAPI Observation Unit Services")
 @Controller
@@ -133,6 +135,10 @@ public class ObservationUnitResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<ObservationUnitDto>> createObservationUnits(@PathVariable final String crop,
 		@RequestBody final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos) {
+		final Set<String> programDbIds = observationUnitImportRequestDtos.stream()
+			.map(ObservationUnitImportRequestDto::getProgramDbId)
+			.collect(Collectors.toSet());
+		this.permissionValidator.validateProgramByProgramDbIds(crop, new ArrayList<>(programDbIds), true);
 		BaseValidator.checkNotNull(observationUnitImportRequestDtos, "observation.unit.import.request.null");
 
 		final ObservationUnitImportResponse observationUnitImportResponse =

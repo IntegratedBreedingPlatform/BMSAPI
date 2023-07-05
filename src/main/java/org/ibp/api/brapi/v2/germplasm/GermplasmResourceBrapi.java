@@ -100,6 +100,8 @@ public class GermplasmResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
+		this.permissionValidator.validateProgramByStudyDbId(crop, studyDbId);
+
 		final GermplasmSearchRequest germplasmSearchRequest =
 			this.getGermplasmSearchRequestDto(germplasmDbId, commonCropName, germplasmPUI, germplasmName, accessionNumber, studyDbId,
 				synonym, genus, parentDbId,
