@@ -7,6 +7,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.DatasetTypeDTO;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -17,6 +18,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsParamDTO;
@@ -50,6 +52,8 @@ import org.mockito.Spy;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,6 +87,7 @@ public class DatasetServiceImplTest {
 	private static final String ROW = "ROW";
 	public static final String BLOCK_NO = "BLOCK_NO";
 	public static final String PLOT_NO = "PLOT_NO";
+	public static final String PLANT_NO = "PLANT_NO";
 	public static final String REP_NO = "REP_NO";
 	private static final String STOCK_ID = "STOCK_ID";
 	private static final String FACT1 = "FACT1";
@@ -136,12 +141,21 @@ public class DatasetServiceImplTest {
 	@Mock
 	private OntologyDataManager ontologyDataManager;
 
+	@Mock
+	private DatasetTypeService datasetTypeService;
+
 	@InjectMocks
 	private DatasetServiceImpl studyDatasetService;
 
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
+		final DatasetDTO datasetDTO = new DatasetDTO();
+		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLOT_DATA.getId());
+		Mockito.when(this.middlewareDatasetService.getDataset(ArgumentMatchers.anyInt())).thenReturn(datasetDTO);
+		final DatasetTypeDTO datasetTypeDTO = new DatasetTypeDTO();
+		datasetTypeDTO.setSubObservationType(false);
+		Mockito.when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLOT_DATA.getId())).thenReturn(datasetTypeDTO);
 	}
 
 	@Test
@@ -1130,6 +1144,134 @@ public class DatasetServiceImplTest {
 		measurementVariableList.add(0, locationAbbrVariable);
 
 		this.testAddLocationVariables(measurementVariableList);
+	}
+
+	@Test
+	public void testAddObsUnitIdColumnAndValuesIfNecessary() {
+		final Random random = new Random();
+		final int studyId = random.nextInt();
+		final int datasetId = random.nextInt();
+		final DatasetDTO datasetDTO = new DatasetDTO();
+		datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
+		final MeasurementVariable observationUnitVariable = new MeasurementVariable();
+		observationUnitVariable.setName(PLANT_NO);
+		observationUnitVariable.setVariableType(VariableType.OBSERVATION_UNIT);
+		datasetDTO.setVariables(Collections.singletonList(observationUnitVariable));
+		final StudyInstance instance = new StudyInstance();
+		instance.setInstanceNumber(1);
+		instance.setInstanceId(1);
+		datasetDTO.setInstances(Collections.singletonList(instance));
+		final DatasetTypeDTO datasetTypeDTO = new DatasetTypeDTO();
+		datasetTypeDTO.setSubObservationType(true);
+		Mockito.when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())).thenReturn(datasetTypeDTO);
+		Mockito.when(this.middlewareDatasetService.getDataset(datasetId)).thenReturn(datasetDTO);
+		final ObservationsPutRequestInput input = this.createObservationsPutRequestInput();
+
+		final Map<Integer, List<ObservationUnitRow>> observationUnitRowsMap = new HashMap<>();
+		final ObservationUnitRow row = new ObservationUnitRow();
+		row.setTrialInstance(1);
+		final Map<String, org.generationcp.middleware.service.api.dataset.ObservationUnitData> variables = new HashMap<>();
+		variables.put(TRIAL_INSTANCE, new org.generationcp.middleware.service.api.dataset.ObservationUnitData("1"));
+		variables.put(PLOT_NO, new org.generationcp.middleware.service.api.dataset.ObservationUnitData(TermId.PLOT_NO.getId(), "1"));
+		variables.put(PLANT_NO, new org.generationcp.middleware.service.api.dataset.ObservationUnitData("1"));
+		row.setVariables(variables);
+		row.setObsUnitId(RandomStringUtils.randomAlphabetic(5));
+		observationUnitRowsMap.put(1, Collections.singletonList(row));
+		Mockito.when(this.middlewareDatasetService.getInstanceIdToObservationUnitRowsMap(studyId, datasetId, Collections.singletonList(1))).thenReturn(observationUnitRowsMap);
+
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), ObservationsPutRequestInput.class.getName());
+
+		Assert.assertFalse(input.getData().get(0).contains(OBS_UNIT_ID));
+		this.studyDatasetService.addObsUnitIdColumnAndValuesIfNecessary(errors, studyId, datasetId, input);
+		Assert.assertTrue(input.getData().get(0).contains(OBS_UNIT_ID));
+		Assert.assertEquals(row.getObsUnitId(), input.getData().get(1).get(input.getData().get(1).size()-1));
+		Assert.assertFalse(errors.hasErrors());
+	}
+
+	@Test
+	public void testAddObsUnitIdColumnAndValuesIfNecessary_WithNoTrialInstanceHeader() {
+		try {
+			final Random random = new Random();
+			final int studyId = random.nextInt();
+			final int datasetId = random.nextInt();
+			final DatasetDTO datasetDTO = new DatasetDTO();
+			datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
+			final DatasetTypeDTO datasetTypeDTO = new DatasetTypeDTO();
+			datasetTypeDTO.setSubObservationType(true);
+			Mockito.when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())).thenReturn(datasetTypeDTO);
+			Mockito.when(this.middlewareDatasetService.getDataset(datasetId)).thenReturn(datasetDTO);
+			final ObservationsPutRequestInput input = this.createObservationsPutRequestInput();
+			input.getData().get(0).remove(TRIAL_INSTANCE);
+
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), ObservationsPutRequestInput.class.getName());
+
+			Assert.assertFalse(input.getData().get(0).contains(OBS_UNIT_ID));
+			this.studyDatasetService.addObsUnitIdColumnAndValuesIfNecessary(errors, studyId, datasetId, input);
+			Assert.fail("Should Throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("required.header.trial.instance"));
+		}
+	}
+
+	@Test
+	public void testAddObsUnitIdColumnAndValuesIfNecessary_WithNoPlotNoHeader() {
+		try {
+			final Random random = new Random();
+			final int studyId = random.nextInt();
+			final int datasetId = random.nextInt();
+			final DatasetDTO datasetDTO = new DatasetDTO();
+			datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
+			final DatasetTypeDTO datasetTypeDTO = new DatasetTypeDTO();
+			datasetTypeDTO.setSubObservationType(true);
+			Mockito.when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())).thenReturn(datasetTypeDTO);
+			Mockito.when(this.middlewareDatasetService.getDataset(datasetId)).thenReturn(datasetDTO);
+			final ObservationsPutRequestInput input = this.createObservationsPutRequestInput();
+			input.getData().get(0).remove(PLOT_NO);
+
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), ObservationsPutRequestInput.class.getName());
+
+			Assert.assertFalse(input.getData().get(0).contains(OBS_UNIT_ID));
+			this.studyDatasetService.addObsUnitIdColumnAndValuesIfNecessary(errors, studyId, datasetId, input);
+			Assert.fail("Should Throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("required.header.plot.no"));
+		}
+	}
+
+	@Test
+	public void testAddObsUnitIdColumnAndValuesIfNecessary_WithEmptyTrialInstanceValue() {
+		try {
+			final Random random = new Random();
+			final int studyId = random.nextInt();
+			final int datasetId = random.nextInt();
+			final DatasetDTO datasetDTO = new DatasetDTO();
+			datasetDTO.setDatasetTypeId(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId());
+			final DatasetTypeDTO datasetTypeDTO = new DatasetTypeDTO();
+			datasetTypeDTO.setSubObservationType(true);
+			Mockito.when(this.datasetTypeService.getDatasetTypeById(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())).thenReturn(datasetTypeDTO);
+			Mockito.when(this.middlewareDatasetService.getDataset(datasetId)).thenReturn(datasetDTO);
+			final ObservationsPutRequestInput input = this.createObservationsPutRequestInput();
+			input.getData().get(1).set(0, "");
+
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), ObservationsPutRequestInput.class.getName());
+
+			Assert.assertFalse(input.getData().get(0).contains(OBS_UNIT_ID));
+			this.studyDatasetService.addObsUnitIdColumnAndValuesIfNecessary(errors, studyId, datasetId, input);
+			Assert.fail("Should Throw an exception");
+		} catch (final ApiRequestValidationException e) {
+			assertThat(Arrays.asList(e.getErrors().get(0).getCodes()), hasItem("empty.trial.instance"));
+		}
+	}
+
+	private ObservationsPutRequestInput createObservationsPutRequestInput() {
+		final ObservationsPutRequestInput input = new ObservationsPutRequestInput();
+		final List<List<String>> data = new ArrayList<>();
+		input.setData(data);
+		final List<String> header = new ArrayList<>(Arrays.asList(StudyBookTableBuilder.TRIAL_INSTANCE, StudyBookTableBuilder.PLOT_NO, PLANT_NO));
+		final List<String> row = new ArrayList<>(Arrays.asList("1", "1", "1"));
+		data.add(header);
+		data.add(row);
+		return input;
 	}
 
 	private void testAddLocationVariables(final List<MeasurementVariable> measurementVariableList) {

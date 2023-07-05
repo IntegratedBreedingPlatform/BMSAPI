@@ -86,6 +86,9 @@ public class DatasetResource {
 	private DatasetExportService datasetKsuExcelExportServiceImpl;
 
 	@Autowired
+	private DatasetExportService datasetTransposedExcelExportServiceImpl;
+
+	@Autowired
 	private SearchRequestService searchRequestService;
 
 	@Autowired
@@ -501,9 +504,10 @@ public class DatasetResource {
 		@RequestParam(value = "instanceIds") final Set<Integer> instanceIds,
 		@RequestParam(value = "collectionOrderId") final Integer collectionOrderId,
 		@RequestParam(value = "singleFile") final boolean singleFile,
-		@RequestParam(value = "includeSampleGenotypeValues", required = false) final boolean includeSampleGenotypeValues) {
+		@RequestParam(value = "includeSampleGenotypeValues", required = false) final boolean includeSampleGenotypeValues,
+		@RequestParam(value = "transposeByPlot", required = false) final boolean transposeByPlot) {
 
-		final DatasetExportService exportMethod = this.getExportFileStrategy(fileType);
+		final DatasetExportService exportMethod = this.getExportFileStrategy(fileType, transposeByPlot);
 		if (exportMethod != null) {
 			final File file =
 				exportMethod.export(studyId, datasetId, instanceIds, collectionOrderId, singleFile, includeSampleGenotypeValues);
@@ -513,11 +517,14 @@ public class DatasetResource {
 		return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 	}
 
-	private DatasetExportService getExportFileStrategy(final String fileType) {
+	private DatasetExportService getExportFileStrategy(final String fileType, final boolean transposeByPlot) {
 		final String trimmedFileType = fileType.trim();
 		if (DatasetResource.CSV.equalsIgnoreCase(trimmedFileType)) {
 			return this.datasetCSVExportServiceImpl;
 		} else if (DatasetResource.XLS.equalsIgnoreCase(trimmedFileType)) {
+			if (transposeByPlot) {
+				return this.datasetTransposedExcelExportServiceImpl;
+			}
 			return this.datasetExcelExportServiceImpl;
 		} else if (DatasetResource.KSU_CSV.equalsIgnoreCase(trimmedFileType)) {
 			return this.datasetKsuCSVExportServiceImpl;

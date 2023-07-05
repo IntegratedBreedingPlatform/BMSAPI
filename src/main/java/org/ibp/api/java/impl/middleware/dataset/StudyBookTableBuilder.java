@@ -16,8 +16,9 @@ import org.springframework.validation.MapBindingResult;
 
 public class StudyBookTableBuilder {
 
-	private static final String OBS_UNIT_ID = "OBS_UNIT_ID";
-	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
+	static final String OBS_UNIT_ID = "OBS_UNIT_ID";
+	static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
+	static final String PLOT_NO = "PLOT_NO";
 
 	private Integer duplicatedFoundNumber;
 
