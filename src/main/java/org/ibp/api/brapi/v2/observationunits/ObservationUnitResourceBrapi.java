@@ -72,6 +72,7 @@ public class ObservationUnitResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchObservationUnits(
 		@PathVariable final String crop,
 		@RequestBody final ObservationUnitSearchRequestDTO ObservationUnitSearchRequestDTO) {
+		this.permissionValidator.validateProgramByProgramDbIds(crop, ObservationUnitSearchRequestDTO.getProgramDbIds(), false);
 
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(ObservationUnitSearchRequestDTO, ObservationUnitSearchRequestDTO.class)

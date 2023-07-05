@@ -18,9 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -57,11 +59,26 @@ public class BrapiPermissionValidator {
 		}
 	}
 
+	public List<String> validateProgramByProgramDbIds(final String cropName, final List<String> programDbIds,
+		final boolean errorWhenInvalidIdExists) {
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+
+		if (user.hasOnlyProgramRoles(cropName)) {
+			final List<String> validPrograms = this.getAllValidProgramsForUser(
+				cropName, programDbIds, user.getUserid(), errorWhenInvalidIdExists);
+			if (validPrograms != null)
+				return validPrograms;
+		}
+
+		return programDbIds;
+	}
+
 	public List<String> validateProgramByProgramDbId(final String cropName, final String programDbId) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
 		if (user.hasOnlyProgramRoles(cropName)) {
-			final List<String> validPrograms = this.getAllValidProgramsForUser(cropName, programDbId, user.getUserid());
+			final List<String> validPrograms = this.getAllValidProgramsForUser(cropName,
+				Arrays.asList(programDbId), user.getUserid(), true);
 			if (validPrograms != null)
 				return validPrograms;
 		} else if (StringUtils.isNotEmpty(programDbId)) {
@@ -71,7 +88,8 @@ public class BrapiPermissionValidator {
 		return Collections.emptyList();
 	}
 
-	private List<String> getAllValidProgramsForUser(final String cropName, final String programDbId, final Integer userId) {
+	private List<String> getAllValidProgramsForUser(final String cropName, final List<String> programDbIds, final Integer userId,
+		final boolean errorWhenInvalidIdExists) {
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		programSearchRequest.setLoggedInUserId(userId);
 		programSearchRequest.setCommonCropName(cropName);
@@ -80,11 +98,12 @@ public class BrapiPermissionValidator {
 			.stream().map(ProgramDTO::getUniqueID).collect(Collectors.toList());
 
 		if (CollectionUtils.isNotEmpty(userPrograms)) {
-			if (StringUtils.isNotEmpty(programDbId)) {
-				if (!userPrograms.contains(programDbId)) {
+			if(CollectionUtils.isNotEmpty(programDbIds) && !userPrograms.containsAll(programDbIds)) {
+				if(errorWhenInvalidIdExists) {
 					throw new AccessDeniedException("");
 				}
-				return Arrays.asList(programDbId);
+				programDbIds.retainAll(userPrograms);
+				return programDbIds;
 			}
 
 			return userPrograms;
@@ -105,7 +124,8 @@ public class BrapiPermissionValidator {
 				final DmsProject dmsProject = this.studyService.getDmSProjectByStudyId(trialDbId);
 
 				if (dmsProject != null) {
-					return this.getAllValidProgramsForUser(cropName, dmsProject.getProgramUUID(), user.getUserid());
+					return this.getAllValidProgramsForUser(cropName, Arrays.asList(dmsProject.getProgramUUID()),
+						user.getUserid(), true);
 				}
 			}
 		}
@@ -123,8 +143,13 @@ public class BrapiPermissionValidator {
 			obsRequestDto.setObservationUnitDbIds(Arrays.asList(observationUnitDbId));
 			final List<ObservationUnitDto> observationList = this.observationUnitService
 				.searchObservationUnits(null, null, obsRequestDto);
-			if (!CollectionUtils.isEmpty(observationList)) {
-				return this.getAllValidProgramsForUser(cropName, observationList.get(0).getProgramDbId(), user.getUserid());
+			final Set<String> programs = observationList.stream()
+				.filter(obs -> StringUtils.isNotEmpty(obs.getProgramDbId()))
+				.map(ObservationUnitDto::getProgramDbId).collect(Collectors.toSet());
+			if (CollectionUtils.isNotEmpty(programs)) {
+				return this.getAllValidProgramsForUser(cropName,
+					new ArrayList<>(programs),
+					user.getUserid(), true);
 			}
 		}
 		return Collections.emptyList();

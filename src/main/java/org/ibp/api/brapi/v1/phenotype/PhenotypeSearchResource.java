@@ -13,6 +13,7 @@ import org.ibp.api.brapi.v1.common.Pagination;
 import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v2.observationunits.ObservationUnitMapper;
 import org.ibp.api.domain.common.PagedResult;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -37,6 +38,9 @@ public class PhenotypeSearchResource {
 	@Autowired
 	private ObservationUnitService observationUnitService;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "Phenotype search", notes = "Returns a list of observationUnit with the observed Phenotypes")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_MANAGE_OBSERVATION_UNITS', 'GRAPHICAL_QUERIES')")
 	@RequestMapping(value = "/{crop}/brapi/v1/phenotypes-search", method = RequestMethod.POST)
@@ -44,6 +48,8 @@ public class PhenotypeSearchResource {
 	@JsonView(BrapiView.BrapiV1_2.class)
 	public ResponseEntity<EntityListResponse<ObservationUnitDto>> searchPhenotypes(@PathVariable final String crop,
 		@RequestBody final PhenotypeSearchRequestDTO requestDTO) {
+		requestDTO.setProgramDbIds(this.permissionValidator.validateProgramByProgramDbIds(
+			crop, requestDTO.getProgramDbIds(), false));
 		final ModelMapper mapper = ObservationUnitMapper.getInstance();
 		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO =
 			mapper.map(requestDTO, ObservationUnitSearchRequestDTO.class);
