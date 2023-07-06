@@ -139,7 +139,7 @@ public class DatasetValidator {
 		this.errors = new MapBindingResult(new HashMap<String, String>(), Integer.class.getName());
 
 		final Optional<String> studyAliases =
-			this.studyDataManager.getAliasesForStudy(studyId).stream()
+			this.studyDataManager.getAliasesForStudy(studyId, varId).stream()
 				.filter(studyAlias -> StringUtils.equalsIgnoreCase(alias, studyAlias)).findFirst();
 
 		if (studyAliases.isPresent()) {
