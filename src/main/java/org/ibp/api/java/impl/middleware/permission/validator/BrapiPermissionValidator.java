@@ -51,7 +51,7 @@ public class BrapiPermissionValidator {
 	 *
 	 * @param cropName
 	 */
-	public void validateUserHasAtLeastCropRoles(String cropName) {
+	public void validateUserHasAtLeastCropRoles(final String cropName) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
 		if (user.hasOnlyProgramRoles(cropName)) {
@@ -84,7 +84,11 @@ public class BrapiPermissionValidator {
 	}
 
 	public List<String> validateProgramByProgramDbId(final String cropName, final String programDbId) {
-		return this.validateProgramByProgramDbIds(cropName, Arrays.asList(programDbId), true);
+		final List<String> programDbIdList = new ArrayList<>();
+		if (StringUtils.isNotEmpty(programDbId)) {
+			programDbIdList.add(programDbId);
+		}
+		return this.validateProgramByProgramDbIds(cropName, programDbIdList, true);
 	}
 
 	private List<String> getAllValidProgramsForUser(final String cropName, final List<String> programDbIds, final Integer userId,
@@ -97,13 +101,13 @@ public class BrapiPermissionValidator {
 			.stream().map(ProgramDTO::getUniqueID).collect(Collectors.toList());
 
 		if (CollectionUtils.isNotEmpty(userPrograms)) {
-			if(CollectionUtils.isNotEmpty(programDbIds) && !userPrograms.containsAll(programDbIds)) {
-				if(errorWhenInvalidIdExists) {
+			if (CollectionUtils.isNotEmpty(programDbIds) && !userPrograms.containsAll(programDbIds)) {
+				if (errorWhenInvalidIdExists) {
 					throw new AccessDeniedException("");
 				}
 				final List<String> programDbIdsArray = new ArrayList<>(programDbIds);
 				programDbIdsArray.retainAll(userPrograms);
-				if(CollectionUtils.isNotEmpty(programDbIdsArray))
+				if (CollectionUtils.isNotEmpty(programDbIdsArray))
 					return programDbIdsArray;
 			}
 
