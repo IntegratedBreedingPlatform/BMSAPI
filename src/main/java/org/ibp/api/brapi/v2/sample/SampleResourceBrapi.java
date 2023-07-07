@@ -18,6 +18,7 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ public class SampleResourceBrapi {
 	@Autowired
 	private SearchRequestService searchRequestService;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "Get samples", notes = "Get samples")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES', 'MS_OBSERVATIONS', 'MS_VIEW_OBSERVATIONS', 'MS_SAMPLE_LISTS', "
 		+ "'MS_IMPORT_GENOTYPES_OPTIONS', 'MS_IMPORT_GENOTYPES_FROM_GIGWA', 'MS_IMPORT_GENOTYPES_FROM_FILE', 'LISTS', 'SAMPLES_LISTS')")
@@ -74,6 +78,8 @@ public class SampleResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
+
 		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO(sampleDbId, observationUnitDbId, plateDbId,
 			germplasmDbId, studyDbId, externalReferenceID, externalReferenceSource);
 
@@ -89,6 +95,9 @@ public class SampleResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchSamples(
 		@PathVariable final String crop,
 		@RequestBody final SampleSearchRequestDTO samplesSearchRequest) {
+
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
+
 		final BrapiSearchDto searchDto =
 			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(samplesSearchRequest, SampleSearchRequestDTO.class)
 				.toString());
@@ -111,6 +120,8 @@ public class SampleResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
+
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final SampleSearchRequestDTO samplesSearchRequest;
 		try {
@@ -174,6 +185,9 @@ public class SampleResourceBrapi {
 	@ResponseBody
 	public ResponseEntity<SingleEntityResponse<SampleObservationDto>> getSampleBySampleId(@PathVariable final String crop,
 		final @PathVariable String sampleDbId) {
+
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
+
 		final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
 		requestDTO.setSampleDbIds(Collections.singletonList(sampleDbId));
 		final List<SampleObservationDto> sampleObservationDtos = this.sampleServiceBrapi.getSampleObservations(requestDTO, null);

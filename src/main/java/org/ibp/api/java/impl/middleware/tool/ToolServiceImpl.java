@@ -2,13 +2,12 @@ package org.ibp.api.java.impl.middleware.tool;
 
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.domain.workbench.ToolDTO;
 import org.generationcp.middleware.domain.workbench.ToolLinkDTO;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.pojos.workbench.ToolName;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -79,25 +78,20 @@ public class ToolServiceImpl implements ToolService {
 		for (final PermissionDto permission : permissions) {
 			final WorkbenchSidebarCategoryLink link =
 				this.workbenchService.getWorkbenchSidebarLinksByCategoryId(permission.getWorkbenchCategoryLinkId());
-
 			if (link != null && !links.contains(link)) {
+				if (categoryMap.get(link.getWorkbenchSidebarCategory()) == null) {
+					categoryMap.put(link.getWorkbenchSidebarCategory(), new ArrayList<>());
+				}
 				if (link.getTool() == null) {
 					link.setTool(new Tool(link.getSidebarLinkName(), link.getSidebarLinkTitle(), ""));
 				}
-				if (!ToolName.GRAPHICAL_QUERIES.getName().equals(link.getTool().getToolName())
-					|| this.showGraphicalQuery(loggedInUser, cropName)) {
-					if (categoryMap.get(link.getWorkbenchSidebarCategory()) == null) {
-						categoryMap.put(link.getWorkbenchSidebarCategory(), new ArrayList<>());
-					}
-
-					categoryMap.get(link.getWorkbenchSidebarCategory()).add(link);
-					links.add(link);
-				}
+				categoryMap.get(link.getWorkbenchSidebarCategory()).add(link);
+				links.add(link);
 			}
 		}
 
 		//Convert HashMap to TreeMap.It will be sorted in natural order.
-		final Map<WorkbenchSidebarCategory, List<WorkbenchSidebarCategoryLink>> treeMap = new TreeMap<>(categoryMap);
+		final Map<WorkbenchSidebarCategory, List<WorkbenchSidebarCategoryLink>> treeMap = new TreeMap<>( categoryMap );
 
 		//sorting the list with a comparator
 		for (final WorkbenchSidebarCategory category : treeMap.keySet()) {
@@ -112,7 +106,7 @@ public class ToolServiceImpl implements ToolService {
 					.collect(Collectors.toList());
 
 				return new ToolDTO(e.getKey().getSidebarCategorylabel(), toolLinkDTOS);
-			}).collect(Collectors.toList());
+		}).collect(Collectors.toList());
 	}
 
 	private void validateProgram(final String cropName, final String programUUID) {
@@ -127,7 +121,4 @@ public class ToolServiceImpl implements ToolService {
 		}
 	}
 
-	private boolean showGraphicalQuery(final WorkbenchUser loggedInUser, final String cropName) {
-		return !loggedInUser.hasOnlyProgramRoles(cropName);
-	}
 }

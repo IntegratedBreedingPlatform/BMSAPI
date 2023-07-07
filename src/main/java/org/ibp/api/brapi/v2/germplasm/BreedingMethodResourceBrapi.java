@@ -13,6 +13,7 @@ import org.ibp.api.brapi.v1.common.Result;
 import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.java.breedingmethod.BreedingMethodService;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -37,6 +38,9 @@ public class BreedingMethodResourceBrapi {
 
 	@Autowired
 	private BreedingMethodService breedingMethodService;
+
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
 
 	@ApiOperation(value = "Get the Breeding Methods", notes = "Get the list of germplasm breeding methods available in a system.")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'CROP_MANAGEMENT', 'MANAGE_CROP_SETTINGS')")
@@ -86,6 +90,8 @@ public class BreedingMethodResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<BreedingMethod>> getBreedingMethodById(
 		@PathVariable final String crop,
 		@PathVariable final Integer breedingMethodDbId) {
+
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final BreedingMethodDTO breedingMethodDTOS = this.breedingMethodService.getBreedingMethod(breedingMethodDbId);
 		final ModelMapper modelMapper = BreedingMethodMapper.getInstance();

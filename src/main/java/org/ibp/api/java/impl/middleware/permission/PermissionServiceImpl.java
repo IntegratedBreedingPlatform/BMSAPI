@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class PermissionServiceImpl implements PermissionService {
@@ -24,14 +25,14 @@ public class PermissionServiceImpl implements PermissionService {
 	@Override
 	public PermissionDto getPermissionTree(final Integer roleTypeId) {
 
-		BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "roleTypeId");
+		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), "roleTypeId");
 
 		if (roleTypeId == null) {
 			errors.reject("role.type.can.not.be.null");
 
 		}
 
-		final RoleTypeDto roleType = roleTypeService.getRoleType(roleTypeId);
+		final RoleTypeDto roleType = this.roleTypeService.getRoleType(roleTypeId);
 		if (roleType == null) {
 			errors.reject("role.role.type.does.not.exist");
 		}
@@ -40,8 +41,13 @@ public class PermissionServiceImpl implements PermissionService {
 			throw new ApiRequestValidationException(errors.getAllErrors());
 		}
 
-		final PermissionDto permissionDto = permissionService.getPermissionTree(roleTypeId);
+		final PermissionDto permissionDto = this.permissionService.getPermissionTree(roleTypeId);
 
 		return permissionDto;
+	}
+
+	@Override
+	public List<PermissionDto> getPermissions(final Integer userId, final String cropName, final Integer programId, final Boolean skipProgramValidation) {
+		return this.permissionService.getPermissions(userId, cropName, programId, skipProgramValidation);
 	}
 }

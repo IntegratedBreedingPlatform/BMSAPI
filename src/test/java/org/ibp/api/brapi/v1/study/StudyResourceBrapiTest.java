@@ -14,6 +14,7 @@ import org.hamcrest.collection.IsCollectionWithSize;
 import org.ibp.ApiUnitTestBase;
 import org.ibp.api.brapi.StudyServiceBrapi;
 import org.ibp.api.brapi.TrialServiceBrapi;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,11 +62,20 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		public LocationService locationService() {
 			return Mockito.mock(LocationService.class);
 		}
+
+		@Bean
+		@Primary
+		public BrapiPermissionValidator permissionValidator() {
+			return Mockito.mock(BrapiPermissionValidator.class);
+		}
 	}
 
 
 	@Autowired
 	private LocationService locationService;
+
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
 
 	@Test
 	public void testGetStudyObservationsAsTable() throws Exception {
@@ -339,6 +349,9 @@ public class StudyResourceBrapiTest extends ApiUnitTestBase {
 		Mockito.when(this.studyServiceBrapi.getStudyInstances(Mockito.any(StudySearchFilter.class), Mockito.any(PageRequest.class)))
 			.thenReturn(studyInstanceDtos);
 		Mockito.when(this.studyServiceBrapi.countStudyInstances(Mockito.any(StudySearchFilter.class))).thenReturn(1l);
+
+		Mockito.when(this.permissionValidator.validateProgramByProgramDbId(studyInstanceDto.getCommonCropName(), ""))
+			.thenReturn(Collections.EMPTY_LIST);
 
 		final UriComponents uriComponents = UriComponentsBuilder.newInstance().path("/maize/brapi/v1/studies")
 			.build().encode();

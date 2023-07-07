@@ -29,6 +29,7 @@ import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -66,6 +67,9 @@ public class StudyResourceBrapi {
 
 	@Autowired
 	private BrapiResponseMessageGenerator<StudyInstanceDto> responseMessageGenerator;
+
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
 
 	@ApiOperation(value = "Get the details for a specific Study", notes = "Get the details for a specific Study")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
@@ -149,9 +153,10 @@ public class StudyResourceBrapi {
 			return new ResponseEntity<>(entityListResponse, HttpStatus.BAD_REQUEST);
 		}
 
+		final List<String> validPrograms = this.permissionValidator.validateProgramByProgramDbId(crop, programDbId);
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		studySearchFilter.setStudyTypeDbId(studyTypeDbId);
-		studySearchFilter.setProgramDbId(programDbId);
+		studySearchFilter.setProgramDbIds(validPrograms);
 		studySearchFilter.setLocationDbId(locationDbId);
 		studySearchFilter.setSeasonDbId(seasonDbId);
 		if (trialDbId != null) {
@@ -211,6 +216,8 @@ public class StudyResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<StudyInstanceDto>> createStudies(@PathVariable final String crop,
 		@RequestBody final List<StudyImportRequestDTO> studyImportRequestDTOS) {
+		studyImportRequestDTOS.stream().forEach(request -> this.permissionValidator.validateProgramByTrialDbId(crop, request.getTrialDbId()));
+
 		BaseValidator.checkNotNull(studyImportRequestDTOS, "study.import.request.null");
 		final StudyImportResponse
 			studyImportResponse = this.studyServiceBrapi.createStudies(crop, studyImportRequestDTOS);

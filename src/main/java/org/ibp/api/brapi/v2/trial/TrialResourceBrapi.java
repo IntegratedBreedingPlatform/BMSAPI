@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v2.TrialSearchRequestDTO;
@@ -25,6 +26,7 @@ import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,9 @@ public class TrialResourceBrapi {
 
 	@Autowired
 	private BrapiResponseMessageGenerator<TrialSummary> responseMessageGenerator;
+
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
 
 	@ApiOperation(value = "Retrieve a filtered list of breeding Trials", notes = "Retrieve a filtered list of breeding Trials. A Trial is a collection of Studies")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
@@ -113,8 +118,9 @@ public class TrialResourceBrapi {
 
 		final TrialSearchRequestDTO trialSearchRequestDTO = new TrialSearchRequestDTO();
 
-		if (StringUtils.isNotEmpty(programDbId)) {
-			trialSearchRequestDTO.setProgramDbIds(Arrays.asList(programDbId));
+		final List<String> validPrograms = this.permissionValidator.validateProgramByProgramDbId(crop, programDbId);
+		if (CollectionUtils.isNotEmpty(validPrograms)) {
+			trialSearchRequestDTO.setProgramDbIds(validPrograms);
 		}
 		if (StringUtils.isNotEmpty(locationDbId)) {
 			trialSearchRequestDTO.setLocationDbIds(Arrays.asList(locationDbId));
@@ -164,6 +170,7 @@ public class TrialResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<TrialSummary>> createTrial(@PathVariable final String crop,
 		@RequestBody final List<TrialImportRequestDTO> trialImportRequestDTOs) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 		BaseValidator.checkNotNull(trialImportRequestDTOs, "trial.import.request.null");
 
 		final TrialImportResponse trialImportResponse = this.trialServiceBrapi.createTrials(crop, trialImportRequestDTOs);
@@ -184,6 +191,7 @@ public class TrialResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchTrials(
 		@PathVariable final String crop,
 		@RequestBody final TrialSearchRequestDTO trialSearchRequestDTO) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final BrapiSearchDto searchDto =
 			new BrapiSearchDto(this.searchRequestService.saveSearchRequest(trialSearchRequestDTO, TrialSearchRequestDTO.class)
@@ -206,6 +214,7 @@ public class TrialResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION, required = false)
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final TrialSearchRequestDTO trialSearchRequestDTO;
 		try {

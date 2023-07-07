@@ -10,6 +10,7 @@ import org.ibp.api.brapi.v1.common.SingleEntityResponse;
 import org.ibp.api.java.file.FileMetadataService;
 import org.ibp.api.java.impl.middleware.common.validator.ImageValidator;
 import org.ibp.api.java.impl.middleware.file.validator.FileValidator;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.Arrays;
 
 @Api("BrAPI v2 Image services")
 @Controller(value = "ImageResourceBrapiV2")
@@ -33,6 +36,9 @@ public class ImageResourceBrapi {
 	@Autowired
 	private ImageValidator imageValidator;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation("Create a new image meta data object")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/images", method = RequestMethod.POST)
@@ -41,6 +47,8 @@ public class ImageResourceBrapi {
 		@PathVariable final String crop,
 		@RequestBody final ImageNewRequest body
 	) {
+		this.permissionValidator.validateProgramByObservationUnitDbId(crop, Arrays.asList(body.getObservationUnitDbId()), true);
+
 		this.fileValidator.validateFileStorage();
 		this.imageValidator.validateImage(body);
 

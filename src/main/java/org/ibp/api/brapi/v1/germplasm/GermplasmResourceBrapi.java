@@ -28,6 +28,7 @@ import org.ibp.api.brapi.v2.germplasm.GermplasmSearchRequestMapper;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.germplasm.GermplasmAttributeService;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -63,6 +64,9 @@ public class GermplasmResourceBrapi {
 
 	@Autowired
 	private GermplasmAttributeService germplasmAttributeService;
+
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
 
 	@Deprecated
 	@ApiOperation(value = "Search germplasms", notes = "Search germplasms. <p>DEPRECATED: use /search/germplasm</p> ")
@@ -139,6 +143,7 @@ public class GermplasmResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 		germplasmSearchRequest.setPreferredName(germplasmName);
@@ -175,6 +180,7 @@ public class GermplasmResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<Germplasm>> searchGermplasm(
 		@PathVariable final String crop,
 		@PathVariable final String germplasmDbId) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final GermplasmDTO germplasmDTO = this.germplasmService.getGermplasmDTObyGUID(germplasmDbId);
 
@@ -203,6 +209,7 @@ public class GermplasmResourceBrapi {
 		@ApiParam(value = "include array of siblings in response")
 		@RequestParam(value = "includeSiblings", required = false) final Boolean includeSiblings
 	) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		if (notation != null) {
 			return new ResponseEntity<>(
@@ -226,6 +233,7 @@ public class GermplasmResourceBrapi {
 		@ApiParam(value = "the internal id of the germplasm", required = true)
 		@PathVariable(value = "germplasmDbId") final String germplasmDbId
 	) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final ProgenyDTO progenyDTO = this.germplasmService.getProgeny(germplasmDbId);
 		if (progenyDTO == null) {
@@ -242,6 +250,7 @@ public class GermplasmResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<SearchDto>> postSearchGermplasm(
 		@PathVariable final String crop,
 		@RequestBody final org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto germplasmSearchRequestDto) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final GermplasmSearchRequest germplasmSearchRequestV2 =
 			GermplasmSearchRequestMapper.getInstance().map(germplasmSearchRequestDto, GermplasmSearchRequest.class);
@@ -270,6 +279,8 @@ public class GermplasmResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize
 	) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
+
 		final GermplasmSearchRequest germplasmSearchRequest;
 
 		try {
@@ -387,6 +398,7 @@ public class GermplasmResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize
 	) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 
 		final int finalPageNumber = currentPage == null ? BrapiPagedResult.DEFAULT_PAGE_NUMBER : currentPage;
 		final int finalPageSize = pageSize == null ? BrapiPagedResult.DEFAULT_PAGE_SIZE : pageSize;

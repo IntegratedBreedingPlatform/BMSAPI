@@ -26,6 +26,7 @@ import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.domain.search.SearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
 import org.modelmapper.ModelMapper;
@@ -57,6 +58,9 @@ public class GermplasmResourceBrapi {
 
 	@Autowired
 	private BrapiResponseMessageGenerator<GermplasmDTO> responseMessageGenerator;
+
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
 
 	@ApiOperation(value = "Get a filtered list of Germplasm", notes = "Get a filtered list of Germplasm")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'GERMPLASM', 'MANAGE_GERMPLASM','SEARCH_GERMPLASM')")
@@ -96,6 +100,8 @@ public class GermplasmResourceBrapi {
 		@ApiParam(value = BrapiPagedResult.PAGE_SIZE_DESCRIPTION)
 		@RequestParam(value = "pageSize", required = false) final Integer pageSize) {
 
+		this.permissionValidator.validateProgramByStudyDbId(crop, studyDbId);
+
 		final GermplasmSearchRequest germplasmSearchRequest =
 			this.getGermplasmSearchRequestDto(germplasmDbId, commonCropName, germplasmPUI, germplasmName, accessionNumber, studyDbId,
 				synonym, genus, parentDbId,
@@ -123,6 +129,9 @@ public class GermplasmResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<Germplasm>> saveGermplasm(@PathVariable final String crop,
 		@RequestBody final List<GermplasmImportRequest> germplasmImportRequestList) {
+
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
+
 		BaseValidator.checkNotNull(germplasmImportRequestList, "germplasm.import.list.null");
 
 		final GermplasmImportResponse germplasmImportResponse = this.germplasmService.createGermplasm(crop, germplasmImportRequestList);
@@ -143,6 +152,7 @@ public class GermplasmResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<Germplasm>> updateGermplasm(@PathVariable final String crop,
 		@PathVariable final String germplasmDbId,
 		@RequestBody final GermplasmUpdateRequest germplasmUpdateRequest) {
+		this.permissionValidator.validateUserHasAtLeastCropRoles(crop);
 		BaseValidator.checkNotNull(germplasmUpdateRequest, "germplasm.import.list.null");
 
 		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(germplasmDbId, germplasmUpdateRequest);

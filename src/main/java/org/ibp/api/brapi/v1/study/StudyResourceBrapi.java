@@ -46,6 +46,7 @@ import org.ibp.api.exception.BrapiNotFoundException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetService;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -123,6 +124,9 @@ public class StudyResourceBrapi {
 	@Autowired
 	private VariableServiceBrapi variableServiceBrapi;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "List of studies", notes = "Get a list of studies.")
 	@RequestMapping(value = "/{crop}/brapi/v1/studies", method = RequestMethod.GET)
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES','VIEW_STUDIES')")
@@ -164,9 +168,10 @@ public class StudyResourceBrapi {
 			pageRequest = new PageRequest(finalPageNumber, finalPageSize);
 		}
 
+		final List<String> validPrograms = this.permissionValidator.validateProgramByProgramDbId(crop, programDbId);
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		studySearchFilter.setStudyTypeDbId(studyTypeDbId);
-		studySearchFilter.setProgramDbId(programDbId);
+		studySearchFilter.setProgramDbIds(validPrograms);
 		studySearchFilter.setLocationDbId(locationDbId);
 		studySearchFilter.setSeasonDbId(seasonDbId);
 		if (trialDbId != null) {

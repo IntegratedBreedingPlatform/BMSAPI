@@ -26,6 +26,7 @@ import org.ibp.api.brapi.v2.BrapiResponseMessageGenerator;
 import org.ibp.api.domain.common.PagedResult;
 import org.ibp.api.domain.search.BrapiSearchDto;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
+import org.ibp.api.java.impl.middleware.permission.validator.BrapiPermissionValidator;
 import org.ibp.api.java.observationunits.ObservationUnitService;
 import org.ibp.api.rest.common.PaginatedSearch;
 import org.ibp.api.rest.common.SearchSpec;
@@ -44,6 +45,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Api(value = "BrAPI Observation Unit Services")
 @Controller
@@ -61,6 +64,9 @@ public class ObservationUnitResourceBrapi {
 	@Autowired
 	private BrapiResponseMessageGenerator<ObservationUnitDto> responseMessageGenerator;
 
+	@Autowired
+	private BrapiPermissionValidator permissionValidator;
+
 	@ApiOperation(value = "Post observation units search", notes = "Post observation units search")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/{crop}/brapi/v2/search/observationunits", method = RequestMethod.POST)
@@ -68,6 +74,7 @@ public class ObservationUnitResourceBrapi {
 	public ResponseEntity<SingleEntityResponse<BrapiSearchDto>> postSearchObservationUnits(
 		@PathVariable final String crop,
 		@RequestBody final ObservationUnitSearchRequestDTO ObservationUnitSearchRequestDTO) {
+		this.permissionValidator.validateProgramByProgramDbIds(crop, ObservationUnitSearchRequestDTO.getProgramDbIds(), false);
 
 		final String searchRequestId =
 			this.searchRequestService.saveSearchRequest(ObservationUnitSearchRequestDTO, ObservationUnitSearchRequestDTO.class)
@@ -128,6 +135,10 @@ public class ObservationUnitResourceBrapi {
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<EntityListResponse<ObservationUnitDto>> createObservationUnits(@PathVariable final String crop,
 		@RequestBody final List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos) {
+		final Set<String> programDbIds = observationUnitImportRequestDtos.stream()
+			.map(ObservationUnitImportRequestDto::getProgramDbId)
+			.collect(Collectors.toSet());
+		this.permissionValidator.validateProgramByProgramDbIds(crop, new ArrayList<>(programDbIds), true);
 		BaseValidator.checkNotNull(observationUnitImportRequestDtos, "observation.unit.import.request.null");
 
 		final ObservationUnitImportResponse observationUnitImportResponse =
@@ -198,6 +209,13 @@ public class ObservationUnitResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
 
+		if (StringUtils.isNotEmpty(programDbId)) {
+			this.permissionValidator.validateProgramByStudyDbId(crop, programDbId);
+		}
+		if (StringUtils.isNotEmpty(studyDbId)) { // no validation if parameter is not present
+			this.permissionValidator.validateProgramByStudyDbId(crop, studyDbId);
+		}
+
 		final ObservationLevelFilter observationLevelFilter = new ObservationLevelFilter(studyDbId, trialDbId, programDbId);
 
 		// The response doesn't require pagination. The value for the "pagination" key is returned with all the keys set to zero.
@@ -250,6 +268,8 @@ public class ObservationUnitResourceBrapi {
 		@RequestParam(value = "pageSize",
 			required = false) final Integer pageSize) {
 
+		this.permissionValidator.validateProgramByStudyDbId(crop, studyDbId);
+
 		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO = this.getObservationUnitSearchRequestDTO(germplasmDbId,
 			observationUnitDbId, studyDbId, locationDbId, trialDbId, programDbId, seasonDbId, observationUnitLevelName,
 			observationUnitLevelOrder, observationUnitLevelCode, includeObservations,
@@ -297,7 +317,8 @@ public class ObservationUnitResourceBrapi {
 		if (!StringUtils.isEmpty(observationUnitLevelName)
 			|| !StringUtils.isEmpty(observationUnitLevelOrder)
 			|| !StringUtils.isEmpty(observationUnitLevelCode)) {
-			final Integer order = NumberUtils.isNumber(observationUnitLevelOrder) ? NumberUtils.createInteger(observationUnitLevelOrder) : null;
+			final Integer order =
+				NumberUtils.isNumber(observationUnitLevelOrder) ? NumberUtils.createInteger(observationUnitLevelOrder) : null;
 			observationUnitSearchRequestDTO.setObservationLevels(
 				Lists.newArrayList(new ObservationLevelRelationship(
 					null, observationUnitLevelCode, observationUnitLevelName, order)));

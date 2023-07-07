@@ -67,7 +67,6 @@ public class ProgramResourceBrapi {
 			required = false) final String programName,
 		@ApiParam(value = "Filter by program abbreviation. Exact match.", required = false) @RequestParam(value = "abbreviation",
 			required = false) final String abbreviation) {
-
 		this.cropValidator.validateCrop(crop);
 
 		if (!StringUtils.isBlank(abbreviation)) {
