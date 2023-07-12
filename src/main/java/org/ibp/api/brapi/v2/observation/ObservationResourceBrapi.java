@@ -107,8 +107,7 @@ public class ObservationResourceBrapi {
 		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
 		// validate and set programDbId, sets all valid program for user if request param is empty
 		observationSearchRequestDto.setProgramDbIds(
-			this.permissionValidator.validateProgramByProgramDbIds(crop, Arrays.asList(programDbId), false));
-
+			StringUtils.isNotEmpty(programDbId) ? this.permissionValidator.validateProgramByProgramDbIds(crop, Arrays.asList(programDbId), false) : new ArrayList<>());
 		observationSearchRequestDto.setObservationDbIds(
 			StringUtils.isNotEmpty(observationDbId) ? Arrays.asList(observationDbId) : new ArrayList<>());
 		observationSearchRequestDto.setObservationUnitDbIds(
