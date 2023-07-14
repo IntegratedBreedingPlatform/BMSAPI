@@ -52,23 +52,29 @@ public class PRepDesignTypeServiceImpl implements ExperimentalDesignTypeService 
 		final Map<Integer, StandardVariable> standardVariablesMap =
 			this.ontologyDataManager.getStandardVariables(DESIGN_FACTOR_VARIABLES, programUUID).stream()
 				.collect(Collectors.toMap(StandardVariable::getId, standardVariable -> standardVariable));
-
-		// Generate experiment design parameters input to design runner
-		final Map<BreedingViewDesignParameter, List<ListItem>> listItems =
-			this.createReplicationListItems(studyEntryDtoList, experimentalDesignInput.getReplicationPercentage(),
-				experimentalDesignInput.getReplicationsCount());
-		experimentalDesignInput.setNumberOfBlocks(experimentalDesignInput.getBlockSize());
-		final MainDesign mainDesign = this.experimentDesignGenerator
-			.generate(experimentalDesignInput, this.getBreedingViewVariablesMap(standardVariablesMap), studyEntryDtoList.size(), null,
-				listItems);
-
 		// Generate observation unit rows
 		final String entryNumberName = standardVariablesMap.get(TermId.ENTRY_NO.getId()).getName();
 		final List<MeasurementVariable> measurementVariables = this.getMeasurementVariables(studyId, experimentalDesignInput, programUUID);
-		return this.experimentalDesignProcessor
-			.generateObservationUnitRows(experimentalDesignInput.getTrialInstancesForDesignGeneration(), measurementVariables, studyEntryDtoList, mainDesign,
-				entryNumberName, null,
-				new HashMap<>());
+
+		final List<ObservationUnitRow> observationUnitRows = new ArrayList<>();
+		final Map<BreedingViewVariableParameter, String> breedingViewVariablesMap = this.getBreedingViewVariablesMap(standardVariablesMap);
+		for(final Integer instance: experimentalDesignInput.getTrialInstancesForDesignGeneration()) {
+			final Set<Integer> instanceForGeneration = new HashSet<>(Collections.singletonList(instance));
+
+			// create replicationListItems for every instance so randomized replicated entries will be different for each
+			final Map<BreedingViewDesignParameter, List<ListItem>> listItems =
+					this.createReplicationListItems(studyEntryDtoList, experimentalDesignInput.getReplicationPercentage(),
+							experimentalDesignInput.getReplicationsCount());
+			experimentalDesignInput.setNumberOfBlocks(experimentalDesignInput.getBlockSize());
+			final MainDesign mainDesign = this.experimentDesignGenerator
+					.generate(experimentalDesignInput, breedingViewVariablesMap, studyEntryDtoList.size(), null,
+							listItems);
+			observationUnitRows.addAll(this.experimentalDesignProcessor
+					.generateObservationUnitRows(instanceForGeneration, measurementVariables, studyEntryDtoList, mainDesign,
+							entryNumberName, null,
+							new HashMap<>()));
+		}
+		return observationUnitRows;
 	}
 
 	private Map<BreedingViewVariableParameter, String> getBreedingViewVariablesMap(final Map<Integer, StandardVariable> standardVariablesMap) {
