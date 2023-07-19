@@ -12,17 +12,7 @@ import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
-import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory.manager.InventoryView;
-import org.generationcp.middleware.domain.inventory.manager.LotAttributeColumnDto;
-import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotMergeRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
-import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.*;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.LotStatus;
@@ -261,6 +251,24 @@ public class LotResource {
 		try {
 			this.inventoryLock.lockWrite();
 			this.lotService.updateLots(extendedLotDtos, lotRequest, programUUID);
+		} finally {
+			this.inventoryLock.unlockWrite();
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+	}
+
+	@ApiOperation(value = "Update Lots Available Balance", notes = "Update Lots Available Balance")
+	@RequestMapping(value = "/crops/{cropName}/lot-lists/balance", method = RequestMethod.PATCH)
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('UPDATE_LOTS')")
+	@ResponseBody
+	public ResponseEntity<Void> updateLotsBalance(
+			@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
+			@RequestBody final List<LotUpdateBalanceRequestDto> lotUpdateBalanceRequestDtos) {
+
+		try {
+			this.inventoryLock.lockWrite();
+			this.lotService.updateLotsBalance(lotUpdateBalanceRequestDtos, programUUID);
 		} finally {
 			this.inventoryLock.unlockWrite();
 		}

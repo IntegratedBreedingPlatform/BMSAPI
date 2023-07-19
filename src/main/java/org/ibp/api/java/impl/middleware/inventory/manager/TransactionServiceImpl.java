@@ -4,15 +4,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
-import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
-import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
-import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
-import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.*;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
@@ -299,7 +291,7 @@ public class TransactionServiceImpl implements TransactionService {
 	public void saveLotBalanceAdjustment(final LotAdjustmentRequestDto lotAdjustmentRequestDto) {
 		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
 
-		final BindingResult errors = new MapBindingResult(new HashMap<String, String>(), TransactionService.class.getName());
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), TransactionService.class.getName());
 
 		this.searchCompositeDtoValidator.validateSearchCompositeDto(lotAdjustmentRequestDto.getSelectedLots(), errors);
 
@@ -314,8 +306,10 @@ public class TransactionServiceImpl implements TransactionService {
 		this.lotInputValidator.validateLotBalance(lotAdjustmentRequestDto.getBalance());
 		this.inventoryCommonValidator.validateTransactionNotes(lotAdjustmentRequestDto.getNotes(), errors);
 
+		final List<LotUpdateBalanceRequestDto> lotUpdateBalanceRequestDtos = lotDtos.stream().map(lotDto -> new LotUpdateBalanceRequestDto(lotDto.getLotUUID(),
+				lotAdjustmentRequestDto.getBalance(), lotAdjustmentRequestDto.getNotes())).collect(Collectors.toList());
+
 		this.transactionService
-			.saveAdjustmentTransactions(user.getUserid(), lotDtos.stream().map(ExtendedLotDto::getLotId).collect(Collectors.toSet()),
-				lotAdjustmentRequestDto.getBalance(), lotAdjustmentRequestDto.getNotes());
+			.saveAdjustmentTransactions(user.getUserid(), lotUpdateBalanceRequestDtos);
 	}
 }

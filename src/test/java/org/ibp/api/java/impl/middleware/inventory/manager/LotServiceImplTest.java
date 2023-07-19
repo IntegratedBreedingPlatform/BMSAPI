@@ -10,11 +10,7 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
-import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
-import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
-import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
-import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.*;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -64,8 +60,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LotServiceImplTest {
@@ -131,7 +126,10 @@ public class LotServiceImplTest {
 	private DatasetValidator datasetValidator;
 
 	@Captor
-	private ArgumentCaptor<Set> setCollectionArgumentCaptor;
+	private ArgumentCaptor<List<LotUpdateBalanceRequestDto>> listCollectionArgumentCaptor;
+
+	@Captor
+	private ArgumentCaptor<Set<Integer>> setCollectionArgumentCaptor;
 
 	@Captor
 	private ArgumentCaptor<LotGeneratorInputDto> lotGeneratorInputDtoArgumentCaptor;
@@ -202,7 +200,7 @@ public class LotServiceImplTest {
 			thenReturn(newLotUUID);
 
 		Mockito.doNothing().when(this.middlewareTransactionService).saveAdjustmentTransactions(ArgumentMatchers.eq(USER_ID),
-			ArgumentMatchers.any(Set.class), ArgumentMatchers.eq(5D), ArgumentMatchers.isNull());
+			ArgumentMatchers.any(List.class));
 
 		final ExtendedLotDto newSplitExtendedLotDto = ExtendedLotDtoDummyFactory.create(lotActualBalance);
 		Mockito.when(this.middlewareLotService.searchLots(ArgumentMatchers.any(LotsSearchDto.class), ArgumentMatchers.isNull()))
@@ -229,11 +227,11 @@ public class LotServiceImplTest {
 		assertThat(actualLotGeneratorInputDto.getStockPrefix(), is(newLotSplitDto.getStockPrefix()));
 
 		Mockito.verify(this.middlewareTransactionService).saveAdjustmentTransactions(ArgumentMatchers.eq(USER_ID),
-			this.setCollectionArgumentCaptor.capture(), ArgumentMatchers.eq(5D), ArgumentMatchers.isNull());
-		final Set<Integer> saveAdjustmentTransactionLotIds = this.setCollectionArgumentCaptor.getValue();
-		assertNotNull(saveAdjustmentTransactionLotIds);
-		assertThat(saveAdjustmentTransactionLotIds, hasSize(1));
-		assertThat(saveAdjustmentTransactionLotIds, contains(splitExtendedLotDto.getLotId()));
+			this.listCollectionArgumentCaptor.capture());
+		final List<LotUpdateBalanceRequestDto> lotUpdateBalanceRequestDtos = this.listCollectionArgumentCaptor.getValue();
+		assertNotNull(lotUpdateBalanceRequestDtos);
+		assertThat(lotUpdateBalanceRequestDtos, hasSize(1));
+		assertTrue(lotUpdateBalanceRequestDtos.stream().anyMatch(a -> a.getLotUUID() == splitExtendedLotDto.getLotUUID()));
 
 		Mockito.verify(this.middlewareTransactionService).depositLots(ArgumentMatchers.eq(USER_ID),
 			this.setCollectionArgumentCaptor.capture(),
