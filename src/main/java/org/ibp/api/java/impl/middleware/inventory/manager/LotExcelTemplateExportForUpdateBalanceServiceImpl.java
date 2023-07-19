@@ -28,8 +28,7 @@ public class LotExcelTemplateExportForUpdateBalanceServiceImpl extends AbstractL
     private static final String FILE_NAME = "basic_template_import_update_balance_";
     private static final int LOTS_SHEET_GID_COLUMN_INDEX = 0;
     private static final int LOTS_SHEET_NEW_BALANCE_COLUMN_INDEX = 1;
-    private static final int LOTS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX = 2;
-    private static final int LOTS_SHEET_NOTES_COLUMN_INDEX = 3;
+    private static final int LOTS_SHEET_NOTES_COLUMN_INDEX = 2;
 
     @Override
     public File export(final String programUUID, final String cropName, final List<LocationDTO> locations, final List<VariableDetails> units) {
@@ -66,18 +65,12 @@ public class LotExcelTemplateExportForUpdateBalanceServiceImpl extends AbstractL
         cell.setCellValue(
                 this.messageSource.getMessage("export.inventory.manager.lot.template.new.balance.column", null, locale));
 
-        cell = row.createCell(LOTS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX, CellType.STRING);
-        cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.AQUA.getIndex()));
-        cell.setCellValue(
-                this.messageSource.getMessage("export.inventory.manager.lot.template.storage.location.abbr.column", null, locale));
-
         cell = row.createCell(LOTS_SHEET_NOTES_COLUMN_INDEX, CellType.STRING);
         cell.setCellStyle(this.getHeaderStyle(xlsBook, IndexedColors.YELLOW.getIndex()));
         cell.setCellValue(this.messageSource.getMessage("export.inventory.manager.lot.template.notes.column", null, locale));
 
         xlsSheet.setColumnWidth(LOTS_SHEET_GID_COLUMN_INDEX, 8 * 250);
         xlsSheet.setColumnWidth(LOTS_SHEET_NEW_BALANCE_COLUMN_INDEX, 10 * 250);
-        xlsSheet.setColumnWidth(LOTS_SHEET_STORAGE_LOCATION_ABBR_COLUMN_INDEX, 34 * 250);
         xlsSheet.setColumnWidth(LOTS_SHEET_NOTES_COLUMN_INDEX, 10 * 250);
     }
 
