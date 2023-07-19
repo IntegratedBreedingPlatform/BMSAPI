@@ -144,6 +144,7 @@ public class OntologyMapper {
 				this.map().getMetadata().getUsage().setGermplasm(this.source.getGermplasm());
 				this.map().getMetadata().getUsage().setBreedingMethods(this.source.getBreedingMethods());
 				this.map().getMetadata().getUsage().setLists(this.source.getLists());
+				this.map().getMetadata().getUsage().setLots(this.source.getLots());
 				this.map().getMetadata().getUsage().setSystemTerm(this.source.getIsSystem());
 
 				this.map().getMetadata().setDateCreated(this.source.getDateCreated());
