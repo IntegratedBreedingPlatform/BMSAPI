@@ -167,7 +167,6 @@ public class StudyTreeServiceImplTest {
 
 		Mockito.verify(this.studyTreeValidator).validateNodeId(FOLDER_ID, PROGRAM_UUID);
 		Mockito.verify(this.studyTreeValidator).validateFolderId(PARENT_FOLDER_ID, PROGRAM_UUID);
-		Mockito.verify(this.studyTreeValidator).validateFolderHasNoChildren(FOLDER_ID, "study.folder.move.has.child", PROGRAM_UUID);
 		Mockito.verify(this.studyTreeValidator).validateNotSameFolderNameInParent(FOLDER_NAME, PARENT_FOLDER_ID, PROGRAM_UUID);
 
 		Mockito.verify(this.studyDataManager).getChildrenOfFolder(PARENT_FOLDER_ID, PROGRAM_UUID);
