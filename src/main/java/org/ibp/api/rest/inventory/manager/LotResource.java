@@ -291,7 +291,7 @@ public class LotResource {
 	@RequestMapping(
 		value = "/crops/{cropName}/lot-lists/templates/xls",
 		method = RequestMethod.GET)
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')" + " or hasAnyAuthority('UPDATE_LOT_BALANCE')")
 	public ResponseEntity<FileSystemResource> getTemplate(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
 		@RequestParam(required = true) final LotExcelTemplateExportType lotExcelTemplateExportType) {
