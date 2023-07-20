@@ -260,7 +260,7 @@ public class LotResource {
 
 	@ApiOperation(value = "Update Lots Available Balance", notes = "Update Lots Available Balance")
 	@RequestMapping(value = "/crops/{cropName}/lot-lists/balance", method = RequestMethod.PATCH)
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('UPDATE_LOTS')")
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('UPDATE_LOT_BALANCE')")
 	@ResponseBody
 	public ResponseEntity<Void> updateLotsBalance(
 			@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
