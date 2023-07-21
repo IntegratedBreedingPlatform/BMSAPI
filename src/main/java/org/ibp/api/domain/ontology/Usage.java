@@ -33,6 +33,9 @@ public class Usage {
 	// lists of variable
 	private Integer lists;
 
+	// lots of variable
+	private Integer lots;
+
 	private boolean systemTerm;
 
 	public void addUsage(final TermSummary variable) {
@@ -92,6 +95,14 @@ public class Usage {
 
 	public void setLists(final Integer lists) {
 		this.lists = lists;
+	}
+
+	public Integer getLots() {
+		return lots;
+	}
+
+	public void setLots(final Integer lots) {
+		this.lots = lots;
 	}
 
 	public boolean isSystemTerm() {
