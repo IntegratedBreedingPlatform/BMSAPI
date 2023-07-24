@@ -93,7 +93,6 @@ public class StudyTreeServiceImpl implements StudyTreeService {
 		final DmsProject folderToMove = this.studyTreeValidator.validateNodeId(nodeId, programUUID);
 		this.studyTreeValidator.validateFolderId(newParentFolderId, programUUID);
 
-		this.studyTreeValidator.validateFolderHasNoChildren(nodeId, "study.folder.move.has.child", programUUID);
 		//Validate if there is a folder with same name in parent folder
 		this.studyTreeValidator.validateNotSameFolderNameInParent(folderToMove.getName(), newParentFolderId, programUUID);
 
