@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateBalanceRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -38,6 +39,7 @@ import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
+import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotImportRequestDtoValidator;
@@ -57,11 +59,13 @@ import org.springframework.validation.MapBindingResult;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.checkArgument;
@@ -127,6 +131,9 @@ public class LotServiceImpl implements LotService {
 
 	@Autowired
 	private DatasetValidator datasetValidator;
+
+	@Autowired
+	private InventoryCommonValidator inventoryCommonValidator;
 
 	private static final String DEFAULT_STOCKID_PREFIX = "SID";
 
@@ -272,6 +279,34 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
+	public void updateLotsBalance(final List<LotUpdateBalanceRequestDto> lotUpdateBalanceRequestDtos, final String programUUID) {
+
+		final WorkbenchUser user = this.securityService.getCurrentlyLoggedInUser();
+
+		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotService.class.getName());
+
+		final Set<String> lotUUIDs = lotUpdateBalanceRequestDtos.stream().map(LotUpdateBalanceRequestDto::getLotUUID).collect(Collectors.toSet());
+
+		final LotsSearchDto searchDTO = new LotsSearchDto();
+		searchDTO.setLotUUIDs(new ArrayList<>(lotUUIDs));
+		final List<ExtendedLotDto> lotDtos = this.lotService.searchLots(searchDTO, null);
+
+		this.extendedLotListValidator.validateAllProvidedLotUUIDsExist(lotDtos, lotUUIDs);
+		this.extendedLotListValidator.validateEmptyList(lotDtos);
+		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
+		this.extendedLotListValidator.validateClosedLots(lotDtos);
+
+		lotUpdateBalanceRequestDtos.forEach((lotAdjustmentRequestDto -> {
+			this.lotInputValidator.validateLotBalance(lotAdjustmentRequestDto.getBalance());
+			this.inventoryCommonValidator.validateTransactionNotes(lotAdjustmentRequestDto.getNotes(), errors);
+		}));
+
+		this.transactionService
+				.saveAdjustmentTransactions(user.getUserid(), lotUpdateBalanceRequestDtos);
+
+	}
+
+	@Override
 	public void importLotsWithInitialTransaction(final String programUUID, final LotImportRequestDto lotImportRequestDto) {
 		final WorkbenchUser loggedInUser = this.securityService.getCurrentlyLoggedInUser();
 		final CropType cropType = this.contextUtil.getProjectInContext().getCropType();
@@ -346,10 +381,9 @@ public class LotServiceImpl implements LotService {
 			lotGeneratorInputDto);
 
 		//Create an adjustment transaction for the split lot
-		this.transactionService.saveAdjustmentTransactions(loggedInUserId,
-			Arrays.asList(splitLotDto.getLotId()).stream().collect(Collectors.toSet()),
-			splitLotDto.getAvailableBalance() - initialDeposit.getAmount(),
-			null);
+		final LotUpdateBalanceRequestDto lotUpdateBalanceRequestDto = new LotUpdateBalanceRequestDto(splitLotDto.getLotUUID(),
+				splitLotDto.getAvailableBalance() - initialDeposit.getAmount(), null);
+		this.transactionService.saveAdjustmentTransactions(loggedInUserId, Collections.singletonList(lotUpdateBalanceRequestDto));
 
 		//Create deposit transaction for the new lot
 		final LotsSearchDto newLotSearchDto = new LotsSearchDto();

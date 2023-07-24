@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotMergeRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateBalanceRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -37,12 +38,14 @@ import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.InventoryLock;
+import org.ibp.api.java.impl.middleware.inventory.manager.LotExcelTemplateExportForUpdateBalanceServiceImpl;
+import org.ibp.api.java.impl.middleware.inventory.manager.LotExcelTemplateExportForUpdateServiceImpl;
+import org.ibp.api.java.impl.middleware.inventory.manager.LotExcelTemplateExportServiceImpl;
 import org.ibp.api.java.impl.middleware.inventory.manager.common.SearchRequestDtoResolver;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.ExtendedLotListValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotMergeValidator;
 import org.ibp.api.java.impl.middleware.inventory.manager.validator.LotSplitValidator;
 import org.ibp.api.java.inventory.manager.LotService;
-import org.ibp.api.java.inventory.manager.LotTemplateExportService;
 import org.ibp.api.java.location.LocationService;
 import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.rest.common.PaginatedSearch;
@@ -85,7 +88,13 @@ public class LotResource {
 	private LotService lotService;
 
 	@Autowired
-	private LotTemplateExportService lotTemplateExportServiceImpl;
+	private LotExcelTemplateExportServiceImpl lotExcelTemplateExportService;
+
+	@Autowired
+	private LotExcelTemplateExportForUpdateServiceImpl lotExcelTemplateExportForUpdateService;
+
+	@Autowired
+	private LotExcelTemplateExportForUpdateBalanceServiceImpl lotExcelTemplateExportForUpdateBalanceService;
 
 	@Autowired
 	private VariableService variableService;
@@ -260,6 +269,24 @@ public class LotResource {
 
 	}
 
+	@ApiOperation(value = "Update Lots Available Balance", notes = "Update Lots Available Balance")
+	@RequestMapping(value = "/crops/{cropName}/lot-lists/balance", method = RequestMethod.PATCH)
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('UPDATE_LOT_BALANCE')")
+	@ResponseBody
+	public ResponseEntity<Void> updateLotsBalance(
+			@PathVariable final String cropName, @RequestParam(required = false) final String programUUID,
+			@RequestBody final List<LotUpdateBalanceRequestDto> lotUpdateBalanceRequestDtos) {
+
+		try {
+			this.inventoryLock.lockWrite();
+			this.lotService.updateLotsBalance(lotUpdateBalanceRequestDtos, programUUID);
+		} finally {
+			this.inventoryLock.unlockWrite();
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+	}
+
 	@ApiOperation(value = "Create list of lots with an initial balance", notes = "Create list of lots with an initial balance")
 	@RequestMapping(
 		value = "/crops/{cropName}/lot-lists",
@@ -275,10 +302,10 @@ public class LotResource {
 	@RequestMapping(
 		value = "/crops/{cropName}/lot-lists/templates/xls",
 		method = RequestMethod.GET)
-	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')")
+	@PreAuthorize(HAS_MANAGE_LOTS + " or hasAnyAuthority('IMPORT_LOTS')" + " or hasAnyAuthority('UPDATE_LOT_BALANCE')")
 	public ResponseEntity<FileSystemResource> getTemplate(@PathVariable final String cropName,
 		@RequestParam(required = false) final String programUUID,
-		@RequestParam(required = false) final boolean isUpdateFormat) {
+		@RequestParam(required = true) final LotExcelTemplateExportType lotExcelTemplateExportType) {
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
@@ -288,7 +315,15 @@ public class LotResource {
 				.searchLocations(cropName, new LocationSearchRequest(LotResource.STORAGE_LOCATION_TYPE, null, null, null),
 					null, null);
 
-		final File file = this.lotTemplateExportServiceImpl.export(programUUID, cropName, locations, units, isUpdateFormat);
+		final File file;
+		if (lotExcelTemplateExportType == LotExcelTemplateExportType.LOT_UPDATE) {
+			file = this.lotExcelTemplateExportForUpdateService.export(programUUID, cropName, locations, units);
+		} else if (lotExcelTemplateExportType == LotExcelTemplateExportType.LOT_UPDATE_BALANCE) {
+			file = this.lotExcelTemplateExportForUpdateBalanceService.export(programUUID, cropName, locations, units);
+		} else {
+			file = this.lotExcelTemplateExportService.export(programUUID, cropName, locations, units);
+		}
+
 		final HttpHeaders headers = new HttpHeaders();
 		headers
 			.add(HttpHeaders.CONTENT_DISPOSITION, String.format("attachment; filename=%s", FileUtils.sanitizeFileName(file.getName())));
@@ -504,4 +539,12 @@ public class LotResource {
 		return new ResponseEntity<>(this.lotService.getLotAttributeColumnDtos(programUUID), HttpStatus.OK);
 	}
 
+	public enum LotExcelTemplateExportType {
+		LOT_CREATION,
+		LOT_UPDATE,
+		LOT_UPDATE_BALANCE;
+	}
+
+
 }
+

@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateBalanceRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,8 @@ public interface LotService {
 	List<String> createLots(final String programUUID, LotGeneratorBatchRequestDto lotGeneratorBatchRequestDto);
 
 	void updateLots(List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotRequest, String programUUID);
+
+	void updateLotsBalance(List<LotUpdateBalanceRequestDto> lotUpdateBalanceRequestDtos, String programUUID);
 
 	void importLotsWithInitialTransaction(String programUUID, LotImportRequestDto lotImportRequestDto);
 

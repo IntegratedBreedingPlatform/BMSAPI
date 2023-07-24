@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface LotTemplateExportService {
 
-	File export(String programUUID, String cropName, List<LocationDTO> locations, List<VariableDetails> scales, boolean isUpdateFormat);
+	File export(String programUUID, String cropName, List<LocationDTO> locations, List<VariableDetails> scales);
 }
