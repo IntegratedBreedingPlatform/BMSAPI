@@ -10,7 +10,12 @@ import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.LotGeneratorBatchRequestDto;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
-import org.generationcp.middleware.domain.inventory.manager.*;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateBalanceRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -60,7 +65,9 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LotServiceImplTest {

@@ -1,10 +1,18 @@
 package org.ibp.api.java.impl.middleware.inventory.manager;
 
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
-import org.generationcp.middleware.domain.inventory.manager.*;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotAdjustmentRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositDto;
+import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotUpdateBalanceRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.LotWithdrawalInputDto;
+import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
+import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.manager.api.SearchRequestService;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
