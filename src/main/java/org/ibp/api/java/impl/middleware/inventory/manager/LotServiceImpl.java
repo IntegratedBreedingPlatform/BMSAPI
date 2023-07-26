@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotImportRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
+import org.generationcp.middleware.domain.inventory.manager.LotMultiUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotSplitRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateBalanceRequestDto;
@@ -37,6 +38,7 @@ import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmS
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.GermplasmValidator;
+import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.common.validator.SearchCompositeDtoValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.inventory.common.validator.InventoryCommonValidator;
@@ -134,6 +136,9 @@ public class LotServiceImpl implements LotService {
 
 	@Autowired
 	private InventoryCommonValidator inventoryCommonValidator;
+
+	@Autowired
+	private LocationValidator locationValidator;
 
 	private static final String DEFAULT_STOCKID_PREFIX = "SID";
 
@@ -286,6 +291,7 @@ public class LotServiceImpl implements LotService {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), LotService.class.getName());
 
 		final Set<String> lotUUIDs = lotUpdateBalanceRequestDtos.stream().map(LotUpdateBalanceRequestDto::getLotUUID).collect(Collectors.toSet());
+		final List<String> filteredLocationAbbrs = lotUpdateBalanceRequestDtos.stream().map(LotUpdateBalanceRequestDto::getStorageLocationAbbr).distinct().collect(Collectors.toList());
 
 		final LotsSearchDto searchDTO = new LotsSearchDto();
 		searchDTO.setLotUUIDs(new ArrayList<>(lotUUIDs));
@@ -295,11 +301,30 @@ public class LotServiceImpl implements LotService {
 		this.extendedLotListValidator.validateEmptyList(lotDtos);
 		this.extendedLotListValidator.validateEmptyUnits(lotDtos);
 		this.extendedLotListValidator.validateClosedLots(lotDtos);
+		if (filteredLocationAbbrs.stream().anyMatch(s -> !StringUtils.isBlank(s))) {
+			this.locationValidator.validateSeedLocationAbbr(errors, filteredLocationAbbrs);
+		}
+		if (errors.hasErrors()) {
+			throw new ApiRequestValidationException(errors.getAllErrors());
+		}
 
+		final List<LotMultiUpdateRequestDto.LotUpdateDto> lotUpdateDtoList = new ArrayList<>();
 		lotUpdateBalanceRequestDtos.forEach((lotAdjustmentRequestDto -> {
 			this.lotInputValidator.validateLotBalance(lotAdjustmentRequestDto.getBalance());
 			this.inventoryCommonValidator.validateTransactionNotes(lotAdjustmentRequestDto.getNotes(), errors);
+
+			final LotMultiUpdateRequestDto.LotUpdateDto lotUpdateDto = new LotMultiUpdateRequestDto.LotUpdateDto();
+			lotUpdateDto.setLotUID(lotAdjustmentRequestDto.getLotUUID());
+			lotUpdateDto.setStorageLocationAbbr(lotAdjustmentRequestDto.getStorageLocationAbbr());
+			lotUpdateDtoList.add(lotUpdateDto);
 		}));
+
+		// Update the lots' storage location abbr if available
+		final LotUpdateRequestDto lotUpdateRequestDto = new LotUpdateRequestDto();
+		final LotMultiUpdateRequestDto lotMultiUpdateRequestDto = new LotMultiUpdateRequestDto();
+		lotMultiUpdateRequestDto.setLotList(lotUpdateDtoList);
+		lotUpdateRequestDto.setMultiInput(lotMultiUpdateRequestDto);
+		this.lotService.updateLots(lotDtos, lotUpdateRequestDto, programUUID);
 
 		this.transactionService
 				.saveAdjustmentTransactions(user.getUserid(), lotUpdateBalanceRequestDtos);
