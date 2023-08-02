@@ -50,6 +50,8 @@ public class ObservationImportRequestValidator {
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
 	private static final int MAX_VALUE_LENGTH = 255;
 
+	private static final String NOT_AVAILABLE_VALUE = "NA";
+
 	public static final List<String> PLOT_SUBPLOT_OBSERVATION_LEVEL_NAMES =
 		ListUtils.unmodifiableList(Arrays.asList(ObservationLevelEnum.PLOT.getLevelName(), ObservationLevelEnum.PLANT.getLevelName(),
 			ObservationLevelEnum.SUB_PLOT.getLevelName(), ObservationLevelEnum.CUSTOM.getLevelName(),
@@ -162,6 +164,10 @@ public class ObservationImportRequestValidator {
 			this.errors.reject("observation.import.value.required", new String[] {index.toString()}, "");
 			return true;
 		}
+		// If value "NA" it means the data is "missing". NA should be a valid value.
+		if (ObservationImportRequestValidator.NOT_AVAILABLE_VALUE.equals(dto.getValue())) {
+			return false;
+		}
 		if (dto.getValue().length() > MAX_VALUE_LENGTH) {
 			this.errors.reject("observation.import.value.exceeded.length", new String[] {index.toString()}, "");
 			return true;
@@ -172,7 +178,7 @@ public class ObservationImportRequestValidator {
 			return true;
 		}
 		if (DataType.DATE_TIME_VARIABLE.getBrapiName().equalsIgnoreCase(scale.getDataType())
-			&& Util.tryParseDate(dto.getValue(), Util.DATE_AS_NUMBER_FORMAT) == null) {
+			&& Util.tryParseDate(dto.getValue(), Util.FRONTEND_DATE_FORMAT) == null) {
 			this.errors.reject("observation.import.value.invalid.date", new String[] {index.toString()}, "");
 			return true;
 		}
