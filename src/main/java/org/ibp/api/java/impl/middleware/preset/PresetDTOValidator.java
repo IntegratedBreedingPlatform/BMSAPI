@@ -113,8 +113,7 @@ public class PresetDTOValidator {
 			}
 		}
 
-		if (!PresetType.LABEL_PRINTING_PRESET.equals(PresetType.getEnum(presetDTO.getType()))
-			&& !PresetType.ATTRIBUTES_PROPAGATION_PRESET.equals(PresetType.getEnum(presetDTO.getType()))) {
+		if (!PresetType.LABEL_PRINTING_PRESET.equals(PresetType.getEnum(presetDTO.getType()))) {
 			this.errors.reject("preset.type.not.supported", "");
 			throw new NotSupportedException(this.errors.getAllErrors().get(0));
 		}
@@ -148,8 +147,7 @@ public class PresetDTOValidator {
 			|| ToolSection.LOT_LABEL_PRINTING_PRESET.name().equals(toolSection)
 			|| ToolSection.GERMPLASM_LABEL_PRINTING_PRESET.name().equals(toolSection)
 			|| ToolSection.GERMPLASM_LIST_LABEL_PRINTING_PRESET.name().equals(toolSection)
-			|| ToolSection.STUDY_ENTRIES_LABEL_PRINTING_PRESET.name().equals(toolSection)
-			|| ToolSection.ATTRIBUTES_PROPAGATION_PRESET.name().equals(toolSection);
+			|| ToolSection.STUDY_ENTRIES_LABEL_PRINTING_PRESET.name().equals(toolSection);
 	}
 
 	private void validateLabelPrintingPreset(final String crop, final LabelPrintingPresetDTO labelPrintingPresetDTO) {
