@@ -262,7 +262,7 @@ public class ObservationUnitImportRequestValidator {
 				if (relationship.getLevelName().equalsIgnoreCase(ObservationLevelEnum.PLOT.getLevelName())) {
 					hasPlot = true;
 				}
-				if (!VALID_OBSERVATION_RELATIONSHIP_LEVEL_NAMES.contains(relationship.getLevelName().toUpperCase())) {
+				if (VALID_OBSERVATION_RELATIONSHIP_LEVEL_NAMES.stream().noneMatch(s -> s.equalsIgnoreCase(relationship.getLevelName()))) {
 					this.errors.reject("observation.unit.import.invalid.observation.level.relationship.level.name",
 						new String[] {index.toString()}, "");
 					return false;
