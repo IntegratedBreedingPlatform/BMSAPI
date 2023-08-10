@@ -5,20 +5,19 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.commons.constant.ToolSection;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.domain.labelprinting.FilePresetConfigurationDTO;
+import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetDTO;
+import org.generationcp.middleware.domain.labelprinting.PresetType;
 import org.generationcp.middleware.manager.api.PresetService;
 import org.generationcp.middleware.pojos.presets.ProgramPreset;
 import org.ibp.ApiUnitTestBase;
-import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.domain.ontology.VariableDetails;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.ConflictException;
 import org.ibp.api.exception.NotSupportedException;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.ontology.VariableService;
-import org.generationcp.middleware.domain.labelprinting.FilePresetConfigurationDTO;
-import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
-import org.generationcp.middleware.domain.labelprinting.PresetDTO;
-import org.generationcp.middleware.domain.labelprinting.PresetType;
 import org.ibp.api.rest.labelprinting.domain.FieldType;
 import org.ibp.api.rest.labelprinting.domain.LabelPrintingFieldUtils;
 import org.junit.Before;
@@ -77,8 +76,9 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		this.toolId = 23;
 
 		this.type = PresetType.LABEL_PRINTING_PRESET.getName();
-		this.selectedField = Arrays.asList(Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,4), LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,13)));
-		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE, Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,2)));
+		this.selectedField = Arrays.asList(Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, 4)));
+		this.barcodeSetting = new LabelPrintingPresetDTO.BarcodeSetting(Boolean.TRUE, Boolean.FALSE,
+			Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, 2)));
 		this.filePresetConfigurationDTO = new FilePresetConfigurationDTO();
 		this.filePresetConfigurationDTO.setOutputType("csv");
 		this.presetId = RandomUtils.nextInt();
@@ -245,7 +245,8 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		presetDTO.setFileConfiguration(this.filePresetConfigurationDTO);
 		presetDTO.setBarcodeSetting(this.barcodeSetting);
 
-		final List<List<String>> selectedFields = Arrays.asList(Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,-2)));
+		final List<List<String>> selectedFields =
+			Arrays.asList(Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, -2)));
 		presetDTO.setSelectedFields(selectedFields);
 
 		Mockito.doReturn(null).when(this.variableService).getVariableById(CROP_NAME, presetDTO.getProgramUUID(), "-1");
@@ -276,7 +277,8 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(true, true, Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,1)));
+			new LabelPrintingPresetDTO.BarcodeSetting(true, true,
+				Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, 1)));
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
@@ -334,7 +336,8 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(true, false, Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,-2)));
+			new LabelPrintingPresetDTO.BarcodeSetting(true, false,
+				Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, -2)));
 		Mockito.doReturn(null).when(this.variableService).getVariableById(CROP_NAME, presetDTO.getProgramUUID(), "-1");
 
 		presetDTO.setBarcodeSetting(barcodeSetting);
@@ -393,7 +396,8 @@ public class PresetDTOValidatorTest extends ApiUnitTestBase {
 		});
 
 		final LabelPrintingPresetDTO.BarcodeSetting barcodeSetting =
-			new LabelPrintingPresetDTO.BarcodeSetting(false, false, Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC,1)));
+			new LabelPrintingPresetDTO.BarcodeSetting(false, false,
+				Arrays.asList(LabelPrintingFieldUtils.buildCombinedKey(FieldType.STATIC, 1)));
 		presetDTO.setBarcodeSetting(barcodeSetting);
 
 		Mockito.doReturn(new ArrayList<>()).when(this.presetService)
