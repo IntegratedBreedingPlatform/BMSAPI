@@ -65,6 +65,26 @@ public class ImageResourceBrapi {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
+	@ApiOperation("Update an image meta data")
+	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
+	@RequestMapping(value = "/images/{imageDbId}", method = RequestMethod.PUT)
+	@JsonView(BrapiView.BrapiV2.class)
+	public ResponseEntity<SingleEntityResponse<Image>> updateImage(
+			@PathVariable final String cropName,
+			@PathVariable("imageDbId") final String imageDbId,
+			@RequestBody final ImageNewRequest body
+	) {
+		this.permissionValidator.validateProgramByObservationUnitDbId(cropName, Arrays.asList(body.getObservationUnitDbId()), true);
+
+		this.fileValidator.validateFileStorage();
+		this.imageValidator.validateImage(body);
+
+		final Image result = this.fileMetadataService.updateImage(imageDbId, body);
+		final SingleEntityResponse<Image> response = new SingleEntityResponse<>();
+		response.setResult(result);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+
 	@ApiOperation("Update an image with the image file content")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
 	@RequestMapping(value = "/images/{imageDbId}/imagecontent",
