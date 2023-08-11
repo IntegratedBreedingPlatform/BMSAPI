@@ -93,7 +93,7 @@ public class ImageResourceBrapi {
 			method = RequestMethod.PUT)
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<SingleEntityResponse<Image>> updateImageContent(
-			@PathVariable final String cropName,
+			@PathVariable final String crop,
 			@PathVariable("imageDbId") final String imageDbId,
 			@RequestBody final byte[] imageContent
 	) {
