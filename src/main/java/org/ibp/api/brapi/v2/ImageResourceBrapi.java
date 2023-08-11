@@ -67,14 +67,14 @@ public class ImageResourceBrapi {
 
 	@ApiOperation("Update an image meta data")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
-	@RequestMapping(value = "/images/{imageDbId}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/{crop}/brapi/v2/images/{imageDbId}", method = RequestMethod.PUT)
 	@JsonView(BrapiView.BrapiV2.class)
 	public ResponseEntity<SingleEntityResponse<Image>> updateImage(
-			@PathVariable final String cropName,
+			@PathVariable final String crop,
 			@PathVariable("imageDbId") final String imageDbId,
 			@RequestBody final ImageNewRequest body
 	) {
-		this.permissionValidator.validateProgramByObservationUnitDbId(cropName, Arrays.asList(body.getObservationUnitDbId()), true);
+		this.permissionValidator.validateProgramByObservationUnitDbId(crop, Arrays.asList(body.getObservationUnitDbId()), true);
 
 		this.fileValidator.validateFileStorage();
 		this.imageValidator.validateImage(body);
@@ -87,7 +87,7 @@ public class ImageResourceBrapi {
 
 	@ApiOperation("Update an image with the image file content")
 	@PreAuthorize("hasAnyAuthority('ADMIN', 'STUDIES', 'MANAGE_STUDIES')")
-	@RequestMapping(value = "/images/{imageDbId}/imagecontent",
+	@RequestMapping(value = "/{crop}/brapi/v2/images/{imageDbId}/imagecontent",
 			produces = {"application/json"},
 			consumes = {"image/*"},
 			method = RequestMethod.PUT)
