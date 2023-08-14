@@ -41,8 +41,8 @@ public class TemplateResource {
     }
 
     @RequestMapping(value = "/crops/{cropname}/programs/{programUUID}/templates/{templateId}", method = RequestMethod.PUT)
-    @ApiOperation(value = "Update a existing Template",
-            notes = "Update a existing Template.")
+    @ApiOperation(value = "Update an existing Template",
+            notes = "Update an existing Template.")
     @ResponseBody
     public ResponseEntity<Void> updateTemplate(
             @PathVariable final String cropname, @PathVariable final String programUUID, @PathVariable final Integer templateId,

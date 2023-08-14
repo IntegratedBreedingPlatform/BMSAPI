@@ -6,9 +6,7 @@ import org.generationcp.middleware.api.template.TemplateDTO;
 import org.generationcp.middleware.api.template.TemplateDetailsDTO;
 import org.generationcp.middleware.api.template.TemplateService;
 import org.generationcp.middleware.api.template.TemplateType;
-import org.generationcp.middleware.pojos.Template;
 import org.ibp.api.exception.ApiRequestValidationException;
-import org.ibp.api.java.ontology.VariableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,10 +14,7 @@ import static org.ibp.api.java.impl.middleware.common.validator.BaseValidator.ch
 
 @Component
 public class TemplateDTOValidator {
-
-    @Autowired
-    private VariableService variableService;
-
+    private static final int MAX_TEMPLATE_NAME_LENGTH = 255;
     @Autowired
     private TemplateService templateService;
 
@@ -40,6 +35,10 @@ public class TemplateDTOValidator {
 
         if (StringUtils.isEmpty(templateDTO.getTemplateName())) {
             throw new ApiRequestValidationException("template.name.required", new Object[] {});
+        }
+
+        if (templateDTO.getTemplateName().length() > MAX_TEMPLATE_NAME_LENGTH) {
+            throw new ApiRequestValidationException("template.name.invalid.length", new Object[] {});
         }
 
         if (StringUtils.isEmpty(templateDTO.getProgramUUID())) {
@@ -69,12 +68,12 @@ public class TemplateDTOValidator {
 
     public void validateUpdateTemplateDTO(final TemplateDTO templateDTO) {
         checkNotNull(templateDTO, "request.null");
-        final Template existingTemplate = this.templateService.getTemplateByIdAndProgramUUID(templateDTO.getTemplateId(), templateDTO.getProgramUUID());
+        final TemplateDTO existingTemplate = this.templateService.getTemplateByIdAndProgramUUID(templateDTO.getTemplateId(), templateDTO.getProgramUUID());
         if (existingTemplate == null) {
             throw new ApiRequestValidationException("template.id.invalid", new Object[] {templateDTO.getTemplateId()});
         }
 
-        final Template template = this.templateService.getTemplateByNameAndProgramUUID(templateDTO.getTemplateName(), templateDTO.getProgramUUID());
+        final TemplateDTO template = this.templateService.getTemplateByNameAndProgramUUID(templateDTO.getTemplateName(), templateDTO.getProgramUUID());
         if (existingTemplate.getTemplateId() != template.getTemplateId()) {
             throw new ApiRequestValidationException("template.name.invalid", new Object[] {templateDTO.getTemplateName()});
         }
