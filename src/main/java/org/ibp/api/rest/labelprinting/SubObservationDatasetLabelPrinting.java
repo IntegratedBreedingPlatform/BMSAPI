@@ -88,7 +88,6 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 
 	private Field studyNameField;
 	private Field yearField;
-	private Field parentageField;
 	private Field seasonField;
 	private List<Field> defaultStudyDetailsFields;
 	private List<Field> defaultLotDetailsFields;
@@ -111,12 +110,10 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 	void initStaticFields() {
 		final String studyNamePropValue = this.getMessage("label.printing.field.study.name");
 		final String yearPropValue = this.getMessage("label.printing.field.year");
-		final String parentagePropValue = this.getMessage("label.printing.field.parentage");
 		final String seasonPropValue = this.getMessage("label.printing.field.season");
 
 		this.studyNameField = new Field(FieldType.STATIC, LabelPrintingStaticField.STUDY_NAME.getFieldId(), studyNamePropValue);
 		this.yearField = new Field(FieldType.STATIC, LabelPrintingStaticField.YEAR.getFieldId(), yearPropValue);
-		this.parentageField = new Field(FieldType.STATIC, LabelPrintingStaticField.PARENTAGE.getFieldId(), parentagePropValue);
 		this.seasonField = new Field(FieldType.VARIABLE, TermId.SEASON_VAR.getId(), seasonPropValue);
 		this.defaultStudyDetailsFields = Arrays.asList(this.studyNameField, this.yearField);
 
@@ -268,7 +265,6 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 			datasetType.getName().concat(" ").concat(OBS_UNIT_ID));
 		datasetDetailsFields.add(subObsUnitIdfield);
 		datasetDetailsFields.addAll(ObservationLabelPrintingHelper.transform(datasetVariables));
-		datasetDetailsFields.add(this.parentageField);
 
 		if (!studyDetailsFields.contains(this.seasonField)) {
 			studyDetailsFields.add(this.seasonField);

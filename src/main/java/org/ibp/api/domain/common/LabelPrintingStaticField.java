@@ -14,7 +14,6 @@ import java.util.Optional;
 public enum LabelPrintingStaticField {
 	YEAR(4),
 	STUDY_NAME(6),
-	PARENTAGE(13),
 	SUB_OBSERVATION_DATASET_OBS_UNIT_ID(25),
 	LOT_ID(22),
 	LOT_UID(1),
