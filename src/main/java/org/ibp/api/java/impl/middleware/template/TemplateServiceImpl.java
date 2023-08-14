@@ -1,4 +1,4 @@
-package org.ibp.api.java.impl.middleware;
+package org.ibp.api.java.impl.middleware.template;
 
 import org.generationcp.middleware.api.template.TemplateDTO;
 import org.ibp.api.java.template.TemplateService;
@@ -11,10 +11,14 @@ import java.util.List;
 public class TemplateServiceImpl implements TemplateService {
 
     @Autowired
+    private TemplateDTOValidator templateDTOValidator;
+
+    @Autowired
     private org.generationcp.middleware.api.template.TemplateService templateServiceMw;
 
     @Override
     public TemplateDTO saveTemplate(String crop, TemplateDTO templateDTO) {
+        this.templateDTOValidator.validateSaveTemplateDTO(templateDTO);
         return this.templateServiceMw.saveTemplate(templateDTO);
     }
 
@@ -30,6 +34,7 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     public void updateTemplate(String crop, Integer templateId, TemplateDTO templateDTO) {
+        this.templateDTOValidator.validateUpdateTemplateDTO(templateDTO);
         this.templateServiceMw.updateTemplate(templateDTO);
     }
 }

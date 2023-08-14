@@ -3,6 +3,8 @@ package org.ibp.api.java.impl.middleware.study.validator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.location.LocationRequestDto;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.study.AbstractAdvanceRequest;
 import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
@@ -10,9 +12,11 @@ import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.ruleengine.naming.expression.SelectionTraitExpression;
@@ -20,10 +24,14 @@ import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.impl.study.advance.resolver.level.SelectionTraitDataResolver;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BreedingMethodValidator;
+import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.study.StudyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.MapBindingResult;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -76,6 +84,12 @@ public class AdvanceValidator {
 	@Resource
 	private StudyDataManager studyDataManager;
 
+	@Autowired
+	private LocationValidator locationValidator;
+
+	@Autowired
+	private VariableService variableService;
+
 	public void validateAdvanceStudy(final Integer studyId, final AdvanceStudyRequest request) {
 		checkNotNull(request, "request.null");
 
@@ -94,6 +108,32 @@ public class AdvanceValidator {
 		this.validateBulkingSelection(request, selectedBreedingMethodDTO, request.getDatasetId(), dataset.getVariables());
 		this.validateSelectionTrait(studyId, request, selectedBreedingMethodDTO);
 		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), plotDatasetVariables);
+		this.validateDescriptorsPropagation(request.isPropagateDescriptors(), request.getDescriptorIds(),
+				request.isOverrideDescriptorsLocation(), request.getLocationOverrideId());
+	}
+
+	public void validateDescriptorsPropagation(final boolean isPropagateDescriptors, final List<Integer> descriptorIds,
+		final boolean isOverrideDescriptorsLocation, final Integer locationOverrideId) {
+		if (isPropagateDescriptors) {
+			if (CollectionUtils.isEmpty(descriptorIds)) {
+				throw new ApiRequestValidationException("advance.descriptor.ids.required", new Object[] {});
+			}
+
+			final VariableFilter filter = new VariableFilter();
+			filter.addVariableIds(descriptorIds);
+			filter.addVariableType(VariableType.GERMPLASM_PASSPORT);
+			filter.addVariableType(VariableType.GERMPLASM_ATTRIBUTE);
+			final List<Variable> variables = this.variableService.searchVariables(filter);
+			final Set<Integer> descriptorIdsSet = new HashSet<>(descriptorIds);
+			if (CollectionUtils.isEmpty(variables) || descriptorIdsSet.size() != descriptorIdsSet.size()) {
+				throw new ApiRequestValidationException("advance.descriptor.ids.invalid", new Object[] {});
+			}
+
+			if (isOverrideDescriptorsLocation) {
+				this.locationValidator.validateLocation(new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName()), locationOverrideId);
+			}
+		}
+
 	}
 
 	public void validateAdvanceSamples(final Integer studyId, final AdvanceSamplesRequest request) {
@@ -110,6 +150,8 @@ public class AdvanceValidator {
 
 		this.validateAdvanceSamplesBreedingMethodSelection(request.getBreedingMethodId());
 		this.validateReplicationNumberSelection(studyId, request.getSelectedReplications(), plotDatasetVariables);
+		this.validateDescriptorsPropagation(request.isPropagateDescriptors(), request.getDescriptorIds(),
+				request.isOverrideDescriptorsLocation(), request.getLocationOverrideId());
 	}
 
 	/**
