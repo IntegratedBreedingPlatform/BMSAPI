@@ -40,7 +40,7 @@ public class TemplateDTOValidatorTest {
         try {
             final TemplateDTO templateDTO = this.createTemplateDTO();
             this.templateDTOValidator.validateTemplateDTO(templateDTO);
-        } catch (ApiRequestValidationException e) {
+        } catch (final ApiRequestValidationException e) {
             Assert.fail("Should not fail");
         }
     }
@@ -52,7 +52,7 @@ public class TemplateDTOValidatorTest {
             templateDTO.setTemplateDetails(new ArrayList<>());
             this.templateDTOValidator.validateTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.details.required"));
         }
@@ -65,7 +65,7 @@ public class TemplateDTOValidatorTest {
             templateDTO.setTemplateName(null);
             this.templateDTOValidator.validateTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.name.required"));
         }
@@ -78,7 +78,7 @@ public class TemplateDTOValidatorTest {
             templateDTO.setTemplateName(RandomStringUtils.randomAlphabetic(256));
             this.templateDTOValidator.validateTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.name.invalid.length"));
         }
@@ -91,7 +91,7 @@ public class TemplateDTOValidatorTest {
             templateDTO.setProgramUUID(null);
             this.templateDTOValidator.validateTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.programuuid.required"));
         }
@@ -104,7 +104,7 @@ public class TemplateDTOValidatorTest {
             templateDTO.setTemplateType(null);
             this.templateDTOValidator.validateTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.type.required"));
         }
@@ -117,7 +117,7 @@ public class TemplateDTOValidatorTest {
             templateDTO.setTemplateType(RandomStringUtils.randomAlphabetic(5));
             this.templateDTOValidator.validateTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.type.invalid"));
         }
@@ -130,7 +130,7 @@ public class TemplateDTOValidatorTest {
             templateDTO.getTemplateDetails().get(0).setName(null);
             this.templateDTOValidator.validateTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.details.name.required"));
         }
@@ -143,7 +143,7 @@ public class TemplateDTOValidatorTest {
             templateDTO.getTemplateDetails().get(0).setType(null);
             this.templateDTOValidator.validateTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.details.type.required"));
         }
@@ -156,7 +156,7 @@ public class TemplateDTOValidatorTest {
             templateDTO.getTemplateDetails().get(0).setVariableId(null);
             this.templateDTOValidator.validateTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.details.variable.id.required"));
         }
@@ -167,7 +167,7 @@ public class TemplateDTOValidatorTest {
         try {
             final TemplateDTO templateDTO = this.createTemplateDTO();
             this.templateDTOValidator.validateSaveTemplateDTO(templateDTO);
-        } catch (ApiRequestValidationException e) {
+        } catch (final ApiRequestValidationException e) {
             Assert.fail("Should not fail");
         }
     }
@@ -179,7 +179,7 @@ public class TemplateDTOValidatorTest {
             Mockito.when(this.templateService.getTemplateByNameAndProgramUUID(templateDTO.getTemplateName(), PROGRAM_UUID)).thenReturn(new TemplateDTO());
             this.templateDTOValidator.validateSaveTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.name.invalid"));
         }
@@ -194,7 +194,7 @@ public class TemplateDTOValidatorTest {
             Mockito.when(this.templateService.getTemplateByIdAndProgramUUID(templateDTO.getTemplateId(), PROGRAM_UUID)).thenReturn(templateDTO);
             Mockito.when(this.templateService.getTemplateByNameAndProgramUUID(templateDTO.getTemplateName(), PROGRAM_UUID)).thenReturn(templateDTO);
             this.templateDTOValidator.validateUpdateTemplateDTO(templateDTO);
-        } catch (ApiRequestValidationException e) {
+        } catch (final ApiRequestValidationException e) {
             Assert.fail("Should not fail");
         }
     }
@@ -206,7 +206,7 @@ public class TemplateDTOValidatorTest {
             templateDTO.setTemplateId(1);
             this.templateDTOValidator.validateUpdateTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.id.invalid"));
         }
@@ -221,7 +221,7 @@ public class TemplateDTOValidatorTest {
             Mockito.when(this.templateService.getTemplateByNameAndProgramUUID(templateDTO.getTemplateName(), PROGRAM_UUID)).thenReturn(new TemplateDTO());
             this.templateDTOValidator.validateUpdateTemplateDTO(templateDTO);
             Assert.fail("Should fail");
-        } catch (ApiRequestValidationException exception) {
+        } catch (final ApiRequestValidationException exception) {
             assertThat(exception, instanceOf(ApiRequestValidationException.class));
             assertThat(exception.getErrors().get(0).getCode(), is("template.name.invalid"));
         }

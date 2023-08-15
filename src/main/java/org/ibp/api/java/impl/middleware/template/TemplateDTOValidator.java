@@ -26,7 +26,7 @@ public class TemplateDTOValidator {
         }
     }
 
-    void validateTemplateDTO(TemplateDTO templateDTO) {
+    void validateTemplateDTO(final TemplateDTO templateDTO) {
         checkNotNull(templateDTO, "request.null");
         if (CollectionUtils.isEmpty(templateDTO.getTemplateDetails())) {
             throw new ApiRequestValidationException("template.details.required", new Object[] {});
@@ -76,6 +76,5 @@ public class TemplateDTOValidator {
         if (existingTemplate.getTemplateId() != template.getTemplateId()) {
             throw new ApiRequestValidationException("template.name.invalid", new Object[] {templateDTO.getTemplateName()});
         }
-
     }
 }
