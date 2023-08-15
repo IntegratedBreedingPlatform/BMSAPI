@@ -24,10 +24,9 @@ public class TemplateDTOValidator {
         if (this.templateService.getTemplateByNameAndProgramUUID(templateDTO.getTemplateName(), templateDTO.getProgramUUID()) != null) {
             throw new ApiRequestValidationException("template.name.invalid", new Object[] {templateDTO.getTemplateName()});
         }
-
     }
 
-    private static void validateTemplateDTO(TemplateDTO templateDTO) {
+    void validateTemplateDTO(TemplateDTO templateDTO) {
         checkNotNull(templateDTO, "request.null");
         if (CollectionUtils.isEmpty(templateDTO.getTemplateDetails())) {
             throw new ApiRequestValidationException("template.details.required", new Object[] {});

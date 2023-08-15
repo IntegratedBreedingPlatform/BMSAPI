@@ -2,6 +2,7 @@ package org.ibp.api.java.impl.middleware.study.validator;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
+import org.generationcp.middleware.api.location.LocationRequestDto;
 import org.generationcp.middleware.api.study.AbstractAdvanceRequest;
 import org.generationcp.middleware.api.study.AdvanceSamplesRequest;
 import org.generationcp.middleware.api.study.AdvanceStudyRequest;
@@ -9,9 +10,11 @@ import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.ruleengine.naming.expression.SelectionTraitExpression;
@@ -20,9 +23,12 @@ import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.service.impl.study.advance.resolver.level.SelectionTraitDataResolver;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.impl.middleware.common.validator.BreedingMethodValidator;
+import org.ibp.api.java.impl.middleware.common.validator.LocationValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.dataset.validator.InstanceValidator;
+import org.ibp.api.java.ontology.VariableService;
 import org.ibp.api.java.study.StudyService;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
@@ -30,14 +36,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.MapBindingResult;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.core.Is.is;
@@ -96,6 +98,12 @@ public class AdvanceValidatorTest {
 
 	@Mock
 	private StudyDataManager studyDataManager;
+
+	@Mock
+	private VariableService variableService;
+
+	@Mock
+	private LocationValidator locationValidator;
 
 	@Before
 	public void setUp() throws Exception {
@@ -1321,6 +1329,62 @@ public class AdvanceValidatorTest {
 		}
 
 		Mockito.verify(this.breedingMethodValidator).validateMethod(BREEDING_METHOD_ID);
+	}
+
+	@Test
+	public void testValidateDescriptorsPropagation_FAIL_DescriptorsIdEmpty() {
+		try {
+			this.advanceValidator.validateDescriptorsPropagation(true, new ArrayList<>(), false, 0);
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.descriptor.ids.required"));
+		}
+	}
+
+	@Test
+	public void testValidateDescriptorsPropagation_FAIL_DescriptorsIdInvalid() {
+		try {
+			this.advanceValidator.validateDescriptorsPropagation(true, Arrays.asList(1, 2, 3), false, 0);
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("advance.descriptor.ids.invalid"));
+		}
+	}
+
+	@Test
+	public void testValidateDescriptorsPropagation_FAIL_LocationIdInvalid() {
+		try {
+			final VariableFilter filter = new VariableFilter();
+			filter.addVariableIds(Collections.singletonList(1));
+			filter.addVariableType(VariableType.GERMPLASM_PASSPORT);
+			filter.addVariableType(VariableType.GERMPLASM_ATTRIBUTE);
+			Mockito.when(this.variableService.searchVariables(filter)).thenReturn(Collections.singletonList(new Variable()));
+			final BindingResult errors = new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName());
+			errors.reject("location.invalid");
+			Mockito.when(this.locationValidator.validateLocation(new MapBindingResult(new HashMap<>(), LocationRequestDto.class.getName()), 1))
+					.thenThrow(new ApiRequestValidationException(errors.getAllErrors()));
+			this.advanceValidator.validateDescriptorsPropagation(true, Arrays.asList(1), true, 1);
+			fail("should have failed");
+		} catch (final ApiRequestValidationException exception) {
+			assertThat(exception, instanceOf(ApiRequestValidationException.class));
+			assertThat(exception.getErrors().get(0).getCode(), is("location.invalid"));
+		}
+	}
+
+	@Test
+	public void testValidateDescriptorsPropagation_SUCCESS() {
+		try {
+			final VariableFilter filter = new VariableFilter();
+			filter.addVariableIds(Collections.singletonList(1));
+			filter.addVariableType(VariableType.GERMPLASM_PASSPORT);
+			filter.addVariableType(VariableType.GERMPLASM_ATTRIBUTE);
+			Mockito.when(this.variableService.searchVariables(filter)).thenReturn(Collections.singletonList(new Variable()));
+			this.advanceValidator.validateDescriptorsPropagation(true, Arrays.asList(1), true, 1);
+		} catch (final ApiRequestValidationException exception) {
+			Assert.fail("Should not fail");
+		}
 	}
 
 	private void mockValidateStudyHasPlotDataset() {
