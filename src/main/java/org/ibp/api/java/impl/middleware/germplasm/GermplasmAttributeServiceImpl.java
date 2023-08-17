@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.germplasm.search.GermplasmAttributeSearchRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
@@ -43,8 +44,9 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest) {
 		final BindingResult errors = new MapBindingResult(new HashMap<>(), String.class.getName());
 		this.germplasmValidator.validateGids(errors, new ArrayList<>(germplasmAttributeSearchRequest.getGids()));
-		if (germplasmAttributeSearchRequest.getVariableTypeId() != null) {
-			this.germplasmAttributeValidator.validateAttributeType(errors, germplasmAttributeSearchRequest.getVariableTypeId());
+		if (CollectionUtils.isNotEmpty(germplasmAttributeSearchRequest.getVariableTypeIds())) {
+			germplasmAttributeSearchRequest.getVariableTypeIds().forEach((id) ->
+					this.germplasmAttributeValidator.validateAttributeType(errors, id));
 		}
 		return this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest);
 	}
