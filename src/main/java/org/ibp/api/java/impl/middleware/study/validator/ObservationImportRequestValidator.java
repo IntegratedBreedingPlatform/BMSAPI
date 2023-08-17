@@ -50,6 +50,8 @@ public class ObservationImportRequestValidator {
 	private static final int MAX_REFERENCE_SOURCE_LENGTH = 255;
 	private static final int MAX_VALUE_LENGTH = 255;
 
+	private static final String NOT_AVAILABLE_VALUE = "NA";
+
 	public static final List<String> PLOT_SUBPLOT_OBSERVATION_LEVEL_NAMES =
 		ListUtils.unmodifiableList(Arrays.asList(ObservationLevelEnum.PLOT.getLevelName(), ObservationLevelEnum.PLANT.getLevelName(),
 			ObservationLevelEnum.SUB_PLOT.getLevelName(), ObservationLevelEnum.CUSTOM.getLevelName(),
@@ -76,33 +78,44 @@ public class ObservationImportRequestValidator {
 		BaseValidator.checkNotEmpty(observationDtos, "observation.import.request.null");
 		this.errors = new MapBindingResult(new HashMap<>(), ObservationDto.class.getName());
 
-		final List<String> germplasmDbIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getGermplasmDbId()))
-			.map(ObservationDto::getGermplasmDbId).collect(Collectors.toList());
+		// Retrieve the Observation Units
+		final Set<String> observationUnitDbIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getObservationUnitDbId()))
+				.map(ObservationDto::getObservationUnitDbId).collect(Collectors.toSet());
+		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO = new ObservationUnitSearchRequestDTO();
+		observationUnitSearchRequestDTO.setObservationUnitDbIds(new ArrayList<>(observationUnitDbIds));
+		final Map<String, ObservationUnitDto> observationUnitDtoMap =
+				this.observationUnitService.searchObservationUnits(null, null, observationUnitSearchRequestDTO).stream()
+						.collect(Collectors.toMap(ObservationUnitDto::getObservationUnitDbId, Function.identity()));
+
+		// If the germplasmDbId is missing, derive the value from observationUnit.
+		observationDtos.stream().filter(o -> StringUtils.isEmpty(o.getGermplasmDbId())).forEach(observationDto -> {
+			if (observationUnitDtoMap.containsKey(observationDto.getObservationUnitDbId())) {
+				observationDto.setGermplasmDbId(observationUnitDtoMap.get(observationDto.getObservationUnitDbId()).getGermplasmDbId());
+			}
+		});
+
+		// Retrieve the Germplasm
+		final Set<String> germplasmDbIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getGermplasmDbId()))
+			.map(ObservationDto::getGermplasmDbId).collect(Collectors.toSet());
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
-		germplasmSearchRequest.setGermplasmDbIds(germplasmDbIds);
+		germplasmSearchRequest.setGermplasmDbIds(new ArrayList<>(germplasmDbIds));
 		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmService.searchGermplasmDTO(germplasmSearchRequest, null)
 			.stream().collect(Collectors.toMap(GermplasmDTO::getGermplasmDbId, Function.identity()));
 
-		final List<String> studyDbIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getStudyDbId()))
-			.map(ObservationDto::getStudyDbId).collect(Collectors.toList());
+		// Retrieve the Study
+		final Set<String> studyDbIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getStudyDbId()))
+			.map(ObservationDto::getStudyDbId).collect(Collectors.toSet());
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
-		studySearchFilter.setStudyDbIds(studyDbIds);
+		studySearchFilter.setStudyDbIds(new ArrayList<>(studyDbIds));
 		final Map<String, StudyInstanceDto> studyInstancesMap =
 			this.studyServiceBrapi.getStudyInstances(studySearchFilter, null).stream()
 				.collect(Collectors.toMap(StudyInstanceDto::getStudyDbId, Function.identity()));
 
-		final List<String> observationUnitDbIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getObservationUnitDbId()))
-			.map(ObservationDto::getObservationUnitDbId).collect(Collectors.toList());
-		final ObservationUnitSearchRequestDTO observationUnitSearchRequestDTO = new ObservationUnitSearchRequestDTO();
-		observationUnitSearchRequestDTO.setObservationUnitDbIds(observationUnitDbIds);
-		final Map<String, ObservationUnitDto> observationUnitDtoMap =
-			this.observationUnitService.searchObservationUnits(null, null, observationUnitSearchRequestDTO).stream()
-				.collect(Collectors.toMap(ObservationUnitDto::getObservationUnitDbId, Function.identity()));
-
-		final List<String> variableIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getObservationVariableDbId()))
-			.map(ObservationDto::getObservationVariableDbId).collect(Collectors.toList());
+		// Retrieve the Trait Variables
+		final Set<String> variableIds = observationDtos.stream().filter(o -> StringUtils.isNotEmpty(o.getObservationVariableDbId()))
+			.map(ObservationDto::getObservationVariableDbId).collect(Collectors.toSet());
 		final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
-		variableSearchRequestDTO.setObservationVariableDbIds(variableIds);
+		variableSearchRequestDTO.setObservationVariableDbIds(new ArrayList<>(variableIds));
 		final Map<String, VariableDTO> variableDTOMap =
 			this.variableServiceBrapi.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT).stream()
 				.collect(Collectors.toMap(VariableDTO::getObservationVariableDbId, Function.identity()));
@@ -115,6 +128,7 @@ public class ObservationImportRequestValidator {
 
 		final Map<String, List<String>> studyVariableIdsMap = new HashMap<>();
 
+		// Validate the observationDto and remove invalid item from the list.
 		final Map<ObservationDto, Integer> importRequestByIndexMap = IntStream.range(0, observationDtos.size())
 			.boxed().collect(Collectors.toMap(observationDtos::get, i -> i));
 		observationDtos.removeIf(dto -> {
@@ -150,6 +164,10 @@ public class ObservationImportRequestValidator {
 			this.errors.reject("observation.import.value.required", new String[] {index.toString()}, "");
 			return true;
 		}
+		// If value "NA" it means the data is "missing". NA should be a valid value.
+		if (ObservationImportRequestValidator.NOT_AVAILABLE_VALUE.equals(dto.getValue())) {
+			return false;
+		}
 		if (dto.getValue().length() > MAX_VALUE_LENGTH) {
 			this.errors.reject("observation.import.value.exceeded.length", new String[] {index.toString()}, "");
 			return true;
@@ -160,7 +178,7 @@ public class ObservationImportRequestValidator {
 			return true;
 		}
 		if (DataType.DATE_TIME_VARIABLE.getBrapiName().equalsIgnoreCase(scale.getDataType())
-			&& Util.tryParseDate(dto.getValue(), Util.DATE_AS_NUMBER_FORMAT) == null) {
+			&& Util.tryParseDate(dto.getValue(), Util.FRONTEND_DATE_FORMAT) == null) {
 			this.errors.reject("observation.import.value.invalid.date", new String[] {index.toString()}, "");
 			return true;
 		}
@@ -205,8 +223,7 @@ public class ObservationImportRequestValidator {
 			return true;
 		}
 		if (variableDTO.getContextOfUse().contains(VariableDTO.ContextOfUseEnum.PLOT.name())
-			&& !PLOT_SUBPLOT_OBSERVATION_LEVEL_NAMES.contains(
-			observationUnitDto.getObservationLevel().toUpperCase())) {
+			&& PLOT_SUBPLOT_OBSERVATION_LEVEL_NAMES.stream().noneMatch(observationUnitDto.getObservationLevel()::equalsIgnoreCase)) {
 			this.errors.reject("observation.import.observationVariableDbId.invalid.trait.and.selection.method.variable",
 				new String[] {index.toString(), VariableDTO.ContextOfUseEnum.PLOT.name()}, "");
 			return true;
