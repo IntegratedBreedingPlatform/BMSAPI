@@ -13,12 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -81,4 +76,12 @@ public class GermplasmAttributeResource {
 
 	}
 
+	@ApiOperation(value = "Returns germplasm attributes filtered by List gids and attribute type", notes = "Returns germplasm attributes by gid and attribute type")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/attributes", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmAttributeDto>> getAttributes(@PathVariable final String cropName,
+										 @RequestParam(required = false) final String programUUID,
+										 @RequestBody final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest) {
+		return new ResponseEntity<>(this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest), HttpStatus.OK);
+	}
 }
