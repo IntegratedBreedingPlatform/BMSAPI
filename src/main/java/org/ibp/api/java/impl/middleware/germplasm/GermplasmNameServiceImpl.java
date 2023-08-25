@@ -1,6 +1,8 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
+import org.generationcp.middleware.api.germplasm.search.GermplasmNameSearchRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.exceptions.InvalidGermplasmNameSettingException;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
@@ -20,6 +22,7 @@ import org.springframework.validation.MapBindingResult;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -88,4 +91,10 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 			throw new ApiRuntimeException("An error has occurred when trying generate next name in sequence", e);
 		}
 	}
+
+	@Override
+	public List<GermplasmNameDto> getGermplasmNamesByGids(GermplasmNameSearchRequest germplasmNameSearchRequest) {
+		return this.germplasmNameService.getGermplasmNamesByGids(germplasmNameSearchRequest.getGids().stream().collect(Collectors.toList()));
+	}
+
 }

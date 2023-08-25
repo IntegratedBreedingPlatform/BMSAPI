@@ -2,7 +2,9 @@ package org.ibp.api.rest.germplasm;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.generationcp.middleware.api.germplasm.search.GermplasmNameSearchRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmCodeNameBatchRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.pojos.germplasm.GermplasmNameSetting;
 import org.generationcp.middleware.service.api.GermplasmCodingResult;
@@ -12,12 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -78,4 +75,12 @@ public class GermplasmNameResource {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
+	@ApiOperation(value = "Returns germplasm Names filtered by List gids", notes = "Returns germplasm Names filtered by List gids")
+	@RequestMapping(value = "/crops/{cropName}/germplasm/names", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<List<GermplasmNameDto>> getGermplasmNames(@PathVariable final String cropName,
+																@RequestParam(required = false) final String programUUID,
+																@RequestBody final GermplasmNameSearchRequest germplasmNameSearchRequest) {
+		return new ResponseEntity<>(this.germplasmNameService.getGermplasmNamesByGids(germplasmNameSearchRequest), HttpStatus.OK);
+	}
 }
