@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ObservationUnitServiceImpl implements ObservationUnitService {
@@ -74,7 +75,10 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	@Override
 	public List<ObservationLevel> getObservationLevels(final ObservationLevelFilter observationLevelFilter, final String crop) {
 		this.observationLevelFilterValidator.validate(observationLevelFilter, crop);
-		return this.middlewareObservationUnitService.getObservationLevels(observationLevelFilter);
+		return this.middlewareObservationUnitService.getObservationLevels(observationLevelFilter).stream().map(ol -> {
+			ol.setLevelName(ol.getLevelName().toLowerCase());
+			return ol;
+		}).collect(Collectors.toList());
 	}
 
 }

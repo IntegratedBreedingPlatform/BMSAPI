@@ -17,7 +17,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.validation.BindingResult;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -49,7 +48,7 @@ public class GermplasmAttributeServiceImplTest {
 	public void testGetGermplasmAttributeDtos() {
 		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
 		germplasmAttributeSearchRequest.setGids(Sets.newHashSet(GID));
-		germplasmAttributeSearchRequest.setVariableTypeId(GERMPLASM_ATTRIBUTE_TYPE_ID);
+		germplasmAttributeSearchRequest.setVariableTypeIds(Collections.singletonList(GERMPLASM_ATTRIBUTE_TYPE_ID));
 		this.germplasmAttributeServiceImpl.getGermplasmAttributeDtos(germplasmAttributeSearchRequest);
 		Mockito.verify(this.germplasmAttributeValidator).validateAttributeType(ArgumentMatchers.any(BindingResult.class),
 			ArgumentMatchers.eq(GERMPLASM_ATTRIBUTE_TYPE_ID));

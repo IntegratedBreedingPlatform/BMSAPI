@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @Api(value = "Germplasm Attribute Services")
@@ -33,7 +34,9 @@ public class GermplasmAttributeResource {
 		@RequestParam(required = false) final String programUUID) {
 		final GermplasmAttributeSearchRequest germplasmAttributeSearchRequest = new GermplasmAttributeSearchRequest();
 		germplasmAttributeSearchRequest.setGids(Sets.newHashSet(gid));
-		germplasmAttributeSearchRequest.setVariableTypeId(variableTypeId);
+		if (variableTypeId != null) {
+			germplasmAttributeSearchRequest.setVariableTypeIds(Collections.singletonList(variableTypeId));
+		}
 		germplasmAttributeSearchRequest.setProgramUUID(programUUID);
 		return new ResponseEntity<>(this.germplasmAttributeService.getGermplasmAttributeDtos(germplasmAttributeSearchRequest),
 			HttpStatus.OK);
