@@ -84,6 +84,12 @@ public class DatasetTransposedExcelGenerator extends DatasetExcelGenerator {
         final List<MeasurementVariable> nonFactorColumns = columns.stream().filter(var -> !var.isFactor()).collect(Collectors.toList());
         int nonFactorColumnStart = 0;
         final int numberOfNonFactorColumns = nonFactorColumns.size();
+
+        // Create cell styles with different borders and use them whenever necessary
+        final CellStyle leftBorderedCellStyle = this.createCellStyle(xlsSheet.getWorkbook().createCellStyle(), true, false, false);
+        final CellStyle rightBorderedCellStyle = this.createCellStyle(xlsSheet.getWorkbook().createCellStyle(), false, true, false);
+        final CellStyle borderedCellStyle = this.createCellStyle(xlsSheet.getWorkbook().createCellStyle(), true, true, false);
+
         for(final String plotNumber: observationUnitRowMap.keySet()) {
             final HSSFRow row = xlsSheet.createRow(currentRowNum++);
             // factors are the same for entries with same plot number, so we'll use the first one
@@ -101,14 +107,14 @@ public class DatasetTransposedExcelGenerator extends DatasetExcelGenerator {
                         currentColNum = this.writeSampleGenotypeDataCell(sampleGenotypeDtoList, row, currentColNum, column);
                         if (numberOfNonFactorColumns > 1) {
                             if (j == 0) {
-                                this.applyCellBorders(row.getCell(currentColNum - 1), true, false, false);
+                                row.getCell(currentColNum - 1).setCellStyle(leftBorderedCellStyle);
                             }
                             if (j == (numberOfNonFactorColumns - 1)) {
-                                this.applyCellBorders(row.getCell(currentColNum - 1), false, true, false);
+                                row.getCell(currentColNum - 1).setCellStyle(rightBorderedCellStyle);
                             }
                         } else {
                             // Add borders to both sides if there's only 1 nonfactor column
-                            this.applyCellBorders(row.getCell(currentColNum - 1), true, true, false);
+                            row.getCell(currentColNum - 1).setCellStyle(borderedCellStyle);
                         }
                     }
                 }
@@ -121,11 +127,24 @@ public class DatasetTransposedExcelGenerator extends DatasetExcelGenerator {
     private void addLastRowBottomBorder(final HSSFSheet xlsSheet, final int numberOfSubObsPerPlot, final int nonFactorColumnStart, final int numberOfNonFactorColumns) {
         final HSSFRow lastRow = xlsSheet.getRow(xlsSheet.getLastRowNum());
         final int totalNumberOfNonFactorColumns = numberOfNonFactorColumns * numberOfSubObsPerPlot;
+
+        // Create cell styles with different borders and use them whenever necessary
+        final CellStyle leftBorderedCellStyle = this.createCellStyle(xlsSheet.getWorkbook().createCellStyle(), true, false, true);
+        final CellStyle rightBorderedCellStyle = this.createCellStyle(xlsSheet.getWorkbook().createCellStyle(), false, true, true);
+        final CellStyle bottomBorderedCell = this.createCellStyle(xlsSheet.getWorkbook().createCellStyle(), false, false, true);
+        final CellStyle borderedCellStyle = this.createCellStyle(xlsSheet.getWorkbook().createCellStyle(), true, true, true);
+
         for (int i = 0; i < totalNumberOfNonFactorColumns; i++) {
             final HSSFCell cell = lastRow.getCell(nonFactorColumnStart + i);
-            final boolean hasBorderLeft = cell.getCellStyle().getBorderLeft().equals(BorderStyle.THIN);
-            final boolean hasBorderRight = cell.getCellStyle().getBorderRight().equals(BorderStyle.THIN);
-            this.applyCellBorders(cell, hasBorderLeft, hasBorderRight, true);
+            if (cell.getCellStyle().getBorderLeft().equals(BorderStyle.THIN) && cell.getCellStyle().getBorderRight().equals(BorderStyle.THIN)) {
+                cell.setCellStyle(borderedCellStyle);
+            } else if (cell.getCellStyle().getBorderLeft().equals(BorderStyle.THIN)) {
+                cell.setCellStyle(leftBorderedCellStyle);
+            } else if (cell.getCellStyle().getBorderRight().equals(BorderStyle.THIN)) {
+                cell.setCellStyle(rightBorderedCellStyle);
+            } else {
+                cell.setCellStyle(bottomBorderedCell);
+            }
         }
     }
 
@@ -246,8 +265,7 @@ public class DatasetTransposedExcelGenerator extends DatasetExcelGenerator {
         }
     }
 
-    private void applyCellBorders(final Cell cell, final boolean hasBorderLeft, final boolean hasBorderRight, final boolean hasBorderBottom) {
-        final CellStyle cellStyle = cell.getSheet().getWorkbook().createCellStyle();
+    private CellStyle createCellStyle(final CellStyle cellStyle, final boolean hasBorderLeft, final boolean hasBorderRight, final boolean hasBorderBottom) {
         if (hasBorderLeft) {
             cellStyle.setBorderLeft(BorderStyle.THIN);
         }
@@ -257,8 +275,6 @@ public class DatasetTransposedExcelGenerator extends DatasetExcelGenerator {
         if (hasBorderBottom) {
             cellStyle.setBorderBottom(BorderStyle.THIN);
         }
-
-        // Apply the cell style to the specified cell
-        cell.setCellStyle(cellStyle);
+        return cellStyle;
     }
 }
