@@ -22,7 +22,7 @@ public interface GermplasmListDataService {
 
 	List<GermplasmListMeasurementVariableDTO> getGermplasmListDataTableHeader(Integer listId, String programUUID);
 
-	void updateGermplasmListDataView(Integer listId, List<GermplasmListDataUpdateViewDTO> columns);
+	void updateGermplasmListDataView(Integer listId, List<GermplasmListDataUpdateViewDTO> columns, String programUUID);
 
 	void fillWithCrossExpansion(Integer listId, Integer level);
 

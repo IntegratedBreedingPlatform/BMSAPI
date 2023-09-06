@@ -62,7 +62,7 @@ public class GermplasmListDataServiceImplTest {
 		Mockito.doNothing().when(this.germplasmListValidator).validateListIsUnlocked(germplasmList);
 		Mockito.doNothing().when(this.germplasmListDataServiceMiddleware).updateGermplasmListDataView(GERMPLASM_LIST_ID, view);
 
-		this.germplasmListDataService.updateGermplasmListDataView(GERMPLASM_LIST_ID, view);
+		this.germplasmListDataService.updateGermplasmListDataView(GERMPLASM_LIST_ID, view, PROGRAM_UUID);
 
 		Mockito.verify(this.germplasmListValidator).validateGermplasmList(GERMPLASM_LIST_ID);
 		Mockito.verify(this.germplasmListValidator).validateListIsUnlocked(germplasmList);

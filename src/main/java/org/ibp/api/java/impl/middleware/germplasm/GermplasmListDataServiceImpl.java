@@ -1,14 +1,18 @@
 package org.ibp.api.java.impl.middleware.germplasm;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataUpdateViewDTO;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListReorderEntriesRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmListDataService;
 import org.ibp.api.java.impl.middleware.common.validator.BaseValidator;
@@ -21,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.MapBindingResult;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +34,10 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class GermplasmListDataServiceImpl implements GermplasmListDataService {
+	private static final List<Integer> PEDIGREE_RELATED_COLUMN_IDS = Arrays.asList(GermplasmListStaticColumns.IMMEDIATE_SOURCE_GID.getTermId(),
+			GermplasmListStaticColumns.IMMEDIATE_SOURCE_NAME.getTermId(), GermplasmListStaticColumns.GROUP_SOURCE_GID.getTermId(), GermplasmListStaticColumns.GROUP_SOURCE_NAME.getTermId(),
+			GermplasmListStaticColumns.CROSS.getTermId(), GermplasmListStaticColumns.FEMALE_PARENT_GID.getTermId(), GermplasmListStaticColumns.FEMALE_PARENT_NAME.getTermId(),
+			GermplasmListStaticColumns.MALE_PARENT_GID.getTermId(), GermplasmListStaticColumns.MALE_PARENT_NAME.getTermId());
 
 	@Autowired
 	private org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService germplasmListDataService;
@@ -56,21 +65,35 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	@Override
 	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId, final String programUUID) {
 		this.germplasmListValidator.validateGermplasmList(listId);
-
-		return this.germplasmListDataService.getGermplasmListColumns(listId, programUUID);
+		final List<GermplasmListColumnDTO> columns = this.germplasmListDataService.getGermplasmListColumns(listId, programUUID);
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			return columns.stream().filter(column -> !PEDIGREE_RELATED_COLUMN_IDS.contains(column.getId())).collect(Collectors.toList());
+		}
+		return columns;
 	}
 
 	@Override
 	public List<GermplasmListMeasurementVariableDTO> getGermplasmListDataTableHeader(final Integer listId, final String programUUID) {
 		this.germplasmListValidator.validateGermplasmList(listId);
-
-		return this.germplasmListDataService.getGermplasmListDataTableHeader(listId, programUUID);
+		final List<GermplasmListMeasurementVariableDTO> tableHeaders = this.germplasmListDataService.getGermplasmListDataTableHeader(listId, programUUID);
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			return tableHeaders.stream().filter(header -> !PEDIGREE_RELATED_COLUMN_IDS.contains(header.getTermId())).collect(Collectors.toList());
+		}
+		return tableHeaders;
 	}
 
 	@Override
-	public void updateGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view) {
+	public void updateGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view, final String programUUID) {
 		final GermplasmList germplasmList = this.germplasmListValidator.validateGermplasmList(listId);
 		this.germplasmListValidator.validateListIsUnlocked(germplasmList);
+		// Add the Pedigree related columns existing in the list when user has no VIEW_PEDIGREE_INFORMATION_PERMISSIONS
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			final List<GermplasmListMeasurementVariableDTO> pedigreeRelatedHeaders = this.germplasmListDataService.getGermplasmListDataTableHeader(listId, programUUID).
+					stream().filter(header -> PEDIGREE_RELATED_COLUMN_IDS.contains(header.getTermId())).collect(Collectors.toList());
+			pedigreeRelatedHeaders.forEach(header -> {
+				view.add(new GermplasmListDataUpdateViewDTO(header.getTermId(), null, GermplasmListColumnCategory.STATIC));
+			});
+		}
 		this.germplasmListValidator.validateMaxColumnsAllowed(germplasmList, view);
 		this.germplasmListDataService.updateGermplasmListDataView(listId, view);
 	}

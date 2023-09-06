@@ -323,7 +323,7 @@ public class GermplasmListResource {
 		@PathVariable final Integer listId,
 		@RequestParam(required = false) final String programUUID,
 		@RequestBody final List<GermplasmListDataUpdateViewDTO> view) {
-		this.germplasmListDataService.updateGermplasmListDataView(listId, view);
+		this.germplasmListDataService.updateGermplasmListDataView(listId, view, programUUID);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
