@@ -5,6 +5,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.program.ProgramDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -20,6 +21,7 @@ import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateReq
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
@@ -66,6 +68,11 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class StudyEntryServiceImpl implements StudyEntryService {
+
+	public static final List<Integer> PEDIGREE_RELATED_COLUMN_IDS = Arrays.asList(StudyEntryGermplasmDescriptorColumns.CROSS.getId(),
+			StudyEntryGermplasmDescriptorColumns.IMMEDIATE_SOURCE_NAME.getId(), StudyEntryGermplasmDescriptorColumns.GROUP_SOURCE_NAME.getId(),
+			StudyEntryGermplasmDescriptorColumns.FEMALE_PARENT_GID.getId(), StudyEntryGermplasmDescriptorColumns.FEMALE_PARENT_NAME.getId(),
+			StudyEntryGermplasmDescriptorColumns.MALE_PARENT_GID.getId(), StudyEntryGermplasmDescriptorColumns.MALE_PARENT_NAME.getId());
 
 	@Resource
 	private StudyValidator studyValidator;
@@ -272,6 +279,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		sortedColumns.addAll(entryDetails.values());
 
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			return sortedColumns.stream().filter(column -> !PEDIGREE_RELATED_COLUMN_IDS.contains(column.getTermId())).collect(Collectors.toList());
+		}
 		return sortedColumns;
 	}
 
@@ -329,7 +339,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId, final String programUUID) {
 		this.studyValidator.validate(studyId, false);
-		return this.middlewareStudyEntryService.getStudyEntryColumns(studyId, programUUID);
+		final List<StudyEntryColumnDTO> columns = this.middlewareStudyEntryService.getStudyEntryColumns(studyId, programUUID);
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			return columns.stream().filter(column -> !PEDIGREE_RELATED_COLUMN_IDS.contains(column.getId())).collect(Collectors.toList());
+		}
+		return columns;
 	}
 
 	@Override

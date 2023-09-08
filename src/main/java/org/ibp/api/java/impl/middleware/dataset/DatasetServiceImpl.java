@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.api.brapi.v1.observation.ObservationDTO;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -24,6 +25,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitEntryReplaceRequest;
@@ -50,6 +52,7 @@ import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService
 import org.ibp.api.java.impl.middleware.name.validator.GermplasmNameTypeValidator;
 import org.ibp.api.java.impl.middleware.ontology.validator.VariableValidator;
 import org.ibp.api.java.impl.middleware.study.ObservationUnitsMetadata;
+import org.ibp.api.java.impl.middleware.study.StudyEntryServiceImpl;
 import org.ibp.api.java.impl.middleware.study.validator.StudyEntryValidator;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.dataset.DatasetDTO;
@@ -158,7 +161,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.datasetValidator.validateDataset(studyId, datasetId);
 
-		return this.middlewareDatasetService.getObservationSetColumns(studyId, datasetId, draftMode);
+		return this.removePedigreeRelatedVariablesIfNecessary(this.middlewareDatasetService.getObservationSetColumns(studyId, datasetId, draftMode));
 	}
 
 	@Override
@@ -169,7 +172,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.datasetValidator.validateDataset(studyId, datasetId);
 
-		return this.middlewareDatasetService.getObservationSetVariables(datasetId);
+		return this.removePedigreeRelatedVariablesIfNecessary(this.middlewareDatasetService.getObservationSetVariables(datasetId));
 	}
 
 	@Override
@@ -1185,8 +1188,18 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		this.studyValidator.validateUpdateStudyEntryColumnsWithSupportedVariableTypes(plotDatasetPropertiesDTO.getVariableIds(),
 			programUUID);
-		this.studyValidator.validateMaxStudyEntryColumnsAllowed(plotDatasetPropertiesDTO, programUUID);
 
+		// Add the Pedigree related variables existing in the dataset when user has no VIEW_PEDIGREE_INFORMATION_PERMISSIONS
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			final org.generationcp.middleware.domain.dms.DatasetDTO plotDataset = this.middlewareDatasetService
+					.getDatasetsWithVariables(studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())).get(0);
+			plotDataset.getVariables().forEach(variable -> LOG.error(variable.getTermId() + " " + variable.getName()));
+			final List<Integer> pedigreeRelatedVariables = plotDataset.getVariables().
+					stream().filter(variable -> StudyEntryServiceImpl.PEDIGREE_RELATED_COLUMN_IDS.contains(variable.getTermId()))
+					.map(MeasurementVariable::getTermId).collect(Collectors.toList());
+			plotDatasetPropertiesDTO.getVariableIds().addAll(pedigreeRelatedVariables);
+		}
+		this.studyValidator.validateMaxStudyEntryColumnsAllowed(plotDatasetPropertiesDTO, programUUID);
 		this.middlewareDatasetService.updatePlotDatasetProperties(studyId, plotDatasetPropertiesDTO, programUUID);
 	}
 
@@ -1244,5 +1257,13 @@ public class DatasetServiceImpl implements DatasetService {
 	private Optional<MeasurementVariable> getObservationUnitVariable(final List<MeasurementVariable> columns) {
 		return columns.stream().filter(variable -> variable.getVariableType().getId() == TermId.OBSERVATION_UNIT.getId())
 				.findFirst();
+	}
+
+	private List<MeasurementVariable> removePedigreeRelatedVariablesIfNecessary(final List<MeasurementVariable> measurementVariables) {
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			return measurementVariables.stream().filter(variable -> !StudyEntryServiceImpl.PEDIGREE_RELATED_COLUMN_IDS.contains(variable.getTermId()))
+					.collect(Collectors.toList());
+		}
+		return measurementVariables;
 	}
 }

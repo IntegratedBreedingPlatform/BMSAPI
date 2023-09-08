@@ -14,6 +14,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.genotype.SampleGenotypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -33,11 +34,13 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.Util;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
 import org.ibp.api.java.dataset.DatasetService;
+import org.ibp.api.java.impl.middleware.study.StudyEntryServiceImpl;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -355,11 +358,15 @@ public class DatasetExcelGenerator implements DatasetFileGenerator {
 						.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 							VariableType.ENVIRONMENT_CONDITION.getId()));
 
-		final List<MeasurementVariable> plotVariables =
+		List<MeasurementVariable> plotVariables =
 			this.datasetService.getMeasurementVariables(plotDatasetId, Lists
 				.newArrayList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId(),
 					VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId(), VariableType.GERMPLASM_ATTRIBUTE.getId(),
 					VariableType.GERMPLASM_PASSPORT.getId()));
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			plotVariables = plotVariables.stream().filter(variable -> !StudyEntryServiceImpl.PEDIGREE_RELATED_COLUMN_IDS.contains(variable.getTermId()))
+					.collect(Collectors.toList());
+		}
 
 		final List<MeasurementVariable> datasetVariables = this.datasetService
 			.getMeasurementVariables(dataSetDto.getDatasetId(), Lists

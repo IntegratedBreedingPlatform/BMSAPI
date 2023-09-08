@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.commons.util.StringUtil;
@@ -19,10 +20,12 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.MethodService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.java.dataset.DatasetFileGenerator;
+import org.ibp.api.java.impl.middleware.study.StudyEntryServiceImpl;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 
 import javax.annotation.Resource;
@@ -33,6 +36,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportService {
 
@@ -181,8 +185,7 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 					Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.EXPERIMENTAL_DESIGN.getId(),
 						VariableType.TREATMENT_FACTOR.getId(), VariableType.OBSERVATION_UNIT.getId(), VariableType.ENTRY_DETAIL.getId(),
 						VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId()));
-
-		final List<MeasurementVariable> allVariables = new ArrayList<>();
+		List<MeasurementVariable> allVariables = new ArrayList<>();
 		allVariables.addAll(plotDataSetColumns);
 		//Add variables that are specific to the sub-observation dataset types
 		if (Arrays.stream(subObsDatasetTypeIds.toArray()).anyMatch(dataSetDTO.getDatasetTypeId()::equals)) {
@@ -194,6 +197,11 @@ public abstract class BaseDatasetKsuExportService extends AbstractDatasetExportS
 						VariableType.GERMPLASM_ATTRIBUTE.getId(),
 						VariableType.GERMPLASM_PASSPORT.getId()));
 			allVariables.addAll(subObservationSetColumns);
+		}
+
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			allVariables = allVariables.stream().filter(variable -> !StudyEntryServiceImpl.PEDIGREE_RELATED_COLUMN_IDS.contains(variable.getTermId()))
+					.collect(Collectors.toList());
 		}
 		return this.moveSelectedVariableInTheFirstColumn(allVariables, TermId.OBS_UNIT_ID.getId());
 	}

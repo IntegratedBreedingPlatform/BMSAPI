@@ -1,5 +1,6 @@
 package org.ibp.api.java.impl.middleware.dataset;
 
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -7,9 +8,11 @@ import org.generationcp.middleware.domain.genotype.SampleGenotypeDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeSearchRequestDTO;
 import org.generationcp.middleware.domain.genotype.SampleGenotypeVariablesSearchFilter;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.ibp.api.exception.ResourceNotFoundException;
 import org.ibp.api.java.dataset.DatasetExportService;
+import org.ibp.api.java.impl.middleware.study.StudyEntryServiceImpl;
 import org.ibp.api.rest.dataset.ObservationUnitData;
 import org.ibp.api.rest.dataset.ObservationUnitRow;
 import org.springframework.stereotype.Service;
@@ -56,8 +59,11 @@ public class DatasetCSVExportServiceImpl extends AbstractDatasetExportService im
 	@Override
 	public List<MeasurementVariable> getColumns(final int studyId, final DatasetDTO datasetDTO, final boolean includeSampleGenotypeValues) {
 
-		final List<MeasurementVariable> allVariables = new ArrayList<>(this.studyDatasetService.getAllDatasetVariables(studyId, datasetDTO.getDatasetId()));
-
+		List<MeasurementVariable> allVariables = new ArrayList<>(this.studyDatasetService.getAllDatasetVariables(studyId, datasetDTO.getDatasetId()));
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			allVariables = allVariables.stream().filter(variable -> !StudyEntryServiceImpl.PEDIGREE_RELATED_COLUMN_IDS.contains(variable.getTermId()))
+					.collect(Collectors.toList());
+		}
 		if (includeSampleGenotypeValues) {
 			// Add Genotype Marker variables to the list of columns
 			final SampleGenotypeVariablesSearchFilter filter = new SampleGenotypeVariablesSearchFilter();

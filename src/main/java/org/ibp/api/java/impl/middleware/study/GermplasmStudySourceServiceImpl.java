@@ -1,5 +1,7 @@
 package org.ibp.api.java.impl.middleware.study;
 
+import org.generationcp.commons.security.SecurityUtil;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
@@ -41,13 +43,16 @@ public class GermplasmStudySourceServiceImpl implements GermplasmStudySourceServ
 		final List<GermplasmStudySourceDto> germplasmStudySourceDtoList = this.germplasmStudySourceMiddlewareService
 			.getGermplasmStudySources(germplasmStudySourceSearchRequest, pageable);
 
-		final Map<Integer, String> crossExpansionsMap = this.pedigreeService
-			.getCrossExpansions(germplasmStudySourceDtoList.stream().map(GermplasmStudySourceDto::getGid).collect(Collectors.toSet()), null,
-				this.crossExpansionProperties);
+		if (SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			final Map<Integer, String> crossExpansionsMap = this.pedigreeService
+					.getCrossExpansions(germplasmStudySourceDtoList.stream().map(GermplasmStudySourceDto::getGid).collect(Collectors.toSet()), null,
+							this.crossExpansionProperties);
 
-		for (final GermplasmStudySourceDto germplasmStudySourceDto : germplasmStudySourceDtoList) {
-			germplasmStudySourceDto.setCross(crossExpansionsMap.get(germplasmStudySourceDto.getGid()));
+			for (final GermplasmStudySourceDto germplasmStudySourceDto : germplasmStudySourceDtoList) {
+				germplasmStudySourceDto.setCross(crossExpansionsMap.get(germplasmStudySourceDto.getGid()));
+			}
 		}
+
 		return germplasmStudySourceDtoList;
 	}
 
