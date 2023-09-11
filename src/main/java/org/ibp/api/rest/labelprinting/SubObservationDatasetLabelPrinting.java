@@ -3,6 +3,7 @@ package org.ibp.api.rest.labelprinting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
@@ -20,12 +21,14 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.java.impl.middleware.dataset.validator.DatasetValidator;
 import org.ibp.api.java.impl.middleware.inventory.study.StudyTransactionsService;
+import org.ibp.api.java.impl.middleware.study.StudyEntryServiceImpl;
 import org.ibp.api.java.impl.middleware.study.validator.StudyValidator;
 import org.ibp.api.rest.common.FileType;
 import org.ibp.api.rest.labelprinting.domain.Field;
@@ -224,10 +227,14 @@ public class SubObservationDatasetLabelPrinting extends ObservationDatasetLabelP
 		final List<MeasurementVariable> treatmentFactors =
 			this.middlewareDatasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TREATMENT_FACTOR.getId()));
 
-		final List<MeasurementVariable> plotVariables = this.middlewareDatasetService.getObservationSetVariables(
+		List<MeasurementVariable> plotVariables = this.middlewareDatasetService.getObservationSetVariables(
 			plotDatasetId,
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.GERMPLASM_DESCRIPTOR.getId(),
 				VariableType.ENTRY_DETAIL.getId()));
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			plotVariables = plotVariables.stream().filter(variable -> !StudyEntryServiceImpl.PEDIGREE_RELATED_COLUMN_IDS.contains(variable.getTermId()))
+					.collect(Collectors.toList());
+		}
 
 		final List<MeasurementVariable> datasetVariables = this.middlewareDatasetService
 			.getObservationSetVariables(labelsInfoInput.getDatasetId(), Arrays.asList(VariableType.OBSERVATION_UNIT.getId()));

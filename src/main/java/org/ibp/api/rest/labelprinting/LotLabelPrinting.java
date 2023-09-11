@@ -2,6 +2,7 @@ package org.ibp.api.rest.labelprinting;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
@@ -11,6 +12,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.service.api.inventory.LotAttributeService;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.exception.NotSupportedException;
@@ -211,7 +213,12 @@ public class LotLabelPrinting extends LabelPrintingStrategy {
 
 		// Germplasm labels
 		final LabelType germplasmLabelTypes = new LabelType(GERMPLASM_FIXED_LABEL_TYPES.getTitle(), GERMPLASM_FIXED_LABEL_TYPES.getKey());
-		germplasmLabelTypes.setFields(new ArrayList<>(GERMPLASM_FIXED_LABEL_TYPES.getFields()));
+		List<Field> fields = new ArrayList<>(GERMPLASM_FIXED_LABEL_TYPES.getFields());
+		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
+			fields.removeIf(field -> field.getId().equals(GERMPLASM_FIELD.CROSS.getId()));
+		}
+
+		germplasmLabelTypes.setFields(fields);
 
 		// Get attributtes
 		final Integer searchRequestId = labelsInfoInput.getSearchRequestId();

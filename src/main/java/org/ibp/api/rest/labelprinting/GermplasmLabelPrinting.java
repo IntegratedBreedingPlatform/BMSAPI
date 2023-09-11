@@ -2,6 +2,7 @@ package org.ibp.api.rest.labelprinting;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
@@ -16,6 +17,7 @@ import org.generationcp.middleware.domain.labelprinting.LabelPrintingPresetDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.api.SearchRequestService;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.ibp.api.domain.common.LabelPrintingStaticField;
 import org.ibp.api.exception.ApiRequestValidationException;
 import org.ibp.api.java.germplasm.GermplasmService;
@@ -70,6 +72,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 	List<Integer> germplasmFieldIds;
 
 	List<SortableFieldDto> sortedByFields;
+
+	boolean hasViewPedigreeDetailsPermissions;
 
 	public static final String GERMPLASM_DATE = "GERMPLASM DATE";
 	public static final String METHOD_ABBREV = "METHOD ABBREV";
@@ -128,9 +132,11 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 
 		this.defaultGermplasmDetailsFields = this.buildGermplasmDetailsFields();
 		this.germplasmFieldIds = this.defaultGermplasmDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
-
-		this.defaultPedigreeDetailsFields = this.buildPedigreeDetailsFields();
-		this.pedigreeFieldIds = this.defaultPedigreeDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
+		this.hasViewPedigreeDetailsPermissions = SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS);
+		if (this.hasViewPedigreeDetailsPermissions) {
+			this.defaultPedigreeDetailsFields = this.buildPedigreeDetailsFields();
+			this.pedigreeFieldIds = this.defaultPedigreeDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
+		}
 
 	}
 
@@ -180,11 +186,13 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		germplasmType.setFields(this.defaultGermplasmDetailsFields);
 		labelTypes.add(germplasmType);
 
-		// Pedigree labels
-		final String pedigreePropValue = this.getMessage("label.printing.pedigree.details");
-		final LabelType pedigreeType = new LabelType(pedigreePropValue, pedigreePropValue);
-		pedigreeType.setFields(this.defaultPedigreeDetailsFields);
-		labelTypes.add(pedigreeType);
+		if (this.hasViewPedigreeDetailsPermissions) {
+			// Pedigree labels
+			final String pedigreePropValue = this.getMessage("label.printing.pedigree.details");
+			final LabelType pedigreeType = new LabelType(pedigreePropValue, pedigreePropValue);
+			pedigreeType.setFields(this.defaultPedigreeDetailsFields);
+			labelTypes.add(pedigreeType);
+		}
 
 		this.populateNamesAndAttributesLabelType(programUUID, labelTypes, germplasmSearchResponses);
 		return labelTypes;
@@ -505,6 +513,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final String femaleParentPreferredNamePropValue = this.getMessage("label.printing.field.pedigree.female.parent.preferred.name");
 		final String immediateSourceGIDPropValue = this.getMessage("label.printing.field.pedigree.immediate.souce.gid");
 		final String immediateSourceNamePropValue = this.getMessage("label.printing.field.pedigree.immediate.source.name");
+		final String groupSourceGidPropValue = this.getMessage("label.printing.field.germplasm.group.source.gid");
+		final String groupSourcePreferredNamePropValue = this.getMessage("label.printing.field.germplasm.group.source.preferred.name");
 
 		return ImmutableList.<Field>builder()
 			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.CROSS.getFieldId(), crossPropValue))
@@ -514,6 +524,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			.add(new Field(FieldType.VARIABLE, TermId.CROSS_FEMALE_PREFERRED_NAME.getId(), femaleParentPreferredNamePropValue))
 			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.IMMEDIATE_SOURCE_GID.getFieldId(), immediateSourceGIDPropValue))
 			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.IMMEDIATE_SOURCE_NAME.getFieldId(), immediateSourceNamePropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId(), groupSourceGidPropValue))
+			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId(), groupSourcePreferredNamePropValue))
 			.build();
 	}
 
@@ -532,8 +544,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		final String methodCodePropValue = this.getMessage("label.printing.field.germplasm.method.code");
 		final String methodNumberPropValue = this.getMessage("label.printing.field.germplasm.method.number");
 		final String methodGroupPropValue = this.getMessage("label.printing.field.germplasm.method.group");
-		final String groupSourceGidPropValue = this.getMessage("label.printing.field.germplasm.group.source.gid");
-		final String groupSourcePreferredNamePropValue = this.getMessage("label.printing.field.germplasm.group.source.preferred.name");
 		final String availablePropValue = this.getMessage("label.printing.field.germplasm.available");
 		final String unitsPropValue = this.getMessage("label.printing.field.germplasm.units");
 		final String lotsPropValue = this.getMessage("label.printing.field.germplasm.lots");
@@ -552,8 +562,6 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.METHOD_CODE.getFieldId(), methodCodePropValue))
 			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.METHOD_NUMBER.getFieldId(), methodNumberPropValue))
 			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.METHOD_GROUP.getFieldId(), methodGroupPropValue))
-			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.GROUP_SOURCE_GID.getFieldId(), groupSourceGidPropValue))
-			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.GROUP_SOURCE_PREFERRED_NAME.getFieldId(), groupSourcePreferredNamePropValue))
 			.add(new Field(FieldType.VARIABLE, TermId.AVAILABLE_INVENTORY.getId(), availablePropValue))
 			.add(new Field(FieldType.VARIABLE, TermId.UNITS_INVENTORY.getId(), unitsPropValue))
 			.add(new Field(FieldType.STATIC, LabelPrintingStaticField.LOTS.getFieldId(), lotsPropValue))

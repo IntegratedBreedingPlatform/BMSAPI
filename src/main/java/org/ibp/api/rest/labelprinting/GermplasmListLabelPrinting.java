@@ -1,6 +1,7 @@
 package org.ibp.api.rest.labelprinting;
 
 import org.generationcp.commons.constant.ToolSection;
+import org.generationcp.commons.security.SecurityUtil;
 import org.generationcp.commons.util.FileNameGenerator;
 import org.generationcp.commons.util.FileUtils;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
@@ -14,6 +15,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
+import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
@@ -77,8 +79,11 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		this.defaultGermplasmDetailsFields = this.buildGermplasmDetailsFields();
 		this.germplasmFieldIds = this.defaultGermplasmDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
 
-		this.defaultPedigreeDetailsFields = this.buildPedigreeDetailsFields();
-		this.pedigreeFieldIds = this.defaultPedigreeDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
+		this.hasViewPedigreeDetailsPermissions = SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS);
+		if (this.hasViewPedigreeDetailsPermissions) {
+			this.defaultPedigreeDetailsFields = this.buildPedigreeDetailsFields();
+			this.pedigreeFieldIds = this.defaultPedigreeDetailsFields.stream().map(Field::getId).collect(Collectors.toList());
+		}
 
 	}
 
@@ -129,7 +134,9 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		final String germplasmPropValue = this.getMessage("label.printing.germplasm.details");
 		final LabelType germplasmType = new LabelType(germplasmPropValue, germplasmPropValue);
 		germplasmType.setFields(new ArrayList<>(this.defaultGermplasmDetailsFields));
-		germplasmType.getFields().addAll(new ArrayList<>(this.defaultPedigreeDetailsFields));
+		if (this.hasViewPedigreeDetailsPermissions) {
+			germplasmType.getFields().addAll(new ArrayList<>(this.defaultPedigreeDetailsFields));
+		}
 		labelTypes.add(germplasmType);
 
 		this.populateNamesAndAttributesLabelType(programUUID, labelTypes, germplasmSearchResponseList);

@@ -1193,7 +1193,6 @@ public class DatasetServiceImpl implements DatasetService {
 		if (!SecurityUtil.hasAnyAuthority(PermissionsEnum.VIEW_PEDIGREE_INFORMATION_PERMISSIONS)) {
 			final org.generationcp.middleware.domain.dms.DatasetDTO plotDataset = this.middlewareDatasetService
 					.getDatasetsWithVariables(studyId, Collections.singleton(DatasetTypeEnum.PLOT_DATA.getId())).get(0);
-			plotDataset.getVariables().forEach(variable -> LOG.error(variable.getTermId() + " " + variable.getName()));
 			final List<Integer> pedigreeRelatedVariables = plotDataset.getVariables().
 					stream().filter(variable -> StudyEntryServiceImpl.PEDIGREE_RELATED_COLUMN_IDS.contains(variable.getTermId()))
 					.map(MeasurementVariable::getTermId).collect(Collectors.toList());
