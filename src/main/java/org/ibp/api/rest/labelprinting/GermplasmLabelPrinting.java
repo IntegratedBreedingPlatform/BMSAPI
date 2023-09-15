@@ -597,4 +597,8 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		return this.defaultGermplasmDetailsFields;
 	}
 
+	void setHasViewPedigreeDetailsPermissions(final boolean hasViewPedigreeDetailsPermissions) {
+		this.hasViewPedigreeDetailsPermissions = hasViewPedigreeDetailsPermissions;
+	}
+
 }

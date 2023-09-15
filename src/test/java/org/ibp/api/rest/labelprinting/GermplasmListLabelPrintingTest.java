@@ -192,7 +192,6 @@ public class GermplasmListLabelPrintingTest {
 	public void testGetAvailableLabelTypes() {
 		this.labelPrinting.initStaticFields();
 		final List<Field> germplasmFields = new ArrayList<>(this.labelPrinting.getDefaultGermplasmDetailsFields());
-		germplasmFields.addAll(this.labelPrinting.defaultPedigreeDetailsFields);
 
 		final List<LabelType> labelTypes = this.labelPrinting.getAvailableLabelTypes(this.labelsInfoInput, PROGRAM_UUID);
 		Mockito.verify(this.germplasmService).searchGermplasm(ArgumentMatchers.any(GermplasmSearchRequest.class),

@@ -298,6 +298,7 @@ public class StudyEntryServiceImplTest {
 
 		final MeasurementVariable entryCodeVariable = new MeasurementVariable(TermId.ENTRY_CODE.getId());
 		final MeasurementVariable entryNoVariable = new MeasurementVariable(TermId.ENTRY_NO.getId());
+		entryNoVariable.setVariableType(VariableType.ENTRY_DETAIL);
 		final MeasurementVariable designationVariable = new MeasurementVariable(TermId.DESIG.getId());
 		final MeasurementVariable crossVariable = new MeasurementVariable(TermId.CROSS.getId());
 		final MeasurementVariable gidVariable = new MeasurementVariable(TermId.GID.getId());
@@ -314,11 +315,10 @@ public class StudyEntryServiceImplTest {
 
 		final List<MeasurementVariable> results = this.studyEntryService.getEntryTableHeader(studyId);
 
-		MatcherAssert.assertThat(results, IsCollectionWithSize.hasSize(9));
+		MatcherAssert.assertThat(results, IsCollectionWithSize.hasSize(7));
 		MatcherAssert.assertThat(entryCodeVariable, IsIn.in(results));
 		MatcherAssert.assertThat(entryNoVariable, IsIn.in(results));
 		MatcherAssert.assertThat(designationVariable, IsIn.in(results));
-		MatcherAssert.assertThat(crossVariable, IsIn.in(results));
 		MatcherAssert.assertThat(gidVariable, IsIn.in(results));
 		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_UNIT.getId()), IsIn.in(results));
 		MatcherAssert.assertThat(new MeasurementVariable(TermId.GID_AVAILABLE_BALANCE.getId()), IsIn.in(results));

@@ -140,6 +140,7 @@ public class GermplasmLabelPrintingTest {
 	@Test
 	public void testGetAvailableLabelTypes() {
 		this.germplasmLabelPrinting.initStaticFields();
+		this.germplasmLabelPrinting.setHasViewPedigreeDetailsPermissions(true);
 		final List<LabelType> labelTypes = this.germplasmLabelPrinting.getAvailableLabelTypes(this.labelsInfoInput, PROGRAM_UUID);
 
 		final Map<String, LabelType> labelTypeMap = labelTypes.stream().collect(Collectors.toMap(LabelType::getKey, Function.identity()));
