@@ -164,7 +164,9 @@ public class GermplasmListLabelPrinting extends GermplasmLabelPrinting {
 		//Get Germplasm names, attributes, entry details data
 		final List<Integer> germplasmFieldIds = new ArrayList<>();
 		germplasmFieldIds.addAll(this.germplasmFieldIds);
-		germplasmFieldIds.addAll(this.pedigreeFieldIds);
+		if (this.hasViewPedigreeDetailsPermissions) {
+			germplasmFieldIds.addAll(this.pedigreeFieldIds);
+		}
 		final Set<String> combinedKeys = this.getSelectedFieldIds(labelsGeneratorInput);
 		final boolean fieldsContainsNonGermplasmFields =
 			combinedKeys.stream().anyMatch(fieldId -> !germplasmFieldIds.contains(fieldId));

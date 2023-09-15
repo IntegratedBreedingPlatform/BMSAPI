@@ -239,7 +239,9 @@ public class GermplasmLabelPrinting extends LabelPrintingStrategy {
 		//Get Germplasm names and attributes data
 		final List<Integer> nonNameAndAttributeIds = new ArrayList<>();
 		nonNameAndAttributeIds.addAll(this.germplasmFieldIds);
-		nonNameAndAttributeIds.addAll(this.pedigreeFieldIds);
+		if (this.hasViewPedigreeDetailsPermissions) {
+			nonNameAndAttributeIds.addAll(this.pedigreeFieldIds);
+		}
 		final Set<String> combinedKeys = this.getSelectedFieldIds(labelsGeneratorInput);
 		final boolean fieldsContainsNamesOrAttributes =
 			combinedKeys.stream().anyMatch(fieldId -> !nonNameAndAttributeIds.contains(LabelPrintingFieldUtils.getFieldIdFromCombinedKey(fieldId)));
