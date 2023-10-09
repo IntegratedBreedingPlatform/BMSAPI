@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.commons.util.CollectionTransformationUtil;
+import org.generationcp.middleware.api.crossplan.CrossPlanSearchRequest;
+import org.generationcp.middleware.api.crossplan.CrossPlanSearchResponse;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
@@ -13,6 +15,7 @@ import org.ibp.api.java.crossplan.CrossPlanService;
 import org.ibp.api.rest.crossplan.CrossPlanDesignInput;
 import org.ibp.api.rest.crossplan.CrossPlanPreview;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -32,6 +35,9 @@ public class CrossPlanServiceImpl implements CrossPlanService {
     @Autowired
     private PedigreeService pedigreeService;
 
+    @Autowired
+
+    private org.generationcp.middleware.service.api.crossplan.CrossPlanService crossPlanServiceMiddleware;
     @Resource
     private CrossExpansionProperties crossExpansionProperties;
 
@@ -158,5 +164,15 @@ public class CrossPlanServiceImpl implements CrossPlanService {
     @Override
     public void saveCrossPlan() {
 
+    }
+
+    @Override
+    public Long countSearchCrossPlans(String programUUID, CrossPlanSearchRequest crossPlanSearchRequest) {
+        return this.crossPlanServiceMiddleware.countSearchCrossPlans(programUUID,crossPlanSearchRequest);
+    }
+
+    @Override
+    public List<CrossPlanSearchResponse> searchCrossPlans(String programUUID, CrossPlanSearchRequest crossPlanSearchRequest, Pageable pageable) {
+        return this.crossPlanServiceMiddleware.searchCrossPlans(programUUID, crossPlanSearchRequest, pageable);
     }
 }
